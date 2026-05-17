@@ -105,18 +105,23 @@ def resend_verify_domain(api_key: str, domain_id: str) -> dict:
 
 def hostinger_push_records(token: str, root_domain: str, records: list[dict]) -> tuple[bool, str]:
     """Push DKIM / SPF / DMARC records via the Hostinger DNS REST endpoint.
-    Returns (ok, message). Endpoint shape is the same as the MCP tool the
-    chat uses: PATCH /api/domains/v1/portfolio/{domain}/dns/records."""
-    url = f"{HOSTINGER_API}/domains/v1/portfolio/{root_domain}/dns/records"
+    Returns (ok, message).
+
+    Endpoint discovered 2026-05-17 by direct probing — the actual working path
+    is PUT /api/dns/v1/zones/{domain} (not /domains/v1/portfolio/.../dns/records
+    as the older Hostinger docs suggest). With overwrite=false the API merges
+    new records into the existing zone without deleting anything, which is
+    what we want for autoprovision."""
+    url = f"{HOSTINGER_API}/dns/v1/zones/{root_domain}"
     body = {"overwrite": False, "zone": [_record_payload(r) for r in records]}
     try:
         with httpx.Client(timeout=30) as c:
-            r = c.patch(url,
-                        headers={"Authorization": f"Bearer {token}",
-                                 "Content-Type": "application/json",
-                                 "Accept": "application/json"},
-                        json=body)
-        if r.status_code in (200, 201, 204):
+            r = c.put(url,
+                      headers={"Authorization": f"Bearer {token}",
+                               "Content-Type": "application/json",
+                               "Accept": "application/json"},
+                      json=body)
+        if r.status_code in (200, 201, 202, 204):
             return True, f"DNS push ok ({r.status_code})"
         return False, f"DNS push failed: {r.status_code} {r.text[:300]}"
     except Exception as e:
