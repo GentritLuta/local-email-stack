@@ -1,0 +1,122 @@
+﻿[
+    {
+        "File":  "AI Finder.json",
+        "Name":  "AI Finder",
+        "Active":  true,
+        "NodeCount":  12,
+        "Types":  "n8n-nodes-base.googleSheetsx2, n8n-nodes-base.noOpx1, n8n-nodes-base.splitInBatchesx1, @n8n/n8n-nodes-langchain.lmChatOpenAix1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.codex1, n8n-nodes-base.waitx1, n8n-nodes-base.ifx1, n8n-nodes-base.limitx1, n8n-nodes-base.setx1, @n8n/n8n-nodes-langchain.agentx1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 2, openAiApi=OpenAi account 3",
+        "HttpUrls":  "",
+        "Models":  "model=@{__rl=True; value=gpt-5.4; mode=list; cachedResultName=gpt-5.4}"
+    },
+    {
+        "File":  "Close CRM.json",
+        "Name":  "Close CRM",
+        "Active":  true,
+        "NodeCount":  12,
+        "Types":  "n8n-nodes-base.codex2, n8n-nodes-base.noOpx1, n8n-nodes-base.splitInBatchesx1, n8n-nodes-base.limitx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.waitx1, n8n-nodes-base.googleSheetsx1, n8n-nodes-base.setx1, n8n-nodes-base.httpRequestx1, n8n-nodes-base.manualTriggerx1, n8n-nodes-base.stickyNotex1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 3, httpBasicAuth=Unnamed credential",
+        "HttpUrls":  "https://api.close.com/api/v1/lead/",
+        "Models":  ""
+    },
+    {
+        "File":  "Daily Reset.json",
+        "Name":  "Daily Reset",
+        "Active":  true,
+        "NodeCount":  4,
+        "Types":  "n8n-nodes-base.googleSheetsx1, n8n-nodes-base.stickyNotex1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.codex1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 2",
+        "HttpUrls":  "",
+        "Models":  ""
+    },
+    {
+        "File":  "Email Verifier_Finder.json",
+        "Name":  "Email Verifier/Finder",
+        "Active":  true,
+        "NodeCount":  18,
+        "Types":  "n8n-nodes-base.codex3, n8n-nodes-base.httpRequestx2, n8n-nodes-base.googleSheetsx2, n8n-nodes-base.ifx2, n8n-nodes-base.setx2, n8n-nodes-base.manualTriggerx1, n8n-nodes-anymailfinder-official.anymailFinderx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.noOpx1, n8n-nodes-base.splitInBatchesx1, n8n-nodes-base.waitx1, n8n-nodes-base.limitx1",
+        "Credentials":  "anymailFinderApi=Anymail Finder account 2, googleSheetsOAuth2Api=Google Sheets account 3",
+        "HttpUrls":  "https://api.apollo.io/api/v1/mixed_people/api_search | https://api.apollo.io/v1/people/enrich",
+        "Models":  ""
+    },
+    {
+        "File":  "Instantly Campaign.json",
+        "Name":  "Instantly Campaign",
+        "Active":  true,
+        "NodeCount":  12,
+        "Types":  "n8n-nodes-base.codex2, n8n-nodes-base.splitInBatchesx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.limitx1, n8n-nodes-base.noOpx1, n8n-nodes-instantly.instantlyx1, n8n-nodes-base.setx1, n8n-nodes-base.manualTriggerx1, n8n-nodes-base.googleSheetsx1, @n8n/n8n-nodes-langchain.lmChatOpenAix1, @n8n/n8n-nodes-langchain.agentx1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 3, instantlyApi=Instantly account, openAiApi=OpenAi account",
+        "HttpUrls":  "",
+        "Models":  "model=@{__rl=True; value=gpt-4.1-mini; mode=list; cachedResultName=gpt-4.1-mini}"
+    },
+    {
+        "File":  "Lead Crawler.json",
+        "Name":  "Lead Crawler",
+        "Active":  false,
+        "NodeCount":  16,
+        "Types":  "n8n-nodes-base.codex4, n8n-nodes-base.stickyNotex3, n8n-nodes-base.googleSheetsx3, n8n-nodes-base.ifx2, n8n-nodes-base.splitOutx1, n8n-nodes-base.httpRequestx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.setx1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 3",
+        "HttpUrls":  "https://places.googleapis.com/v1/places:searchText",
+        "Models":  ""
+    },
+    {
+        "File":  "_Crypto_ AI Finder.json",
+        "Name":  "[Crypto] AI Finder",
+        "Active":  false,
+        "NodeCount":  12,
+        "Types":  "n8n-nodes-base.googleSheetsx2, n8n-nodes-base.noOpx1, n8n-nodes-base.splitInBatchesx1, @n8n/n8n-nodes-langchain.lmChatOpenAix1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.codex1, n8n-nodes-base.waitx1, n8n-nodes-base.ifx1, n8n-nodes-base.limitx1, n8n-nodes-base.setx1, @n8n/n8n-nodes-langchain.agentx1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 2, openAiApi=OpenAi account 3",
+        "HttpUrls":  "",
+        "Models":  "model=@{__rl=True; value=gpt-5.4; mode=list; cachedResultName=gpt-5.4}"
+    },
+    {
+        "File":  "_Crypto_ Close CRM.json",
+        "Name":  "[Crypto] Close CRM",
+        "Active":  false,
+        "NodeCount":  12,
+        "Types":  "n8n-nodes-base.codex2, n8n-nodes-base.noOpx1, n8n-nodes-base.splitInBatchesx1, n8n-nodes-base.limitx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.waitx1, n8n-nodes-base.googleSheetsx1, n8n-nodes-base.setx1, n8n-nodes-base.httpRequestx1, n8n-nodes-base.manualTriggerx1, n8n-nodes-base.stickyNotex1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 3, httpBasicAuth=Unnamed credential",
+        "HttpUrls":  "https://api.close.com/api/v1/lead/",
+        "Models":  ""
+    },
+    {
+        "File":  "_Crypto_ Daily Reset.json",
+        "Name":  "[Crypto] Daily Reset",
+        "Active":  false,
+        "NodeCount":  4,
+        "Types":  "n8n-nodes-base.googleSheetsx1, n8n-nodes-base.stickyNotex1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.codex1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 2",
+        "HttpUrls":  "",
+        "Models":  ""
+    },
+    {
+        "File":  "_Crypto_ Email Verifier_Finder.json",
+        "Name":  "[Crypto] Email Verifier/Finder",
+        "Active":  false,
+        "NodeCount":  18,
+        "Types":  "n8n-nodes-base.codex3, n8n-nodes-base.httpRequestx2, n8n-nodes-base.googleSheetsx2, n8n-nodes-base.ifx2, n8n-nodes-base.setx2, n8n-nodes-base.manualTriggerx1, n8n-nodes-anymailfinder-official.anymailFinderx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.noOpx1, n8n-nodes-base.splitInBatchesx1, n8n-nodes-base.waitx1, n8n-nodes-base.limitx1",
+        "Credentials":  "anymailFinderApi=Anymail Finder account 2, googleSheetsOAuth2Api=Google Sheets account 3",
+        "HttpUrls":  "https://api.apollo.io/api/v1/mixed_people/api_search | https://api.apollo.io/v1/people/enrich",
+        "Models":  ""
+    },
+    {
+        "File":  "_Crypto_ Instantly Campaign.json",
+        "Name":  "[Crypto] Instantly Campaign",
+        "Active":  false,
+        "NodeCount":  12,
+        "Types":  "n8n-nodes-base.codex2, n8n-nodes-base.splitInBatchesx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.limitx1, n8n-nodes-base.noOpx1, n8n-nodes-instantly.instantlyx1, n8n-nodes-base.setx1, n8n-nodes-base.manualTriggerx1, n8n-nodes-base.googleSheetsx1, @n8n/n8n-nodes-langchain.lmChatOpenAix1, @n8n/n8n-nodes-langchain.agentx1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 3, instantlyApi=Instantly account, openAiApi=OpenAi account",
+        "HttpUrls":  "",
+        "Models":  "model=@{__rl=True; value=gpt-4.1-mini; mode=list; cachedResultName=gpt-4.1-mini}"
+    },
+    {
+        "File":  "_Crypto_ Lead Crawler.json",
+        "Name":  "[Crypto] Lead Crawler",
+        "Active":  false,
+        "NodeCount":  16,
+        "Types":  "n8n-nodes-base.codex4, n8n-nodes-base.stickyNotex3, n8n-nodes-base.googleSheetsx3, n8n-nodes-base.ifx2, n8n-nodes-base.splitOutx1, n8n-nodes-base.httpRequestx1, n8n-nodes-base.scheduleTriggerx1, n8n-nodes-base.setx1",
+        "Credentials":  "googleSheetsOAuth2Api=Google Sheets account 3",
+        "HttpUrls":  "https://places.googleapis.com/v1/places:searchText",
+        "Models":  ""
+    }
+]

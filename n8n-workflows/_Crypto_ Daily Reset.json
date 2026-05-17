@@ -1,0 +1,253 @@
+﻿{
+    "updatedAt":  "2026-04-28T16:48:25.000Z",
+    "createdAt":  "2026-04-28T16:48:25.675Z",
+    "id":  "DodhGr237IXVtYDr",
+    "name":  "[Crypto] Daily Reset",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "triggerAtHour":  21,
+                                                                           "triggerAtMinute":  1
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "id":  "afdb0e81-8021-4a83-a947-dbd18041e01c",
+                      "name":  "Schedule Trigger"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const today = new Date();\nconst formatted = today.toISOString().split(\u0027T\u0027)[0];\n\nreturn [{\n  today_date: formatted\n}];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       208,
+                                       0
+                                   ],
+                      "id":  "11189096-4c2a-40ad-9820-98956a4b6454",
+                      "name":  "Code in JavaScript"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Leads V2?",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  1930238445,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "State",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=1930238445"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "row_number":  2,
+                                                                       "last_reset_date":  "={{ $json.today_date }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "row_number"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "daily_count",
+                                                                            "displayName":  "daily_count",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "daily_cap",
+                                                                            "displayName":  "daily_cap",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "last_reset_date",
+                                                                            "displayName":  "last_reset_date",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "enabled",
+                                                                            "displayName":  "enabled",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "base_lat",
+                                                                            "displayName":  "base_lat",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "base_lng",
+                                                                            "displayName":  "base_lng",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "lat_index",
+                                                                            "displayName":  "lat_index",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "lng_index",
+                                                                            "displayName":  "lng_index",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  false
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       416,
+                                       0
+                                   ],
+                      "id":  "f2f98bbd-e7f1-4025-87b3-cae14ebf4c72",
+                      "name":  "Update row in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "hbDZuPuPzxz9RvVN",
+                                                                        "name":  "Google Sheets account 2"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "Tie back to State Sheet",
+                                         "height":  80,
+                                         "width":  150
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "position":  [
+                                       384,
+                                       -96
+                                   ],
+                      "typeVersion":  1,
+                      "id":  "51e1cc4d-5c60-44be-8763-57831be235a5",
+                      "name":  "Sticky Note"
+                  }
+              ],
+    "connections":  {
+                        "Schedule Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Code in JavaScript",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Code in JavaScript":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Update row in sheet",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "dc588bed-8832-40d1-9307-e4586e85beea",
+    "activeVersionId":  null,
+    "versionCounter":  2,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-28T16:48:25.681Z",
+                       "createdAt":  "2026-04-28T16:48:25.681Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "DodhGr237IXVtYDr",
+                       "projectId":  "C3AYlpbnTPZxdj6d",
+                       "project":  {
+                                       "updatedAt":  "2026-03-05T02:06:34.068Z",
+                                       "createdAt":  "2026-03-05T02:05:07.685Z",
+                                       "id":  "C3AYlpbnTPZxdj6d",
+                                       "name":  "Gentrit Luta \u003cemailautomationaureonglobal@proton.me\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "77cd825c-5b23-4939-9a9a-294dc9e93f9d"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,0 +1,14 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+httpx==0.27.2
+asyncpg==0.29.0
+pyyaml==6.0.2
+pydantic==2.9.2
+
+# Engine-specific (importable on demand; failures are logged + engine disabled)
+twscrape==0.16.0
+yt-dlp==2024.10.7
+instaloader==4.13.0
+TikTokApi==6.5.2
+praw==7.7.1
+playwright==1.47.0

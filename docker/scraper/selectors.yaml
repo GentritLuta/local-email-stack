@@ -1,0 +1,79 @@
+# selectors.yaml — DOM selectors per source.
+#
+# The scraper writes back to this file when AI-heal regenerates selectors
+# (innovation #1). Treat as semi-managed config: hand-edits are welcome but
+# the auto-heal commits its updates with a `# auto-healed YYYY-MM-DD` comment.
+
+google_maps:
+  results_container: "[role='feed']"
+  result_row: "[role='feed'] > div > div[jsaction]"
+  fields:
+    name: "div[role='heading'] >>text"
+    rating: "span[role='img'][aria-label*='star'] >>aria-label"
+    address: "div[class*='fontBodyMedium'] >>text"
+    phone: "button[data-item-id*='phone'] >>aria-label"
+    website: "a[data-item-id='authority'] >>href"
+    category: "button[jsaction*='category'] >>text"
+  pagination:
+    next_button: "button[aria-label='Next page']"
+    end_of_results: "p:has-text('You've reached the end of the list')"
+
+yelp:
+  results_container: "ul.unified-search-list"
+  result_row: "ul.unified-search-list > li"
+  fields:
+    name: "h3 a >>text"
+    rating: "div[role='img'][aria-label*='star'] >>aria-label"
+    address: "p[class*='secondaryAttributes']:nth-of-type(2) >>text"
+    phone: "p[class*='secondaryAttributes']:nth-of-type(1) >>text"
+    category: "span[class*='priceCategory'] >>text"
+    website: ""   # Yelp hides external URLs; resolved via the detail page
+  pagination:
+    next_button: "a.next-link"
+
+bing_places:
+  results_container: "#b_results"
+  result_row: "li.b_algo"
+  fields:
+    name: "h2 a >>text"
+    address: ".b_factrow .b_address >>text"
+    phone: ".b_factrow .b_phone >>text"
+    website: "h2 a >>href"
+  pagination:
+    next_button: "a.sb_pagN"
+
+# Overpass uses the structured JSON API; no selectors needed.
+overpass:
+  api_url: "https://overpass-api.de/api/interpreter"
+  query_template: |
+    [out:json][timeout:25];
+    (
+      node["amenity"="{{category}}"](around:{{radius}},{{lat}},{{lng}});
+      way["amenity"="{{category}}"](around:{{radius}},{{lat}},{{lng}});
+    );
+    out center tags;
+
+# Generic — used by AI Finder's look_at_page tool for arbitrary company sites.
+generic_site:
+  strip_selectors:
+    - "header"
+    - "footer"
+    - "nav"
+    - "script"
+    - "style"
+    - "noscript"
+    - "iframe"
+    - "[role='banner']"
+    - "[role='navigation']"
+  team_page_hints:
+    - "/about"
+    - "/team"
+    - "/people"
+    - "/founders"
+    - "/leadership"
+    - "/our-story"
+    - "/contact"
+  contact_page_hints:
+    - "/contact"
+    - "/contact-us"
+    - "/get-in-touch"

@@ -1,0 +1,109 @@
+{
+  "slug": "aureon",
+  "name": "Aureon Global — Resend pool on mail.aureonglobal.de",
+  "created_at": "2026-05-17",
+  "active": true,
+
+  "company": {
+    "name": "Aureon Global",
+    "site": "aureonglobal.de",
+    "tagline": "boutique european operator helping service businesses tighten the lead-to-booking handoff"
+  },
+
+  "_architecture_note": [
+    "Per-persona reputation isolation: each persona sends from a unique address on a",
+    "dedicated subdomain (mail.aureonglobal.de) verified at Resend. No Hostinger mailbox",
+    "is required behind these From: addresses because Resend owns the SMTP egress.",
+    "Replies route back via Hostinger's normal MX on aureonglobal.de — the user adds an",
+    "ImprovMX-style forwarder (or Cloudflare Email Routing) on mail.aureonglobal.de later",
+    "if they want replies to a different inbox; for now Reply-To = info@aureonglobal.de."
+  ],
+
+  "relay": {
+    "backend": "resend",
+    "from_domain": "mail.aureonglobal.de",
+    "resend_domain_id": "863fec1e-fab3-44a8-93c1-f7752b5edc9c",
+    "resend_region": "eu-west-1",
+    "resend_api_key": "",
+    "domain_verified_at": "2026-05-17T15:18:00Z",
+    "_note": "resend_api_key in aureon.private.json (gitignored)"
+  },
+
+  "personas": [
+    {
+      "slug": "daniel",
+      "from_name": "Daniel",
+      "from_addr": "daniel@mail.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "voice": {
+        "register": "warm-direct",
+        "quirks": ["short paragraphs", "occasional dash—like this"],
+        "avoid": ["corporate speak", "exclamation marks"]
+      },
+      "signature": "daniel\naureon global"
+    },
+    {
+      "slug": "anna",
+      "from_name": "Anna",
+      "from_addr": "anna@mail.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "voice": {
+        "register": "calm-precise",
+        "quirks": ["specific numbers", "one question per email"],
+        "avoid": ["hype", "stacked adjectives"]
+      },
+      "signature": "anna\naureon global"
+    },
+    {
+      "slug": "marco",
+      "from_name": "Marco",
+      "from_addr": "marco@mail.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "voice": {
+        "register": "friendly-italian",
+        "quirks": ["occasional 'davvero'", "warmer opener"],
+        "avoid": ["templated phrases", "marketing language"]
+      },
+      "signature": "marco\naureon global"
+    }
+  ],
+
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 30,
+    "min_seconds_between_sends_same_persona": 180
+  },
+
+  "warmup": {
+    "enabled": true,
+    "started_at": null,
+    "current_day": 0,
+    "ramp_curve": "snowball_v1",
+    "max_daily_sends": 90,
+    "warmup_targets": [],
+    "real_send_mix": [
+      { "until_day": 14,   "warmup_pct": 80 },
+      { "until_day": 30,   "warmup_pct": 30 },
+      { "until_day": 45,   "warmup_pct": 10 },
+      { "until_day": 9999, "warmup_pct": 5  }
+    ],
+    "reputation": {
+      "bounce_rate_7d": 0.0,
+      "complaint_rate_7d": 0.0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.001
+    }
+  },
+
+  "ramp_curve_snowball_v1": [
+    { "from_day": 1,  "daily": 9  },
+    { "from_day": 4,  "daily": 18 },
+    { "from_day": 8,  "daily": 36 },
+    { "from_day": 15, "daily": 60 },
+    { "from_day": 22, "daily": 90 }
+  ]
+}

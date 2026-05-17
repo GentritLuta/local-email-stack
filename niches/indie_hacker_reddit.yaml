@@ -1,0 +1,27 @@
+name: "Indie hackers active on Reddit"
+slug: indie_hacker_reddit
+sourcing_engines:
+  - engine: reddit_user
+    config:
+      subreddits: [SaaS, Entrepreneur, indiehackers, sideproject, startups, microsaas, EntrepreneurRideAlong]
+      min_karma: 200
+      recent_post_days: 30
+      bio_keywords: [building, founder, indie, solo, "in public", "saas"]
+      limit: 200
+  - engine: bluesky_user
+    config:
+      feeds: ["at://did:plc:something/app.bsky.feed.generator/indiehackers"]
+      bio_keywords: [building, founder, "indie hacker"]
+      min_followers: 200
+      limit: 100
+enrichment:
+  level: comprehensive
+persona_assignment: m2              # Daniel — casual-professional
+sequence:
+  steps:
+    - delay_days: 0
+      template: indie_initial
+    - delay_days: 5
+      template: indie_followup
+    - delay_days: 12
+      template: indie_breakup

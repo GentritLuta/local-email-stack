@@ -1,0 +1,81 @@
+{
+  "name": "Aureon Global — 20 cold-email variants",
+  "slug": "aureon_20_variants",
+  "created_at": "2026-05-17",
+  "sender": {
+    "from_name": "Aureon",
+    "from_addr": "info@aureonglobal.de",
+    "reply_to": "info@aureonglobal.de",
+    "company": "Aureon Global",
+    "signature": "aureon global\naureonglobal.de"
+  },
+  "deliverability_notes": [
+    "Every variant: under 100 words, plain language, conversational tone.",
+    "No URLs in body. No images. No tracking pixels.",
+    "No 'Re:' subject lines (cold mail with fake replies is a top spam flag).",
+    "No spam-trigger words: free, guarantee, act now, limited time, click here, etc.",
+    "Single specific question or single soft CTA. Lowercase sign-off.",
+    "Sent from a real Hostinger mailbox => proper SPF/DKIM/DMARC + clean PTR."
+  ],
+  "variants": [
+    { "n": 1,  "angle": "soft_intro",       "subject": "quick question",
+      "body": "hi,\n\nbrief one — we work with a handful of mid-sized european operators on the messy middle between marketing and bookings. wondering if that's something you've thought about lately, or if it's been a 'later' problem.\n\nno pitch, just curious where your focus is right now.\n\naureon" },
+
+    { "n": 2,  "angle": "specific_obs",     "subject": "noticed something",
+      "body": "hi,\n\nbrowsing similar businesses in your space recently and the most consistent gap i keep seeing is the gap between inbound interest and booked work — the leads come in fine, the conversion to a real conversation is where things fall off.\n\nis that recognizable on your end or not at all?\n\naureon" },
+
+    { "n": 3,  "angle": "question_open",    "subject": "your booking flow",
+      "body": "hi,\n\nquick one — when a new lead reaches out to you (form, instagram dm, whatever), who picks it up and how long until they get a real response?\n\nasking because we work on exactly that gap. would be useful to know whether it's already solved or not.\n\naureon" },
+
+    { "n": 4,  "angle": "case_brief",       "subject": "small story",
+      "body": "hi,\n\nworked with a service business similar in shape to yours last quarter. their inbound went up 30%, but their actual booked work only moved 4%. the gap was a 47-minute average response time to new leads.\n\nfixed the response time, conversion roughly tripled. sharing in case it rings a bell.\n\naureon" },
+
+    { "n": 5,  "angle": "tiny_offer",       "subject": "offer to think out loud",
+      "body": "hi,\n\nhappy to spend 20 minutes walking through your current lead-to-booking flow with you if it's useful. no slides, no pitch. i just see a lot of these and patterns are usually visible quickly.\n\nworth a thursday or friday?\n\naureon" },
+
+    { "n": 6,  "angle": "compliment_real",  "subject": "your business",
+      "body": "hi,\n\nwhat you do looks substantial — the kind of operation that's already past the messy startup phase. that's usually when the question shifts from 'how do we get more leads' to 'how do we close the ones we already have'.\n\nany of that worth a chat?\n\naureon" },
+
+    { "n": 7,  "angle": "data_anchor",      "subject": "47 minutes",
+      "body": "hi,\n\none number from our work: the average time a small european service business takes to respond to a new lead is 47 minutes. inside 15 minutes, conversion to a booked call goes up about 3x.\n\nis your response time anywhere near 15 min? if not, that's usually the cheapest win.\n\naureon" },
+
+    { "n": 8,  "angle": "pattern_question", "subject": "your week",
+      "body": "hi,\n\nare you the person who personally responds to new leads, or has someone on the team taken that over by now?\n\nasking because the answer changes what's worth doing first. happy to share what we usually recommend in each case.\n\naureon" },
+
+    { "n": 9,  "angle": "shared_pain",      "subject": "the leads come in fine",
+      "body": "hi,\n\nthe phrase i hear most often from operators like you: 'the leads come in fine, the conversion to a real conversation is the problem.'\n\nif that sentence is recognizable, i think there's a 20-minute chat worth having. if it isn't, all good — wrong angle on my part.\n\naureon" },
+
+    { "n": 10, "angle": "soft_ask",         "subject": "introduction",
+      "body": "hi,\n\ni run aureon global — small european operator focused on lead-to-booking workflows for service businesses. we work with a few companies similar in scale to yours.\n\nwould a brief introduction be useful, or is now a bad moment?\n\naureon" },
+
+    { "n": 11, "angle": "blunt_ask",        "subject": "honest question",
+      "body": "hi,\n\nhonest question: how confident are you that every lead who reaches out actually gets a real reply within 24 hours?\n\nasking because for most of the businesses we look at, the answer is 'mostly yes, except when it's busy' — and the 'except when it's busy' bucket is where the money is lost.\n\naureon" },
+
+    { "n": 12, "angle": "season_hook",      "subject": "before q3",
+      "body": "hi,\n\nlooking at q3 ahead — for most service businesses we work with, the months when the lead-flow is highest are also the months when the conversion is lowest. simply because no one has time.\n\nworth a 15-minute chat about how to keep conversion stable through the busy stretch?\n\naureon" },
+
+    { "n": 13, "angle": "compare_peers",    "subject": "comparing notes",
+      "body": "hi,\n\ncomparing notes between a few similar european businesses in your space. one thing that varies a lot is whether you treat instagram dms as a real channel or just casual contact.\n\nwhere do you sit on that? curious whether it's working for you or not.\n\naureon" },
+
+    { "n": 14, "angle": "future_pace",      "subject": "twelve months out",
+      "body": "hi,\n\ntwelve months out — what would you want to be different about how your business handles inbound work?\n\nask because we usually work backwards from that answer, and what you say is more interesting than what i'd guess.\n\naureon" },
+
+    { "n": 15, "angle": "permission",       "subject": "permission to send something",
+      "body": "hi,\n\nfound a short write-up that's relevant to operators in your space — about why the booking conversion rate quietly drops in the busiest months. takes two minutes to read.\n\nokay to send it your way?\n\naureon" },
+
+    { "n": 16, "angle": "tiny_specific",    "subject": "one specific thing",
+      "body": "hi,\n\none specific thing: the gap between a lead submitting a form and them getting a real, human reply is the single biggest predictor of whether they'll book.\n\ndo you have a rough sense of that gap on your end? if it's under 15 min, you're already doing better than most. if not, easy fix.\n\naureon" },
+
+    { "n": 17, "angle": "no_pitch",         "subject": "not a pitch",
+      "body": "hi,\n\nthis isn't a pitch — just wanted to introduce myself in case our paths cross later. i run aureon global; we work with a small number of european service businesses on the lead-to-booking handoff.\n\nif that ever becomes a topic for you, you know who to ask.\n\naureon" },
+
+    { "n": 18, "angle": "very_short",       "subject": "five seconds",
+      "body": "hi,\n\nfive-second question: is your current lead response time something you'd want to improve, or is it already as fast as you want it to be?\n\nthat's it. just curious where your head is at on this.\n\naureon" },
+
+    { "n": 19, "angle": "anti_funnel",      "subject": "lead-to-booking",
+      "body": "hi,\n\nmost 'lead gen' advice is about getting more leads. what we work on is the opposite end — making sure the leads you already have actually turn into work.\n\nrarely the more interesting end of the conversation but usually the cheaper win. worth a chat sometime?\n\naureon" },
+
+    { "n": 20, "angle": "soft_breakup",     "subject": "low-effort question",
+      "body": "hi,\n\nlast one from me, then i'll let this rest:\n\nif your current lead-to-booking conversion went up by 20% next quarter, would that meaningfully change the business — or is it a 'nice to have'?\n\nthat answer tells me whether it's worth the conversation.\n\naureon" }
+  ]
+}

@@ -1,0 +1,864 @@
+﻿{
+    "updatedAt":  "2026-04-28T15:53:20.748Z",
+    "createdAt":  "2026-03-05T02:11:21.452Z",
+    "id":  "Kn5k4Th7WbyPwK1h",
+    "name":  "Lead Crawler",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "seconds",
+                                                                           "secondsInterval":  10
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "id":  "593e32a1-b06f-4562-bfdd-4b4be49cd897",
+                      "name":  "Schedule Trigger"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Leads V2?",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  1930238445,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "State",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=1930238445"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       208,
+                                       0
+                                   ],
+                      "id":  "93312966-680a-4936-923d-0a6d45bf2c60",
+                      "name":  "Get row(s) in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "qLPeod8jWUTxYQI0",
+                                                                        "name":  "Google Sheets account 3"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const baseLat = parseFloat($json.base_lat);\nconst baseLng = parseFloat($json.base_lng);\nlet latIndex = parseInt($json.lat_index);\nlet lngIndex = parseInt($json.lng_index);\n\nconst step = 0.06;\n\n// US bounds\nconst MIN_LAT = 25;\nconst MAX_LAT = 49;\nconst MIN_LNG = -125;\nconst MAX_LNG = -66;\n\n// Calculate coordinates\nlet latitude = baseLat + (latIndex * step);\nlet longitude = baseLng + (lngIndex * step);\n\n// 🔒 Fix longitude overflow (east/west)\nif (longitude \u003c MIN_LNG || longitude \u003e MAX_LNG) {\n  lngIndex = 0;\n  latIndex += 1;\n}\n\n// 🔒 Fix latitude overflow (north/south)\nif (latitude \u003c MIN_LAT || latitude \u003e MAX_LAT) {\n  latIndex = 0;\n}\n\n// Recalculate after correction\nlatitude = baseLat + (latIndex * step);\nlongitude = baseLng + (lngIndex * step);\n\nreturn [\n{\n  json: {\n    latitude,\n    longitude,\n    latIndex,\n    lngIndex,\n    googleLocation: `${latitude},${longitude}`\n  }\n}\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       416,
+                                       0
+                                   ],
+                      "id":  "a92e48b9-1084-4508-bcc3-ea16bc283c9e",
+                      "name":  "Code in JavaScript"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "6aaba9ba-e653-4023-b147-573525d3598f",
+                                                                                   "leftValue":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.daily_count }}",
+                                                                                   "rightValue":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.daily_cap }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "number",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       624,
+                                       0
+                                   ],
+                      "id":  "51fb59b4-dd46-4781-81d8-68d8212674b4",
+                      "name":  "If"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "4016417d-daa3-42ec-b80a-ed27a11cc50f",
+                                                                                     "name":  "daily_count",
+                                                                                     "value":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.daily_count }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "95bb57a6-82c8-469a-ae0b-dda7b3bd6b2b",
+                                                                                     "name":  "daily_cap",
+                                                                                     "value":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.daily_cap }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "e3eda19b-6214-4e8d-8e93-526a043e3792",
+                                                                                     "name":  "latitude",
+                                                                                     "value":  "={{ $json.latitude }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "3668fa5d-ebaa-4b6f-ac6b-234c00f48544",
+                                                                                     "name":  "longitude",
+                                                                                     "value":  "={{ $json.longitude }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "14d52e84-d8e3-4239-98f2-ae4d18c64a7f",
+                                                                                     "name":  "Google_Maps_API",
+                                                                                     "value":  "AIzaSyDgO51--oAkpNODx5PedIh5rWORI-bcnM4",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "7186da38-0f1e-4982-b41a-03145c44f282",
+                                                                                     "name":  "query",
+                                                                                     "value":  "property management",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       0,
+                                       240
+                                   ],
+                      "id":  "d2c3c9b0-5b74-4107-8237-324e2f7fb4de",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "Add query for search",
+                                         "height":  80,
+                                         "width":  150
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "position":  [
+                                       -176,
+                                       240
+                                   ],
+                      "typeVersion":  1,
+                      "id":  "af59334b-d6b6-43e1-8fbc-2c0bcd2f0168",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://places.googleapis.com/v1/places:searchText",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "X-Goog-Api-Key",
+                                                                                         "value":  "={{ $json.Google_Maps_API }}"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "X-Goog-FieldMask",
+                                                                                         "value":  "places.id,places.displayName,places.nationalPhoneNumber,places.websiteUri,places.formattedAddress"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"textQuery\": \"{{$json.query}}\",\n  \"maxResultCount\": 20,\n  \"locationBias\": {\n    \"circle\": {\n      \"center\": {\n        \"latitude\": {{$json.latitude}},\n        \"longitude\": {{$json.longitude}}\n      },\n      \"radius\": 5000\n    }\n  }\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       208,
+                                       240
+                                   ],
+                      "id":  "bd56600d-5c95-40c8-82ce-15d59b3c0394",
+                      "name":  "Get Places"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "Add query, typed out\nNO CAPITAL LETTERS",
+                                         "height":  80,
+                                         "width":  160
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "position":  [
+                                       176,
+                                       160
+                                   ],
+                      "typeVersion":  1,
+                      "id":  "c9f623fd-9ef3-43a2-8ac6-9d8d01f395e0",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "loose",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "5a645292-d211-4f67-8a87-6f48586465c2",
+                                                                                   "leftValue":  "={{ $json.places }}",
+                                                                                   "rightValue":  "",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "exists",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "looseTypeValidation":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       416,
+                                       240
+                                   ],
+                      "id":  "c4dc7ea7-f3ff-4cd0-94e4-05c2bc6cff82",
+                      "name":  "If1"
+                  },
+                  {
+                      "parameters":  {
+                                         "fieldToSplitOut":  "results, places",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.splitOut",
+                      "typeVersion":  1,
+                      "position":  [
+                                       624,
+                                       240
+                                   ],
+                      "id":  "82d6eaef-435b-41a0-9757-22db27473e60",
+                      "name":  "Split Out"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "appendOrUpdate",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Leads V2?",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  118941135,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Leads 2",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=118941135"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "id":  "={{ $json.places.id }}",
+                                                                       "formatted_address":  "={{ $json.places.formattedAddress }}",
+                                                                       "companyName":  "={{ $json.places.displayName.text }}",
+                                                                       "phone":  "={{ $json.places.nationalPhoneNumber }}",
+                                                                       "website":  "={{ $json.places.websiteUri }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "id"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "formatted_address",
+                                                                            "displayName":  "formatted_address",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "geometry",
+                                                                            "displayName":  "geometry",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "companyName",
+                                                                            "displayName":  "companyName",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "title",
+                                                                            "displayName":  "title",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "rating",
+                                                                            "displayName":  "rating",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "owner",
+                                                                            "displayName":  "owner",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "id",
+                                                                            "displayName":  "id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  true,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "phone",
+                                                                            "displayName":  "phone",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "mobileNumber",
+                                                                            "displayName":  "mobileNumber",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "website",
+                                                                            "displayName":  "website",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "email",
+                                                                            "displayName":  "email",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "linkedin",
+                                                                            "displayName":  "linkedin",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "instagram",
+                                                                            "displayName":  "instagram",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "twitter",
+                                                                            "displayName":  "twitter",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "facebook",
+                                                                            "displayName":  "facebook",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       0,
+                                       448
+                                   ],
+                      "id":  "12acca62-723d-4e6c-a9e8-8b3b12aaa1c5",
+                      "name":  "Append or update row in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "qLPeod8jWUTxYQI0",
+                                                                        "name":  "Google Sheets account 3"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "return [\n  {\n    json: {\n      new_count: items.length\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       208,
+                                       448
+                                   ],
+                      "id":  "4d20424c-ef46-4fc5-becd-bb8ab5949717",
+                      "name":  "Code in JavaScript1"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Read state row from sheet\nconst state = $items(\"Get row(s) in sheet\")[0].json;\n\n// ---- SAFE STATE ----\nlet latIndex = Number(state.lat_index || 0);\nlet lngIndex = Number(state.lng_index || 0);\n\n// 🔥 GUARANTEE DIRECTION EXISTS\nlet direction = Number(state.direction);\nif (direction !== 1 \u0026\u0026 direction !== -1) {\n  direction = 1;\n}\n\n// Optional (safe)\nlet dailyCount = Number(state.daily_count || 0);\n\n// ---- BASE (DO NOT CHANGE IN SHEET) ----\nconst baseLat = Number(state.base_lat);\nconst baseLng = Number(state.base_lng);\n\n// ---- CONFIG ----\nconst step = 0.06;\nconst eastLng = -66.06;\nconst northLat = 49;\n\n// Max steps across from your base\nconst maxLngIndex = Math.floor((eastLng - baseLng) / step);\n\n// ------------------------------------------------\n// 🔥 MOVE FIRST (critical)\n// ------------------------------------------------\nif (direction === 1) {\n  lngIndex += 1;\n} else {\n  lngIndex -= 1;\n}\n\n// ------------------------------------------------\n// 🔥 EDGE HANDLING (ONLY place latitude changes)\n// ------------------------------------------------\n\n// Hit EAST edge\nif (lngIndex \u003e= maxLngIndex) {\n  lngIndex = maxLngIndex;\n  latIndex += 1;\n  direction = -1;\n}\n\n// Hit WEST edge\nelse if (lngIndex \u003c= 0) {\n  lngIndex = 0;\n  latIndex += 1;\n  direction = 1;\n}\n\n// ------------------------------------------------\n// CALCULATE POSITION\n// ------------------------------------------------\nconst latitude = baseLat + (latIndex * step);\nconst longitude = baseLng + (lngIndex * step);\n\n// Stop/reset at north\nif (latitude \u003e= northLat) {\n  latIndex = 0;\n  lngIndex = 0;\n  direction = 1;\n}\n\n// ------------------------------------------------\n// 🔥 ALWAYS RETURN CLEAN STATE\n// ------------------------------------------------\nreturn [\n{\n  json: {\n    lat_index: latIndex,\n    lng_index: lngIndex,\n    direction: direction,\n    daily_count: dailyCount ?? 0,\n    latitude: latitude,\n    longitude: longitude\n  }\n}\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       432,
+                                       448
+                                   ],
+                      "id":  "a7b0730b-157e-48d1-9766-083501cb3c66",
+                      "name":  "Advance Grid"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Leads V2?",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  1930238445,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "State",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=1930238445"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "daily_count":  "={{ $(\u0027Advance Grid\u0027).item.json.daily_count }}",
+                                                                       "lng_index":  "={{ $json.lng_index }}",
+                                                                       "lat_index":  "={{ $json.lat_index }}",
+                                                                       "row_number":  2,
+                                                                       "direction":  "={{ $json.direction }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "row_number"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "daily_count",
+                                                                            "displayName":  "daily_count",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "daily_cap",
+                                                                            "displayName":  "daily_cap",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "last_reset_date",
+                                                                            "displayName":  "last_reset_date",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "enabled",
+                                                                            "displayName":  "enabled",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "base_lat",
+                                                                            "displayName":  "base_lat",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "base_lng",
+                                                                            "displayName":  "base_lng",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "lat_index",
+                                                                            "displayName":  "lat_index",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "lng_index",
+                                                                            "displayName":  "lng_index",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "direction",
+                                                                            "displayName":  "direction",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  false
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       640,
+                                       448
+                                   ],
+                      "id":  "e9330e4f-241b-45fd-9905-03b9f485e21a",
+                      "name":  "Update row in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "qLPeod8jWUTxYQI0",
+                                                                        "name":  "Google Sheets account 3"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "Rebuild from IF to go one way if the node is 1 and another if it is -1. Will this work? will it go back and forth like it is suppose to? how do we write the code?"
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "position":  [
+                                       576,
+                                       -208
+                                   ],
+                      "typeVersion":  1,
+                      "id":  "936802d3-46ce-42df-bd44-3c32def51097",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "return [\n{\n  json: {\n    lat_index: $json.lat_index,\n    lng_index: $json.lng_index,\n    direction: $json.direction,\n    latitude: $json.latitude,\n    longitude: $json.longitude\n  }\n}\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       704,
+                                       672
+                                   ],
+                      "id":  "1f218b40-5205-436b-98ed-5118dd594e38",
+                      "name":  "Code in JavaScript2"
+                  }
+              ],
+    "connections":  {
+                        "Schedule Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Get row(s) in sheet",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Get row(s) in sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Code in JavaScript",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Code in JavaScript":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "If",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "If":  {
+                                   "main":  [
+                                                [
+
+                                                ],
+                                                [
+                                                    {
+                                                        "node":  "Edit Fields",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ]
+                                            ]
+                               },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Get Places",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Get Places":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "If1",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "If1":  {
+                                    "main":  [
+                                                 [
+                                                     {
+                                                         "node":  "Split Out",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ],
+                                                 [
+                                                     {
+                                                         "node":  "Advance Grid",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ]
+                                             ]
+                                },
+                        "Split Out":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Append or update row in sheet",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Append or update row in sheet":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Code in JavaScript1",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                        "Code in JavaScript1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Advance Grid",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Advance Grid":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Update row in sheet",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Code in JavaScript2":  {
+                                                    "main":  [
+                                                                 [
+
+                                                                 ]
+                                                             ]
+                                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false,
+                     "timeSavedMode":  "fixed",
+                     "callerPolicy":  "workflowsFromSameOwner",
+                     "saveExecutionProgress":  true
+                 },
+    "staticData":  {
+                       "node:Schedule Trigger":  {
+                                                     "recurrenceRules":  [
+
+                                                                         ]
+                                                 }
+                   },
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "pinData":  {
+
+                },
+    "versionId":  "a1a018ec-c8b4-44f3-b6ec-671c5756b2ec",
+    "activeVersionId":  null,
+    "versionCounter":  516,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-03-05T02:11:21.457Z",
+                       "createdAt":  "2026-03-05T02:11:21.457Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "Kn5k4Th7WbyPwK1h",
+                       "projectId":  "C3AYlpbnTPZxdj6d",
+                       "project":  {
+                                       "updatedAt":  "2026-03-05T02:06:34.068Z",
+                                       "createdAt":  "2026-03-05T02:05:07.685Z",
+                                       "id":  "C3AYlpbnTPZxdj6d",
+                                       "name":  "Gentrit Luta \u003cemailautomationaureonglobal@proton.me\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "77cd825c-5b23-4939-9a9a-294dc9e93f9d"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

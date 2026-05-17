@@ -1,0 +1,30 @@
+# Mid-tier YT fitness creators — sweet spot: big enough to need help, small enough to reply.
+name: "Fitness creators on YouTube — mid-tier"
+slug: youtube_fitness_midtier
+sourcing_engines:
+  - engine: youtube_channel
+    config:
+      search_queries:
+        - "home workout no equipment"
+        - "calisthenics progressions"
+        - "kettlebell training program"
+        - "mobility routine for desk workers"
+        - "strength training over 40"
+      min_subscribers: 25000
+      max_subscribers: 500000
+      uploaded_in_last_days: 30
+      country_bias: [US, GB, CA, AU, DE, NL]
+      limit: 200
+enrichment:
+  level: comprehensive
+icp_filter:
+  must_have: [contact_email_or_business_inquiry]
+persona_assignment: m7              # Imani — punchy
+sequence:
+  steps:
+    - delay_days: 0
+      template: creator_initial_value
+    - delay_days: 5
+      template: creator_followup_specific
+    - delay_days: 13
+      template: creator_breakup

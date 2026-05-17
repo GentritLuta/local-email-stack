@@ -1,0 +1,404 @@
+﻿{
+    "updatedAt":  "2026-04-28T17:25:02.157Z",
+    "createdAt":  "2026-04-28T16:48:32.321Z",
+    "id":  "3QAESb4Lv49eAfkN",
+    "name":  "[Crypto] Instantly Campaign",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -16,
+                                       -272
+                                   ],
+                      "id":  "687f2a6d-65ca-4eae-9e50-00280f23103d",
+                      "name":  "When clicking ‘Execute workflow’"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       288,
+                                       -288
+                                   ],
+                      "id":  "a9c27a7c-b9f5-4d0c-8e00-94c3a071cdcc",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Leads V2?",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  969403208,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Email Leads",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=969403208"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       272,
+                                       0
+                                   ],
+                      "id":  "af0ef006-21a2-4433-a394-2c8e48918995",
+                      "name":  "Get row(s) in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "qLPeod8jWUTxYQI0",
+                                                                        "name":  "Google Sheets account 3"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=Handle: @{{ $json.handle || $json.companyName }}\nName: {{ $json.name || $json.owner }}\nNiche: {{ $json.niche_tag || \u0027unknown\u0027 }}\nPersonalization hint: {{ $json.personalization_hint || \u0027\u0027 }}\nLast pinned excerpt: {{ $json.last_pinned_excerpt || \u0027\u0027 }}\nBio: {{ $json.bio || \u0027\u0027 }}",
+                                         "options":  {
+                                                         "systemMessage":  "You write the personalization snippet (\"first-line opener\") for cold-email outreach from algoalpha.io — an algorithmic crypto trading signals \u0026 alpha platform — to crypto influencers / KOLs. The full email template lives in Instantly; you only generate the opening 1-2 sentences that reference the recipient\u0027s specific work.\n\nOutput: 1-2 sentences, 25-50 words, plain text only (no JSON, no quotes, no labels).\n\nRules:\n- Reference something SPECIFIC from the bio or pinned tweet — a thread, take, project, focus area. Generic compliments are forbidden (\"love your content\", \"huge fan\").\n- Sound like a peer trader/analyst writing to another, not like a marketer.\n- No emojis. No exclamation marks. No hype words (\"Insane\", \"Crazy\", \"10x\", \"absolute alpha\").\n- Don\u0027t pitch algoalpha.io in the snippet — that\u0027s the next paragraph in the template. The snippet is purely the bridge that earns the next sentence.\n- Don\u0027t mention the company by name.\n- Never mention Aureon Global. This is for algoalpha.io.\n\nExamples of good snippets:\n- \"Saw your funding-rate divergence thread last week — clean call on the BTC perp basis flipping. The on-chain confirmation from your follow-up post was nicely timed.\"\n- \"Followed your liquidations heatmap setup since you posted the v2 layout. The 4h compression call into ETH options expiry was sharp.\"\n\nBad (do not output):\n- \"I love your crypto content!\"\n- \"You have a great Twitter following.\"\n- \"I noticed you\u0027re into crypto.\""
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       -112,
+                                       320
+                                   ],
+                      "id":  "ae21b92d-37b4-42e9-937c-17cecb784ce9",
+                      "name":  "AI Agent",
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4.1-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4.1-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -32,
+                                       448
+                                   ],
+                      "id":  "1ae0eb04-1cb2-402e-90e0-ce6abc4b01bd",
+                      "name":  "OpenAI Chat Model",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "aVfelHNZ8Kjfi9D5",
+                                                            "name":  "OpenAi account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "lead",
+                                         "operation":  "addToCampaign",
+                                         "campaign":  {
+                                                          "__rl":  true,
+                                                          "value":  "b087e1e2-21c0-47d1-aa8d-bceb2960e6e8",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "Campaign 2"
+                                                      },
+                                         "email":  "={{ $(\u0027Get row(s) in sheet\u0027).item.json.email }}",
+                                         "firstName":  "={{ $json.firstName }}",
+                                         "lastName":  "={{ $json.lastName }}",
+                                         "personalization":  "={{ $json.output }}",
+                                         "customFields":  {
+
+                                                          }
+                                     },
+                      "type":  "n8n-nodes-instantly.instantly",
+                      "typeVersion":  1,
+                      "position":  [
+                                       640,
+                                       208
+                                   ],
+                      "id":  "19fd83d5-8b04-438c-b8f7-ba9a44d5c998",
+                      "name":  "Add lead to campaign",
+                      "credentials":  {
+                                          "instantlyApi":  {
+                                                               "id":  "bKLd3MSTRTPs447u",
+                                                               "name":  "Instantly account"
+                                                           }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Loop over input items and add a new field called \u0027myNewField\u0027 to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       272,
+                                       208
+                                   ],
+                      "id":  "87eca4db-f180-4c1f-9905-6af9d46fa9a9",
+                      "name":  "Code in JavaScript"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Change this if your column has a different name\nconst fullName = $json.personName || $json.name || $json.owner || \"\";\n\nconst parts = fullName.trim().split(/\\s+/);\n\nconst firstName = parts.shift() || \"\";\nconst lastName = parts.join(\" \") || \"\";\n\nreturn [\n  {\n    json: {\n      ...$json,\n      firstName: firstName,\n      lastName: lastName\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       464,
+                                       208
+                                   ],
+                      "id":  "a0b99035-0242-403a-92a4-8558f0b6e44a",
+                      "name":  "Code in JavaScript1"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       480,
+                                       0
+                                   ],
+                      "id":  "3c07d132-a1de-41d2-9081-2ef196a29ced",
+                      "name":  "Loop Over Items"
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.noOp",
+                      "name":  "Replace Me",
+                      "typeVersion":  1,
+                      "position":  [
+                                       832,
+                                       208
+                                   ],
+                      "id":  "cd029394-281c-4d45-951d-0ac01ebb825a"
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.limit",
+                      "typeVersion":  1,
+                      "position":  [
+                                       768,
+                                       0
+                                   ],
+                      "id":  "bb9bf628-4ce3-4a51-9026-a693fe9fd27f",
+                      "name":  "Limit"
+                  },
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -16,
+                                       0
+                                   ],
+                      "id":  "0dfd0cc1-a0d9-4ae4-a7df-6943f32477bc",
+                      "name":  "Schedule Trigger"
+                  }
+              ],
+    "connections":  {
+                        "When clicking ‘Execute workflow’":  {
+                                                                 "main":  [
+                                                                              [
+
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+
+                                                         ]
+                                                     ]
+                                        },
+                        "Get row(s) in sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Loop Over Items",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "OpenAI Chat Model":  {
+                                                  "ai_languageModel":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "AI Agent",
+                                                                                   "type":  "ai_languageModel",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                              },
+                        "AI Agent":  {
+                                         "main":  [
+                                                      [
+
+                                                      ]
+                                                  ]
+                                     },
+                        "Code in JavaScript":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Code in JavaScript1",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Code in JavaScript1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Add lead to campaign",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Loop Over Items":  {
+                                                "main":  [
+                                                             [
+
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Limit",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Replace Me":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "Loop Over Items",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Add lead to campaign":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "Replace Me",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Limit":  {
+                                      "main":  [
+                                                   [
+                                                       {
+                                                           "node":  "Code in JavaScript",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                                   ]
+                                               ]
+                                  },
+                        "Schedule Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Get row(s) in sheet",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  null,
+    "pinData":  {
+
+                },
+    "versionId":  "b004fcd9-858b-4702-a7c1-db1c1e869a1b",
+    "activeVersionId":  null,
+    "versionCounter":  3,
+    "triggerCount":  0,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-04-28T16:48:32.324Z",
+                       "createdAt":  "2026-04-28T16:48:32.324Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "3QAESb4Lv49eAfkN",
+                       "projectId":  "C3AYlpbnTPZxdj6d",
+                       "project":  {
+                                       "updatedAt":  "2026-03-05T02:06:34.068Z",
+                                       "createdAt":  "2026-03-05T02:05:07.685Z",
+                                       "id":  "C3AYlpbnTPZxdj6d",
+                                       "name":  "Gentrit Luta \u003cemailautomationaureonglobal@proton.me\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "77cd825c-5b23-4939-9a9a-294dc9e93f9d"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

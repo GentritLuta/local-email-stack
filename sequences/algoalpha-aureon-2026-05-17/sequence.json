@@ -1,0 +1,83 @@
+{
+  "name": "AlgoAlpha — high-deliverability sequence",
+  "slug": "algoalpha_aureon_test",
+  "created_at": "2026-05-17",
+  "deliverability_notes": [
+    "Every step under 100 words. Brief mail looks human, not templated.",
+    "No URLs in any step. Links — especially short/tracked ones — are a top spam trigger.",
+    "No images, no attachments, no tracking pixels.",
+    "No 'Re:' on the cold initial (step 1). Spam filters watch for fake-reply subjects.",
+    "Plain text first; HTML alternative mirrors plain. No tables, no inline CSS gymnastics.",
+    "Conversational tone. Specific observation. Single question. Lowercase sign-off.",
+    "Steps 2+ use real In-Reply-To/References headers to thread under step 1."
+  ],
+  "sender": {
+    "from_name": "Tomás Silva",
+    "from_addr": "tomas@mail.algoalpha.io",
+    "reply_to": "tomas@mail.algoalpha.io",
+    "company": "AlgoAlpha",
+    "site": "algoalpha.io",
+    "signature": "tomás\nco-founder, algoalpha"
+  },
+  "recipient": {
+    "email": "info@aureonglobal.de",
+    "first_name": "there",
+    "company": "Aureon Global"
+  },
+  "stop_on_reply": true,
+  "stop_on_bounce": true,
+  "schedule": "test_burst",
+  "schedule_explainer": "In production each step is spaced 3-14 days apart. Stops on reply, bounce, or complaint.",
+  "steps": [
+    {
+      "n": 1, "day": 0, "kind": "initial",
+      "subject": "thought on basis trades",
+      "body": "hey there,\n\nrunning algoalpha — small systematic shop, mostly market-neutral on crypto perps.\n\nsaw your team works on infra-adjacent stuff. quick question: who do you usually source quant research from these days? curious where the gap is.\n\nhappy to share what we've been seeing if useful.\n\ntomás"
+    },
+    {
+      "n": 2, "day": 3, "kind": "soft_followup",
+      "subject": "thought on basis trades",
+      "body": "hey,\n\nfollowing up briefly. no pressure.\n\none specific thing: BTC funding decomposed across the three biggest perp venues told a different story than spot basis last month. happy to walk through what we found if it's useful for your work.\n\ntomás"
+    },
+    {
+      "n": 3, "day": 7, "kind": "specific_value",
+      "subject": "thought on basis trades",
+      "body": "hey,\n\nlast one for a bit.\n\nthe regime shift we tracked between mid-march and mid-april broke most classic carry models — the funding leg diverged from spot-implied basis by enough that our backtest of the standard playbook lost 60% of its PnL.\n\nif a writeup of how we adapted would be useful, just say yes and i'll send it next week before public release.\n\ntomás"
+    },
+    {
+      "n": 4, "day": 12, "kind": "case_study",
+      "subject": "one case study",
+      "body": "hey,\n\nbrief case: a research operator with audience size near yours syndicated one of our notes last quarter. their engagement on the post tripled vs their baseline. eleven of their readers replied wanting direct access.\n\nnot a pitch, just sharing in case the framing is useful.\n\ntomás"
+    },
+    {
+      "n": 5, "day": 17, "kind": "thought_leadership",
+      "subject": "the 4-week window most carry models missed",
+      "body": "hey,\n\nshort one. between mid-march and mid-april, BTC perp funding decoupled from the spot-implied basis by a margin most classic carry models didn't price.\n\nthe short explanation is options market makers absorbed more delta than dealers expected. the long explanation is in our latest note.\n\nwant the early read?\n\ntomás"
+    },
+    {
+      "n": 6, "day": 24, "kind": "social_signal",
+      "subject": "the 4-week window most carry models missed",
+      "body": "hey,\n\nquick note — the stackhouse podcast added the writeup to their reading list this week. thought you might find it relevant.\n\nrest of the series drops over the next six weeks. want it ahead of public release?\n\ntomás"
+    },
+    {
+      "n": 7, "day": 32, "kind": "personal_relevance",
+      "subject": "your framing on basis as a liability",
+      "body": "hey,\n\nrereading your piece on basis trades. the framing of funding as a liability the long owes the short is the cleanest mental model i've seen for it — most attempts get the sign wrong on the spot leg.\n\nif you ever want to compare risk-decomposition notes, just say so.\n\ntomás"
+    },
+    {
+      "n": 8, "day": 40, "kind": "offer_clear",
+      "subject": "open offer",
+      "body": "hey,\n\nmaking this concrete.\n\nwe publish one to two long-form notes per month on systematic crypto strategies. most go behind a paywall after a week.\n\noffer: pre-publication access for you, free, indefinitely. no NDA, no required mention.\n\nreply yes and i'll add you.\n\ntomás"
+    },
+    {
+      "n": 9, "day": 50, "kind": "summary",
+      "subject": "summary",
+      "body": "hey,\n\nprobably my last one. if the silence means not your beat, fully heard.\n\nthings i mentioned: the q1 to q2 carry break, the cross-venue spread backtest, the open offer for pre-publication research access.\n\nwishing you a good rest of the quarter.\n\ntomás"
+    },
+    {
+      "n": 10, "day": 62, "kind": "breakup",
+      "subject": "closing the loop",
+      "body": "hey,\n\nclosing the loop. clearly the timing or fit isn't right and that's fine.\n\nif our work surfaces somewhere later and you want the back-channel, you have my email.\n\ntomás"
+    }
+  ]
+}

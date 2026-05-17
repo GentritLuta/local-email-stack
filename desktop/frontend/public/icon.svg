@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LocalEmailStack logo — "the orbit"
+  Concept: an envelope at the center, three orbital rings (the three pipeline stages:
+  source, enrich, send), with a node on each ring representing the active step.
+  Color: dark slate base, electric cyan + lime accents.
+  Scales cleanly from 16×16 (taskbar) to 1024×1024 (installer banner).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%"  stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="ring-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="ring-b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#a3e635"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="env" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background tile, rounded -->
+  <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#bg)"/>
+
+  <!-- Three concentric orbital rings -->
+  <g transform="translate(256 256)" fill="none" stroke-width="6" filter="url(#soft-glow)">
+    <ellipse rx="200" ry="100"  stroke="url(#ring-a)" opacity="0.85"
+             transform="rotate(-15)"/>
+    <ellipse rx="180" ry="180"  stroke="url(#ring-b)" opacity="0.55"/>
+    <ellipse rx="200" ry="100"  stroke="url(#ring-a)" opacity="0.85"
+             transform="rotate(75)"/>
+  </g>
+
+  <!-- Three orbital nodes — sourced, enriched, sent -->
+  <g filter="url(#soft-glow)">
+    <circle cx="450" cy="200" r="10" fill="#a3e635"/>
+    <circle cx="100" cy="350" r="10" fill="#22d3ee"/>
+    <circle cx="380" cy="430" r="10" fill="#0ea5e9"/>
+  </g>
+
+  <!-- Center envelope -->
+  <g transform="translate(256 256)" filter="url(#soft-glow)">
+    <rect x="-90" y="-60" width="180" height="120" rx="14" ry="14"
+          fill="url(#env)" stroke="#0f172a" stroke-width="4"/>
+    <polyline points="-90,-60 0,18 90,-60"
+              fill="none" stroke="#0f172a" stroke-width="6"
+              stroke-linejoin="round"/>
+    <!-- Small spark above envelope flap, indicates "sent" -->
+    <circle cx="0" cy="-78" r="6" fill="#a3e635"/>
+  </g>
+</svg>

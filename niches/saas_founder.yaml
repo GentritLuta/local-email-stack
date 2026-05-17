@@ -1,0 +1,42 @@
+# SaaS founders < 25 employees, sourced across 4 platforms in parallel.
+name: "SaaS founders — small teams"
+slug: saas_founder
+sourcing_engines:
+  - engine: producthunt_maker
+    config:
+      categories: [saas, developer-tools, productivity]
+      launched_in_last_days: 365
+      limit: 200
+  - engine: hackernews_who_is_hiring
+    config:
+      months_back: 6
+      keywords: ["seed", "Series A", "small team", "founding engineer", "remote", "yc"]
+      limit: 200
+  - engine: github_developer
+    config:
+      languages: [TypeScript, Go, Python, Rust]
+      bio_keywords: [founder, "co-founder", ceo, building, "building in public"]
+      min_followers: 200
+      pushed_within_days: 30
+      limit: 200
+  - engine: linkedin_via_google
+    config:
+      titles: [CEO, Founder, "Co-Founder", CTO]
+      company_size_keywords: [seed, series-a, startup, "founding team"]
+      industry_keywords: [saas, "b2b", developer-tools]
+      limit: 200
+enrichment:
+  level: comprehensive
+icp_filter:
+  exclude_keywords: ["enterprise", "fortune 500", "5000+ employees", "consulting"]
+persona_assignment: m4              # Tomás — technical founder
+sequence:
+  steps:
+    - delay_days: 0
+      template: saas_initial_value
+    - delay_days: 5
+      template: saas_followup_specific
+    - delay_days: 12
+      template: saas_value_add
+    - delay_days: 21
+      template: saas_breakup

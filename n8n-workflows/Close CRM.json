@@ -1,0 +1,755 @@
+﻿{
+    "updatedAt":  "2026-04-28T15:53:18.313Z",
+    "createdAt":  "2026-03-05T02:28:15.166Z",
+    "id":  "rZI7mTLz6YlJJcUI",
+    "name":  "Close CRM",
+    "description":  null,
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -48,
+                                       -288
+                                   ],
+                      "id":  "d6efea0f-e5bf-4cde-9d42-a4d727ad47e9",
+                      "name":  "When clicking ‘Execute workflow’"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       208,
+                                       0
+                                   ],
+                      "id":  "c824b365-7af2-4940-b71c-d5c9fbc82f38",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Leads V2?",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  427333439,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "CRM Test",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=427333439"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       416,
+                                       0
+                                   ],
+                      "id":  "fb096421-4ee8-4d80-8d0f-ac7d846a2bac",
+                      "name":  "Get row(s) in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "qLPeod8jWUTxYQI0",
+                                                                        "name":  "Google Sheets account 3"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.close.com/api/v1/lead/",
+                                         "authentication":  "genericCredentialType",
+                                         "genericAuthType":  "httpBasicAuth",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"name\": \"{{$json.companyName}}\",\n  \"url\": \"{{$json.website}}\",\n  \"addresses\": [\n    {\n      \"city\": \"{{$json.city}}\",\n      \"state\": \"{{$json.state}}\"\n    }\n  ],\n  \"contacts\": [\n    {\n      \"name\": \"{{$json.firstName}} {{$json.lastName}}\",\n      \"emails\": [\n        {\n          \"email\": \"{{$json.email}}\"\n        }\n      ],\n      \"phones\": [\n        {\n          \"phone\": \"DEBUG-{{$json.phone}}\"\n        }\n      ]\n    }\n  ]\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       832,
+                                       240
+                                   ],
+                      "id":  "96054ba1-0c22-4088-8235-7fe81d7de740",
+                      "name":  "HTTP Request",
+                      "retryOnFail":  false,
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "httpBasicAuth":  {
+                                                                "id":  "2dnZv1HfjoH7rMB9",
+                                                                "name":  "Unnamed credential"
+                                                            }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "api_4yKLAgfyhBrdHYE9NWFGB8.2KPmZKkwofNb6gsQjx1MJM"
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "position":  [
+                                       256,
+                                       -256
+                                   ],
+                      "typeVersion":  1,
+                      "id":  "a5a48f73-7f74-4e83-9f31-d29c93ef2ebe",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// Get full name from possible fields\nconst fullName = $json.personName || $json.name || $json.owner || \"\";\n\n// Split name\nconst parts = fullName.trim().split(/\\s+/);\nconst firstName = parts.shift() || \"\";\nconst lastName = parts.join(\" \") || \"\";\n\n// Get city/state string from possible fields\nconst location = $json.location || $json.cityState || $json.formatted_address || \"\";\n\n// Split city and state\nlet city = \"\";\nlet state = \"\";\n\nif (location.includes(\",\")) {\n  const locationParts = location.split(\",\");\n  city = locationParts[0].trim();\n  state = locationParts[1].trim();\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      firstName: firstName,\n      lastName: lastName,\n      city: city,\n      state: state\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       416,
+                                       240
+                                   ],
+                      "id":  "b4942c82-b8f1-46d3-8c8a-74b460e81830",
+                      "name":  "Code in JavaScript"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       832,
+                                       0
+                                   ],
+                      "id":  "28f32234-072b-45df-a685-84a2c0b6b349",
+                      "name":  "Loop Over Items"
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.noOp",
+                      "name":  "Replace Me",
+                      "typeVersion":  1,
+                      "position":  [
+                                       976,
+                                       416
+                                   ],
+                      "id":  "2fc2ffe7-b31e-4283-9976-07ceef67b264"
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.limit",
+                      "typeVersion":  1,
+                      "position":  [
+                                       0,
+                                       240
+                                   ],
+                      "id":  "893d3fa1-03ae-4673-ba67-b1deef3dfa3c",
+                      "name":  "Limit"
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       208,
+                                       240
+                                   ],
+                      "id":  "48462e37-79e9-4411-82da-b5ffdbb840ce",
+                      "name":  "Wait",
+                      "webhookId":  "e36b815f-d076-42ad-8c8e-4973cc63f6b0"
+                  },
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "hours",
+                                                                           "hoursInterval":  3
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "id":  "25c683f3-0353-4662-b0c3-5620044c2dab",
+                      "name":  "Schedule Trigger"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const raw = $json.phone || \"\";\n\n// Remove everything except digits\nconst digits = raw.replace(/\\D/g, \"\");\n\n// Force US format\nlet formatted = digits;\n\nif (digits.length === 10) {\n  formatted = \"+1\" + digits;\n} else if (digits.length === 11 \u0026\u0026 digits.startsWith(\"1\")) {\n  formatted = \"+\" + digits;\n} else {\n  formatted = \"+\" + digits; // fallback\n}\n\nreturn [\n{\n  json: {\n    ...$json,\n    phone: formatted\n  }\n}\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       624,
+                                       240
+                                   ],
+                      "id":  "b5b116ed-fa40-4542-bd97-bba51bfd2087",
+                      "name":  "Code in JavaScript1"
+                  }
+              ],
+    "connections":  {
+                        "When clicking ‘Execute workflow’":  {
+                                                                 "main":  [
+                                                                              [
+
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Get row(s) in sheet",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Get row(s) in sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Loop Over Items",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Code in JavaScript":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Code in JavaScript1",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Loop Over Items":  {
+                                                "main":  [
+                                                             [
+
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Limit",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Replace Me":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "Loop Over Items",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Limit":  {
+                                      "main":  [
+                                                   [
+                                                       {
+                                                           "node":  "Wait",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                                   ]
+                                               ]
+                                  },
+                        "HTTP Request":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Replace Me",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Wait":  {
+                                     "main":  [
+                                                  [
+                                                      {
+                                                          "node":  "Code in JavaScript",
+                                                          "type":  "main",
+                                                          "index":  0
+                                                      }
+                                                  ]
+                                              ]
+                                 },
+                        "Schedule Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Edit Fields",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Code in JavaScript1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "HTTP Request",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false
+                 },
+    "staticData":  {
+                       "node:Schedule Trigger":  {
+                                                     "recurrenceRules":  [
+                                                                             12
+                                                                         ]
+                                                 }
+                   },
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "pinData":  {
+
+                },
+    "versionId":  "b503dba2-5ab3-4c65-a1da-156b4a0d52ee",
+    "activeVersionId":  "b503dba2-5ab3-4c65-a1da-156b4a0d52ee",
+    "versionCounter":  248,
+    "triggerCount":  1,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-03-05T02:28:15.170Z",
+                       "createdAt":  "2026-03-05T02:28:15.170Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "rZI7mTLz6YlJJcUI",
+                       "projectId":  "C3AYlpbnTPZxdj6d",
+                       "project":  {
+                                       "updatedAt":  "2026-03-05T02:06:34.068Z",
+                                       "createdAt":  "2026-03-05T02:05:07.685Z",
+                                       "id":  "C3AYlpbnTPZxdj6d",
+                                       "name":  "Gentrit Luta \u003cemailautomationaureonglobal@proton.me\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "creatorId":  "77cd825c-5b23-4939-9a9a-294dc9e93f9d"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-03-22T23:54:04.364Z",
+                          "createdAt":  "2026-03-22T23:54:04.364Z",
+                          "versionId":  "b503dba2-5ab3-4c65-a1da-156b4a0d52ee",
+                          "workflowId":  "rZI7mTLz6YlJJcUI",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "type":  "n8n-nodes-base.manualTrigger",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -48,
+                                                             -288
+                                                         ],
+                                            "id":  "d6efea0f-e5bf-4cde-9d42-a4d727ad47e9",
+                                            "name":  "When clicking ‘Execute workflow’"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.set",
+                                            "typeVersion":  3.4,
+                                            "position":  [
+                                                             208,
+                                                             0
+                                                         ],
+                                            "id":  "c824b365-7af2-4940-b71c-d5c9fbc82f38",
+                                            "name":  "Edit Fields"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "documentId":  {
+                                                                                  "__rl":  true,
+                                                                                  "value":  "1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U",
+                                                                                  "mode":  "list",
+                                                                                  "cachedResultName":  "Leads V2?",
+                                                                                  "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit?usp=drivesdk"
+                                                                              },
+                                                               "sheetName":  {
+                                                                                 "__rl":  true,
+                                                                                 "value":  427333439,
+                                                                                 "mode":  "list",
+                                                                                 "cachedResultName":  "CRM Test",
+                                                                                 "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1riT86nZttAuubzGu9LI6xfu5yb36TUoeiNQWLc4CQ3U/edit#gid=427333439"
+                                                                             },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.googleSheets",
+                                            "typeVersion":  4.7,
+                                            "position":  [
+                                                             416,
+                                                             0
+                                                         ],
+                                            "id":  "fb096421-4ee8-4d80-8d0f-ac7d846a2bac",
+                                            "name":  "Get row(s) in sheet",
+                                            "credentials":  {
+                                                                "googleSheetsOAuth2Api":  {
+                                                                                              "id":  "qLPeod8jWUTxYQI0",
+                                                                                              "name":  "Google Sheets account 3"
+                                                                                          }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://api.close.com/api/v1/lead/",
+                                                               "authentication":  "genericCredentialType",
+                                                               "genericAuthType":  "httpBasicAuth",
+                                                               "sendHeaders":  true,
+                                                               "headerParameters":  {
+                                                                                        "parameters":  [
+                                                                                                           {
+                                                                                                               "name":  "Content-Type",
+                                                                                                               "value":  "application/json"
+                                                                                                           }
+                                                                                                       ]
+                                                                                    },
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={\n  \"name\": \"{{$json.companyName}}\",\n  \"url\": \"{{$json.website}}\",\n  \"addresses\": [\n    {\n      \"city\": \"{{$json.city}}\",\n      \"state\": \"{{$json.state}}\"\n    }\n  ],\n  \"contacts\": [\n    {\n      \"name\": \"{{$json.firstName}} {{$json.lastName}}\",\n      \"emails\": [\n        {\n          \"email\": \"{{$json.email}}\"\n        }\n      ],\n      \"phones\": [\n        {\n          \"phone\": \"DEBUG-{{$json.phone}}\"\n        }\n      ]\n    }\n  ]\n}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             832,
+                                                             240
+                                                         ],
+                                            "id":  "96054ba1-0c22-4088-8235-7fe81d7de740",
+                                            "name":  "HTTP Request",
+                                            "retryOnFail":  false,
+                                            "alwaysOutputData":  true,
+                                            "credentials":  {
+                                                                "httpBasicAuth":  {
+                                                                                      "id":  "2dnZv1HfjoH7rMB9",
+                                                                                      "name":  "Unnamed credential"
+                                                                                  }
+                                                            },
+                                            "onError":  "continueRegularOutput"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "api_4yKLAgfyhBrdHYE9NWFGB8.2KPmZKkwofNb6gsQjx1MJM"
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "position":  [
+                                                             256,
+                                                             -256
+                                                         ],
+                                            "typeVersion":  1,
+                                            "id":  "a5a48f73-7f74-4e83-9f31-d29c93ef2ebe",
+                                            "name":  "Sticky Note"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// Get full name from possible fields\nconst fullName = $json.personName || $json.name || $json.owner || \"\";\n\n// Split name\nconst parts = fullName.trim().split(/\\s+/);\nconst firstName = parts.shift() || \"\";\nconst lastName = parts.join(\" \") || \"\";\n\n// Get city/state string from possible fields\nconst location = $json.location || $json.cityState || $json.formatted_address || \"\";\n\n// Split city and state\nlet city = \"\";\nlet state = \"\";\n\nif (location.includes(\",\")) {\n  const locationParts = location.split(\",\");\n  city = locationParts[0].trim();\n  state = locationParts[1].trim();\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      firstName: firstName,\n      lastName: lastName,\n      city: city,\n      state: state\n    }\n  }\n];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             416,
+                                                             240
+                                                         ],
+                                            "id":  "b4942c82-b8f1-46d3-8c8a-74b460e81830",
+                                            "name":  "Code in JavaScript"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.splitInBatches",
+                                            "typeVersion":  3,
+                                            "position":  [
+                                                             832,
+                                                             0
+                                                         ],
+                                            "id":  "28f32234-072b-45df-a685-84a2c0b6b349",
+                                            "name":  "Loop Over Items"
+                                        },
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "type":  "n8n-nodes-base.noOp",
+                                            "name":  "Replace Me",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             976,
+                                                             416
+                                                         ],
+                                            "id":  "2fc2ffe7-b31e-4283-9976-07ceef67b264"
+                                        },
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "type":  "n8n-nodes-base.limit",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             0,
+                                                             240
+                                                         ],
+                                            "id":  "893d3fa1-03ae-4673-ba67-b1deef3dfa3c",
+                                            "name":  "Limit"
+                                        },
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "type":  "n8n-nodes-base.wait",
+                                            "typeVersion":  1.1,
+                                            "position":  [
+                                                             208,
+                                                             240
+                                                         ],
+                                            "id":  "48462e37-79e9-4411-82da-b5ffdbb840ce",
+                                            "name":  "Wait",
+                                            "webhookId":  "e36b815f-d076-42ad-8c8e-4973cc63f6b0"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "rule":  {
+                                                                            "interval":  [
+                                                                                             {
+                                                                                                 "field":  "hours",
+                                                                                                 "hoursInterval":  3
+                                                                                             }
+                                                                                         ]
+                                                                        }
+                                                           },
+                                            "type":  "n8n-nodes-base.scheduleTrigger",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             0,
+                                                             0
+                                                         ],
+                                            "id":  "25c683f3-0353-4662-b0c3-5620044c2dab",
+                                            "name":  "Schedule Trigger"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "const raw = $json.phone || \"\";\n\n// Remove everything except digits\nconst digits = raw.replace(/\\D/g, \"\");\n\n// Force US format\nlet formatted = digits;\n\nif (digits.length === 10) {\n  formatted = \"+1\" + digits;\n} else if (digits.length === 11 \u0026\u0026 digits.startsWith(\"1\")) {\n  formatted = \"+\" + digits;\n} else {\n  formatted = \"+\" + digits; // fallback\n}\n\nreturn [\n{\n  json: {\n    ...$json,\n    phone: formatted\n  }\n}\n];"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             624,
+                                                             240
+                                                         ],
+                                            "id":  "b5b116ed-fa40-4542-bd97-bba51bfd2087",
+                                            "name":  "Code in JavaScript1"
+                                        }
+                                    ],
+                          "connections":  {
+                                              "When clicking ‘Execute workflow’":  {
+                                                                                       "main":  [
+                                                                                                    [
+
+                                                                                                    ]
+                                                                                                ]
+                                                                                   },
+                                              "Edit Fields":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "Get row(s) in sheet",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              },
+                                              "Get row(s) in sheet":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Loop Over Items",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Code in JavaScript":  {
+                                                                         "main":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "Code in JavaScript1",
+                                                                                              "type":  "main",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                     },
+                                              "Loop Over Items":  {
+                                                                      "main":  [
+                                                                                   [
+
+                                                                                   ],
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Limit",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "Replace Me":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Loop Over Items",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                                              "Limit":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "Wait",
+                                                                                 "type":  "main",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        },
+                                              "HTTP Request":  {
+                                                                   "main":  [
+                                                                                [
+                                                                                    {
+                                                                                        "node":  "Replace Me",
+                                                                                        "type":  "main",
+                                                                                        "index":  0
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                               },
+                                              "Wait":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Code in JavaScript",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                                              "Schedule Trigger":  {
+                                                                       "main":  [
+                                                                                    [
+                                                                                        {
+                                                                                            "node":  "Edit Fields",
+                                                                                            "type":  "main",
+                                                                                            "index":  0
+                                                                                        }
+                                                                                    ]
+                                                                                ]
+                                                                   },
+                                              "Code in JavaScript1":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "HTTP Request",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      }
+                                          },
+                          "authors":  "Gentrit Luta",
+                          "name":  null,
+                          "description":  null,
+                          "autosaved":  true,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-04-28T15:54:09.254Z",
+                                                             "id":  86,
+                                                             "workflowId":  "rZI7mTLz6YlJJcUI",
+                                                             "versionId":  "b503dba2-5ab3-4c65-a1da-156b4a0d52ee",
+                                                             "event":  "activated",
+                                                             "userId":  "77cd825c-5b23-4939-9a9a-294dc9e93f9d"
+                                                         }
+                                                     ]
+                      }
+}

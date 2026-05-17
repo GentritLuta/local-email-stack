@@ -1,0 +1,33 @@
+# Crypto founders/builders on X with engaged audience (avoid mega-accounts + shill bots).
+name: "Crypto founders & builders on X"
+slug: crypto_twitter
+sourcing_engines:
+  - engine: twitter_profile
+    config:
+      bio_keywords: ["defi", "ethereum", "solana", "founder", "building", "0x", "web3", "ZK", "rollup"]
+      exclude_bio_keywords: ["nft promoter", "crypto signals", "100x", "pump", "shill", "moon"]
+      min_followers: 5000
+      max_followers: 200000
+      recent_post_within_days: 14
+      language: en
+      limit: 300
+  - engine: farcaster_creator
+    config:
+      channels: ["dev", "crypto", "ethereum", "founders", "base"]
+      bio_keywords: ["building", "founder", "engineer", "dev"]
+      min_followers: 500
+      recent_cast_days: 14
+      limit: 200
+enrichment:
+  level: comprehensive
+icp_filter:
+  must_have: [website_or_linktree]
+persona_assignment: m4              # Tomás — calm-technical
+sequence:
+  steps:
+    - delay_days: 0
+      template: crypto_initial_value_link
+    - delay_days: 5
+      template: crypto_followup_specific
+    - delay_days: 12
+      template: crypto_breakup

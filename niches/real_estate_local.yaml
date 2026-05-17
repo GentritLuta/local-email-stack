@@ -1,0 +1,32 @@
+# Real-estate agents in a chosen city.
+# Clone this file, change `location/lat/lng/slug/name`, drop in niches/, hot-reloads in 5 min.
+name: "Real estate agents — Austin TX"
+slug: real_estate_austin
+sourcing_engines:
+  - engine: local_business
+    config:
+      category: "real_estate_agency"
+      location: "Austin, TX"
+      lat: 30.2672
+      lng: -97.7431
+      radius_m: 30000
+      min_rating: 4.0
+      max_rating: 5.0
+      sources: [google_maps, yelp, bing_places]
+      limit: 250
+enrichment:
+  level: comprehensive
+icp_filter:
+  must_have: [website, phone]
+  exclude_keywords: ["national franchise", "brokerage chain"]
+persona_assignment: m10            # Caleb — midwest-direct
+sequence:
+  steps:
+    - delay_days: 0
+      template: real_estate_initial
+    - delay_days: 4
+      template: real_estate_followup_1
+    - delay_days: 9
+      template: real_estate_value
+    - delay_days: 16
+      template: real_estate_breakup

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "LocalEmailStack",
+  "version": "0.4.0",
+  "identifier": "xyz.insaneaiautomation.local-email-stack",
+  "build": {
+    "frontendDist": "../frontend/dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm --prefix ../frontend run dev",
+    "beforeBuildCommand": "npm --prefix ../frontend run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "LocalEmailStack",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "center": true,
+        "theme": "Dark"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost http://localhost:* ws://localhost:*; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi", "deb", "appimage", "dmg"],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png",
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png"
+    ],
+    "publisher": "Insane AI Automation",
+    "category": "Productivity",
+    "shortDescription": "Self-hosted cold-email pipeline — observe, control, transfer.",
+    "longDescription": "Control panel for the LocalEmailStack: source leads from 12 platforms, enrich with maximal public context, send via your own Postal MTA, watch the pipeline in real time. $0/mo recurring. Backup + transfer to another PC with one click.",
+    "windows": {
+      "nsis": {
+        "installMode": "perUser",
+        "installerIcon": "icons/icon.ico"
+      }
+    }
+  }
+}

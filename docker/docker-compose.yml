@@ -1,0 +1,423 @@
+# Local Cold-Email Stack — v4 compose ($0/mo, self-healing, hands-free).
+# Target: Ubuntu 22.04/24.04 + Docker + NVIDIA Container Toolkit.
+# Bring-up: copy ../bootstrap.env.example → ../bootstrap.env, then run ../scripts/bootstrap.sh.
+
+name: local-email-stack
+
+x-restart: &restart_policy
+  restart: unless-stopped
+
+networks:
+  edge:
+  internal:
+    internal: false
+
+volumes:
+  postgres_data:
+  redis_data:
+  n8n_data:
+  qdrant_data:
+  minio_data:
+  ollama_models:
+  traefik_certs:
+  grafana_data:
+  prometheus_data:
+  loki_data:
+  twenty_data:
+  searxng_data:
+  nocodb_data:
+  federation_repo:
+
+services:
+  # ─── Edge / TLS ────────────────────────────────────────────────────────────
+  traefik:
+    image: traefik:v3.1
+    <<: *restart_policy
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/certs/acme.json
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/certs
+    networks: [edge]
+
+  # ─── Data plane ────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    <<: *restart_policy
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: n8n,twenty,leads,nocodb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh:ro
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    <<: *restart_policy
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks: [internal]
+
+  minio:
+    image: minio/minio:latest
+    <<: *restart_policy
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    networks: [internal]
+
+  # ─── LLM ───────────────────────────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    <<: *restart_policy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      OLLAMA_KEEP_ALIVE: "24h"
+      OLLAMA_NUM_PARALLEL: "2"
+      OLLAMA_FLASH_ATTENTION: "1"
+    volumes:
+      - ollama_models:/root/.ollama
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    <<: *restart_policy
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml
+    networks: [internal]
+    depends_on: [ollama]
+
+  # ─── Web search tool (for AI Finder agent) ─────────────────────────────────
+  searxng:
+    image: searxng/searxng:latest
+    <<: *restart_policy
+    environment:
+      SEARXNG_BASE_URL: http://searxng:8080/
+    volumes:
+      - searxng_data:/etc/searxng
+    networks: [internal]
+
+  # ─── Scraping (innovation #1) ──────────────────────────────────────────────
+  browserless:
+    image: ghcr.io/browserless/chromium:latest
+    <<: *restart_policy
+    environment:
+      TOKEN: ${BROWSERLESS_TOKEN}
+      CONCURRENT: 6
+      QUEUED: 30
+      TIMEOUT: 60000
+    networks: [internal]
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    <<: *restart_policy
+    environment:
+      LOG_LEVEL: info
+    networks: [internal]
+
+  scraper:
+    build: ./scraper
+    <<: *restart_policy
+    environment:
+      BROWSERLESS_URL: http://browserless:3000
+      BROWSERLESS_TOKEN: ${BROWSERLESS_TOKEN}
+      FLARESOLVERR_URL: http://flaresolverr:8191
+      OLLAMA_URL: http://ollama:11434
+      VISION_MODEL: qwen2-vl:7b
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      SELECTORS_PATH: /app/selectors.yaml
+    volumes:
+      - ./scraper/selectors.yaml:/app/selectors.yaml
+    networks: [internal]
+    depends_on: [browserless, flaresolverr, minio, ollama]
+
+  # ─── Universal sourcing (innovation #11) ───────────────────────────────────
+  sourcing:
+    build: ./sourcing
+    <<: *restart_policy
+    environment:
+      PG_DSN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/leads
+      SCRAPER_URL: http://scraper:8080
+      SEARXNG_URL: http://searxng:8080
+      ENRICHER_URL: http://enricher:8000
+      NICHES_DIR: /app/niches
+      NEYNAR_API_KEY: ${NEYNAR_API_KEY:-}
+      REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID:-}
+      REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET:-}
+      REDDIT_USER_AGENT: ${REDDIT_USER_AGENT:-local-email-stack/4.0}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      INSTAGRAM_USERNAME: ${INSTAGRAM_USERNAME:-}
+      INSTAGRAM_PASSWORD: ${INSTAGRAM_PASSWORD:-}
+      PRODUCTHUNT_TOKEN: ${PRODUCTHUNT_TOKEN:-}
+      OLLAMA_URL: http://ollama:11434
+      LLM_MODEL: qwen2.5:32b-instruct-q4_K_M
+    volumes:
+      - ../niches:/app/niches
+    networks: [internal]
+    depends_on: [postgres, scraper, searxng, ollama]
+
+  # ─── Maximum-context enricher (innovation #12) ─────────────────────────────
+  enricher:
+    build: ./enricher
+    <<: *restart_policy
+    environment:
+      PG_DSN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/leads
+      SCRAPER_URL: http://scraper:8080
+      SEARXNG_URL: http://searxng:8080
+      SOURCING_URL: http://sourcing:8000
+      ENRICH_CONCURRENCY: 4
+    networks: [internal]
+    depends_on: [postgres, scraper, searxng]
+
+  # ─── Email finder + verifier (replaces Apollo + Anymail Finder) ────────────
+  email-finder:
+    build: ./email-finder
+    <<: *restart_policy
+    environment:
+      PG_DSN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/leads
+      SMTP_PROBE_FROM: probe@${PARENT_DOMAIN}
+    networks: [internal]
+    depends_on: [postgres]
+
+  # ─── Smart outbound routing (innovation #3) ────────────────────────────────
+  route-picker:
+    build: ./route-picker
+    <<: *restart_policy
+    environment:
+      PG_DSN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/leads
+    networks: [internal]
+    depends_on: [postgres]
+
+  # ─── Bandit + lead-quality scorer (innovations #4, #6) ─────────────────────
+  bandit-scorer:
+    build: ./bandit-scorer
+    <<: *restart_policy
+    environment:
+      PG_DSN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/leads
+      OLLAMA_URL: http://ollama:11434
+      EMBED_MODEL: nomic-embed-text
+    networks: [internal]
+    depends_on: [postgres, ollama]
+
+  # ─── Persona-coherent prompt renderer (innovation #5) ──────────────────────
+  persona-engine:
+    build: ./persona-engine
+    <<: *restart_policy
+    environment:
+      PERSONAS_PATH: /app/personas.yaml
+    volumes:
+      - ./persona-engine/personas.yaml:/app/personas.yaml
+    networks: [internal]
+
+  # ─── Federated suppression sync (innovation #10) ───────────────────────────
+  suppression-syncer:
+    build: ./suppression-syncer
+    <<: *restart_policy
+    environment:
+      PG_DSN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/leads
+      SUPPRESSION_FEDERATION_ENABLED: ${SUPPRESSION_FEDERATION_ENABLED:-false}
+      SUPPRESSION_FEDERATION_SALT: ${SUPPRESSION_FEDERATION_SALT:-}
+      FEDERATION_REPO_DIR: /var/lib/federation
+      FEDERATION_REPO_URL: https://github.com/yourorg/suppression-federation.git
+    volumes:
+      - federation_repo:/var/lib/federation
+    networks: [internal]
+    depends_on: [postgres]
+    # Runs as a cron in n8n via HTTP; this container exposes a single endpoint /run.
+    # If you want a standalone cron instead, wrap in supercronic.
+
+  # ─── Self-healing watchdog (innovation #9) ─────────────────────────────────
+  watchdog:
+    build: ./watchdog
+    <<: *restart_policy
+    environment:
+      ALERTMANAGER_URL: http://alertmanager:9093/api/v1/alerts
+      ORACLE_SSH_HOST: ${ORACLE_SSH_HOST}
+      ORACLE_SSH_USER: ${ORACLE_SSH_USER}
+      ORACLE_SSH_KEY: /keys/oracle_postal_rsa
+      LITELLM_CONFIG_PATH: /litellm/config.yaml
+      ROUTE_PICKER_URL: http://route-picker:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${ORACLE_SSH_KEY}:/keys/oracle_postal_rsa:ro
+      - ./litellm/config.yaml:/litellm/config.yaml
+    networks: [internal]
+    depends_on: [route-picker, alertmanager]
+
+  # ─── Orchestration (n8n in queue mode) ─────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    <<: *restart_policy
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: ${POSTGRES_USER}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      EXECUTIONS_MODE: queue
+      QUEUE_BULL_REDIS_HOST: redis
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_HOST: ${N8N_HOST}
+      N8N_PROTOCOL: https
+      WEBHOOK_URL: https://${N8N_HOST}/
+      GENERIC_TIMEZONE: ${TIMEZONE}
+      N8N_METRICS: "true"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks: [internal, edge]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.rule=Host(`${N8N_HOST}`)
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.routers.n8n.tls.certresolver=le
+      - traefik.http.services.n8n.loadbalancer.server.port=5678
+    depends_on: [postgres, redis]
+
+  n8n-worker:
+    image: n8nio/n8n:latest
+    <<: *restart_policy
+    command: ["worker"]
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: ${POSTGRES_USER}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      EXECUTIONS_MODE: queue
+      QUEUE_BULL_REDIS_HOST: redis
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks: [internal]
+    depends_on: [n8n]
+    deploy:
+      replicas: 2
+
+  # ─── CRM ───────────────────────────────────────────────────────────────────
+  twenty:
+    image: twentycrm/twenty:latest
+    <<: *restart_policy
+    environment:
+      PG_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/twenty
+      SERVER_URL: https://${CRM_HOST}
+      APP_SECRET: ${TWENTY_APP_SECRET}
+      STORAGE_TYPE: s3
+      STORAGE_S3_REGION: us-east-1
+      STORAGE_S3_NAME: twenty
+      STORAGE_S3_ENDPOINT: http://minio:9000
+    volumes:
+      - twenty_data:/app/storage
+    networks: [internal, edge]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.twenty.rule=Host(`${CRM_HOST}`)
+      - traefik.http.routers.twenty.entrypoints=websecure
+      - traefik.http.routers.twenty.tls.certresolver=le
+      - traefik.http.services.twenty.loadbalancer.server.port=3000
+    depends_on: [postgres, minio]
+
+  # ─── NocoDB (Sheets replacement) ───────────────────────────────────────────
+  nocodb:
+    image: nocodb/nocodb:latest
+    <<: *restart_policy
+    environment:
+      NC_DB: "pg://postgres:5432?u=${POSTGRES_USER}&p=${POSTGRES_PASSWORD}&d=nocodb"
+    volumes:
+      - nocodb_data:/usr/app/data
+    networks: [internal, edge]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nocodb.rule=Host(`${NOCODB_HOST}`)
+      - traefik.http.routers.nocodb.entrypoints=websecure
+      - traefik.http.routers.nocodb.tls.certresolver=le
+      - traefik.http.services.nocodb.loadbalancer.server.port=8080
+    depends_on: [postgres]
+
+  # ─── Observability ─────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    <<: *restart_policy
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks: [internal]
+
+  loki:
+    image: grafana/loki:latest
+    <<: *restart_policy
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    networks: [internal]
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    <<: *restart_policy
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    networks: [internal]
+
+  grafana:
+    image: grafana/grafana:latest
+    <<: *restart_policy
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    networks: [internal, edge]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST}`)
+      - traefik.http.routers.grafana.entrypoints=websecure
+      - traefik.http.routers.grafana.tls.certresolver=le
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+    depends_on: [prometheus, loki]
+
+  # ─── Tailscale (joins the home server to the Oracle Postal VM) ─────────────
+  tailscale:
+    image: tailscale/tailscale:latest
+    <<: *restart_policy
+    hostname: home-email-stack
+    environment:
+      TS_AUTHKEY: ${TAILSCALE_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "false"
+    volumes:
+      - /var/lib/tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    networks: [internal]

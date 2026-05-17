@@ -1,0 +1,14 @@
+{
+  "_note": "Copy to aureon.private.json (gitignored). Fill in each mailbox's app password. The slug must match the corresponding entry in aureon.json mailboxes.",
+  "mailbox_credentials": {
+    "daniel": {
+      "pass": "xxxx-xxxx-xxxx-xxxx"
+    },
+    "anna":   {
+      "pass": "xxxx-xxxx-xxxx-xxxx"
+    },
+    "marco":  {
+      "pass": "xxxx-xxxx-xxxx-xxxx"
+    }
+  }
+}

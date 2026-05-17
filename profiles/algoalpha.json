@@ -1,0 +1,65 @@
+{
+  "slug": "algoalpha",
+  "name": "AlgoAlpha",
+  "created_at": "2026-05-17",
+  "active": true,
+
+  "identity": {
+    "from_name": "Tomás Silva",
+    "from_addr": "tomas@mail.algoalpha.io",
+    "reply_to": "tomas@mail.algoalpha.io",
+    "role": "Co-founder",
+    "company": "AlgoAlpha",
+    "site": "https://algoalpha.io",
+    "signature": "Tomás\nco-founder · AlgoAlpha\nhttps://algoalpha.io"
+  },
+
+  "voice": {
+    "register": "calm-technical",
+    "quirks": ["uses specific numbers when relevant", "minimal fluff", "precise questions", "names a real research finding when referencing AlgoAlpha"],
+    "avoid": ["hype", "stacked adjectives", "vague metrics like 'huge'", "fake urgency"]
+  },
+
+  "relay": {
+    "backend": "resend",
+    "resend_api_key": "",
+    "from_domains": ["mail.algoalpha.io"],
+    "domain_verified_at": null,
+    "dkim_selector": "resend"
+  },
+
+  "warmup": {
+    "enabled": true,
+    "started_at": null,
+    "current_day": 0,
+    "ramp_curve": "snowball_v1",
+    "max_daily_sends": 300,
+    "warmup_targets": [],
+    "real_send_mix": [
+      { "until_day": 14,   "warmup_pct": 80 },
+      { "until_day": 30,   "warmup_pct": 30 },
+      { "until_day": 45,   "warmup_pct": 10 },
+      { "until_day": 9999, "warmup_pct": 5  }
+    ],
+    "reputation": {
+      "bounce_rate_7d": 0.0,
+      "complaint_rate_7d": 0.0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.001
+    }
+  },
+
+  "ramp_curve_snowball_v1": [
+    { "from_day": 1,  "daily": 10  },
+    { "from_day": 4,  "daily": 20  },
+    { "from_day": 8,  "daily": 40  },
+    { "from_day": 15, "daily": 80  },
+    { "from_day": 22, "daily": 150 },
+    { "from_day": 31, "daily": 250 },
+    { "from_day": 46, "daily": 300 }
+  ]
+}

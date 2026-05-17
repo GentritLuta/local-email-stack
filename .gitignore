@@ -1,0 +1,64 @@
+# ─── Secrets & per-user config (NEVER commit) ─────────────────────────────
+profiles/*.private.json
+sequences/hostinger.env
+sequences/relay.env
+sequences/supabase.env
+docker/.env
+bootstrap.env
+
+# ─── Operational state (per-machine, not source) ──────────────────────────
+warmup-state/
+sequences/test-sends/
+sequences/**/eml/
+sequences/**/results.json
+sequences/**/*.eml
+desktop/portable/
+desktop/logs/
+desktop/dev-server.log
+desktop/dev-server.err
+desktop/EdgeProfile/
+
+# ─── Build outputs ────────────────────────────────────────────────────────
+desktop/frontend/node_modules/
+desktop/frontend/dist/
+desktop/frontend/.vite/
+desktop/src-tauri/target/
+desktop/src-tauri/icons/16x16.png
+desktop/src-tauri/icons/24x24.png
+desktop/src-tauri/icons/32x32.png
+desktop/src-tauri/icons/48x48.png
+desktop/src-tauri/icons/64x64.png
+desktop/src-tauri/icons/96x96.png
+desktop/src-tauri/icons/128x128.png
+desktop/src-tauri/icons/256x256.png
+desktop/src-tauri/icons/icon.png
+
+# ─── Published-to-frontend snapshots (auto-generated, live in /public) ────
+desktop/frontend/public/profiles/
+desktop/frontend/public/sequences/
+
+# ─── Python ───────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.pyc
+
+# ─── Node ─────────────────────────────────────────────────────────────────
+node_modules/
+.npm/
+*.log
+npm-debug.log*
+
+# ─── Rust ─────────────────────────────────────────────────────────────────
+target/
+**/*.rs.bk
+Cargo.lock
+
+# ─── OS / IDE ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

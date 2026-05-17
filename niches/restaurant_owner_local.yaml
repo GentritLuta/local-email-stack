@@ -1,0 +1,26 @@
+name: "Restaurant owners — {{LOCATION}}"
+slug: restaurant_local
+sourcing_engines:
+  - engine: local_business
+    config:
+      category: "restaurant"
+      location: "{{LOCATION}}"
+      radius_m: 15000
+      min_rating: 3.8
+      max_rating: 4.7         # skip the chains
+      sources: [google_maps, yelp]
+      limit: 200
+enrichment:
+  level: comprehensive
+icp_filter:
+  must_have: [website, phone]
+  exclude_keywords: [franchise, chain]
+persona_assignment: m8        # Marco — warm-italian
+sequence:
+  steps:
+    - delay_days: 0
+      template: restaurant_initial
+    - delay_days: 4
+      template: restaurant_followup
+    - delay_days: 11
+      template: restaurant_breakup

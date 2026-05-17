@@ -1,0 +1,21 @@
+name: "Beauty/skincare creators on TikTok"
+slug: tiktok_beauty
+sourcing_engines:
+  - engine: tiktok_creator
+    config:
+      hashtags: ["skincare", "skincareroutine", "skincaretips", "beautytok", "korean skincare", "acne tips"]
+      min_followers: 10000
+      min_engagement_rate: 0.04
+      recent_posts_within_days: 14
+      limit: 200
+enrichment:
+  level: comprehensive
+persona_assignment: m5              # Lena — personal-direct
+sequence:
+  steps:
+    - delay_days: 0
+      template: creator_initial_value
+    - delay_days: 5
+      template: creator_followup_specific
+    - delay_days: 13
+      template: creator_breakup
