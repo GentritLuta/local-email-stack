@@ -41,13 +41,17 @@ FALLBACK_UNSUB_MAILTO = "info@aureonglobal.de?subject=unsubscribe"
 
 
 def unsubscribe_url(token: Optional[str], brand: dict | None = None) -> str:
-    """Build the per-prospect unsubscribe URL. Falls back to mailto: when no
-    token (ad-hoc test sends without a real prospect row)."""
-    if not token:
-        return f"mailto:{FALLBACK_UNSUB_MAILTO}"
+    """Build the per-prospect unsubscribe URL. Always returns a URL (not a
+    mailto:) so the recipient gets a real button. When the token is missing
+    we strip it from the template — the static page handles the no-token
+    case with a clean error + a fallback contact line."""
     b = brand or DEFAULT_BRAND
     template = b.get("unsubscribe_url_template") or DEFAULT_BRAND["unsubscribe_url_template"]
-    return template.format(token=token)
+    if token:
+        return template.format(token=token)
+    # No token: strip ?t={token} (or &t={token}) from template, keep base URL.
+    base = template.split("?")[0]
+    return base
 
 
 def _esc(s: str) -> str:
@@ -100,6 +104,20 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
                     f'<a href="https://{_esc(site)}" style="color:{c["text_2"]};text-decoration:none;">{_esc(site)}</a>'
                     if site else _esc(b.get("wordmark") or ""))
 
+    # Bottom logo block — the wordmark repeated in the brand accent color,
+    # centered, gives the email a clear "this is from <brand>" close. Matches
+    # the site's repeated wordmark pattern.
+    bottom_logo_html = ""
+    if wordmark:
+        bottom_logo_html = f'''
+        <tr><td style="padding:32px 36px 8px;border-top:1px solid {c['rule']};text-align:center;">
+          <div style="font-family:{font};font-size:20px;font-weight:700;letter-spacing:.04em;color:{c['accent']};">
+            {_esc(wordmark).upper()}
+          </div>
+          {f'<div style="font-family:{font};font-size:11px;color:{c["muted"]};margin-top:4px;letter-spacing:.02em;">{_esc(tagline)}</div>' if tagline else ''}
+          <div style="height:2px;width:40px;background:{c['accent']};margin:14px auto 0;opacity:.7;"></div>
+        </td></tr>'''
+
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -124,8 +142,9 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
             {company_line}
           </div>
         </td></tr>
-        <tr><td style="padding:18px 36px 28px;border-top:1px solid {c['rule']};font-family:{font};font-size:12px;line-height:1.5;color:{c['muted']};">
-          You're receiving this because we believe it's relevant to your business.
+        {bottom_logo_html}
+        <tr><td style="padding:16px 36px 28px;text-align:center;font-family:{font};font-size:12px;line-height:1.5;color:{c['muted']};">
+          You're receiving this because we believe it's relevant to your business.<br>
           <a href="{_esc(unsub)}" style="color:{c['accent_2']};text-decoration:underline;">Unsubscribe with one click</a>
           and we won't contact you again.
         </td></tr>

@@ -1,74 +1,75 @@
 {
-  "name": "Aureon Global — US real estate 7-step sequence",
+  "name": "Aureon Global — US real estate 7-step (Hormozi style)",
   "slug": "aureon_realestate_us",
   "created_at": "2026-05-17",
   "target": "US real estate agents and small brokerages",
-  "deliverability_notes": [
-    "Each step is plain prose (no em-dashes, no images, no URLs in body).",
-    "Renderer (sequences/email_render.py) wraps the body in the canonical HTML.",
-    "Title-case salutation for US business norms.",
-    "Merge fields: {first_name}, {city}, {company}.",
-    "Step 1 introduces, 2-3 add value, 4-5 ask soft, 6 reframes, 7 breaks up."
+  "voice_notes": [
+    "Hormozi style: specific concrete numbers, dream outcome leads, risk reversal in every step, anchor against the alternative.",
+    "No hedging language. No 'just', 'maybe', 'kinda', 'I think'. Direct.",
+    "Strong CTAs as questions. Every step has ONE ask.",
+    "Aureon positioning: Performance Partner, Quality Converts, Limited Intake, 30/70 commission split, only pay on close.",
+    "Real case study numbers — Munich (3 agents, 9→17/mo, +89%, +€192k/yr) and Amsterdam (6 agents, 22%→34% close, +€340k yr1).",
+    "Light HTML, plain prose body — the renderer (sequences/email_render.py) wraps it with the gold-accent template + bottom logo."
   ],
   "step_authoring_guide": {
     "where": "This file. Each object in `variants` defines one step.",
     "fields": {
-      "n":         "Step number 1..7 — matches step_n in the runtime sequence.",
-      "delay_days": "How many days after the PREVIOUS step (step 1 always 0).",
-      "angle":     "Free-text label so you remember what the step is for.",
-      "subject":   "Subject line. May contain merge fields.",
-      "body":      "Plain prose. \\n\\n separates paragraphs. The renderer adds signature + unsubscribe footer; do NOT include them here."
+      "n":          "Step number 1..7 — matches step_n in the runtime sequence.",
+      "delay_days": "Days after the PREVIOUS step (step 1 is always 0).",
+      "angle":      "Free-text label so you remember what the step does.",
+      "subject":    "Subject line. May contain merge fields.",
+      "body":       "Plain prose. \\n\\n separates paragraphs. Renderer adds signature + Aureon logo + unsubscribe footer; do NOT include them here."
     }
   },
   "variants": [
     {
       "n": 1,
       "delay_days": 0,
-      "angle": "intro_and_proof",
-      "subject": "your pipeline this quarter",
-      "body": "Hi {first_name},\n\nSaw a few of your listings in {city} this week. Quick one.\n\nWe run lead generation for real estate teams. Fully managed by us, with our qualification team taking the first call before anything reaches the agent. We only get paid when a deal closes: 30 percent of commission to us, 70 percent stays with you.\n\nResults so far: one Munich team went from 9 to 17 closed deals per month last quarter. An Amsterdam brokerage moved their close rate from 22 percent to 34 percent in year one. We are opening up two pilot spots in the US this quarter.\n\nIf you have capacity for a few extra closed deals, worth a 15 minute call to see if it fits?"
+      "angle": "offer_and_proof",
+      "subject": "5 to 10 more closings this quarter",
+      "body": "Hi {first_name},\n\nQuick one. We help real estate teams close 5 to 10 more deals per quarter without spending another dollar on marketing.\n\nHere is the deal: we run the lead generation, our team takes the first call, qualifies the prospect, and only hands you people who are ready to talk listings. You only pay when a deal closes. 30 percent of commission to us, 70 percent stays with you. No retainer, no setup fees, no nothing if zero deals close.\n\nReal numbers from our work: one team in Munich went from 9 to 17 closed deals per month, an extra 192 thousand euros in their first year. A 6 agent brokerage in Amsterdam moved their close rate from 22 percent to 34 percent and added 340 thousand euros in year one.\n\nWe are taking two US pilot teams this quarter. After that the slots are closed until next quarter.\n\nIf you have room for more closings, worth 15 minutes to see if you qualify?"
     },
     {
       "n": 2,
       "delay_days": 3,
-      "angle": "soft_bump",
-      "subject": "did this reach you",
-      "body": "Hi {first_name},\n\nLast note bumped to the top of your inbox a few days ago and probably got buried. No pressure.\n\nQuick summary in case you missed it. We bring qualified seller and buyer leads to real estate teams. Pricing is 30 percent of commission on the deals we source, paid only after close. The client book stays yours.\n\nIs grabbing a few more deals this quarter something worth a 15 minute look, or is this off topic for where you are right now?"
+      "angle": "anchor_against_alternative",
+      "subject": "would you take 5 free closings",
+      "body": "Hi {first_name},\n\nBuried by now. I will keep it short.\n\nIf I put 5 qualified, pre-screened seller appointments on your calendar this month, and you only paid if a deal closed, would you take that call?\n\nThat is the offer. 30 percent of commission only on closes. Compare that to a marketing agency: 3 to 8 thousand dollars per month, no guarantee, leads still unqualified when they hit your inbox.\n\nWe close that loop. Worth 15 minutes?"
     },
     {
       "n": 3,
       "delay_days": 4,
-      "angle": "specific_data_point",
-      "subject": "the 5 minute number",
-      "body": "Hi {first_name},\n\nOne number we keep coming back to: the average time a US real estate agent takes to respond to a fresh inbound lead is around 47 minutes. Inside 5 minutes, the close rate roughly triples.\n\nMost of our work is closing that gap. We pre-qualify the lead and put a live agent on the phone with them inside 5 minutes, so by the time it lands with you, the person is ready to talk listings or showings.\n\nIs that a number you have a sense of for your team, or is it something nobody has measured?"
+      "angle": "data_anchor_dream_outcome",
+      "subject": "the 5 minute rule (your close rate triples)",
+      "body": "Hi {first_name},\n\nOne number runs our entire model.\n\nWhen you respond to a fresh lead in under 5 minutes, your close rate roughly triples versus the industry average response time of 47 minutes. Most agents lose the deal in the first hour without ever knowing.\n\nWe close that gap. Our team picks up the phone in under 5, qualifies, books the appointment, hands the warm lead to you. You spend your time on the listings that matter.\n\nWhat is your team's current average response time to a new lead? If it is anywhere north of 15 minutes, that is the cheapest revenue you have not collected yet."
     },
     {
       "n": 4,
       "delay_days": 5,
-      "angle": "case_study_specific",
-      "subject": "what worked for a 6 agent team",
-      "body": "Hi {first_name},\n\nShort case study in case it lands.\n\nWe took on a 6 agent brokerage in Amsterdam last year. Their close rate on raw inbound was 22 percent, mostly because leads were sitting too long before getting a call. We took over the first call and pre-qualification. Twelve months in, their close rate is 34 percent and roughly 40 percent of total deals now come from inbound that did not exist before.\n\nNot trying to claim the same numbers for {city}. Just sharing because the setup is repeatable. Worth a quick chat to map it onto your team?"
+      "angle": "case_study_roi",
+      "subject": "how 6 agents added 340k in year one",
+      "body": "Hi {first_name},\n\nReal numbers from our brokerage in Amsterdam last year.\n\nBefore us: 6 agents, close rate 22 percent on inbound, average response time 51 minutes, 0 percent of deal flow from inbound.\n\nAfter 12 months with us: close rate 34 percent. Response time under 5 minutes. Inbound is now 40 percent of total deal flow. Revenue added in year one: 340 thousand euros. Same team, same listings, same effort. The leads stopped leaking.\n\nNot promising the same numbers for {city} blindly. The setup is repeatable. Worth a 15 minute call to map it onto {company} and see what is realistic for you?"
     },
     {
       "n": 5,
       "delay_days": 6,
-      "angle": "blunt_ask",
-      "subject": "honest question",
-      "body": "Hi {first_name},\n\nHonest question, no wrong answer.\n\nWhen you imagine your next twelve months, is the bottleneck more leads coming in, or more leads getting closed once they arrive? For a lot of teams we talk to it is the second one, and that is exactly the gap we work on.\n\nIf either side resonates, I am happy to walk you through what a pilot would look like. Fifteen minutes, no slides."
+      "angle": "either_or_close",
+      "subject": "more leads or more closes",
+      "body": "Hi {first_name},\n\nReal question, takes 30 seconds.\n\nIf I gave you the choice between (a) twice as many leads, or (b) the same leads but double the close rate, which one are you picking?\n\nFor every team I have talked to this year, the answer is (b). And that is the exact problem we solve. Same lead flow, way better closes.\n\nIf that is your situation, reply 'b' and I will send you the pilot scope. If it is (a) for you, I will save us both the time."
     },
     {
       "n": 6,
       "delay_days": 7,
-      "angle": "reframe_low_risk",
-      "subject": "low risk version",
-      "body": "Hi {first_name},\n\nIf the earlier notes felt too far out, here is a smaller version.\n\nWe can run a 60 day pilot. You give us a target zip code or two. We bring in qualified seller appointments. You only pay if a deal closes, at the same 30 percent. If no deals close, you owe nothing and we go our separate ways.\n\nThat is the lowest risk way to find out if it works for {company} without any commitment upfront. Worth a brief call to scope it?"
+      "angle": "risk_reversal_scarcity",
+      "subject": "60 day pilot, 0 dollars down, 2 slots left",
+      "body": "Hi {first_name},\n\nThe most risk-free version I can write you.\n\n60 day pilot. You pick 1 or 2 zip codes. We bring qualified seller appointments inside 5 minutes of every lead. 30 percent of commission only on deals that close inside the 60 days. If no deals close, you owe zero and we both walk away. No retainer, no setup, no contract beyond the pilot.\n\nWe are taking 2 pilot teams in the US this quarter. After this quarter the slots close until next year because we cap intake. Quality converts. Volume does not.\n\nWant the pilot scope for {company}, or pass for now?"
     },
     {
       "n": 7,
       "delay_days": 7,
-      "angle": "breakup",
-      "subject": "last note from me",
-      "body": "Hi {first_name},\n\nI will stop reaching out after this one.\n\nIf there is a future quarter where bringing in more closed deals matters more than it does today, the door is open. A reply with the word later is enough and I will follow up in a few months.\n\nIf this was never relevant, totally fair. Thanks for reading and good luck with the rest of the year in {city}."
+      "angle": "breakup_door_open",
+      "subject": "last one from me",
+      "body": "Hi {first_name},\n\nWrapping up.\n\nIf this is not the quarter, no hard feelings. If you ever want to revisit, a one word reply (\"later\") is enough and I will check in next quarter.\n\nIf this was the wrong angle entirely, fair enough. Best of luck on the rest of {city} this year."
     }
   ]
 }

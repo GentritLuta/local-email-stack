@@ -135,9 +135,16 @@ export function NewProfileModal(props: { onClose: () => void; onCreated: (slug: 
           <label>Company name</label>
           <input value={f.company_name} onChange={e => setF({ ...f, company_name: e.target.value })} />
 
-          <label>Company site</label>
-          <input value={f.company_site} onChange={e => setF({ ...f, company_site: e.target.value })}
-                 placeholder="aureonglobal.de" />
+          <label>Company site *</label>
+          <div>
+            <input value={f.company_site} onChange={e => setF({ ...f, company_site: e.target.value })}
+                   placeholder="aureonglobal.de"
+                   style={{ width: "100%" }} />
+            <div style={{ fontSize: 11, color: "var(--fg-2)", marginTop: 4 }}>
+              Used to auto-extract this client's brand (colors, font, wordmark, tagline) so emails go out in <em>their</em> visual identity — not Aureon's.
+              Brand fills within ~15 min of save, or run <code>py sequences/brand_autofill.py once --slug {slugAuto || "&lt;slug&gt;"}</code> to fill immediately. The unsubscribe page paints in the same brand.
+            </div>
+          </div>
 
           <label>From address *</label>
           <input value={f.from_addr} onChange={e => setF({ ...f, from_addr: e.target.value })}

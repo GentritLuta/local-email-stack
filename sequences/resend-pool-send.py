@@ -148,6 +148,32 @@ def _render(template: str, merge: dict[str, str]) -> str:
     return out
 
 
+def _lookup_token(to_addr: str, profile_slug: str) -> str | None:
+    """Best-effort fetch of an existing prospect's unsubscribe_token by email.
+    Silent on any failure so ad-hoc test sends never crash on a network blip."""
+    try:
+        env_path = Path(__file__).resolve().parent / "supabase.env"
+        if not env_path.exists(): return None
+        env = {}
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            if "=" in line and not line.strip().startswith("#"):
+                k, v = line.split("=", 1)
+                env[k.strip()] = v.strip().strip('"').strip("'")
+        url = env.get("SUPABASE_URL", "").rstrip("/")
+        key = env.get("SUPABASE_ANON_KEY", "")
+        if not url or not key: return None
+        with httpx.Client(timeout=8) as c:
+            r = c.get(f"{url}/rest/v1/prospects?profile_slug=eq.{profile_slug}"
+                      f"&email=eq.{to_addr}&select=unsubscribe_token&limit=1",
+                      headers={"apikey": key, "Authorization": f"Bearer {key}"})
+            if r.status_code == 200:
+                rows = r.json()
+                return rows[0]["unsubscribe_token"] if rows else None
+    except Exception:
+        return None
+    return None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("slug")
@@ -189,8 +215,10 @@ def main() -> int:
     print(f"  to:      {args.to}")
     print(f"  subject: {subject}\n")
 
-    # Optional: pass --unsub-token <token> for ad-hoc tests against a real prospect.
-    unsub_token = merge.get("unsub_token")
+    # Resolve the unsubscribe token: explicit --merge unsub_token=... wins.
+    # Otherwise try to look up the recipient in Supabase prospects (so even
+    # test sends to a known address get a real one-click unsubscribe URL).
+    unsub_token = merge.get("unsub_token") or _lookup_token(args.to, args.slug)
     outcome = send_resend(api_key, persona, args.to, subject, body,
                           unsubscribe_token=unsub_token,
                           brand=profile.get("brand"))
