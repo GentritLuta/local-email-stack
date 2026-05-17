@@ -115,15 +115,19 @@ def materialize_persona(persona: dict, domain_entry: dict) -> dict:
 
 
 def save_profile(profile: dict, *, write_public: bool = True) -> None:
-    """Atomic write of the main profile JSON. Optionally also writes a sanitized
-    copy to the frontend's public dir so the desktop app sees the change.
-    Never writes secrets (API keys) to the public copy."""
+    """Atomic write of the main profile JSON. The in-memory `profile` dict is
+    the merged view of <slug>.json + <slug>.private.json. We MUST strip
+    secrets before writing the main file, otherwise the API key in
+    .private.json leaks into git-tracked .json on every save.
+
+    The .private.json file is the canonical home for secrets — load_profile
+    re-merges it on every load, so stripping here is lossless."""
     slug = profile["slug"]
-    _atomic_write(PROFILES_DIR / f"{slug}.json", profile)
+    safe = _strip_secrets(profile)
+    _atomic_write(PROFILES_DIR / f"{slug}.json", safe)
     if write_public:
-        pub = _strip_secrets(profile)
         PROFILES_PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
-        _atomic_write(PROFILES_PUBLIC_DIR / f"{slug}.json", pub)
+        _atomic_write(PROFILES_PUBLIC_DIR / f"{slug}.json", safe)
 
 
 def save_private(slug: str, fragment: dict) -> None:
@@ -221,8 +225,11 @@ def _deep_merge(a: dict, b: dict) -> dict:
 
 
 def _strip_secrets(profile: dict) -> dict:
+    """Remove every value that lives in <slug>.private.json from the dict
+    before persisting it to the git-tracked main file. Lossless because
+    load_profile re-merges .private.json on every load."""
     p = json.loads(json.dumps(profile))  # deep copy
     r = p.get("relay", {})
     if "resend_api_key" in r:
-        r["resend_api_key"] = "***" if r["resend_api_key"] else ""
+        r["resend_api_key"] = ""        # placeholder; real value lives in .private.json
     return p
