@@ -28,6 +28,7 @@ from pathlib import Path
 import httpx
 
 from profile_lib import load_profile
+from email_render import build_payload
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE  = REPO_ROOT / "sequences" / "supabase.env"
@@ -153,32 +154,29 @@ def get_api_key(profile_slug: str) -> str:
 
 # ─── Send + log ────────────────────────────────────────────────────────────
 
-def send_via_resend(api_key: str, persona: dict, prospect: dict, subject: str, body: str) -> dict:
-    domain = persona["from_addr"].split("@", 1)[1]
-    msg_id = f"<{uuid.uuid4().hex}.{int(time.time())}@{domain}>"
-    body_full = body + "\n\n" + persona.get("signature", "")
-    html = (
-        "<!doctype html><html><body style='font-family:-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.55;color:#1f2937;max-width:600px'>"
-        + "".join(f"<p>{p}</p>" for p in body_full.strip().split("\n\n"))
-        + "</body></html>"
+def _render_merge(template: str, prospect: dict) -> str:
+    """{first_name} / {last_name} / {city} / {company} substitution."""
+    return (template
+            .replace("{first_name}", prospect.get("first_name") or "there")
+            .replace("{last_name}",  prospect.get("last_name")  or "")
+            .replace("{city}",       prospect.get("city")       or "")
+            .replace("{company}",    prospect.get("company")    or ""))
+
+
+def send_via_resend(api_key: str, persona: dict, prospect: dict, subject: str, body: str,
+                    brand: dict | None = None) -> dict:
+    subject = _render_merge(subject, prospect)
+    body    = _render_merge(body,    prospect)
+    payload, msg_id = build_payload(
+        persona=persona,
+        to_addr=prospect["email"],
+        subject=subject,
+        body=body,
+        unsubscribe_token=prospect.get("unsubscribe_token"),
+        brand=brand,
+        tags=[{"name": "persona", "value": persona["slug"]},
+              {"name": "prospect_id", "value": str(prospect.get("id", ""))}],
     )
-    payload = {
-        "from": f'{persona["from_name"]} <{persona["from_addr"]}>',
-        "to":   [prospect["email"]],
-        "reply_to": persona.get("reply_to", persona["from_addr"]),
-        "subject":  subject,
-        "text":     body_full,
-        "html":     html,
-        "headers": {
-            "Message-ID":            msg_id,
-            "List-Unsubscribe":      f"<mailto:{persona['from_addr']}?subject=unsubscribe>",
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-        },
-        "tags": [
-            {"name": "persona", "value": persona["slug"]},
-            {"name": "prospect_id", "value": str(prospect.get("id", ""))},
-        ],
-    }
     try:
         with httpx.Client(timeout=20) as r:
             resp = r.post(RESEND_API,
@@ -268,12 +266,30 @@ def tick() -> None:
                 continue
 
             prospect = fetch_prospect(c, run["prospect_id"])
+            # Verification gate: never send to an unverified prospect. Lead-scrape
+            # writes verified=true only when MX/SMTP/syntax checks all pass.
+            if not prospect.get("verified"):
+                print(f"  ! run {run['id']} skipped: prospect {prospect.get('email')} "
+                      f"is unverified (method={prospect.get('verification_method')}, "
+                      f"error={prospect.get('verification_error')})")
+                c.patch(f"/runs?id=eq.{run['id']}",
+                        json={"status": "cancelled"})
+                continue
+            # Unsubscribe gate: stops further sends to anyone who clicked the
+            # button in a prior email. We pause-cancel rather than skip-and-
+            # retry so the run never resurfaces.
+            if prospect.get("unsubscribed"):
+                print(f"  ! run {run['id']} cancelled: prospect {prospect.get('email')} unsubscribed")
+                c.patch(f"/runs?id=eq.{run['id']}",
+                        json={"status": "cancelled"})
+                continue
             api_key  = get_api_key(profile_slug)
             if not api_key:
                 print(f"  ! no Resend key for {profile_slug}")
                 continue
 
-            outcome = send_via_resend(api_key, persona, prospect, subject, body)
+            outcome = send_via_resend(api_key, persona, prospect, subject, body,
+                                      brand=profile_config.get("brand"))
             log_send(c, run, step_n, persona, prospect, subject, outcome)
 
             print(f"  [{persona['slug']:7}] step {step_n} → {prospect['email']:30}"
@@ -295,27 +311,61 @@ def tick() -> None:
 
 
 def enqueue(sequence_slug: str, prospect_email: str) -> None:
+    """Queue a sequence for a single existing prospect. Refuses unverified prospects."""
     url, key = load_supabase()
     with supa(url, key) as c:
-        # Lookup sequence
         r = c.get(f"/sequences?slug=eq.{sequence_slug}&select=id,profile_slug")
         rows = r.json()
         if not rows:
             sys.exit(f"sequence '{sequence_slug}' not found")
         seq = rows[0]
-        # Ensure prospect
-        r = c.post(f"/prospects?on_conflict=profile_slug,email",
-                   json={"profile_slug": seq["profile_slug"], "email": prospect_email})
-        prospect = r.json()[0] if r.status_code in (200, 201) else None
-        if not prospect:
-            r = c.get(f"/prospects?profile_slug=eq.{seq['profile_slug']}&email=eq.{prospect_email}")
-            prospect = r.json()[0]
-        # Create run
+        # The prospect must already exist AND be verified. We do NOT auto-create
+        # a row from a bare email — lead-scrape is the source of truth.
+        r = c.get(f"/prospects?profile_slug=eq.{seq['profile_slug']}&email=eq.{prospect_email}&select=*")
+        prospects = r.json()
+        if not prospects:
+            sys.exit(f"prospect {prospect_email!r} not found. Scrape it first with lead_scrape.py, "
+                     f"or insert it manually with verified=true.")
+        prospect = prospects[0]
+        if not prospect.get("verified"):
+            sys.exit(f"refusing to enqueue {prospect_email}: unverified "
+                     f"(method={prospect.get('verification_method')}, "
+                     f"error={prospect.get('verification_error')})")
         r = c.post("/runs?on_conflict=sequence_id,prospect_id",
                    json={"sequence_id": seq["id"], "prospect_id": prospect["id"],
                          "status": "queued", "current_step": 1,
                          "next_send_at": dt.datetime.utcnow().isoformat() + "Z"})
         print(f"queued run for {prospect_email}: {r.json()[0]['id']}")
+
+
+def enqueue_niche(sequence_slug: str, niche_slug: str, limit: int | None = None) -> None:
+    """Bulk-enqueue every verified prospect from a niche into a sequence.
+    Skips prospects without a first_name (we can't personalize) and prospects
+    already enrolled in this sequence (the on_conflict clause is a safety net)."""
+    url, key = load_supabase()
+    with supa(url, key) as c:
+        r = c.get(f"/sequences?slug=eq.{sequence_slug}&select=id,profile_slug")
+        rows = r.json()
+        if not rows:
+            sys.exit(f"sequence '{sequence_slug}' not found")
+        seq = rows[0]
+        q = (f"/prospects?niche_slug=eq.{niche_slug}&verified=eq.true"
+             f"&first_name=not.is.null&profile_slug=eq.{seq['profile_slug']}"
+             f"&select=id,email,first_name")
+        if limit:
+            q += f"&limit={limit}"
+        r = c.get(q)
+        prospects = r.json()
+        print(f"found {len(prospects)} verified prospects in niche {niche_slug}")
+        queued = 0
+        for p in prospects:
+            resp = c.post("/runs?on_conflict=sequence_id,prospect_id",
+                          json={"sequence_id": seq["id"], "prospect_id": p["id"],
+                                "status": "queued", "current_step": 1,
+                                "next_send_at": dt.datetime.utcnow().isoformat() + "Z"})
+            if resp.status_code in (200, 201):
+                queued += 1
+        print(f"queued {queued} runs")
 
 
 def status_cmd() -> None:
@@ -332,11 +382,16 @@ def main() -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("tick")
     p_eq = sub.add_parser("enqueue"); p_eq.add_argument("sequence_slug"); p_eq.add_argument("prospect_email")
+    p_en = sub.add_parser("enqueue-niche")
+    p_en.add_argument("sequence_slug")
+    p_en.add_argument("niche_slug")
+    p_en.add_argument("--limit", type=int, default=None)
     sub.add_parser("status")
     args = ap.parse_args()
-    if args.cmd == "tick":     tick()
-    elif args.cmd == "enqueue": enqueue(args.sequence_slug, args.prospect_email)
-    elif args.cmd == "status":  status_cmd()
+    if args.cmd == "tick":              tick()
+    elif args.cmd == "enqueue":         enqueue(args.sequence_slug, args.prospect_email)
+    elif args.cmd == "enqueue-niche":   enqueue_niche(args.sequence_slug, args.niche_slug, args.limit)
+    elif args.cmd == "status":          status_cmd()
     return 0
 
 

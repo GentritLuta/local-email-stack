@@ -7,7 +7,27 @@
   "company": {
     "name": "Aureon Global",
     "site": "aureonglobal.de",
-    "tagline": "boutique european operator helping service businesses tighten the lead-to-booking handoff"
+    "tagline": "Performance Partner for Real Estate Agents & Brokerages"
+  },
+
+  "brand": {
+    "wordmark":    "Aureon Global",
+    "site":        "aureonglobal.de",
+    "tagline":     "Performance Partner for Real Estate Agents & Brokerages",
+    "font_stack":  "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font_url":    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    "colors": {
+      "accent":   "#E6C259",
+      "accent_2": "#b8941f",
+      "text":     "#0a0a0a",
+      "text_2":   "#4b5563",
+      "muted":    "#9ca3af",
+      "bg_page":  "#fafafa",
+      "bg_card":  "#ffffff",
+      "rule":     "#ececec"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe.html?t={token}",
+    "_unsubscribe_note": "If you later point unsubscribe.aureonglobal.de via CNAME at the static page host, update this template and the email link will use it automatically. The token=eq.{token} match in Supabase is the same either way."
   },
 
   "_architecture_note": [

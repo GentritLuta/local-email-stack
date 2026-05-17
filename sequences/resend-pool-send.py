@@ -24,6 +24,7 @@ from pathlib import Path
 import httpx
 
 from profile_lib import load_profile
+from email_render import build_payload
 
 POOL_STATE = Path(__file__).resolve().parent.parent / "warmup-state"
 POOL_STATE.mkdir(exist_ok=True)
@@ -74,32 +75,14 @@ def pick_persona(profile: dict) -> dict:
     return candidates[0][2]
 
 
-def send_resend(api_key: str, persona: dict, to_addr: str, subject: str, body: str) -> dict:
-    sender_domain = persona["from_addr"].split("@", 1)[1]
-    msg_id = f"<{uuid.uuid4().hex}.{int(time.time())}@{sender_domain}>"
-    body_with_sig = body + "\n\n" + persona.get("signature", "")
-    html = (
-        "<!doctype html><html><body style='font-family:-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.55;color:#1f2937;max-width:600px'>"
-        + "".join(f"<p>{p}</p>" for p in body_with_sig.strip().split("\n\n"))
-        + "</body></html>"
+def send_resend(api_key: str, persona: dict, to_addr: str, subject: str, body: str,
+                unsubscribe_token: str | None = None, brand: dict | None = None) -> dict:
+    payload, msg_id = build_payload(
+        persona=persona, to_addr=to_addr, subject=subject, body=body,
+        unsubscribe_token=unsubscribe_token, brand=brand,
+        tags=[{"name": "profile", "value": "aureon"},
+              {"name": "persona", "value": persona["slug"]}],
     )
-    payload = {
-        "from":     f'{persona["from_name"]} <{persona["from_addr"]}>',
-        "to":       [to_addr],
-        "reply_to": persona.get("reply_to", persona["from_addr"]),
-        "subject":  subject,
-        "text":     body_with_sig,
-        "html":     html,
-        "headers": {
-            "Message-ID":            msg_id,
-            "List-Unsubscribe":      f"<mailto:{persona['from_addr']}?subject=unsubscribe>",
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-        },
-        "tags": [
-            {"name": "profile", "value": "aureon"},
-            {"name": "persona", "value": persona["slug"]},
-        ],
-    }
     started = dt.datetime.now().isoformat()
     try:
         with httpx.Client(timeout=20) as c:
@@ -158,6 +141,13 @@ def record(slug: str, persona: dict, to: str, subject: str, outcome: dict) -> No
         pass
 
 
+def _render(template: str, merge: dict[str, str]) -> str:
+    out = template
+    for k, v in merge.items():
+        out = out.replace("{" + k + "}", v)
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("slug")
@@ -165,7 +155,16 @@ def main() -> int:
     ap.add_argument("--variant-n", type=int, required=True)
     ap.add_argument("--to", required=True)
     ap.add_argument("--force-persona", default=None)
+    ap.add_argument("--merge", action="append", default=[],
+                    help="key=value substitution for {key} in subject/body. Repeatable.")
     args = ap.parse_args()
+
+    merge = {}
+    for kv in args.merge:
+        if "=" not in kv:
+            sys.exit(f"--merge expects key=value, got: {kv}")
+        k, v = kv.split("=", 1)
+        merge[k.strip()] = v
 
     profile = load_profile(args.slug)
     persona = (next((p for p in profile["personas"] if p["slug"] == args.force_persona), None)
@@ -181,14 +180,21 @@ def main() -> int:
     if not variant:
         sys.exit(f"variant {args.variant_n} not found")
 
+    subject = _render(variant["subject"], merge)
+    body    = _render(variant["body"],    merge)
+
     print(f"\n=== resend pool send ===")
     print(f"  persona: {persona['slug']} ({persona['from_name']})")
     print(f"  from:    {persona['from_name']} <{persona['from_addr']}>")
     print(f"  to:      {args.to}")
-    print(f"  subject: {variant['subject']}\n")
+    print(f"  subject: {subject}\n")
 
-    outcome = send_resend(api_key, persona, args.to, variant["subject"], variant["body"])
-    record(args.slug, persona, args.to, variant["subject"], outcome)
+    # Optional: pass --unsub-token <token> for ad-hoc tests against a real prospect.
+    unsub_token = merge.get("unsub_token")
+    outcome = send_resend(api_key, persona, args.to, subject, body,
+                          unsubscribe_token=unsub_token,
+                          brand=profile.get("brand"))
+    record(args.slug, persona, args.to, subject, outcome)
     print(json.dumps(outcome, indent=2))
     return 0 if outcome.get("sent") else 2
 

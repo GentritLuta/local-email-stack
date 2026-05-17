@@ -1,0 +1,60 @@
+slug: real_estate_us
+name: "US Real Estate Agents — independent brokerages"
+profile_slug: aureon
+engine: team_pages
+
+# WHAT THIS NICHE DOES
+# Walks the seed URLs below, extracts every mailto: link with its surrounding
+# context (name, role, phone), verifies each address (syntax + disposable +
+# MX + SMTP probe + catch-all check), and upserts only the addresses that
+# survive into Supabase `prospects`. Only verified rows reach a campaign.
+#
+# RUN
+#   py sequences/lead_scrape.py run real_estate_us
+#
+# SCHEDULE (daily 08:30 local)
+#   schtasks /Create /TN "LES-lead-scrape-real_estate_us" /SC DAILY /ST 08:30 ^
+#     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run real_estate_us"
+
+seeds:
+  # Indie low-commission brokerage (Indianapolis, IN) — 14 named agents,
+  # personal @whitestagrealty.com addresses on the homepage. Confirmed working.
+  - https://whitestagrealty.com/
+
+  # Add more indie/boutique brokerage team pages below as you discover them.
+  # Each one usually yields 5–30 named agents with personal emails.
+  # Good search patterns: "agents" OR "our team" + brokerage name + city.
+  # - https://...
+
+filter:
+  # Skip generic role mailboxes — campaigns need individuals.
+  exclude_local_parts:
+    - info
+    - contact
+    - hello
+    - sales
+    - admin
+    - support
+    - office
+    - team
+    - marketing
+    - recruiting
+    - press
+    - jobs
+  exclude_domains: []   # do not exclude any domain by default
+
+# What sequence to run for verified leads from this niche.
+# Edit step copy in sequences/aureon-realestate-us/variants.json — those
+# 7 variant entries are the canonical source for subject + body. Edit
+# step CADENCE (delay_days) below if you want to retime the drip.
+sequence:
+  variants_file: sequences/aureon-realestate-us/variants.json
+  forced_persona: daniel
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }   # intro + proof
+    - { step_n: 2, variant_n: 2, delay_days: 3 }   # soft bump
+    - { step_n: 3, variant_n: 3, delay_days: 4 }   # data point (5-min rule)
+    - { step_n: 4, variant_n: 4, delay_days: 5 }   # specific case study
+    - { step_n: 5, variant_n: 5, delay_days: 6 }   # blunt ask
+    - { step_n: 6, variant_n: 6, delay_days: 7 }   # low-risk pilot
+    - { step_n: 7, variant_n: 7, delay_days: 7 }   # breakup

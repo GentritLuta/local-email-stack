@@ -1,0 +1,74 @@
+{
+  "name": "Aureon Global — US real estate 7-step sequence",
+  "slug": "aureon_realestate_us",
+  "created_at": "2026-05-17",
+  "target": "US real estate agents and small brokerages",
+  "deliverability_notes": [
+    "Each step is plain prose (no em-dashes, no images, no URLs in body).",
+    "Renderer (sequences/email_render.py) wraps the body in the canonical HTML.",
+    "Title-case salutation for US business norms.",
+    "Merge fields: {first_name}, {city}, {company}.",
+    "Step 1 introduces, 2-3 add value, 4-5 ask soft, 6 reframes, 7 breaks up."
+  ],
+  "step_authoring_guide": {
+    "where": "This file. Each object in `variants` defines one step.",
+    "fields": {
+      "n":         "Step number 1..7 — matches step_n in the runtime sequence.",
+      "delay_days": "How many days after the PREVIOUS step (step 1 always 0).",
+      "angle":     "Free-text label so you remember what the step is for.",
+      "subject":   "Subject line. May contain merge fields.",
+      "body":      "Plain prose. \\n\\n separates paragraphs. The renderer adds signature + unsubscribe footer; do NOT include them here."
+    }
+  },
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "intro_and_proof",
+      "subject": "your pipeline this quarter",
+      "body": "Hi {first_name},\n\nSaw a few of your listings in {city} this week. Quick one.\n\nWe run lead generation for real estate teams. Fully managed by us, with our qualification team taking the first call before anything reaches the agent. We only get paid when a deal closes: 30 percent of commission to us, 70 percent stays with you.\n\nResults so far: one Munich team went from 9 to 17 closed deals per month last quarter. An Amsterdam brokerage moved their close rate from 22 percent to 34 percent in year one. We are opening up two pilot spots in the US this quarter.\n\nIf you have capacity for a few extra closed deals, worth a 15 minute call to see if it fits?"
+    },
+    {
+      "n": 2,
+      "delay_days": 3,
+      "angle": "soft_bump",
+      "subject": "did this reach you",
+      "body": "Hi {first_name},\n\nLast note bumped to the top of your inbox a few days ago and probably got buried. No pressure.\n\nQuick summary in case you missed it. We bring qualified seller and buyer leads to real estate teams. Pricing is 30 percent of commission on the deals we source, paid only after close. The client book stays yours.\n\nIs grabbing a few more deals this quarter something worth a 15 minute look, or is this off topic for where you are right now?"
+    },
+    {
+      "n": 3,
+      "delay_days": 4,
+      "angle": "specific_data_point",
+      "subject": "the 5 minute number",
+      "body": "Hi {first_name},\n\nOne number we keep coming back to: the average time a US real estate agent takes to respond to a fresh inbound lead is around 47 minutes. Inside 5 minutes, the close rate roughly triples.\n\nMost of our work is closing that gap. We pre-qualify the lead and put a live agent on the phone with them inside 5 minutes, so by the time it lands with you, the person is ready to talk listings or showings.\n\nIs that a number you have a sense of for your team, or is it something nobody has measured?"
+    },
+    {
+      "n": 4,
+      "delay_days": 5,
+      "angle": "case_study_specific",
+      "subject": "what worked for a 6 agent team",
+      "body": "Hi {first_name},\n\nShort case study in case it lands.\n\nWe took on a 6 agent brokerage in Amsterdam last year. Their close rate on raw inbound was 22 percent, mostly because leads were sitting too long before getting a call. We took over the first call and pre-qualification. Twelve months in, their close rate is 34 percent and roughly 40 percent of total deals now come from inbound that did not exist before.\n\nNot trying to claim the same numbers for {city}. Just sharing because the setup is repeatable. Worth a quick chat to map it onto your team?"
+    },
+    {
+      "n": 5,
+      "delay_days": 6,
+      "angle": "blunt_ask",
+      "subject": "honest question",
+      "body": "Hi {first_name},\n\nHonest question, no wrong answer.\n\nWhen you imagine your next twelve months, is the bottleneck more leads coming in, or more leads getting closed once they arrive? For a lot of teams we talk to it is the second one, and that is exactly the gap we work on.\n\nIf either side resonates, I am happy to walk you through what a pilot would look like. Fifteen minutes, no slides."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "reframe_low_risk",
+      "subject": "low risk version",
+      "body": "Hi {first_name},\n\nIf the earlier notes felt too far out, here is a smaller version.\n\nWe can run a 60 day pilot. You give us a target zip code or two. We bring in qualified seller appointments. You only pay if a deal closes, at the same 30 percent. If no deals close, you owe nothing and we go our separate ways.\n\nThat is the lowest risk way to find out if it works for {company} without any commitment upfront. Worth a brief call to scope it?"
+    },
+    {
+      "n": 7,
+      "delay_days": 7,
+      "angle": "breakup",
+      "subject": "last note from me",
+      "body": "Hi {first_name},\n\nI will stop reaching out after this one.\n\nIf there is a future quarter where bringing in more closed deals matters more than it does today, the door is open. A reply with the word later is enough and I will follow up in a few months.\n\nIf this was never relevant, totally fair. Thanks for reading and good luck with the rest of the year in {city}."
+    }
+  ]
+}

@@ -72,6 +72,35 @@ create table if not exists prospects (
   unique (profile_slug, email)
 );
 
+-- Verification + enrichment columns (added 2026-05-17, autonomous lead pipeline)
+alter table prospects add column if not exists verified            boolean not null default false;
+alter table prospects add column if not exists verified_at         timestamptz;
+alter table prospects add column if not exists verification_method text;   -- mx_verified | smtp_verified | invalid_syntax | disposable | no_mx | smtp_rejected | smtp_failed
+alter table prospects add column if not exists verification_error  text;
+alter table prospects add column if not exists mx_hosts            jsonb;  -- ordered MX records used at verification time
+alter table prospects add column if not exists niche_slug          text;   -- niche that produced this lead
+alter table prospects add column if not exists title               text;   -- role/title (e.g. "Co-Owner")
+alter table prospects add column if not exists phone               text;
+alter table prospects add column if not exists city                text;
+alter table prospects add column if not exists state               text;
+alter table prospects add column if not exists website             text;   -- the lead's company/personal site
+alter table prospects add column if not exists source_url          text;   -- exact URL we scraped them from
+alter table prospects add column if not exists enriched_context    jsonb;  -- everything else (specialties, social, page summary, ...)
+
+-- Unsubscribe state. Each prospect gets a stable per-prospect token so the
+-- email's "Unsubscribe" button hits a static page that PATCHes prospects
+-- (RLS allows it via the matching token).
+alter table prospects add column if not exists unsubscribed        boolean not null default false;
+alter table prospects add column if not exists unsubscribed_at     timestamptz;
+alter table prospects add column if not exists unsubscribe_token   text;
+update prospects set unsubscribe_token = gen_random_uuid()::text where unsubscribe_token is null;
+alter table prospects alter column unsubscribe_token set default gen_random_uuid()::text;
+alter table prospects alter column unsubscribe_token set not null;
+create unique index if not exists idx_prospects_unsub_token on prospects (unsubscribe_token);
+
+create index if not exists idx_prospects_verified    on prospects (verified);
+create index if not exists idx_prospects_niche       on prospects (niche_slug);
+
 create table if not exists runs (
   id              uuid primary key default gen_random_uuid(),
   sequence_id     uuid references sequences(id) on delete cascade,
