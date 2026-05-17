@@ -122,19 +122,14 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
     company_line = (f'<a href="https://{_esc(site)}" style="color:{c["text_2"]};text-decoration:none;">{_esc(site)}</a>'
                     if site else "")
 
-    # Bottom logo block — the wordmark repeated in the brand accent color,
-    # centered, gives the email a clear "this is from <brand>" close. Matches
-    # the site's repeated wordmark pattern.
-    bottom_logo_html = ""
-    if wordmark:
-        bottom_logo_html = f'''
-        <tr><td style="padding:32px 36px 8px;border-top:1px solid {c['rule']};text-align:center;">
-          <div style="font-family:{font};font-size:20px;font-weight:700;letter-spacing:.04em;color:{c['accent']};">
-            {_esc(wordmark).upper()}
-          </div>
-          {f'<div style="font-family:{font};font-size:11px;color:{c["muted"]};margin-top:4px;letter-spacing:.02em;">{_esc(tagline)}</div>' if tagline else ''}
-          <div style="height:2px;width:40px;background:{c['accent']};margin:14px auto 0;opacity:.7;"></div>
-        </td></tr>'''
+    # Corporate footer (the user's preferred style) — only renders when the
+    # profile has a brand.legal block. Otherwise we fall back to the simpler
+    # accent-rule + unsubscribe footer below.
+    legal = (brand or {}).get("legal") or {}
+    if legal.get("company_name"):
+        footer_html = _corporate_footer_html(legal, unsub, accent=c["accent"])
+    else:
+        footer_html = _simple_footer_html(c, font, wordmark, tagline, unsub)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -152,7 +147,7 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
         <tr><td style="padding:28px 36px 8px;">
           {body_html}
         </td></tr>
-        <tr><td style="padding:0 36px 28px;">
+        <tr><td style="padding:0 36px 24px;">
           <div style="font-family:{font};font-size:14px;line-height:1.5;color:{c['text']};">
             {sig_html}
           </div>
@@ -160,17 +155,140 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
             {company_line}
           </div>
         </td></tr>
-        {bottom_logo_html}
-        <tr><td style="padding:16px 36px 28px;text-align:center;font-family:{font};font-size:12px;line-height:1.5;color:{c['muted']};">
-          You're receiving this because we believe it's relevant to your business.<br>
-          <a href="{_esc(unsub)}" style="color:{c['accent_2']};text-decoration:underline;">Unsubscribe with one click</a>
-          and we won't contact you again.
-        </td></tr>
+        {footer_html}
       </table>
     </td></tr>
   </table>
 </body>
 </html>"""
+
+
+def _simple_footer_html(c: dict, font: str, wordmark: str, tagline: str, unsub: str) -> str:
+    """The old minimal footer — wordmark + accent rule + small unsubscribe.
+    Used when a profile hasn't filled in its brand.legal block yet."""
+    bottom = ""
+    if wordmark:
+        bottom = f'''
+        <tr><td style="padding:32px 36px 8px;border-top:1px solid {c['rule']};text-align:center;">
+          <div style="font-family:{font};font-size:20px;font-weight:700;letter-spacing:.04em;color:{c['accent']};">
+            {_esc(wordmark).upper()}
+          </div>
+          {f'<div style="font-family:{font};font-size:11px;color:{c["muted"]};margin-top:4px;letter-spacing:.02em;">{_esc(tagline)}</div>' if tagline else ''}
+          <div style="height:2px;width:40px;background:{c['accent']};margin:14px auto 0;opacity:.7;"></div>
+        </td></tr>'''
+    return bottom + f'''
+        <tr><td style="padding:16px 36px 28px;text-align:center;font-family:{font};font-size:12px;line-height:1.5;color:{c['muted']};">
+          You're receiving this because we believe it's relevant to your business.<br>
+          <a href="{_esc(unsub)}" style="color:{c['accent_2']};text-decoration:underline;">Unsubscribe with one click</a>
+          and we won't contact you again.
+        </td></tr>'''
+
+
+def _corporate_footer_html(legal: dict, unsub: str, accent: str = "#d4af37") -> str:
+    """Two-tier corporate email footer matching the user's spec:
+
+      1. Light Arial block: company name, address, email, CEO, VAT, Reg,
+         long confidentiality disclaimer.
+      2. Dark Verdana block: logo + uppercase wordmark, address, email,
+         Website | Privacy | Terms | Unsubscribe row, copyright + reg
+         numbers, partner-notice line.
+
+    The per-prospect unsubscribe URL is slotted into the link row so legal
+    compliance + the existing one-click unsubscribe flow both apply.
+    """
+    name      = _esc(legal.get("company_name", ""))
+    addr_lines = legal.get("address_lines") or []
+    email     = _esc(legal.get("contact_email", ""))
+    ceo       = _esc(legal.get("ceo", ""))
+    vat       = _esc(legal.get("vat_number", ""))
+    reg       = _esc(legal.get("registration_number", ""))
+    year      = str(legal.get("copyright_year") or 2026)
+    logo_url  = _esc(legal.get("logo_url", ""))
+    logo_w    = int(legal.get("logo_width") or 50)
+    privacy   = _esc(legal.get("privacy_policy_url", ""))
+    terms     = _esc(legal.get("terms_of_service_url", ""))
+    website   = "https://" + _esc(legal.get("contact_email", "").split("@")[-1]) if email else ""
+    disclaim  = _esc(legal.get("legal_disclaimer", ""))
+    partner   = _esc(legal.get("partner_notice", ""))
+
+    # Wordmark text in the dark block — uppercase, strip the legal-form dots
+    # so "Aureon Global L.L.C." reads as "AUREON GLOBAL LLC".
+    wordmark_dark = name.replace(".", "").upper().strip()
+
+    # Light block: street, city, country on one inline line.
+    addr_inline = ", ".join(_esc(l) for l in addr_lines)
+    # Dark block: collapse all but the last line (country) into one row with a
+    # trailing comma, then country on its own line. Mirrors the user's spec.
+    if len(addr_lines) >= 2:
+        addr_block = ", ".join(_esc(l) for l in addr_lines[:-1]) + f",<br>{_esc(addr_lines[-1])}"
+    elif addr_lines:
+        addr_block = _esc(addr_lines[0])
+    else:
+        addr_block = ""
+
+    # ── LIGHT confidentiality block ────────────────────────────────────────
+    light = f'''
+        <tr><td style="padding:0 36px 16px;">
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.45;color:#333333;border-top:1px solid #ececec;padding-top:18px;">
+            <div style="font-weight:700;color:#111111;margin:0 0 2px;">{name}</div>
+            {f'<div>Address: {addr_inline}</div>' if addr_inline else ''}
+            {f'<div>Email: <a href="mailto:{email}" style="color:#333333;text-decoration:none;">{email}</a></div>' if email else ''}
+            {f'<div style="margin-top:8px;">CEO: {ceo}</div>' if ceo else ''}
+            {f'<div>VAT Number: {vat}</div>' if vat else ''}
+            {f'<div style="margin-bottom:8px;">Registration Number: {reg}</div>' if reg else ''}
+            <div>© {year} {name} {disclaim}</div>
+          </div>
+        </td></tr>'''
+
+    # ── DARK Verdana brand block ───────────────────────────────────────────
+    logo_img = (
+        f'<img src="{logo_url}" alt="{name} Logo" width="{logo_w}" '
+        f'style="display:block;margin:0 auto 10px auto;border:0;">'
+        if logo_url else ""
+    )
+    # Links row: Website | Privacy | Terms | Unsubscribe — only show what we have.
+    parts = []
+    if website:  parts.append(f'<a href="{website}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Website</a>')
+    if privacy:  parts.append(f'<a href="{privacy}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Privacy Policy</a>')
+    if terms:    parts.append(f'<a href="{terms}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Terms of Service</a>')
+    if unsub:    parts.append(f'<a href="{_esc(unsub)}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Unsubscribe</a>')
+    sep = '<span style="color:#333333;margin:0 4px;">|</span>'
+    links_row = sep.join(parts)
+
+    dark = f'''
+        <tr><td style="padding:0;">
+          <div style="background-color:#050505;padding:40px 30px;text-align:center;color:#999999;border-top:4px solid {accent};font-family:Verdana,sans-serif;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="center">
+                  <div style="margin-bottom:20px;padding-top:20px;border-top:1px solid #1a1a1a;">
+                    <a href="{website or '#'}" style="text-decoration:none;">
+                      {logo_img}
+                      <span style="color:#ffffff;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px;font-family:Verdana,sans-serif;font-size:16px;">{wordmark_dark}</span>
+                    </a>
+                  </div>
+                  <p style="font-size:12px;line-height:1.6;margin:5px 0;color:#888888;font-family:Verdana,sans-serif;">
+                    <b style="color:#ffffff;">{name}</b><br>
+                    {addr_block}
+                  </p>
+                  {f'<p style="font-size:12px;line-height:1.6;margin:5px 0;font-family:Verdana,sans-serif;"><a href="mailto:{email}" style="color:{accent};text-decoration:none;font-weight:500;">{email}</a></p>' if email else ''}
+                  <p style="font-size:12px;line-height:1.6;margin:10px 0;font-family:Verdana,sans-serif;">
+                    {links_row}
+                  </p>
+                  <div style="margin-top:25px;padding-top:25px;border-top:1px solid #1a1a1a;">
+                    <p style="font-size:10px;color:#555555;margin:0;font-family:Verdana,sans-serif;">
+                      © {year} {wordmark_dark}. All rights reserved.<br>
+                      {f'VAT ID: {vat} | Reg. No: {reg}' if vat or reg else ''}
+                    </p>
+                    {f'<p style="font-size:10px;color:#444444;margin-top:10px;line-height:1.4;font-family:Verdana,sans-serif;">{partner}</p>' if partner else ''}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td></tr>'''
+
+    return light + dark
 
 
 def render_text(*, body: str, persona: dict, unsubscribe_token: Optional[str] = None,

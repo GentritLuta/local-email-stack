@@ -27,7 +27,23 @@
       "rule":     "#ececec"
     },
     "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe.html?t={token}",
-    "_unsubscribe_note": "If you later point unsubscribe.aureonglobal.de via CNAME at the static page host, update this template and the email link will use it automatically. The token=eq.{token} match in Supabase is the same either way."
+    "_unsubscribe_note": "If you later point unsubscribe.aureonglobal.de via CNAME at the static page host, update this template and the email link will use it automatically. The token=eq.{token} match in Supabase is the same either way.",
+
+    "legal": {
+      "company_name":         "Aureon Global L.L.C.",
+      "address_lines":        ["Dushkaja 20", "71000 Kacanik", "Republic of Kosovo"],
+      "contact_email":        "info@aureonglobal.de",
+      "ceo":                  "Gentrit Luta",
+      "vat_number":           "330681892",
+      "registration_number":  "812368240",
+      "copyright_year":       2026,
+      "logo_url":             "https://aureonglobal.de/logo.svg",
+      "logo_width":           50,
+      "privacy_policy_url":   "https://aureonglobal.de/privacy-policy",
+      "terms_of_service_url": "https://aureonglobal.de/terms-of-service",
+      "legal_disclaimer":     "The information transmitted is intended only for the person or entity to which it is addressed and may contain confidential and/or privileged material. Any review re-transmission, dissemination or other use of or taking any action in reliance upon this information by persons or entities other than the intended recipient is prohibited. If you received this in error, please contact the sender immediately by return electronic transmission and then immediately delete this transmission including all attachments without copying, distributing or disclosing the same.",
+      "partner_notice":       "You are receiving this email because you are a registered partner or have requested information from Aureon Global."
+    }
   },
 
   "_architecture_note": [
