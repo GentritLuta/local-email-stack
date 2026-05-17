@@ -1,17 +1,36 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, XCircle, AlertCircle, Copy, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Copy, ExternalLink, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Profile, getActiveSlug, loadAllProfiles, setActiveSlug, reputationStatus, dailyTargetForDay, warmupPctForDay } from "../lib/profiles";
 import { EmptyState } from "../components/EmptyState";
 import { api } from "../lib/api";
+import { NewProfileModal } from "../components/NewProfileModal";
+import { fetchProfiles as fetchSupabaseProfiles, isConfigured, subscribeToTable } from "../lib/supabase";
 
 export function Profiles() {
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
   const [active, setActive] = useState<string | null>(getActiveSlug());
+  const [showNew, setShowNew] = useState(false);
   const navigate = useNavigate();
 
+  async function refresh() {
+    // Prefer Supabase as the source of truth if configured (cross-PC visible);
+    // fall back to static /profiles/*.json otherwise.
+    if (isConfigured()) {
+      const rows = await fetchSupabaseProfiles();
+      const ps = rows.map(r => r.config as Profile);
+      setProfiles(ps);
+    } else {
+      setProfiles(await loadAllProfiles());
+    }
+  }
+
   useEffect(() => {
-    loadAllProfiles().then(setProfiles);
+    refresh();
+    if (isConfigured()) {
+      const u = subscribeToTable("profiles", refresh);
+      return () => { u(); };
+    }
   }, []);
 
   if (!profiles) return (<><h1 className="page-title">Profiles</h1><EmptyState variant="loading" /></>);
@@ -21,9 +40,22 @@ export function Profiles() {
       <div className="row justify">
         <div>
           <h1 className="page-title">Profiles</h1>
-          <p className="page-sub">Each profile is a sending identity — own domain, own voice, own warmup state.</p>
+          <p className="page-sub">Each profile is a sending identity — own domain, own voice, own warmup state. Live from Supabase if configured, else local files.</p>
         </div>
+        <button className="primary" onClick={() => setShowNew(true)}><Plus size={14} /> New client profile</button>
       </div>
+
+      {showNew && (
+        <NewProfileModal
+          onClose={() => setShowNew(false)}
+          onCreated={async (slug) => {
+            setShowNew(false);
+            await refresh();
+            setActive(slug);
+            setActiveSlug(slug);
+          }}
+        />
+      )}
 
       {profiles.length === 0 ? (
         <EmptyState variant="no-data" title="No profiles" message="Add at least one profile to start sending." />
