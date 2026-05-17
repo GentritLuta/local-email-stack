@@ -22,20 +22,34 @@ engine: team_pages
 #     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run crypto_influencer"
 
 seeds:
-  # Crypto editorial team / contributor pages — these typically expose
-  # author bylines with mailto: links or public contact addresses.
+  # Crypto editorial team / author pages. Mix of static (mailto: cards) and
+  # SSR (Next.js / Nuxt JSON blobs) — the scraper handles both.
   - https://decrypt.co/team
+  - https://decrypt.co/authors
   - https://www.theblock.co/about
+  - https://www.theblock.co/people
   - https://bitcoinmagazine.com/about
   - https://thedefiant.io/about
+  - https://thedefiant.io/team
   - https://www.coindesk.com/about
+  - https://blockworks.co/team
+  - https://protos.com/about-us
+  - https://www.cryptobriefing.com/about
+  - https://cryptoslate.com/about
 
-  # Research desks + community sites that publish team info
+  # Research + intelligence desks
   - https://messari.io/about
   - https://www.tokeninsight.com/en/about-us
+  - https://kaiko.com/about
 
-  # Open contact directories — sometimes have email
+  # Newsletter authors + community leaders
+  - https://www.bankless.com/about
+  - https://www.coinage.media/team
+  - https://www.unchainedcrypto.com/about
+
+  # Open contact / press pages
   - https://cointelegraph.com/contact-us
+  - https://cointelegraph.com/about
 
 filter:
   # Skip role mailboxes — campaigns target individuals, not info@/contact@.

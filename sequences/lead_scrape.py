@@ -45,6 +45,29 @@ USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 PHONE_RX = re.compile(r"(?<!\d)(\+?1[\s\-\.]?)?\(?\d{3}\)?[\s\-\.]?\d{3}[\s\-\.]?\d{4}(?!\d)")
 EMAIL_TEXT_RX = re.compile(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+\b")
 
+# Modern SSR pages (Next.js, Nuxt, Astro) embed team data as JSON in <script>
+# tags rather than rendering full DOM cards. Pattern is consistent across
+# frameworks: `"email":"x@y.com","name":"Person Name"` (sometimes with the
+# fields swapped). These regexes catch both orderings.
+JSON_EMAIL_THEN_NAME_RX = re.compile(
+    r'"email"\s*:\s*"([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})"\s*,?\s*'
+    r'[^{}"]{0,200}?'
+    r'"(?:name|full_?name|display_?name)"\s*:\s*"([^"\\]{2,80})"',
+    re.I | re.DOTALL,
+)
+JSON_NAME_THEN_EMAIL_RX = re.compile(
+    r'"(?:name|full_?name|display_?name)"\s*:\s*"([^"\\]{2,80})"\s*,?\s*'
+    r'[^{}"]{0,200}?'
+    r'"email"\s*:\s*"([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})"',
+    re.I | re.DOTALL,
+)
+# Optional bio/title field often follows the name. We capture it when present.
+JSON_BIO_RX = re.compile(
+    r'"email"\s*:\s*"{email}"[^{{}}]*?"(?:bio|title|role|position)"\s*:\s*"([^"\\]{{2,200}})"',
+    re.I | re.DOTALL,
+)
+_HUMAN_NAME_RX = re.compile(r"^[A-Z][A-Za-z'`\-\.]+(?:\s+[A-Z][A-Za-z'`\-\.]+){0,3}$")
+
 
 @dataclass
 class ScrapedLead:
@@ -228,15 +251,51 @@ def _merge(into: ScrapedLead, other: ScrapedLead) -> ScrapedLead:
     return into
 
 
+def _absorb_json_pair(by_email: dict, url: str, email: str, name: str, html: str) -> None:
+    """Insert/merge a JSON-blob-derived lead with proper name + optional bio."""
+    email = email.strip().lower()
+    name  = name.strip()
+    if not email or not _HUMAN_NAME_RX.match(name): return
+    first, last = _split_name(name)
+    # Look for a bio/title field tied to this exact email in the same JSON blob
+    title = None
+    bio_rx = re.compile(JSON_BIO_RX.pattern.format(email=re.escape(email)), JSON_BIO_RX.flags)
+    bm = bio_rx.search(html)
+    if bm:
+        bio = bm.group(1).strip()
+        # First short sentence-like fragment is usually the title/role
+        title = re.split(r"[.\n]", bio, 1)[0][:120]
+    lead = ScrapedLead(email=email, first_name=first, last_name=last,
+                       title=title, source_url=url)
+    existing = by_email.get(email)
+    if existing is None:
+        by_email[email] = lead
+    else:
+        _merge(existing, lead)
+
+
 def extract_leads_from_page(url: str, html: str) -> list[ScrapedLead]:
-    """Collect every email-bearing DOM node on the page, build a candidate
-    lead for each, then merge candidates that share the same email — keeping
-    the entry with the most context (name from the bio card wins over a
-    nameless 'contact us' mailto:)."""
+    """Three-pass extraction. Each pass adds rows or merges fields into the
+    same email key, so the best-known name/title always wins.
+
+      1. JSON blobs in <script> tags — what modern SSR sites (Next.js,
+         Nuxt, Astro) ship as the team-page data. Highest signal because
+         the JSON pairs email + name + bio directly.
+      2. mailto: links — classic team-page pattern (WhiteStag).
+      3. Plain-text email occurrences in rendered HTML — fallback for sites
+         that print emails in copy without a mailto link.
+    """
     soup = BeautifulSoup(html, "lxml")
     by_email: dict[str, ScrapedLead] = {}
 
-    def absorb(node: Tag, email: str) -> None:
+    # 1. JSON-blob extraction (runs on raw HTML, BEFORE DOM parsing so we
+    # capture script-tag content the parser keeps but doesn't expose well).
+    for m in JSON_EMAIL_THEN_NAME_RX.finditer(html):
+        _absorb_json_pair(by_email, url, m.group(1), m.group(2), html)
+    for m in JSON_NAME_THEN_EMAIL_RX.finditer(html):
+        _absorb_json_pair(by_email, url, m.group(2), m.group(1), html)
+
+    def absorb_dom(node: Tag, email: str) -> None:
         if not email: return
         candidate = _build_lead(node, email, url)
         existing = by_email.get(email)
@@ -245,16 +304,16 @@ def extract_leads_from_page(url: str, html: str) -> list[ScrapedLead]:
         else:
             _merge(existing, candidate)
 
-    # 1. mailto: links
+    # 2. mailto: links
     for a in soup.find_all("a", href=re.compile(r"^mailto:", re.I)):
-        absorb(a, a["href"].split(":", 1)[1].split("?")[0].strip().lower())
+        absorb_dom(a, a["href"].split(":", 1)[1].split("?")[0].strip().lower())
 
-    # 2. Plain-text email occurrences
+    # 3. Plain-text email occurrences in rendered text
     for el in soup.find_all(string=EMAIL_TEXT_RX):
         for m in EMAIL_TEXT_RX.finditer(str(el)):
             parent_tag = el.parent if isinstance(el.parent, Tag) else None
             if parent_tag is None: continue
-            absorb(parent_tag, m.group(0).strip().lower())
+            absorb_dom(parent_tag, m.group(0).strip().lower())
 
     return list(by_email.values())
 
