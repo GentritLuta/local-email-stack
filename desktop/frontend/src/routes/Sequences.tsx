@@ -1,183 +1,180 @@
-import { useEffect, useState } from "react";
-import { CheckCircle2, XCircle, Clock, AlertCircle, Settings as SettingsIcon, Copy } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { api, Sequence, SequenceStepResult } from "../lib/api";
+import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, XCircle, Clock, Send } from "lucide-react";
 import { EmptyState } from "../components/EmptyState";
-import { Profile, getActiveSlug, loadAllProfiles, loadProfile } from "../lib/profiles";
+import {
+  DbProfile, DbSequence, DbRun, DbSendLog,
+  fetchProfiles, fetchSequences, fetchRuns, fetchSendLog,
+  isConfigured, subscribeToTable,
+} from "../lib/supabase";
+
+// Live sequences view, sourced entirely from Supabase tables:
+//   sequences        — definitions (one row per sequence per profile)
+//   runs             — per-prospect enrollment, with current_step + status
+//   send_log         — every outbound, joined back to runs via run_id
+// No hardcoded slugs, no stale historical failure narratives.
+
+type SeqMetrics = {
+  sequence: DbSequence;
+  profile_name: string;
+  total_runs: number;
+  queued: number;
+  paused_replied: number;
+  paused_bounced: number;
+  completed: number;
+  cancelled: number;
+  total_sent: number;
+  total_delivered: number;
+  total_bounced: number;
+  total_replied: number;
+};
 
 export function Sequences() {
-  const [seq, setSeq] = useState<Sequence | null>(null);
-  const [results, setResults] = useState<SequenceStepResult[]>([]);
+  const [profiles, setProfiles] = useState<DbProfile[]>([]);
+  const [sequences, setSequences] = useState<DbSequence[]>([]);
+  const [runs, setRuns] = useState<DbRun[]>([]);
+  const [sends, setSends] = useState<DbSendLog[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [selectedN, setSelectedN] = useState<number | null>(null);
-  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  const navigate = useNavigate();
+
+  async function refresh() {
+    if (!isConfigured()) { setLoaded(true); return; }
+    const [ps, sq, rs, sl] = await Promise.all([
+      fetchProfiles(),
+      fetchSequences(),
+      fetchRuns({ limit: 5000 }),
+      fetchSendLog(5000),
+    ]);
+    setProfiles(ps); setSequences(sq); setRuns(rs); setSends(sl); setLoaded(true);
+  }
 
   useEffect(() => {
-    (async () => {
-      const s = await api.getSequence("algoalpha_aureon_test");
-      const r = await api.getSequenceResults("algoalpha_aureon_test");
-      setSeq(s); setResults(r); setLoaded(true);
-      if (s && s.steps[0]) setSelectedN(1);
-      const slug = getActiveSlug();
-      if (slug) setActiveProfile(await loadProfile(slug));
-    })();
-    const h = async (e: Event) => {
-      const slug = (e as CustomEvent).detail as string;
-      setActiveProfile(await loadProfile(slug));
-    };
-    window.addEventListener("active-profile-changed", h);
-    return () => window.removeEventListener("active-profile-changed", h);
+    refresh();
+    const subs = [
+      subscribeToTable("sequences", refresh),
+      subscribeToTable("runs", refresh),
+      subscribeToTable("send_log", refresh),
+    ];
+    return () => subs.forEach(u => u());
   }, []);
 
-  const sendCmd = activeProfile && seq
-    ? `py sequences\\profile-aware-send.py ${activeProfile.slug} sequences\\algoalpha-aureon-2026-05-17\\sequence.json --resume-from 2`
-    : null;
+  const metrics = useMemo<SeqMetrics[]>(() => {
+    const profileNameBySlug = new Map(profiles.map(p => [p.slug, p.name]));
+    const sendsByRun = new Map<string, DbSendLog[]>();
+    for (const s of sends) {
+      if (!s.run_id) continue;
+      const arr = sendsByRun.get(s.run_id) || [];
+      arr.push(s); sendsByRun.set(s.run_id, arr);
+    }
+    const runsBySeq = new Map<string, DbRun[]>();
+    for (const r of runs) {
+      const arr = runsBySeq.get(r.sequence_id) || [];
+      arr.push(r); runsBySeq.set(r.sequence_id, arr);
+    }
+    return sequences.map(seq => {
+      const seqRuns = runsBySeq.get(seq.id) || [];
+      let total_sent = 0, total_delivered = 0, total_bounced = 0, total_replied = 0;
+      for (const r of seqRuns) {
+        const ss = sendsByRun.get(r.id) || [];
+        for (const s of ss) {
+          total_sent++;
+          if (s.delivered && !s.bounced) total_delivered++;
+          if (s.bounced) total_bounced++;
+          if (s.replied) total_replied++;
+        }
+      }
+      return {
+        sequence: seq,
+        profile_name: profileNameBySlug.get(seq.profile_slug) ?? seq.profile_slug,
+        total_runs:      seqRuns.length,
+        queued:          seqRuns.filter(r => r.status === "queued").length,
+        paused_replied:  seqRuns.filter(r => r.status === "paused_replied").length,
+        paused_bounced:  seqRuns.filter(r => r.status === "paused_bounced").length,
+        completed:       seqRuns.filter(r => r.status === "completed").length,
+        cancelled:       seqRuns.filter(r => r.status === "cancelled").length,
+        total_sent, total_delivered, total_bounced, total_replied,
+      };
+    }).sort((a, b) => b.total_runs - a.total_runs);
+  }, [profiles, sequences, runs, sends]);
 
+  if (!isConfigured()) {
+    return (<><h1 className="page-title">Sequences</h1>
+      <EmptyState variant="not-connected"
+                  title="Configure Supabase first"
+                  message="Sequence definitions and their runtime state live in Supabase tables."
+                  hint="Settings → Cross-PC sync → paste URL + anon key." /></>);
+  }
   if (!loaded) return (<><h1 className="page-title">Sequences</h1><EmptyState variant="loading" /></>);
-  if (!seq) {
+
+  // Sequences live in the `sequences` table. They get inserted via
+  // sequence-runner.py or by a campaign-creation flow that's still in
+  // progress — so an empty state here is the honest answer until one exists.
+  if (sequences.length === 0) {
     return (
       <>
         <h1 className="page-title">Sequences</h1>
+        <p className="page-sub">Multi-step cold-email sequences with auto-stop on reply, bounce, or complaint.</p>
         <EmptyState
           variant="no-data"
-          title="No sequences"
-          message="No sequence JSON files found under public/sequences/."
-          hint="Create one by running sequences/send-sequence.py against a sequence.json file." />
+          title="No sequences yet"
+          message="Sequences are stored in Supabase under `sequences` + `sequence_steps`. None have been created yet for any profile."
+          hint={"To enroll a verified prospect in a sequence: \n  py sequences/sequence-runner.py enqueue <sequence_slug> <prospect_email>\nor in bulk per niche: \n  py sequences/sequence-runner.py enqueue-niche <sequence_slug> <niche_slug>"}
+        />
       </>
     );
   }
 
-  const sent    = results.filter(r => r.sent).length;
-  const failed  = results.filter(r => !r.sent && !r.skipped && r.error).length;
-  const pending = seq.steps.length - sent - failed;
-  const selected = seq.steps.find(s => s.n === selectedN);
-  const selectedResult = results.find(r => r.step === selectedN);
-
   return (
     <>
-      <div className="row justify">
-        <div>
-          <h1 className="page-title">Sequences</h1>
-          <p className="page-sub">Multi-step cold-email sequences with auto-stop on reply, bounce, or complaint.</p>
-        </div>
+      <h1 className="page-title">Sequences</h1>
+      <p className="page-sub">
+        Each row is a sequence definition on Supabase, with live counts of every enrollment + every outbound that's been logged to <code>send_log</code> against its runs. No mocks — empty cells are real zeroes.
+      </p>
+
+      <div className="card">
+        <table className="tbl">
+          <thead>
+            <tr>
+              <th>Sequence</th><th>Client</th><th>Active</th>
+              <th>Enrollments</th><th>Queued</th><th>Replied</th><th>Bounced</th><th>Completed</th>
+              <th>Sent</th><th>Delivered</th><th>Reply rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {metrics.map(m => {
+              const s = m.sequence;
+              return (
+                <tr key={s.id}>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{s.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--fg-2)" }}><code>{s.slug}</code></div>
+                  </td>
+                  <td>{m.profile_name}</td>
+                  <td>{s.active
+                        ? <span className="pill green"><CheckCircle2 size={11} style={{verticalAlign:"-1px"}} /> active</span>
+                        : <span className="pill"><Clock size={11} style={{verticalAlign:"-1px"}} /> off</span>}</td>
+                  <td>{m.total_runs}</td>
+                  <td>{m.queued || "—"}</td>
+                  <td>{m.paused_replied || "—"}</td>
+                  <td style={{ color: m.paused_bounced ? "var(--accent-red)" : undefined }}>{m.paused_bounced || "—"}</td>
+                  <td>{m.completed || "—"}</td>
+                  <td>{m.total_sent || "—"}</td>
+                  <td>{m.total_delivered || "—"}</td>
+                  <td>{m.total_sent ? `${((m.total_replied / m.total_sent) * 100).toFixed(1)}%` : "—"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div className="row justify">
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 600 }}>{seq.name}</div>
-            <div className="page-sub" style={{ margin: "4px 0 0" }}>
-              From <span className="pill cyan">{seq.sender.from_addr}</span> →
-              {" "}<span className="pill">{seq.recipient.email}</span>
-              {" "}· <span className="pill">{seq.steps.length} steps</span>
-              {" "}· {seq.stop_on_reply && <span className="pill green">stop on reply</span>}
-            </div>
-          </div>
-          <div className="row gap-2">
-            <button className="primary"
-                    onClick={() => navigate("/settings?tab=sender")}>
-              <SettingsIcon size={14} /> Sender setup
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-4" style={{ marginBottom: 16 }}>
-        <div className="card"><h3>Sent</h3><div className="big" style={{ color: "var(--accent-cyan)" }}>{sent}</div></div>
-        <div className="card"><h3>Failed</h3><div className="big" style={{ color: failed > 0 ? "var(--accent-red)" : "var(--fg-1)" }}>{failed}</div></div>
-        <div className="card"><h3>Pending</h3><div className="big">{pending}</div></div>
-        <div className="card"><h3>Replied</h3><div className="big" style={{ color: "var(--fg-2)" }}>0</div></div>
-      </div>
-
-      {failed > 0 && (
-        <div className="card" style={{ marginBottom: 16, borderColor: "var(--accent-amber)" }}>
-          <div className="row" style={{ alignItems: "flex-start", gap: 12 }}>
-            <AlertCircle size={20} color="var(--accent-amber)" />
-            <div style={{ flex: 1 }}>
-              <strong>Why steps 2–10 failed:</strong> sent direct-to-MX from a residential IP without SPF/DKIM/DMARC.
-              {" "}<code>mx2.hostinger.com</code> rate-limited connections after the first delivery (which is normal anti-spam behavior).
-              {" "}<strong>To make them deliver to inbox:</strong> set up a Resend-backed profile (≈5 min),{" "}
-              then re-send via the profile-aware sender:
-              {sendCmd && (
-                <div className="row gap-2" style={{ marginTop: 10, alignItems: "center" }}>
-                  <code style={{ flex: 1, background: "#000", padding: "6px 10px", borderRadius: 6, color: "var(--accent-lime)", fontSize: 11, overflow: "auto" }}>{sendCmd}</code>
-                  <button onClick={() => navigator.clipboard.writeText(sendCmd)}><Copy size={12} /></button>
-                </div>
-              )}
-              <div style={{ marginTop: 8, fontSize: 12 }}>
-                Active profile: {activeProfile
-                  ? <span className="pill cyan">{activeProfile.name}</span>
-                  : <span className="pill amber">no profile selected — pick one in the sidebar</span>}
-                {activeProfile && !activeProfile.relay.resend_api_key && <span className="pill amber" style={{marginLeft:6}}>add Resend API key in Sender setup</span>}
-              </div>
-              See <code>DELIVERABILITY.md</code> for the full inbox-placement playbook.
-            </div>
+      <div className="card" style={{ marginTop: 16, background: "rgba(34,211,238,0.04)", borderColor: "rgba(34,211,238,0.2)" }}>
+        <div className="row" style={{ alignItems: "flex-start", gap: 10 }}>
+          <Send size={16} color="var(--accent-cyan)" />
+          <div style={{ fontSize: 13, color: "var(--fg-1)" }}>
+            <strong>Where do sequences come from?</strong> They get inserted into <code>sequences</code> + <code>sequence_steps</code> on Supabase by your scripts (variant authoring tools, the niche yaml loader). Once a sequence row exists, run
+            <code style={{ marginLeft: 4 }}>py sequences/sequence-runner.py enqueue-niche &lt;sequence_slug&gt; &lt;niche_slug&gt;</code>
+            to enroll every verified prospect in that niche. The runner ticks every 5 min, sends the next due step, gates on verified=true and unsubscribed=false, advances current_step on success.
           </div>
         </div>
-      )}
-
-      <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <div className="card">
-          <h3>Steps</h3>
-          <table className="tbl">
-            <thead><tr><th>#</th><th>Day</th><th>Subject</th><th>Status</th></tr></thead>
-            <tbody>
-              {seq.steps.map(step => {
-                const r = results.find(x => x.step === step.n);
-                let badge;
-                if (r?.sent) badge = <span className="pill green"><CheckCircle2 size={11} style={{verticalAlign:"-1px"}} /> sent {r.backend ? `via ${r.backend}` : ""}</span>;
-                else if (r?.error) badge = <span className="pill red" title={r.error}><XCircle size={11} style={{verticalAlign:"-1px"}} /> failed</span>;
-                else badge = <span className="pill"><Clock size={11} style={{verticalAlign:"-1px"}} /> pending</span>;
-                return (
-                  <tr key={step.n} onClick={() => setSelectedN(step.n)}
-                      style={{ cursor: "pointer", background: selectedN === step.n ? "rgba(34,211,238,0.05)" : undefined }}>
-                    <td>{step.n}</td><td>+{step.day}d</td>
-                    <td style={{ maxWidth: 320, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{step.subject}</td>
-                    <td>{badge}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="card">
-          <h3>Preview · step {selectedN ?? "—"}</h3>
-          {selected ? (
-            <>
-              <div className="page-sub" style={{ margin: "0 0 8px" }}>
-                From <span className="pill cyan">{seq.sender.from_addr}</span> →
-                {" "}<span className="pill">{seq.recipient.email}</span>
-              </div>
-              <div style={{ fontWeight: 600, marginBottom: 8 }}>{selected.subject}</div>
-              <pre style={{
-                background: "#000", color: "#cbd5e1", padding: 12, borderRadius: 8,
-                fontFamily: "var(--mono)", fontSize: 12, whiteSpace: "pre-wrap",
-                maxHeight: 380, overflow: "auto", margin: 0,
-              }}>{selected.body}
-
---
-{seq.sender.signature}</pre>
-              {selectedResult && (
-                <div className="page-sub" style={{ marginTop: 8 }}>
-                  {selectedResult.sent
-                    ? <>Delivered {selectedResult.mx && <>via <code>{selectedResult.mx}</code></>}{selectedResult.backend && <> · backend: <code>{selectedResult.backend}</code></>}. Message-ID: <code>{selectedResult.message_id}</code></>
-                    : selectedResult.error
-                    ? <>Send error: <code>{selectedResult.error}</code></>
-                    : <>Not yet attempted.</>}
-                </div>
-              )}
-            </>
-          ) : (
-            <div style={{ color: "var(--fg-2)" }}>Pick a step on the left.</div>
-          )}
-        </div>
-      </div>
-
-      <div className="card" style={{ marginTop: 16 }}>
-        <h3>About this run</h3>
-        <p className="page-sub" style={{ margin: 0 }}>{seq.schedule_explainer}</p>
       </div>
     </>
   );
