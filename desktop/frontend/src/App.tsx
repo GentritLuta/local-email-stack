@@ -2,7 +2,7 @@ import { NavLink, Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react";
 import {
   Activity, Database, Mail, Inbox, Layers, Users, FlaskConical, Settings,
-  Send, FileCog, ShieldCheck, Workflow, Rocket, UserRound
+  Send, FileCog, ShieldCheck, Workflow, Rocket, UserRound, Rocket as RocketI, BarChart3
 } from "lucide-react";
 import { Dashboard } from "./routes/Dashboard";
 import { Pipeline } from "./routes/Pipeline";
@@ -17,6 +17,8 @@ import { LogsPage } from "./routes/Logs";
 import { SettingsPage } from "./routes/Settings";
 import { SetupWizard } from "./routes/Setup";
 import { Profiles } from "./routes/Profiles";
+import { Campaigns } from "./routes/Campaigns";
+import { Analytics } from "./routes/Analytics";
 import { api } from "./lib/api";
 import { ensurePermission } from "./lib/notify";
 import { ProfilePicker } from "./components/ProfilePicker";
@@ -51,6 +53,8 @@ export function App() {
         <ProfilePicker />
         <nav>
           <Item to="/" icon={<Activity size={16} />} label="Overview" end />
+          <Item to="/campaigns" icon={<RocketI size={16} />} label="Campaigns" />
+          <Item to="/analytics" icon={<BarChart3 size={16} />} label="Analytics" />
           <Item to="/profiles" icon={<UserRound size={16} />} label="Profiles" />
           <Item to="/sequences" icon={<Send size={16} />} label="Sequences" />
           <Item to="/warmup" icon={<ShieldCheck size={16} />} label="Warmup" />
@@ -68,6 +72,8 @@ export function App() {
       <main className="main">
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/profiles" element={<Profiles />} />
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/sourcing" element={<Sourcing />} />

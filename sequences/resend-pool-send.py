@@ -115,12 +115,47 @@ def send_resend(api_key: str, persona: dict, to_addr: str, subject: str, body: s
         return {"sent": False, "error": str(e), "started_at": started}
 
 
-def record(slug: str, persona_slug: str, to: str, outcome: dict) -> None:
-    row = {"ts": time.time(), "persona": persona_slug, "to": to,
+def record(slug: str, persona: dict, to: str, subject: str, outcome: dict) -> None:
+    """Append to local jsonl AND POST to Supabase send_log so the dashboard sees it live."""
+    ts = time.time()
+    row = {"ts": ts, "persona": persona["slug"], "to": to,
            "delivered": outcome.get("sent"), "error": outcome.get("error"),
            "resend_id": outcome.get("resend_id")}
     with _log(slug).open("a", encoding="utf-8") as f:
         f.write(json.dumps(row) + "\n")
+    # Best-effort push to Supabase. Silent on auth issues.
+    try:
+        env_path = Path(__file__).resolve().parent / "supabase.env"
+        if not env_path.exists():
+            return
+        env = {}
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            if "=" in line and not line.strip().startswith("#"):
+                k, v = line.split("=", 1)
+                env[k.strip()] = v.strip().strip('"').strip("'")
+        url = env.get("SUPABASE_URL", "").rstrip("/")
+        key = env.get("SUPABASE_ANON_KEY", "")
+        if not url or not key:
+            return
+        body = {
+            "step_n":       1,
+            "persona_slug": persona["slug"],
+            "from_addr":    persona["from_addr"],
+            "to_addr":      to,
+            "subject":      subject,
+            "resend_id":    outcome.get("resend_id"),
+            "message_id":   outcome.get("message_id"),
+            "delivered":    bool(outcome.get("sent")),
+            "error":        outcome.get("error"),
+            "sent_at":      dt.datetime.fromtimestamp(ts).isoformat() + "Z",
+        }
+        with httpx.Client(timeout=8) as c:
+            c.post(f"{url}/rest/v1/send_log",
+                   headers={"apikey": key, "Authorization": f"Bearer {key}",
+                            "Content-Type": "application/json"},
+                   json=body)
+    except Exception:
+        pass
 
 
 def main() -> int:
@@ -153,7 +188,7 @@ def main() -> int:
     print(f"  subject: {variant['subject']}\n")
 
     outcome = send_resend(api_key, persona, args.to, variant["subject"], variant["body"])
-    record(args.slug, persona["slug"], args.to, outcome)
+    record(args.slug, persona, args.to, variant["subject"], outcome)
     print(json.dumps(outcome, indent=2))
     return 0 if outcome.get("sent") else 2
 
