@@ -182,6 +182,16 @@ class Supa:
                           params={"id": f"eq.{send_log_id}"},
                           json={"replied": True})
 
+    def mark_send_bounced(self, send_log_id: str) -> None:
+        self.client.patch(f"{self.base}/send_log",
+                          params={"id": f"eq.{send_log_id}"},
+                          json={"bounced": True, "delivered": False})
+
+    def mark_send_complained(self, send_log_id: str) -> None:
+        self.client.patch(f"{self.base}/send_log",
+                          params={"id": f"eq.{send_log_id}"},
+                          json={"complained": True})
+
     def pause_run(self, run_id: str, reason: str) -> None:
         self.client.patch(f"{self.base}/runs",
                           params={"id": f"eq.{run_id}"},
@@ -194,6 +204,26 @@ def split_refs(value: str) -> list[str]:
     if not value:
         return []
     return [s.strip() for s in re.findall(r"<[^>]+>", value)]
+
+
+def _extract_original_recipient(msg) -> str | None:
+    """For a bounce DSN, the original recipient is usually in either an
+    `X-Failed-Recipients` header, the `Original-Recipient` line inside the
+    delivery-status report, or quoted in the body. Best-effort parse."""
+    failed = msg.get("X-Failed-Recipients") or msg.get("Original-Recipient")
+    if failed:
+        m = re.search(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", failed)
+        if m: return m.group(0).lower()
+    try:
+        body = extract_snippet(msg, max_chars=5000)
+        for line in body.splitlines():
+            if "to:" in line.lower() or "recipient" in line.lower() or "<" in line:
+                m = re.search(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", line)
+                if m and "aureonglobal.de" not in m.group(0).lower():
+                    return m.group(0).lower()
+    except Exception:
+        pass
+    return None
 
 
 def one_pass(verbose: bool = True) -> dict:
@@ -254,10 +284,15 @@ def one_pass(verbose: bool = True) -> dict:
                     # First try In-Reply-To/References (precise). Resend tends to
                     # override our Message-ID with the SES one on the wire, so
                     # this often fails — fall back to recipient + subject.
+                    # For bounces the sender is mailer-daemon, so the subject
+                    # fallback uses the *original recipient* address (parsed
+                    # from the bounce body's "X-Failed-Recipients" or the
+                    # quoted body), which our send_log already keys on via to_addr.
                     run_id, resend_id, send_log_id = supa.find_run_by_message_id(in_reply + references)
                     match_via = "header"
-                    if not send_log_id and klass == "reply":
-                        run_id, resend_id, send_log_id = supa.find_send_by_recipient_subject(from_addr, subject)
+                    if not send_log_id and klass in ("reply", "bounce", "complaint"):
+                        candidate_recipient = from_addr if klass == "reply" else _extract_original_recipient(msg) or from_addr
+                        run_id, resend_id, send_log_id = supa.find_send_by_recipient_subject(candidate_recipient, subject)
                         if send_log_id: match_via = "subject"
                     if run_id:
                         stats["matched_to_run"] += 1
@@ -279,8 +314,10 @@ def one_pass(verbose: bool = True) -> dict:
                                          "Matched-Via": match_via if send_log_id else "none"},
                     })
 
-                    if send_log_id and klass == "reply":
-                        supa.mark_send_replied(send_log_id)
+                    if send_log_id:
+                        if   klass == "reply":     supa.mark_send_replied(send_log_id)
+                        elif klass == "bounce":    supa.mark_send_bounced(send_log_id)
+                        elif klass == "complaint": supa.mark_send_complained(send_log_id)
                     if klass == "reply" and run_id:
                         supa.pause_run(run_id, "replied")
                         stats["runs_paused"] += 1
