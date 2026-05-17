@@ -56,13 +56,25 @@
   ],
 
   "relay": {
-    "backend": "resend",
-    "from_domain": "mail.aureonglobal.de",
-    "resend_domain_id": "863fec1e-fab3-44a8-93c1-f7752b5edc9c",
-    "resend_region": "eu-west-1",
-    "resend_api_key": "",
-    "domain_verified_at": "2026-05-17T15:18:00Z",
-    "_note": "resend_api_key in aureon.private.json (gitignored)"
+    "backend":         "resend",
+    "resend_region":   "eu-west-1",
+    "resend_api_key":  "",
+    "_note":           "resend_api_key in aureon.private.json (gitignored)",
+    "from_domains": [
+      {
+        "domain":            "mail.aureonglobal.de",
+        "resend_domain_id":  "863fec1e-fab3-44a8-93c1-f7752b5edc9c",
+        "verified_at":       "2026-05-17T15:18:00Z",
+        "warmup": {
+          "enabled":          true,
+          "current_day":      0,
+          "started_at":       null,
+          "ramp_curve":       "snowball_v1",
+          "max_daily_sends":  90,
+          "reputation":       { "bounce_rate_7d": 0.0, "complaint_rate_7d": 0.0, "delivered_7d": 0, "last_check": null }
+        }
+      }
+    ]
   },
 
   "personas": [

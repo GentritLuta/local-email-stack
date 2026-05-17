@@ -48,6 +48,10 @@ from profile_lib import (
     REPO_ROOT,
     current_warmup_day,
     daily_target_for,
+    iter_send_domains,
+    daily_target_for_domain,
+    current_warmup_day_for_domain,
+    reputation_exceeded_for_domain,
     list_profiles,
     load_profile,
     reputation_exceeded,
@@ -128,82 +132,139 @@ def _within_send_window() -> bool:
 
 
 def _tick_profile(profile: dict, force_window: bool = False) -> dict:
+    """Per-profile tick that loops over every sending subdomain in the pool
+    and advances each one's warmup day independently. Paused domains stay on
+    their day, sending domains tick forward, and a domain over the bounce/
+    complaint threshold pauses without affecting siblings."""
     slug = profile["slug"]
     print(f"\n=== {profile['name']} ({slug})")
-    w = profile.setdefault("warmup", {})
-    if not w.get("enabled", False):
-        print("  warmup disabled — skipping")
-        return {"slug": slug, "skipped": "disabled"}
+    domains = iter_send_domains(profile, only_verified=True, only_enabled=False)
+    if not domains:
+        print("  no verified sending domains in relay.from_domains — skipping")
+        return {"slug": slug, "skipped": "no_domains"}
 
-    blocked, why = reputation_exceeded(profile)
-    if blocked:
-        print(f"  PAUSED: reputation threshold exceeded ({why})")
-        status = {"slug": slug, "paused": True, "reason": why,
-                  "current_day": current_warmup_day(profile)}
-        _publish_status(profile, status)
-        return status
-
-    day = current_warmup_day(profile)
-    started = w.get("started_at")
-    if not started:
-        # Auto-start at day 1
-        w["started_at"] = today_iso()
-        w["current_day"] = 1
-        day = 1
-        save_profile(profile)
-        print(f"  starting warmup → day 1")
-
-    daily = daily_target_for(profile, day)
-    pct   = warmup_pct_for(profile, day)
-    n_warm = max(1, int(round(daily * pct)))
-    n_real = daily - n_warm
-
-    targets = w.get("warmup_targets") or []
+    targets = (profile.get("warmup") or {}).get("warmup_targets") or []
     if not targets:
         print(f"  no warmup_targets configured — fill profile.warmup.warmup_targets first")
-        status = {"slug": slug, "skipped": "no_targets",
-                  "current_day": day, "daily": daily, "warmup_planned": n_warm, "real_planned": n_real}
-        _publish_status(profile, status)
-        return status
+        return {"slug": slug, "skipped": "no_targets"}
 
     if not _within_send_window() and not force_window:
         print(f"  outside 09:00–18:00 send window — deferring (re-run later)")
-        status = {"slug": slug, "deferred": True, "current_day": day,
-                  "daily": daily, "warmup_planned": n_warm, "real_planned": n_real}
-        _publish_status(profile, status)
-        return status
+        return {"slug": slug, "deferred": True}
 
-    sent = 0
+    per_domain_status = []
+    for d in domains:
+        ds = _tick_domain(profile, d, targets)
+        per_domain_status.append(ds)
+    save_profile(profile)
+    status = {
+        "slug": slug,
+        "domains": per_domain_status,
+        "last_tick": dt.datetime.now().isoformat(),
+    }
+    _publish_status(profile, status)
+    return status
+
+
+def _tick_domain(profile: dict, d: dict, targets: list[str]) -> dict:
+    """Advance one subdomain's warmup ramp by one day. Sends today's planned
+    warmup-target batch over a randomized 20-min window. Pauses if the
+    domain's reputation snapshot exceeds the profile's auto_pause thresholds."""
+    domain = d["domain"]
+    w = d.setdefault("warmup", {})
+    if not w.get("enabled", True):
+        print(f"  · {domain}: warmup disabled — skipping")
+        return {"domain": domain, "skipped": "disabled"}
+
+    blocked, why = reputation_exceeded_for_domain(profile, d)
+    if blocked:
+        print(f"  · {domain}: PAUSED — {why}")
+        return {"domain": domain, "paused": True, "reason": why,
+                "current_day": current_warmup_day_for_domain(d)}
+
+    day = current_warmup_day_for_domain(d)
+    if not w.get("started_at"):
+        w["started_at"] = today_iso()
+        w["current_day"] = 1
+        day = 1
+        print(f"  · {domain}: starting warmup → day 1")
+
+    daily = daily_target_for_domain(profile, d)
+    pct   = warmup_pct_for(profile, day)
+    n_warm = max(1, int(round(daily * pct)))
+
+    print(f"  · {domain}: day {day} — daily {daily}, warmup {n_warm}")
+
+    sent  = 0
     fails = 0
-    log = _log_path(profile)
-    print(f"  day {day}: daily={daily}, warmup={n_warm}, real={n_real} (real sends pulled separately from sequences)")
-    for i in range(n_warm):
+    log   = _log_path(profile)
+    for _ in range(n_warm):
         to = random.choice(targets)
         topic = random.choice(WARMUP_TOPICS)
-        outcome = _send_warmup_email(profile, to, topic)
-        row = {"ts": dt.datetime.now().isoformat(), "kind": "warmup", "day": day, **outcome}
+        outcome = _send_warmup_email_from_domain(profile, d, to, topic)
+        row = {"ts": dt.datetime.now().isoformat(), "kind": "warmup",
+               "domain": domain, "day": day, **outcome}
         with log.open("a", encoding="utf-8") as f:
             f.write(json.dumps(row) + "\n")
         if outcome.get("sent"): sent += 1
         else:                   fails += 1
-        # Spread sends randomly across the next ~30 minutes (don't burst)
         time.sleep(random.uniform(8.0, 22.0))
 
-    # Advance the ramp day if we sent at least 60% of plan
     if n_warm == 0 or sent / max(n_warm, 1) >= 0.6:
         w["current_day"] = day + 1
-        save_profile(profile)
-        print(f"  advanced to day {day + 1}")
+        print(f"  · {domain}: advanced to day {day + 1}")
     else:
-        print(f"  send success {sent}/{n_warm} below threshold — not advancing")
+        print(f"  · {domain}: send success {sent}/{n_warm} below threshold — not advancing")
 
-    status = {
-        "slug": slug, "current_day": w["current_day"],
-        "daily": daily, "warmup_planned": n_warm, "warmup_sent": sent, "warmup_failed": fails,
-        "real_planned": n_real, "last_tick": dt.datetime.now().isoformat(),
+    return {"domain": domain, "current_day": w["current_day"],
+            "daily": daily, "warmup_planned": n_warm,
+            "warmup_sent": sent, "warmup_failed": fails}
+
+
+def _send_warmup_email_from_domain(profile: dict, domain_entry: dict, to_addr: str, topic: tuple) -> dict:
+    """Like _send_warmup_email but sends from a specific subdomain in the pool.
+    Uses the first persona's name as the human display name; addr is
+    <persona-slug>@<domain> so the warmup also exercises the same alias
+    space the real sequences use."""
+    api_key = profile.get("relay", {}).get("resend_api_key", "").strip()
+    if not api_key:
+        return {"sent": False, "error": "no Resend API key on profile"}
+    personas = profile.get("personas") or []
+    if not personas:
+        return {"sent": False, "error": "no personas on profile"}
+    # Rotate through personas so warmup also exercises each From-address.
+    p = personas[random.randrange(len(personas))]
+    from_name = p.get("from_name") or p.get("slug", "Team")
+    from_addr = f'{p["slug"]}@{domain_entry["domain"]}'
+    reply_to  = p.get("reply_to") or f'info@{domain_entry["domain"].split(".", 1)[-1]}'
+    sig = p.get("signature") or from_name
+    subject_root, body_root = topic
+    nonce = random.randint(1000, 9999)
+    subject = subject_root if random.random() < 0.5 else subject_root.lower()
+    body = body_root.format(sector=random.choice(["SaaS", "fintech", "infra", "media", "DTC"]))
+    body = body + sig + f"\n\n.ref={nonce}"
+    payload = {
+        "from":     f'{from_name} <{from_addr}>',
+        "to":       [to_addr],
+        "reply_to": reply_to,
+        "subject":  subject,
+        "text":     body,
+        "tags": [
+            {"name": "profile", "value": profile["slug"]},
+            {"name": "domain",  "value": domain_entry["domain"]},
+            {"name": "kind",    "value": "warmup"},
+        ],
     }
-    _publish_status(profile, status)
-    return status
+    try:
+        with httpx.Client(timeout=20) as c:
+            r = c.post(f"{RESEND_API}/emails",
+                       headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                       json=payload)
+        if r.status_code in (200, 202):
+            return {"sent": True, "remote_id": r.json().get("id"), "to": to_addr}
+        return {"sent": False, "error": f"{r.status_code}: {r.text[:200]}", "to": to_addr}
+    except Exception as e:
+        return {"sent": False, "error": str(e), "to": to_addr}
 
 
 def _print_status_for(profile: dict) -> None:

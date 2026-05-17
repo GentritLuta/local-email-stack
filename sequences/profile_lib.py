@@ -28,7 +28,90 @@ def load_profile(slug: str) -> dict:
     if priv_path.exists():
         priv = json.loads(priv_path.read_text(encoding="utf-8"))
         data = _deep_merge(data, priv)
+    _ensure_multi_domain_relay(data)
     return data
+
+
+def _ensure_multi_domain_relay(data: dict) -> None:
+    """Backward-compat shim: synthesize relay.from_domains[] from the older
+    relay.from_domain (single string) so every reader downstream can treat
+    sending as a pool of independently-warmed subdomains. Idempotent."""
+    relay = data.setdefault("relay", {})
+    if relay.get("from_domains"):
+        return
+    legacy_domain = relay.get("from_domain")
+    if not legacy_domain:
+        return
+    # Inherit profile-level warmup as the single-domain warmup state. This
+    # keeps existing send caps intact for the first run after migration.
+    inherited = json.loads(json.dumps(data.get("warmup", {})))
+    inherited.pop("warmup_targets", None)
+    inherited.pop("real_send_mix", None)
+    inherited.pop("auto_pause_thresholds", None)
+    inherited.setdefault("enabled", True)
+    inherited.setdefault("current_day", 0)
+    inherited.setdefault("started_at", None)
+    inherited.setdefault("ramp_curve", "snowball_v1")
+    relay["from_domains"] = [{
+        "domain":            legacy_domain,
+        "resend_domain_id":  relay.get("resend_domain_id"),
+        "verified_at":       relay.get("domain_verified_at"),
+        "warmup":            inherited,
+    }]
+
+
+def iter_send_domains(profile: dict, *, only_verified: bool = True, only_enabled: bool = True) -> list[dict]:
+    """All sending subdomains in this profile's pool. By default returns only
+    domains that are verified at Resend AND have warmup enabled — exactly
+    what the rotation should pick from."""
+    relay = profile.get("relay") or {}
+    out = list(relay.get("from_domains") or [])
+    if only_verified: out = [d for d in out if d.get("verified_at")]
+    if only_enabled:  out = [d for d in out if (d.get("warmup") or {}).get("enabled", True)]
+    return out
+
+
+def daily_target_for_domain(profile: dict, domain_entry: dict) -> int:
+    """Per-domain daily ceiling using the domain's current_day and either its
+    own warmup.ramp_curve or the profile's default snowball curve."""
+    w = (domain_entry or {}).get("warmup") or {}
+    day = int(w.get("current_day", 0))
+    if day < 1: return 0
+    curve_id = w.get("ramp_curve") or "snowball_v1"
+    curve = profile.get(f"ramp_curve_{curve_id}", profile.get("ramp_curve_snowball_v1", []))
+    target = 0
+    for row in sorted(curve, key=lambda r: r["from_day"]):
+        if day >= row["from_day"]: target = row["daily"]
+    cap = int(w.get("max_daily_sends", target))
+    return min(target, cap)
+
+
+def current_warmup_day_for_domain(domain_entry: dict) -> int:
+    return int(((domain_entry or {}).get("warmup") or {}).get("current_day", 0))
+
+
+def reputation_exceeded_for_domain(profile: dict, domain_entry: dict) -> tuple[bool, str | None]:
+    """Per-domain bounce/complaint check against profile-level auto-pause thresholds."""
+    rep = ((domain_entry or {}).get("warmup") or {}).get("reputation", {})
+    th  = (profile.get("warmup") or {}).get("auto_pause_thresholds", {})
+    br_lim = th.get("bounce_rate", 0.05)
+    cr_lim = th.get("complaint_rate", 0.001)
+    if rep.get("bounce_rate_7d", 0.0) > br_lim:
+        return True, f"{domain_entry.get('domain')}: bounce_rate_7d={rep['bounce_rate_7d']:.3f} > {br_lim:.3f}"
+    if rep.get("complaint_rate_7d", 0.0) > cr_lim:
+        return True, f"{domain_entry.get('domain')}: complaint_rate_7d={rep['complaint_rate_7d']:.4f} > {cr_lim:.4f}"
+    return False, None
+
+
+def materialize_persona(persona: dict, domain_entry: dict) -> dict:
+    """Return a copy of a persona with from_addr/reply_to bound to a specific
+    domain from the pool. Lets one persona slug 'daniel' send from any of
+    daniel@<sub>.aureonglobal.de in the pool."""
+    p = dict(persona)
+    domain = domain_entry["domain"]
+    p["from_addr"] = f'{persona["slug"]}@{domain}'
+    # Reply-To stays on the canonical mailbox (info@<root>) so replies converge.
+    return p
 
 
 def save_profile(profile: dict, *, write_public: bool = True) -> None:

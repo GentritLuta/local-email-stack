@@ -23,7 +23,13 @@ from pathlib import Path
 
 import httpx
 
-from profile_lib import load_profile
+from profile_lib import (
+    load_profile,
+    iter_send_domains,
+    daily_target_for_domain,
+    reputation_exceeded_for_domain,
+    materialize_persona,
+)
 from email_render import build_payload
 
 POOL_STATE = Path(__file__).resolve().parent.parent / "warmup-state"
@@ -36,43 +42,86 @@ def _log(slug: str) -> Path:
     return POOL_STATE / f"{slug}.resend.jsonl"
 
 
-def pick_persona(profile: dict) -> dict:
+def pick_persona_and_domain(profile: dict) -> tuple[dict, dict]:
+    """Pick the (persona, sending-domain) pair with the most quota left today.
+
+    Each domain in the pool carries its own warmup state — current_day, ramp
+    curve, reputation. Each persona has its own per-day cap + cooldown. The
+    rotation picks the combination that has BOTH:
+      * domain room (today's sends < the domain's warmup ceiling)
+      * persona room (today's sends from THAT (persona, domain) pair below
+        the per-persona cap, and cooldown elapsed)
+    Preference goes to the least-loaded domain first, least-loaded persona
+    within it second. This spreads volume across the warmed pool so no single
+    subdomain spikes and gets flagged.
+    """
     personas = profile.get("personas", [])
-    if not personas:
-        sys.exit("profile has no personas")
+    domains  = iter_send_domains(profile)
+    if not personas: sys.exit("profile has no personas")
+    if not domains:  sys.exit("profile has no verified sending domains in relay.from_domains")
+
     rot = profile.get("rotation", {})
-    quota = int(rot.get("max_sends_per_persona_per_day", 30))
+    quota   = int(rot.get("max_sends_per_persona_per_day", 30))
     min_gap = int(rot.get("min_seconds_between_sends_same_persona", 60))
 
     now = time.time()
     today_start = dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
     log = _log(profile["slug"])
-    usage = {p["slug"]: {"count_today": 0, "last_ts": 0.0} for p in personas}
+
+    # Usage keyed by (persona_slug, domain).
+    usage: dict[tuple[str, str], dict] = {}
+    domain_total_today: dict[str, int] = {d["domain"]: 0 for d in domains}
     if log.exists():
         for line in log.read_text(encoding="utf-8").splitlines():
-            try:
-                row = json.loads(line)
-            except Exception:
-                continue
-            slug = row.get("persona")
-            ts = float(row.get("ts", 0))
-            if slug in usage:
-                if ts >= today_start:
-                    usage[slug]["count_today"] += 1
-                usage[slug]["last_ts"] = max(usage[slug]["last_ts"], ts)
+            try: row = json.loads(line)
+            except Exception: continue
+            slug   = row.get("persona") or ""
+            domain = row.get("domain") or ""   # written by record() once present
+            ts     = float(row.get("ts", 0))
+            key = (slug, domain)
+            u = usage.setdefault(key, {"count_today": 0, "last_ts": 0.0})
+            if ts >= today_start:
+                u["count_today"] += 1
+                if domain in domain_total_today: domain_total_today[domain] += 1
+            u["last_ts"] = max(u["last_ts"], ts)
 
-    candidates = []
-    for p in personas:
-        u = usage[p["slug"]]
-        if u["count_today"] >= quota:
+    # 1. Filter domains by reputation gate + remaining capacity today.
+    eligible_domains = []
+    for d in domains:
+        blocked, why = reputation_exceeded_for_domain(profile, d)
+        if blocked:
+            print(f"  ! domain paused on reputation: {why}")
             continue
-        if (now - u["last_ts"]) < min_gap:
+        ceiling = daily_target_for_domain(profile, d) or quota   # if warmup not started, use persona cap as soft cap
+        room = max(0, ceiling - domain_total_today.get(d["domain"], 0))
+        if room <= 0:
             continue
-        candidates.append((u["count_today"], u["last_ts"], p))
-    if not candidates:
-        sys.exit("all personas over quota or in cooldown")
-    candidates.sort(key=lambda x: (x[0], x[1]))
-    return candidates[0][2]
+        eligible_domains.append((room, d))
+    if not eligible_domains:
+        sys.exit("every domain in the pool is at its warmup ceiling for today")
+    eligible_domains.sort(key=lambda t: -t[0])  # most room first
+
+    # 2. For each eligible domain (most-room-first), find the least-used
+    # persona that's also out of cooldown.
+    for room, d in eligible_domains:
+        candidates = []
+        for p in personas:
+            key = (p["slug"], d["domain"])
+            u = usage.get(key, {"count_today": 0, "last_ts": 0.0})
+            if u["count_today"] >= quota: continue
+            if (now - u["last_ts"]) < min_gap: continue
+            candidates.append((u["count_today"], u["last_ts"], p))
+        if candidates:
+            candidates.sort(key=lambda x: (x[0], x[1]))
+            return candidates[0][2], d
+
+    sys.exit("all (persona, domain) pairs are over quota or in cooldown")
+
+
+# Backward-compat shim — older callers that just want a persona.
+def pick_persona(profile: dict) -> dict:
+    persona, _ = pick_persona_and_domain(profile)
+    return persona
 
 
 def send_resend(api_key: str, persona: dict, to_addr: str, subject: str, body: str,
@@ -101,7 +150,10 @@ def send_resend(api_key: str, persona: dict, to_addr: str, subject: str, body: s
 def record(slug: str, persona: dict, to: str, subject: str, outcome: dict) -> None:
     """Append to local jsonl AND POST to Supabase send_log so the dashboard sees it live."""
     ts = time.time()
-    row = {"ts": ts, "persona": persona["slug"], "to": to,
+    # Extract the sending subdomain from the From-address so we can attribute
+    # the send to its warmup pool when the rotation reads recent activity.
+    domain = persona.get("from_addr", "").split("@", 1)[-1].strip().lower()
+    row = {"ts": ts, "persona": persona["slug"], "domain": domain, "to": to,
            "delivered": outcome.get("sent"), "error": outcome.get("error"),
            "resend_id": outcome.get("resend_id")}
     with _log(slug).open("a", encoding="utf-8") as f:
@@ -193,10 +245,17 @@ def main() -> int:
         merge[k.strip()] = v
 
     profile = load_profile(args.slug)
-    persona = (next((p for p in profile["personas"] if p["slug"] == args.force_persona), None)
-               if args.force_persona else pick_persona(profile))
-    if not persona:
-        sys.exit(f"persona '{args.force_persona}' not found")
+    # Pick (persona, domain) jointly. The domain comes from the warmed pool
+    # (relay.from_domains), the persona comes from the rotation. If you force
+    # a specific persona, we still pick the best-eligible domain for it.
+    if args.force_persona:
+        persona = next((p for p in profile["personas"] if p["slug"] == args.force_persona), None)
+        if not persona: sys.exit(f"persona '{args.force_persona}' not found")
+        _, domain = pick_persona_and_domain(profile)
+    else:
+        persona, domain = pick_persona_and_domain(profile)
+    persona = materialize_persona(persona, domain)
+
     api_key = profile.get("relay", {}).get("resend_api_key", "").strip()
     if not api_key:
         sys.exit("profile has no relay.resend_api_key — set in profiles/aureon.private.json")
@@ -211,6 +270,7 @@ def main() -> int:
 
     print(f"\n=== resend pool send ===")
     print(f"  persona: {persona['slug']} ({persona['from_name']})")
+    print(f"  domain:  {domain['domain']} (day {((domain.get('warmup') or {}).get('current_day', 0))})")
     print(f"  from:    {persona['from_name']} <{persona['from_addr']}>")
     print(f"  to:      {args.to}")
     print(f"  subject: {subject}\n")

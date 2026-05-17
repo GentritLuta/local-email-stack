@@ -176,6 +176,48 @@ export function Analytics() {
       .sort((a, b) => b.sent - a.sent);
   }, [profiles, filteredSends, filteredProspects, personaToProfile, sinceDate]);
 
+  // ─── Per sending domain (warmup pool view) ──────────────────────────────
+  // The sending pool is each profile's relay.from_domains[]. We attribute
+  // every send_log row to its subdomain via from_addr, then surface volume
+  // + reputation + warmup day per subdomain. This is the table to watch to
+  // make sure no single domain is getting flagged.
+  const byDomain = useMemo(() => {
+    const m = new Map<string, {
+      domain: string; profile: string;
+      sent: number; delivered: number; bounced: number; replied: number; complained: number;
+      currentDay: number; ceiling: number; verified: boolean;
+    }>();
+    // Seed from profile config so every configured domain is visible even
+    // if it hasn't sent anything yet.
+    for (const p of profiles) {
+      if (profileFilter !== "__all__" && p.slug !== profileFilter) continue;
+      const pool = (p.config?.relay?.from_domains ?? []) as any[];
+      for (const d of pool) {
+        const dn = d.domain;
+        if (!dn) continue;
+        m.set(`${p.slug}|${dn}`, {
+          domain: dn, profile: p.name,
+          sent: 0, delivered: 0, bounced: 0, replied: 0, complained: 0,
+          currentDay: (d.warmup?.current_day ?? 0),
+          ceiling:    (d.warmup?.max_daily_sends ?? 0),
+          verified:   Boolean(d.verified_at),
+        });
+      }
+    }
+    for (const s of filteredSends) {
+      const profSlug = personaToProfile.get(s.persona_slug ?? "") ?? "(unknown)";
+      const dn = (s.from_addr.split("@")[1] || "").toLowerCase();
+      const key = `${profSlug}|${dn}`;
+      const row = m.get(key); if (!row) continue;
+      row.sent++;
+      if (s.delivered && !s.bounced) row.delivered++;
+      if (s.bounced)    row.bounced++;
+      if (s.replied)    row.replied++;
+      if (s.complained) row.complained++;
+    }
+    return [...m.values()].sort((a, b) => b.sent - a.sent);
+  }, [profiles, filteredSends, personaToProfile, profileFilter]);
+
   // ─── Per-persona ────────────────────────────────────────────────────────
   const byPersona = useMemo(() => {
     const m = new Map<string, { sent: number; delivered: number; bounced: number; replied: number }>();
@@ -408,6 +450,44 @@ export function Analytics() {
                   <td>{pct(r.delivered, r.sent)}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>)}
+      </div>
+
+      {/* Per sending domain (warmup pool) */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Per sending domain (warmup pool)</h3>
+        <p className="page-sub" style={{ marginTop: 0, marginBottom: 10 }}>
+          Each subdomain in <code>relay.from_domains</code> warms independently. The rotation routes new sends to whichever subdomain has the most room left today, so no single one spikes.
+        </p>
+        {byDomain.length === 0
+          ? <div style={{ color: "var(--fg-2)", padding: 8 }}>No domains in pool yet. Add one with <code>py sequences/provision_subdomain.py add &lt;profile&gt; &lt;subdomain&gt;</code>.</div>
+          : (<table className="tbl">
+            <thead>
+              <tr>
+                <th>Domain</th><th>Client</th><th>Verified</th><th>Day</th><th>Sent</th><th>Delivered</th>
+                <th>Bounced</th><th>Replied</th><th>Reply rate</th><th>Bounce rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byDomain.map(r => {
+                const bRate = r.sent ? r.bounced / r.sent : 0;
+                const bRed  = bRate > 0.05;
+                return (
+                  <tr key={r.domain}>
+                    <td style={{ fontFamily: "var(--mono)" }}>{r.domain}</td>
+                    <td style={{ fontSize: 12, color: "var(--fg-2)" }}>{r.profile}</td>
+                    <td>{r.verified ? <span className="pill green">verified</span> : <span className="pill amber">pending</span>}</td>
+                    <td>{r.currentDay}</td>
+                    <td>{dec(r.sent)}</td>
+                    <td>{dec(r.delivered)}</td>
+                    <td style={{ color: r.bounced ? "var(--accent-red)" : undefined }}>{r.bounced || "—"}</td>
+                    <td>{r.replied || "—"}</td>
+                    <td>{pct(r.replied, r.sent)}</td>
+                    <td style={{ color: bRed ? "var(--accent-red)" : undefined }}>{pct(r.bounced, r.sent)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>)}
       </div>

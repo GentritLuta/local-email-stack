@@ -27,7 +27,13 @@ from pathlib import Path
 
 import httpx
 
-from profile_lib import load_profile
+from profile_lib import (
+    load_profile,
+    iter_send_domains,
+    daily_target_for_domain,
+    reputation_exceeded_for_domain,
+    materialize_persona,
+)
 from email_render import build_payload
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -60,41 +66,72 @@ def supa(url: str, key: str) -> httpx.Client:
     )
 
 
-# ─── Persona rotation (mirrors resend-pool-send.py) ────────────────────────
+# ─── (persona, domain) rotation — mirrors resend-pool-send.py ───────────────
 
-def pick_persona(profile_config: dict, send_log_rows: list[dict]) -> dict:
+def _domain_of(from_addr: str) -> str:
+    return (from_addr or "").split("@", 1)[-1].strip().lower()
+
+
+def pick_persona_and_domain(profile_config: dict, send_log_rows: list[dict]) -> tuple[dict | None, dict | None]:
+    """Pick the (persona, domain) pair with most quota left today, computed
+    from the live send_log we just pulled. Each subdomain in the pool warms
+    independently — this spreads tick traffic across the warmed pool so no
+    single subdomain spikes."""
     personas = profile_config.get("personas", [])
-    if not personas:
-        sys.exit("profile has no personas")
-    rot = profile_config.get("rotation", {})
-    quota = int(rot.get("max_sends_per_persona_per_day", 30))
+    domains  = iter_send_domains(profile_config)
+    if not personas or not domains:
+        return None, None
+
+    rot     = profile_config.get("rotation", {})
+    quota   = int(rot.get("max_sends_per_persona_per_day", 30))
     min_gap = int(rot.get("min_seconds_between_sends_same_persona", 60))
-    now_ts = time.time()
+    now_ts  = time.time()
     today_start = dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
 
-    usage = {p["slug"]: {"count_today": 0, "last_ts": 0.0} for p in personas}
+    pair_usage: dict[tuple[str, str], dict] = {}
+    domain_total_today: dict[str, int] = {d["domain"]: 0 for d in domains}
     for row in send_log_rows:
-        slug = row.get("persona_slug")
-        if slug not in usage:
-            continue
+        slug   = row.get("persona_slug") or ""
+        domain = _domain_of(row.get("from_addr", ""))
         try:
             ts = dt.datetime.fromisoformat(row["sent_at"].replace("Z", "+00:00")).timestamp()
         except Exception:
             continue
+        key = (slug, domain)
+        u = pair_usage.setdefault(key, {"count_today": 0, "last_ts": 0.0})
         if ts >= today_start:
-            usage[slug]["count_today"] += 1
-        usage[slug]["last_ts"] = max(usage[slug]["last_ts"], ts)
+            u["count_today"] += 1
+            if domain in domain_total_today: domain_total_today[domain] += 1
+        u["last_ts"] = max(u["last_ts"], ts)
 
-    candidates = []
-    for p in personas:
-        u = usage[p["slug"]]
-        if u["count_today"] >= quota: continue
-        if (now_ts - u["last_ts"]) < min_gap: continue
-        candidates.append((u["count_today"], u["last_ts"], p))
-    if not candidates:
-        return None
-    candidates.sort(key=lambda x: (x[0], x[1]))
-    return candidates[0][2]
+    eligible = []
+    for d in domains:
+        blocked, _ = reputation_exceeded_for_domain(profile_config, d)
+        if blocked: continue
+        ceiling = daily_target_for_domain(profile_config, d) or quota
+        room = max(0, ceiling - domain_total_today.get(d["domain"], 0))
+        if room <= 0: continue
+        eligible.append((room, d))
+    if not eligible: return None, None
+    eligible.sort(key=lambda t: -t[0])
+
+    for _, d in eligible:
+        cands = []
+        for p in personas:
+            u = pair_usage.get((p["slug"], d["domain"]), {"count_today": 0, "last_ts": 0.0})
+            if u["count_today"] >= quota: continue
+            if (now_ts - u["last_ts"]) < min_gap: continue
+            cands.append((u["count_today"], u["last_ts"], p))
+        if cands:
+            cands.sort(key=lambda x: (x[0], x[1]))
+            return cands[0][2], d
+    return None, None
+
+
+# Backwards-compat shim for the existing tick() — returns just the persona.
+def pick_persona(profile_config: dict, send_log_rows: list[dict]) -> dict | None:
+    persona, _ = pick_persona_and_domain(profile_config, send_log_rows)
+    return persona
 
 
 # ─── Step lookup ───────────────────────────────────────────────────────────
@@ -135,9 +172,11 @@ def fetch_profile_config(c: httpx.Client, profile_slug: str) -> dict:
 
 
 def fetch_today_log(c: httpx.Client, profile_slug: str) -> list[dict]:
-    """Today's send_log rows for this profile (for rotation quota)."""
+    """Today's send_log rows for this profile (for rotation quota). Now also
+    pulls from_addr so the rotation can attribute each send to its sending
+    subdomain when picking the next (persona, domain) pair."""
     today = dt.date.today().isoformat()
-    r = c.get(f"/send_log?sent_at=gte.{today}T00:00:00&select=persona_slug,sent_at"
+    r = c.get(f"/send_log?sent_at=gte.{today}T00:00:00&select=persona_slug,from_addr,sent_at"
               f"&order=sent_at.desc&limit=500")
     r.raise_for_status()
     # Filter to this profile's personas (we don't have a profile_slug column on send_log;
@@ -258,12 +297,16 @@ def tick() -> None:
 
             if today_log_cache is None:
                 today_log_cache = fetch_today_log(c, profile_slug)
-            persona = (next((p for p in profile_config["personas"] if p["slug"] == step.get("forced_persona")), None)
-                       if step.get("forced_persona") else
-                       pick_persona(profile_config, today_log_cache))
-            if not persona:
-                print(f"  ! run {run['id']} step {step_n}: no persona available (over quota / cooldown)")
+            if step.get("forced_persona"):
+                persona = next((p for p in profile_config["personas"] if p["slug"] == step["forced_persona"]), None)
+                _, domain = pick_persona_and_domain(profile_config, today_log_cache)
+            else:
+                persona, domain = pick_persona_and_domain(profile_config, today_log_cache)
+            if not persona or not domain:
+                print(f"  ! run {run['id']} step {step_n}: no (persona, domain) available "
+                      f"(over quota, cooldown, or pool exhausted for today)")
                 continue
+            persona = materialize_persona(persona, domain)
 
             prospect = fetch_prospect(c, run["prospect_id"])
             # Verification gate: never send to an unverified prospect. Lead-scrape
@@ -295,9 +338,11 @@ def tick() -> None:
             print(f"  [{persona['slug']:7}] step {step_n} → {prospect['email']:30}"
                   f"  {'SENT '+(outcome.get('resend_id') or '') if outcome['ok'] else 'FAIL '+outcome.get('error','')}")
 
-            # Track in cache so next persona pick respects this send
+            # Track in cache so the next pick respects BOTH per-persona
+            # cooldown AND per-domain ceiling for the rest of this tick.
             today_log_cache.append({"persona_slug": persona["slug"],
-                                    "sent_at": dt.datetime.utcnow().isoformat() + "Z"})
+                                    "from_addr":   persona["from_addr"],
+                                    "sent_at":     dt.datetime.utcnow().isoformat() + "Z"})
 
             if outcome["ok"]:
                 max_step = fetch_max_step(c, seq_id)
