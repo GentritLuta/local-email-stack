@@ -85,7 +85,9 @@ alter table prospects add column if not exists city                text;
 alter table prospects add column if not exists state               text;
 alter table prospects add column if not exists website             text;   -- the lead's company/personal site
 alter table prospects add column if not exists source_url          text;   -- exact URL we scraped them from
-alter table prospects add column if not exists enriched_context    jsonb;  -- everything else (specialties, social, page summary, ...)
+alter table prospects add column if not exists enriched_context    jsonb;  -- product, pricing, target customer, case studies, social (filled by context_autofill.py)
+alter table prospects add column if not exists enriched_at         timestamptz;  -- when context_autofill last touched this row
+create index if not exists idx_prospects_enriched_at on prospects (enriched_at);
 
 -- Unsubscribe state. Each prospect gets a stable per-prospect token so the
 -- email's "Unsubscribe" button hits a static page that PATCHes prospects

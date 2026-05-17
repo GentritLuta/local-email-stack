@@ -321,8 +321,12 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True) -> int:
             if domain in exclude_domains:
                 summary["skipped_domain"] += 1; continue
 
-            # Domain heuristic: company website = email's domain root (e.g. whitestagrealty.com)
-            if not lead.website:
+            # Domain heuristic: company website = email's domain root (e.g. whitestagrealty.com).
+            # Skip free-mail providers — gmail.com etc. aren't anyone's company site.
+            FREE_MAIL = {"gmail.com","yahoo.com","outlook.com","hotmail.com","icloud.com",
+                          "aol.com","proton.me","protonmail.com","web.de","gmx.de","gmx.com",
+                          "mail.com","live.com","msn.com","yandex.com","yandex.ru","zoho.com"}
+            if not lead.website and domain not in FREE_MAIL:
                 lead.website = f"https://{domain}"
 
             v = verify(lead.email, do_smtp_probe=smtp, do_catchall_probe=smtp)
