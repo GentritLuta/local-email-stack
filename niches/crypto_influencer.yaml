@@ -1,0 +1,72 @@
+slug: crypto_influencer
+name: "Crypto + trading editorial / research / community contacts"
+profile_slug: algoalpha
+engine: team_pages
+
+# WHAT THIS NICHE SCRAPES
+# Public team pages, contributor lists, and contact pages of crypto media
+# outlets, research desks, and DAO/community sites. These are the audiences
+# most likely to engage with AlgoAlpha's product (TradingView indicators +
+# crypto signals): journalists writing on trading + on-chain, research
+# analysts at think-tanks, community leaders running TA workshops.
+#
+# THIS IS A REAL TEST RUN — emails extracted go to Supabase prospects with
+# verified=mx_verified (or smtp_verified where port 25 is reachable).
+# No sends happen from scraping alone; that's a separate enqueue step.
+#
+# RUN
+#   py sequences/lead_scrape.py run crypto_influencer
+#
+# SCHEDULE (daily 09:00)
+#   schtasks /Create /TN "LES-lead-scrape-crypto_influencer" /SC DAILY /ST 09:00 ^
+#     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run crypto_influencer"
+
+seeds:
+  # Crypto editorial team / contributor pages — these typically expose
+  # author bylines with mailto: links or public contact addresses.
+  - https://decrypt.co/team
+  - https://www.theblock.co/about
+  - https://bitcoinmagazine.com/about
+  - https://thedefiant.io/about
+  - https://www.coindesk.com/about
+
+  # Research desks + community sites that publish team info
+  - https://messari.io/about
+  - https://www.tokeninsight.com/en/about-us
+
+  # Open contact directories — sometimes have email
+  - https://cointelegraph.com/contact-us
+
+filter:
+  # Skip role mailboxes — campaigns target individuals, not info@/contact@.
+  exclude_local_parts:
+    - info
+    - contact
+    - hello
+    - sales
+    - admin
+    - support
+    - office
+    - team
+    - marketing
+    - press
+    - jobs
+    - careers
+    - editor
+    - newsdesk
+    - newsroom
+    - tips
+    - pitch
+    - advertising
+    - partnerships
+  # No domain exclusions — even @gmail.com personal emails for influencers
+  # are legitimate targets, just lower-confidence than corporate addresses.
+  exclude_domains: []
+
+# What sequence to run on verified leads from this niche.
+# (No sequence row in Supabase yet — author one before enqueuing.)
+sequence:
+  variants_file: sequences/universal-pitch/variants.json
+  forced_persona: tomas
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }

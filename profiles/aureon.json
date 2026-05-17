@@ -80,8 +80,8 @@
       },
       {
         "domain": "outreach.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "da42ad86-e516-4e04-bf8d-2a2c173e92a6",
+        "verified_at": "2026-05-17T18:27:06.010129Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -98,8 +98,8 @@
       },
       {
         "domain": "team.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "e95c6ecb-2cd1-47e9-8d5d-76ae0c27df4a",
+        "verified_at": "2026-05-17T18:27:07.322179Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -116,8 +116,8 @@
       },
       {
         "domain": "hi.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "7e9bb631-9d86-4fc8-8b87-9a33e2754be9",
+        "verified_at": "2026-05-17T18:27:08.767781Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -134,8 +134,8 @@
       },
       {
         "domain": "desk.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "864d41ed-88bd-4c0a-820e-950c6e11fb82",
+        "verified_at": "2026-05-17T18:27:10.164646Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -152,8 +152,8 @@
       },
       {
         "domain": "connect.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "3b2daea3-c0c0-4f8c-a3d4-3a330b098099",
+        "verified_at": "2026-05-17T18:27:11.489565Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -170,8 +170,8 @@
       },
       {
         "domain": "news.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "64d64303-8f83-4d2f-8a0f-6013bab33e65",
+        "verified_at": "2026-05-17T18:24:59.263184Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -188,8 +188,8 @@
       },
       {
         "domain": "partners.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "2500fd49-6940-4ad5-841e-1425428dfc40",
+        "verified_at": "2026-05-17T18:27:13.022168Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -206,8 +206,8 @@
       },
       {
         "domain": "hub.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "d6e0bf1d-087b-4b3d-941e-6fee3bfd06cc",
+        "verified_at": "2026-05-17T18:24:16.965265Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -224,8 +224,8 @@
       },
       {
         "domain": "send.aureonglobal.de",
-        "resend_domain_id": null,
-        "verified_at": null,
+        "resend_domain_id": "59236db7-572d-4ddf-8a3b-04c36ebb18cf",
+        "verified_at": "2026-05-17T18:26:33.230076Z",
         "warmup": {
           "enabled": true,
           "current_day": 0,

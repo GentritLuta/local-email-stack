@@ -1,65 +1,479 @@
 {
   "slug": "algoalpha",
-  "name": "AlgoAlpha",
+  "name": "AlgoAlpha — TradingView indicators + crypto signals",
   "created_at": "2026-05-17",
   "active": true,
-
-  "identity": {
-    "from_name": "Tomás Silva",
-    "from_addr": "tomas@mail.algoalpha.io",
-    "reply_to": "tomas@mail.algoalpha.io",
-    "role": "Co-founder",
-    "company": "AlgoAlpha",
-    "site": "https://algoalpha.io",
-    "signature": "Tomás\nco-founder · AlgoAlpha\nhttps://algoalpha.io"
+  "company": {
+    "name": "AlgoAlpha",
+    "site": "algoalpha.io",
+    "tagline": "TradingView indicators & crypto signals for 75k+ active traders"
   },
-
-  "voice": {
-    "register": "calm-technical",
-    "quirks": ["uses specific numbers when relevant", "minimal fluff", "precise questions", "names a real research finding when referencing AlgoAlpha"],
-    "avoid": ["hype", "stacked adjectives", "vague metrics like 'huge'", "fake urgency"]
+  "brand": {
+    "wordmark": "AlgoAlpha",
+    "site": "algoalpha.io",
+    "tagline": "TradingView indicators & live crypto signals for 75k+ active traders",
+    "font_stack": "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
+    "colors": {
+      "accent": "#ff7a00",
+      "accent_2": "#ff2d6f",
+      "text": "#0a0a0a",
+      "text_2": "#475569",
+      "muted": "#94a3b8",
+      "bg_page": "#fafafa",
+      "bg_card": "#ffffff",
+      "rule": "#e5e7eb"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe.html?t={token}",
+    "legal": {
+      "company_name": "AlgoAlpha",
+      "address_lines": [
+        "c/o AlgoAlpha",
+        "Lisbon, Portugal"
+      ],
+      "contact_email": "support@algoalpha.io",
+      "ceo": "Tomás Silva",
+      "vat_number": "PT-PENDING",
+      "registration_number": "PT-PENDING",
+      "copyright_year": 2026,
+      "logo_url": "https://algoalpha.io/logo.svg",
+      "logo_width": 50,
+      "privacy_policy_url": "https://algoalpha.io/privacy",
+      "terms_of_service_url": "https://algoalpha.io/terms",
+      "legal_disclaimer": "This message is intended for the addressee only and may contain confidential or proprietary information. If you are not the intended recipient, please delete it and notify the sender. Unauthorised review, redistribution, or use is prohibited.",
+      "partner_notice": "You're receiving this because we believe AlgoAlpha's tooling for systematic crypto traders is relevant to your work. Unsubscribe with one click and we won't reach out again."
+    },
+    "_note_legal": "VAT/Reg numbers above are placeholders — replace with the real Portuguese registration when AlgoAlpha is formally incorporated, or leave the placeholder out of the rendered footer until then."
   },
-
   "relay": {
     "backend": "resend",
+    "resend_region": "eu-west-1",
     "resend_api_key": "",
-    "from_domains": ["mail.algoalpha.io"],
-    "domain_verified_at": null,
-    "dkim_selector": "resend"
+    "_note": "resend_api_key in algoalpha.private.json (gitignored). Uses Aureon's full-access key since AlgoAlpha shares the aureonglobal.de Resend domain pool while its own *.algoalpha.io subdomains are pending.",
+    "_pool_note": "The from_domains below are SHARED with the `aureon` profile. Reputation is per-domain at Resend / Gmail / Microsoft, so any abuse on these subdomains affects BOTH clients. Trade-off accepted by operator: free, capped at the 10-domain Resend Pro account ceiling.",
+    "from_domains": [
+      {
+        "domain": "mail.aureonglobal.de",
+        "resend_domain_id": "863fec1e-fab3-44a8-93c1-f7752b5edc9c",
+        "verified_at": "2026-05-17T15:18:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "outreach.aureonglobal.de",
+        "resend_domain_id": "da42ad86-e516-4e04-bf8d-2a2c173e92a6",
+        "verified_at": "2026-05-17T18:27:06.010129Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "team.aureonglobal.de",
+        "resend_domain_id": "e95c6ecb-2cd1-47e9-8d5d-76ae0c27df4a",
+        "verified_at": "2026-05-17T18:27:07.322179Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "hi.aureonglobal.de",
+        "resend_domain_id": "7e9bb631-9d86-4fc8-8b87-9a33e2754be9",
+        "verified_at": "2026-05-17T18:27:08.767781Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "desk.aureonglobal.de",
+        "resend_domain_id": "864d41ed-88bd-4c0a-820e-950c6e11fb82",
+        "verified_at": "2026-05-17T18:27:10.164646Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "connect.aureonglobal.de",
+        "resend_domain_id": "3b2daea3-c0c0-4f8c-a3d4-3a330b098099",
+        "verified_at": "2026-05-17T18:27:11.489565Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "news.aureonglobal.de",
+        "resend_domain_id": "64d64303-8f83-4d2f-8a0f-6013bab33e65",
+        "verified_at": "2026-05-17T18:24:59.263184Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "partners.aureonglobal.de",
+        "resend_domain_id": "2500fd49-6940-4ad5-841e-1425428dfc40",
+        "verified_at": "2026-05-17T18:27:13.022168Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "hub.aureonglobal.de",
+        "resend_domain_id": "d6e0bf1d-087b-4b3d-941e-6fee3bfd06cc",
+        "verified_at": "2026-05-17T18:24:16.965265Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      },
+      {
+        "domain": "send.aureonglobal.de",
+        "resend_domain_id": "59236db7-572d-4ddf-8a3b-04c36ebb18cf",
+        "verified_at": "2026-05-17T18:26:33.230076Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 90,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        },
+        "_shared_with": "aureon"
+      }
+    ]
   },
-
+  "_personas_note": [
+    "10 personas — the user asked for '10 emails for algoalpha'. The send rotation picks a (persona, domain) pair every send; with 10 personas × 10 verified subdomains that's 100 distinct From-addresses available across the pool, more than enough variety for any sequence cadence.",
+    "Each persona's from_addr at runtime becomes <slug>@<picked-aureon-subdomain> — the materialize_persona helper binds it at send time."
+  ],
+  "personas": [
+    {
+      "slug": "tomas",
+      "from_name": "Tomás Silva",
+      "from_addr": "tomas@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Co-founder",
+      "voice": {
+        "register": "calm-technical",
+        "quirks": [
+          "specific numbers"
+        ],
+        "avoid": [
+          "hype",
+          "em-dashes"
+        ]
+      },
+      "signature": "Tomás Silva\nCo-founder, AlgoAlpha"
+    },
+    {
+      "slug": "sara",
+      "from_name": "Sara Lin",
+      "from_addr": "sara@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Quant Lead",
+      "voice": {
+        "register": "precise-friendly",
+        "quirks": [
+          "one question per email"
+        ],
+        "avoid": [
+          "fluff",
+          "em-dashes"
+        ]
+      },
+      "signature": "Sara Lin\nQuant Lead, AlgoAlpha"
+    },
+    {
+      "slug": "marcus",
+      "from_name": "Marcus Chen",
+      "from_addr": "marcus@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Strategy Engineer",
+      "voice": {
+        "register": "direct-warm",
+        "quirks": [
+          "specific data points"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Marcus Chen\nStrategy Engineer, AlgoAlpha"
+    },
+    {
+      "slug": "anya",
+      "from_name": "Anya Petrov",
+      "from_addr": "anya@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Research Lead",
+      "voice": {
+        "register": "calm-precise",
+        "quirks": [
+          "names a real metric"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Anya Petrov\nResearch Lead, AlgoAlpha"
+    },
+    {
+      "slug": "daniel",
+      "from_name": "Daniel Ross",
+      "from_addr": "daniel@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Signals Engineer",
+      "voice": {
+        "register": "warm-direct",
+        "quirks": [
+          "short paragraphs"
+        ],
+        "avoid": [
+          "em-dashes",
+          "corporate-speak"
+        ]
+      },
+      "signature": "Daniel Ross\nSignals Engineer, AlgoAlpha"
+    },
+    {
+      "slug": "eva",
+      "from_name": "Eva Müller",
+      "from_addr": "eva@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Risk Analyst",
+      "voice": {
+        "register": "measured",
+        "quirks": [
+          "one statistic per email"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Eva Müller\nRisk Analyst, AlgoAlpha"
+    },
+    {
+      "slug": "felix",
+      "from_name": "Felix Tan",
+      "from_addr": "felix@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Platform Engineer",
+      "voice": {
+        "register": "friendly-direct",
+        "quirks": [
+          "practical framing"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Felix Tan\nPlatform Engineer, AlgoAlpha"
+    },
+    {
+      "slug": "gabriela",
+      "from_name": "Gabriela Costa",
+      "from_addr": "gabriela@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Community Manager",
+      "voice": {
+        "register": "warm-engaged",
+        "quirks": [
+          "warm opener"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Gabriela Costa\nCommunity Manager, AlgoAlpha"
+    },
+    {
+      "slug": "hiro",
+      "from_name": "Hiro Yamamoto",
+      "from_addr": "hiro@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Backtesting Lead",
+      "voice": {
+        "register": "calm-direct",
+        "quirks": [
+          "specific time-window stats"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Hiro Yamamoto\nBacktesting Lead, AlgoAlpha"
+    },
+    {
+      "slug": "iris",
+      "from_name": "Iris Walsh",
+      "from_addr": "iris@mail.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Customer Success",
+      "voice": {
+        "register": "friendly-precise",
+        "quirks": [
+          "names a specific feature"
+        ],
+        "avoid": [
+          "em-dashes"
+        ]
+      },
+      "signature": "Iris Walsh\nCustomer Success, AlgoAlpha"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 30,
+    "min_seconds_between_sends_same_persona": 180
+  },
   "warmup": {
     "enabled": true,
-    "started_at": null,
-    "current_day": 0,
-    "ramp_curve": "snowball_v1",
-    "max_daily_sends": 300,
     "warmup_targets": [],
     "real_send_mix": [
-      { "until_day": 14,   "warmup_pct": 80 },
-      { "until_day": 30,   "warmup_pct": 30 },
-      { "until_day": 45,   "warmup_pct": 10 },
-      { "until_day": 9999, "warmup_pct": 5  }
+      {
+        "until_day": 14,
+        "warmup_pct": 80
+      },
+      {
+        "until_day": 30,
+        "warmup_pct": 30
+      },
+      {
+        "until_day": 45,
+        "warmup_pct": 10
+      },
+      {
+        "until_day": 9999,
+        "warmup_pct": 5
+      }
     ],
-    "reputation": {
-      "bounce_rate_7d": 0.0,
-      "complaint_rate_7d": 0.0,
-      "delivered_7d": 0,
-      "last_check": null
-    },
     "auto_pause_thresholds": {
       "bounce_rate": 0.05,
       "complaint_rate": 0.001
     }
   },
-
   "ramp_curve_snowball_v1": [
-    { "from_day": 1,  "daily": 10  },
-    { "from_day": 4,  "daily": 20  },
-    { "from_day": 8,  "daily": 40  },
-    { "from_day": 15, "daily": 80  },
-    { "from_day": 22, "daily": 150 },
-    { "from_day": 31, "daily": 250 },
-    { "from_day": 46, "daily": 300 }
+    {
+      "from_day": 1,
+      "daily": 9
+    },
+    {
+      "from_day": 4,
+      "daily": 18
+    },
+    {
+      "from_day": 8,
+      "daily": 36
+    },
+    {
+      "from_day": 15,
+      "daily": 60
+    },
+    {
+      "from_day": 22,
+      "daily": 90
+    }
   ]
 }

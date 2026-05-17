@@ -69,7 +69,11 @@ def _patch_profile(url: str, key: str, slug: str, config: dict) -> None:
             raise RuntimeError(f"profile patch {r.status_code}: {r.text[:200]}")
 
 
-def _is_pending(d: dict) -> bool:
+def _is_pending(d) -> bool:
+    """A pool entry is pending if it's a fresh dict without verified_at.
+    Older profiles may have left strings in from_domains (legacy format) —
+    we skip those silently so the worker doesn't trip."""
+    if not isinstance(d, dict): return False
     return not d.get("verified_at")
 
 

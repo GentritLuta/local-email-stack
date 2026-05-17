@@ -1,0 +1,272 @@
+[
+  {
+    "name": "resend._domainkey.outreach",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHlBgmeYN2OmDOkeDAe1nNZ71uWaxXGZ3Wzjs6VMz48ntiRieAgco87sUmgauKY7m21FMPPXDGIqz+LV7NwHbOHAVl731n4TBSC1JN4vgH98PQb0fzvHpBsLqUw+lHiXgfRz6GbhLlERABLOrRvf+rKZvaHtldkFqBTzo49KukOQIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.outreach",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.outreach",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.team",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD021ed7PqwZUOYPzPDClWysqJyOwQT4BiBkzu8erHg+s3ELI1Xzkhn0HqS+gE5Ks2K/riTb0v89msTdFk5UnviCyX1rCJTR4rdUqeChr9sTb2a+lQgbA3rLThtZpcxdPzRypUH6pJbwIpxYrcXHfNFoQbhPSqH/jWk0alxNquRfwIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.team",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.team",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.hi",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDMSsll9ywEfdOHotsuKlNm/G8lI5dTwaQ24Xn4AyXWeapMeleeorMX8oUkdIZvxqLAtwLWxBdlKfsZ9spo5Ah3euTeRM8Wc3Ol7bU1B6svU9kUpxeey+tm7Nzddu+IOEHMx0shU9iBFGo3v26BNnPDYyGGXzDDGr+3KfJQLFF/gQIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.hi",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.hi",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.desk",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6AETZQA0mLlJ55CZV7W+nYRh2Yajdu6N2OLda9JvQ0u0dYw7S2lQQYVpSup86DbPDITE4ojB5ph7jYZDFOvc72eXuhO6vItJwKyKwusy1apu4Zr/anb6Rqqv8jZexIgj1TU7iu/MzWLyJZMRVjJvvZZ06mjgeQfk76+975syzWQIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.desk",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.desk",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.connect",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCkp8XHpX38aDyydc1MJE6mW2X2A7Pqdd3km96yfFzHzgnShaRBlq+nLYT3l5wP3z2wh1T3hmxc0yhBe989iRXFbcxXfIZnxHF3VwGEWW2icQEBf9CUPf465xp1L5X1+Ad7X373KMXTYzK7ScIPSHuNjk0mUMBhm6bR2VKpBKtDDwIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.connect",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.connect",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.news",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNVG96gCg7zQli3++K/mfZH1iz2DbmIDXDnp7quYB+hKMGBLcYAecft9kbvkl9AtlWLzMrd6UvWAZg3tO909coHbw63Egumgnv/FhkznVZmo70EuaYoTXgJfnILhiOpUCTPOQ8ekpR6heS6Bugq1pxCc/yZAA187RxVPD+MRYqEwIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.news",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.news",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.partners",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEESe3AWcz+nDjWK/Wx0wjMHK/vL9ruYQwiyHo8HX+s1HUFw8EZvYfVVLc8ocHUor38lXn7mE7qKMi4SVRgC17fTwNjjBYgvgnvylYWtV/woWSItmBSq+aHaRAQsUG+BZ6ktN7nZ2MSZ00G7uyexgI+MPhSHTzY2FDTfyLjlyhXwIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.partners",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.partners",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.hub",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZtmlqRMcni7H4fV9czGwr+T5/QQTIHbPFn+V7U3KT7B7zMrHhD7hEKGrSNWugE16Qv4BpkIrlgBaUdfsZMR6Ox26ezcEsTypLcnDOxMpjQaHIEqXcmC4A0LJXR0H//wpyTlTB5sqyl25XOuecp5keYDh+2Pwja5myxrD8hMvI9wIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.hub",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.hub",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  },
+  {
+    "name": "resend._domainkey.send",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6KCldNAT/VD9srs1RF94bQ94nSgOa57awo/PZiPaQwK94+r0uMlZ6pROlsXErNN6eoJC9FZtrSWtLSLzxJTz1cWuD5t/1MPvpO60XXBXGvDHRFLRmuvq0q6VYDEaRgccenBw2BdHR0mHpAza+nA6WzzgVRT6+JUlaYHMe0NOMKwIDAQAB"
+      }
+    ]
+  },
+  {
+    "name": "send.send",
+    "type": "MX",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com."
+      }
+    ]
+  },
+  {
+    "name": "send.send",
+    "type": "TXT",
+    "ttl": 3600,
+    "records": [
+      {
+        "content": "v=spf1 include:amazonses.com ~all"
+      }
+    ]
+  }
+]
