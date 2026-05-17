@@ -1,0 +1,22 @@
+{
+  "name": "Universal Hormozi free-campaign offer (works for any vertical)",
+  "slug": "universal_pitch",
+  "created_at": "2026-05-17",
+  "target": "any business with an audience",
+  "voice_notes": [
+    "Hormozi grand slam offer: max value, zero risk to recipient.",
+    "Generic enough to send to any company without product specifics.",
+    "All risk is on the sender's time. Recipient keeps 100% of revenue.",
+    "Single CTA: reply YES.",
+    "No em-dashes anywhere."
+  ],
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "grand_slam_offer",
+      "subject": "a proposal for {company} (no cost, no commitment)",
+      "body": "Hi {first_name},\n\nHere is the offer.\n\nI will build {company} a full email marketing campaign for free. Every dollar it generates is yours. I want nothing upfront and nothing after.\n\nWhat I deliver:\n\n1. Seven high converting emails written specifically for your audience. Re-engaging churned leads, upselling existing customers to your highest tier, and pushing annual plans where it makes sense.\n\n2. Full sending infrastructure. Verified domain, warmed up, deliverability tuned. Inbox placement north of 95 percent on the first send, not landing in promotions.\n\n3. Live tracking dashboard. Every open, click, reply, and sale visible the moment we ship. You see the same numbers I see, in real time.\n\nWhat I want in return: one 60 second video testimonial, only if the results are real. If the campaign produces zero revenue, you owe me nothing and we both walk. No retainer, no setup fee, no contract.\n\nWhy I am doing this for free: I am building a case study portfolio this quarter and {company} fits the profile I want to feature. Two pilot slots open. After this quarter intake closes until Q3.\n\nAll upside on your end. My time is the only risk on the table.\n\nIf this is aligned, reply with YES and I will send the full scope this week."
+    }
+  ]
+}

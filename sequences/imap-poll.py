@@ -127,19 +127,44 @@ class Supa:
         }
         self.client = httpx.Client(headers=self.headers, timeout=20)
 
-    def find_run_by_message_id(self, refs: list[str]) -> tuple[str | None, str | None]:
-        """Given list of candidate Message-IDs from In-Reply-To/References, find the matching run."""
+    def find_run_by_message_id(self, refs: list[str]) -> tuple[str | None, str | None, str | None]:
+        """Given list of candidate Message-IDs from In-Reply-To/References, find the matching
+        send_log row (and therefore the run). Returns (run_id, resend_id, send_log_id)."""
         if not refs:
-            return None, None
-        # Postgrest doesn't have an "in" operator that's easy for strings with special chars,
-        # but we can use OR(...) with eq filters or fetch+filter.
+            return None, None, None
         for mid in refs:
             r = self.client.get(f"{self.base}/send_log",
-                                params={"message_id": f"eq.{mid}", "select": "run_id,resend_id"})
+                                params={"message_id": f"eq.{mid}", "select": "id,run_id,resend_id"})
             if r.status_code == 200 and r.json():
                 row = r.json()[0]
-                return row.get("run_id"), row.get("resend_id")
-        return None, None
+                return row.get("run_id"), row.get("resend_id"), row.get("id")
+        return None, None, None
+
+    def find_send_by_recipient_subject(self, recipient: str, subject: str) -> tuple[str | None, str | None, str | None]:
+        """Fallback when In-Reply-To matching fails (Resend overrides our Message-ID
+        with their SES one). Strip 'Re:'/'Fwd:' from the inbound subject and look for
+        the most recent send_log row where to_addr matches and subject is contained."""
+        if not recipient or not subject:
+            return None, None, None
+        stripped = re.sub(r"^(?:re|fwd|fw|aw|wg)\s*:\s*", "", subject, flags=re.I).strip()
+        if len(stripped) < 6:  # too short to be reliable
+            return None, None, None
+        # ilike with wildcards on either side — handles trailing/leading spaces in subjects.
+        pattern = f"*{stripped[:80]}*"
+        r = self.client.get(
+            f"{self.base}/send_log",
+            params={
+                "to_addr": f"eq.{recipient.lower()}",
+                "subject": f"ilike.{pattern}",
+                "select":  "id,run_id,resend_id",
+                "order":   "sent_at.desc",
+                "limit":   "1",
+            },
+        )
+        if r.status_code == 200 and r.json():
+            row = r.json()[0]
+            return row.get("run_id"), row.get("resend_id"), row.get("id")
+        return None, None, None
 
     def insert_reply(self, row: dict) -> None:
         self.client.post(f"{self.base}/replies", json=row)
@@ -150,6 +175,12 @@ class Supa:
         r = self.client.get(f"{self.base}/replies",
                             params={"raw_headers->>Message-ID": f"eq.{message_id}", "select": "id"})
         return r.status_code == 200 and bool(r.json())
+
+    def mark_send_replied(self, send_log_id: str) -> None:
+        """Set send_log.replied=true on the outbound row this reply answered."""
+        self.client.patch(f"{self.base}/send_log",
+                          params={"id": f"eq.{send_log_id}"},
+                          json={"replied": True})
 
     def pause_run(self, run_id: str, reason: str) -> None:
         self.client.patch(f"{self.base}/runs",
@@ -173,69 +204,97 @@ def one_pass(verbose: bool = True) -> dict:
     stats = {"processed": 0, "reply": 0, "bounce": 0, "complaint": 0, "unrelated": 0,
              "matched_to_run": 0, "runs_paused": 0, "errors": 0}
 
+    # Walk both INBOX and INBOX.Junk — cold-mail replies often get filtered
+    # into Junk by Hostinger before a human sees it. We scan messages received
+    # in the last SCAN_DAYS days (not just UNSEEN) so that a reply the operator
+    # already opened in webmail still gets picked up. Duplicate inserts are
+    # prevented by the Message-ID dedupe in supa.already_have().
+    FOLDERS   = ["INBOX", "INBOX.Junk"]
+    SCAN_DAYS = 14
+
+    since = (dt.datetime.utcnow() - dt.timedelta(days=SCAN_DAYS)).strftime("%d-%b-%Y")
+
     imap = imaplib.IMAP4_SSL("imap.hostinger.com", 993)
     try:
         imap.login(user, password)
-        imap.select("INBOX", readonly=False)
-        typ, data = imap.search(None, "UNSEEN")
-        if typ != "OK":
-            return stats
-        nums = data[0].split() if data and data[0] else []
-        for num in nums:
-            try:
-                typ, msg_data = imap.fetch(num, "(RFC822)")
-                if typ != "OK" or not msg_data or not msg_data[0]:
-                    continue
-                raw = msg_data[0][1]
-                msg = email.message_from_bytes(raw, policy=email.policy.default)
-                stats["processed"] += 1
-                klass = classify(msg)
-                stats[klass] = stats.get(klass, 0) + 1
+        for folder in FOLDERS:
+            sel_typ, _ = imap.select(folder, readonly=False)
+            if sel_typ != "OK":
+                if verbose: print(f"  (skip folder {folder}: {sel_typ})")
+                continue
+            typ, data = imap.search(None, "SINCE", since)
+            if typ != "OK":
+                continue
+            nums = data[0].split() if data and data[0] else []
+            if verbose and nums:
+                print(f"  -- {folder}: {len(nums)} unseen --")
+            for num in nums:
+                try:
+                    typ, msg_data = imap.fetch(num, "(RFC822)")
+                    if typ != "OK" or not msg_data or not msg_data[0]:
+                        continue
+                    raw = msg_data[0][1]
+                    msg = email.message_from_bytes(raw, policy=email.policy.default)
+                    stats["processed"] += 1
+                    klass = classify(msg)
+                    stats[klass] = stats.get(klass, 0) + 1
 
-                from_addr = parseaddr(msg.get("From", ""))[1] or "(unknown)"
-                to_addr   = parseaddr(msg.get("To", ""))[1] or user
-                subject   = msg.get("Subject", "") or ""
-                msg_id    = msg.get("Message-ID", "")
-                in_reply  = split_refs(msg.get("In-Reply-To", ""))
-                references = split_refs(msg.get("References", ""))
+                    from_addr = parseaddr(msg.get("From", ""))[1] or "(unknown)"
+                    to_addr   = parseaddr(msg.get("To", ""))[1] or user
+                    subject   = msg.get("Subject", "") or ""
+                    msg_id    = msg.get("Message-ID", "")
+                    in_reply  = split_refs(msg.get("In-Reply-To", ""))
+                    references = split_refs(msg.get("References", ""))
 
-                if supa.already_have(msg_id):
-                    if verbose: print(f"  ↩ skip (already recorded): {msg_id}")
+                    if supa.already_have(msg_id):
+                        if verbose: print(f"  ↩ skip (already recorded): {msg_id}")
+                        imap.store(num, "+FLAGS", "\\Seen")
+                        continue
+
+                    # First try In-Reply-To/References (precise). Resend tends to
+                    # override our Message-ID with the SES one on the wire, so
+                    # this often fails — fall back to recipient + subject.
+                    run_id, resend_id, send_log_id = supa.find_run_by_message_id(in_reply + references)
+                    match_via = "header"
+                    if not send_log_id and klass == "reply":
+                        run_id, resend_id, send_log_id = supa.find_send_by_recipient_subject(from_addr, subject)
+                        if send_log_id: match_via = "subject"
+                    if run_id:
+                        stats["matched_to_run"] += 1
+
+                    snippet = extract_snippet(msg)
+
+                    supa.insert_reply({
+                        "run_id":       run_id,
+                        "profile_slug": None,
+                        "from_addr":    from_addr,
+                        "to_addr":      to_addr,
+                        "subject":      subject[:500],
+                        "class":        klass,
+                        "body_snippet": snippet,
+                        "raw_headers":  {"Message-ID":  msg_id,
+                                         "In-Reply-To": msg.get("In-Reply-To", ""),
+                                         "References":  msg.get("References", ""),
+                                         "Folder":      folder,
+                                         "Matched-Via": match_via if send_log_id else "none"},
+                    })
+
+                    if send_log_id and klass == "reply":
+                        supa.mark_send_replied(send_log_id)
+                    if klass == "reply" and run_id:
+                        supa.pause_run(run_id, "replied")
+                        stats["runs_paused"] += 1
+                    elif klass == "bounce" and run_id:
+                        supa.pause_run(run_id, "bounced")
+                        stats["runs_paused"] += 1
+
                     imap.store(num, "+FLAGS", "\\Seen")
-                    continue
-
-                run_id, resend_id = supa.find_run_by_message_id(in_reply + references)
-                if run_id:
-                    stats["matched_to_run"] += 1
-
-                snippet = extract_snippet(msg)
-
-                supa.insert_reply({
-                    "run_id":       run_id,
-                    "profile_slug": None,
-                    "from_addr":    from_addr,
-                    "to_addr":      to_addr,
-                    "subject":      subject[:500],
-                    "class":        klass,
-                    "body_snippet": snippet,
-                    "raw_headers":  {"Message-ID": msg_id,
-                                     "In-Reply-To": msg.get("In-Reply-To", ""),
-                                     "References":  msg.get("References", "")},
-                })
-
-                if klass == "reply" and run_id:
-                    supa.pause_run(run_id, "replied")
-                    stats["runs_paused"] += 1
-                elif klass == "bounce" and run_id:
-                    supa.pause_run(run_id, "bounced")
-                    stats["runs_paused"] += 1
-
-                imap.store(num, "+FLAGS", "\\Seen")
-                if verbose:
-                    print(f"  ✓ {klass:9} from {from_addr[:32]:32}  matched_run={'yes' if run_id else 'no'}")
-            except Exception as e:
-                stats["errors"] += 1
-                if verbose: print(f"  ! error on msg {num}: {e}")
+                    if verbose:
+                        tag = "run" if run_id else ("send" if send_log_id else "no")
+                        print(f"  ✓ [{folder:11}] {klass:9} from {from_addr[:34]:34}  matched={tag} via={match_via if send_log_id else '-'}")
+                except Exception as e:
+                    stats["errors"] += 1
+                    if verbose: print(f"  ! error on msg {num} in {folder}: {e}")
     finally:
         try: imap.logout()
         except Exception: pass
