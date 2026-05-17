@@ -84,8 +84,24 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
     site = b.get("site") or ""
     unsub = unsubscribe_url(unsubscribe_token, b)
 
-    sig_lines = [_esc(line) for line in (persona.get("signature") or "").split("\n") if line.strip()]
-    sig_html = "<br>".join(sig_lines) or _esc(persona.get("from_name", ""))
+    # Professional signature block:
+    #   • Full name (bold, body text size)
+    #   • Title (or any subsequent lines from persona.signature) in slightly
+    #     smaller, muted secondary color
+    # The company line below this is the site only — the wordmark already
+    # sits in the top header and the bottom logo block, no need to repeat it.
+    sig_lines = [line.strip() for line in (persona.get("signature") or "").split("\n") if line.strip()]
+    if not sig_lines:
+        sig_lines = [persona.get("from_name", "")]
+    name_line = _esc(sig_lines[0])
+    title_lines = [_esc(l) for l in sig_lines[1:]]
+    sig_html = (
+        f'<div style="font-family:{font};font-size:14px;font-weight:600;color:{c["text"]};">{name_line}</div>'
+        + "".join(
+            f'<div style="font-family:{font};font-size:13px;color:{c["text_2"]};margin-top:1px;">{l}</div>'
+            for l in title_lines
+        )
+    )
 
     header_html = ""
     if wordmark:
@@ -100,9 +116,11 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
 
     body_html = _body_paragraphs_html(body, font, c['text'])
 
-    company_line = (f'{_esc(b.get("wordmark") or "")} · '
-                    f'<a href="https://{_esc(site)}" style="color:{c["text_2"]};text-decoration:none;">{_esc(site)}</a>'
-                    if site else _esc(b.get("wordmark") or ""))
+    # Quiet website link directly under the signature. No wordmark here — it's
+    # already in the top header + bottom logo block. Triple-stating it reads
+    # marketing-y, not professional.
+    company_line = (f'<a href="https://{_esc(site)}" style="color:{c["text_2"]};text-decoration:none;">{_esc(site)}</a>'
+                    if site else "")
 
     # Bottom logo block — the wordmark repeated in the brand accent color,
     # centered, gives the email a clear "this is from <brand>" close. Matches

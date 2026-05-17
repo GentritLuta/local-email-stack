@@ -52,39 +52,42 @@
   "personas": [
     {
       "slug": "daniel",
-      "from_name": "Daniel",
+      "from_name": "Daniel Schmidt",
       "from_addr": "daniel@mail.aureonglobal.de",
       "reply_to": "info@aureonglobal.de",
+      "title": "Partner",
       "voice": {
         "register": "warm-direct",
-        "quirks": ["short paragraphs", "occasional dash—like this"],
-        "avoid": ["corporate speak", "exclamation marks"]
+        "quirks": ["short paragraphs"],
+        "avoid": ["corporate speak", "exclamation marks", "em-dashes"]
       },
-      "signature": "daniel\naureon global"
+      "signature": "Daniel Schmidt\nPartner"
     },
     {
       "slug": "anna",
-      "from_name": "Anna",
+      "from_name": "Anna Bauer",
       "from_addr": "anna@mail.aureonglobal.de",
       "reply_to": "info@aureonglobal.de",
+      "title": "Performance Lead",
       "voice": {
         "register": "calm-precise",
         "quirks": ["specific numbers", "one question per email"],
-        "avoid": ["hype", "stacked adjectives"]
+        "avoid": ["hype", "stacked adjectives", "em-dashes"]
       },
-      "signature": "anna\naureon global"
+      "signature": "Anna Bauer\nPerformance Lead"
     },
     {
       "slug": "marco",
-      "from_name": "Marco",
+      "from_name": "Marco Rinaldi",
       "from_addr": "marco@mail.aureonglobal.de",
       "reply_to": "info@aureonglobal.de",
+      "title": "Client Director",
       "voice": {
-        "register": "friendly-italian",
-        "quirks": ["occasional 'davvero'", "warmer opener"],
-        "avoid": ["templated phrases", "marketing language"]
+        "register": "friendly-direct",
+        "quirks": ["warmer opener"],
+        "avoid": ["templated phrases", "marketing language", "em-dashes"]
       },
-      "signature": "marco\naureon global"
+      "signature": "Marco Rinaldi\nClient Director"
     }
   ],
 
