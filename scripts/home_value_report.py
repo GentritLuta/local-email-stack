@@ -151,55 +151,82 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
                   "For an accurate current market value, request a full in-person comparative market analysis "
                   "(CMA) from %s." % (agent_name, agent_name))
 
+    logo_svg = ('<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+                '<defs><linearGradient id="g" x1="10%" y1="10%" x2="90%" y2="90%">'
+                '<stop offset="5%" stop-color="#FFF8D6"/><stop offset="35%" stop-color="#E6C259"/>'
+                '<stop offset="65%" stop-color="#B68E2D"/><stop offset="95%" stop-color="#755615"/>'
+                '</linearGradient></defs><g fill="url(#g)">'
+                '<ellipse cx="50" cy="15" rx="20" ry="7"/>'
+                '<path d="M 18 26 Q 50 33 82 26 L 82 34 Q 50 41 18 34 Z"/>'
+                '<path d="M 8 40 Q 50 47 92 40 L 92 49 Q 50 56 8 49 Z"/>'
+                '<path d="M 8 55 Q 50 62 92 55 L 92 64 Q 50 71 8 64 Z"/>'
+                '<path d="M 18 70 Q 50 77 82 70 L 82 78 Q 50 85 18 78 Z"/>'
+                '<path d="M 32 84 Q 50 89 68 84 L 68 89 Q 50 94 32 89 Z"/></g></svg>')
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
- :root{{--ink:#0f172a;--accent:#0a0a0a;--gold:#b8860b;--muted:#64748b;--line:#e2e8f0;--bg:#f8fafc}}
+ :root{{--ink:#050505;--gold:#d4af37;--gold-d:#b68e2d;--muted:#6b7280;--line:#e7e5e0;--bg:#faf9f6;--cream:#fbf8ef}}
  *{{box-sizing:border-box;margin:0;padding:0}}
- body{{font-family:'Inter',-apple-system,Segoe UI,sans-serif;color:#1e293b;line-height:1.5;background:#fff}}
- .page{{padding:46px 52px 70px;position:relative;min-height:100vh}}
- .top{{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:16px}}
- .brand{{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}}
- .brand .co{{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.04em;text-transform:none;margin-top:3px}}
- .date{{font-size:12px;color:var(--muted);text-align:right}}
- h1{{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:30px 0 4px;color:var(--ink)}}
- .addr{{font-size:16px;color:var(--muted);font-weight:500}}
- .greet{{margin:22px 0 0;font-size:15px}}
- .valbox{{margin:24px 0;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--ink);border-radius:10px;padding:26px 28px}}
- .vlabel{{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}}
- .conf{{display:inline-block;color:#fff;font-size:10px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;text-transform:none}}
- .vrange{{font-size:38px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-top:6px}}
- .vrange span{{color:var(--muted);font-weight:500}}
- .vmid{{font-size:14px;color:#334155;margin-top:4px}}
- .vmethod{{margin-top:14px;font-size:12.5px;color:#475569}}
- .vmethod span{{font-weight:700;color:#334155;display:block;margin-bottom:4px}}
+ body{{font-family:'Inter',-apple-system,Segoe UI,sans-serif;color:#1a1a1a;line-height:1.55;background:#fff}}
+ .page{{padding:0 0 76px;position:relative;min-height:100vh}}
+ .masthead{{background:var(--ink);padding:30px 52px 26px;border-bottom:3px solid var(--gold);color:#fff}}
+ .mh-top{{display:flex;justify-content:space-between;align-items:center}}
+ .logo-lockup{{display:flex;align-items:center;gap:13px}}
+ .logo-lockup .wm{{font-family:'Playfair Display',serif;font-size:21px;font-weight:800;color:#fff;letter-spacing:.01em;line-height:1}}
+ .logo-lockup .tl{{font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-top:4px;font-weight:600}}
+ .mh-meta{{text-align:right;font-size:11px;color:#9ca3af;letter-spacing:.02em}}
+ .mh-meta b{{color:var(--gold);font-weight:600}}
+ .doctitle{{margin-top:24px}}
+ .doctitle .kick{{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:700}}
+ .doctitle h1{{font-family:'Playfair Display',serif;font-size:33px;font-weight:800;color:#fff;letter-spacing:-.01em;margin-top:7px;line-height:1.05}}
+ .doctitle .addr{{font-size:15px;color:#cbd5e1;margin-top:7px}}
+ .body{{padding:30px 52px 0}}
+ .greet{{font-size:14.5px;color:#3f3f46}}
+ .valbox{{margin:24px 0;background:var(--cream);border:1px solid #efe7cf;border-radius:14px;padding:28px 30px;position:relative}}
+ .valbox::before{{content:"";position:absolute;left:0;top:18px;bottom:18px;width:4px;background:linear-gradient(180deg,var(--gold),var(--gold-d));border-radius:0 3px 3px 0}}
+ .vlabel{{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-d)}}
+ .conf{{display:inline-block;color:#fff;font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 9px;border-radius:999px;margin-left:8px;vertical-align:middle;text-transform:none}}
+ .vrange{{font-family:'Playfair Display',serif;font-size:42px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-top:8px;line-height:1}}
+ .vrange span{{color:var(--gold-d);font-weight:600}}
+ .vmid{{font-size:14px;color:#52525b;margin-top:7px}}
+ .vmethod{{margin-top:16px;font-size:12.5px;color:#52525b}}
+ .vmethod span{{font-weight:700;color:#3f3f46;display:block;margin-bottom:5px}}
  .vmethod ul{{margin:0;padding-left:18px}} .vmethod li{{margin-bottom:3px}}
- .vassessed{{font-size:13px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}}
- h2{{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}}
+ .vassessed{{font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px solid #efe7cf}}
+ h2{{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin:32px 0 13px;padding-bottom:8px;border-bottom:2px solid var(--gold)}}
  table.facts{{width:100%;border-collapse:collapse}}
- table.facts td{{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}}
- td.fl{{color:var(--muted);width:46%}} td.fv{{color:var(--ink);font-weight:600}}
- .market p{{font-size:14px;color:#334155;margin-bottom:10px}}
- .ppsf{{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:13px;color:#334155;margin-top:4px}}
- .cta{{margin-top:30px;background:var(--ink);color:#fff;border-radius:12px;padding:28px 30px}}
- .cta h3{{font-size:20px;font-weight:800;margin-bottom:8px}}
- .cta p{{font-size:14px;color:#cbd5e1;margin-bottom:16px;max-width:54ch}}
- .ctabtn{{display:inline-block;background:#fff;color:var(--ink);font-weight:700;font-size:15px;padding:12px 22px;border-radius:9px;text-decoration:none}}
- .agentcard{{margin-top:18px;display:flex;gap:14px;align-items:center;font-size:13px;color:#cbd5e1}}
- .agentcard b{{color:#fff;display:block;font-size:15px}}
- .callout{{margin-top:20px;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:14px 16px;font-size:12.5px;color:#78350f;line-height:1.55}}
- .footer{{position:fixed;bottom:0;left:0;right:0;padding:10px 52px;border-top:1px solid var(--line);font-size:9.5px;color:#94a3b8;line-height:1.4;background:#fff}}
+ table.facts td{{padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}}
+ td.fl{{color:var(--muted);width:46%}} td.fv{{color:var(--ink);font-weight:600;text-align:right}}
+ .market p{{font-size:14px;color:#3f3f46;margin-bottom:10px}}
+ .ppsf{{display:inline-block;background:var(--cream);border:1px solid #efe7cf;border-radius:8px;padding:8px 14px;font-size:13px;color:#52525b;margin-top:4px}}
+ .cta{{margin:32px 0 0;background:var(--ink);border:1px solid #1f1f1f;border-radius:16px;padding:30px 32px;position:relative;overflow:hidden}}
+ .cta::after{{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.22),transparent 70%)}}
+ .cta .kick{{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700}}
+ .cta h3{{font-family:'Playfair Display',serif;font-size:23px;font-weight:800;margin:7px 0 9px;color:#fff}}
+ .cta p{{font-size:14px;color:#cbd5e1;margin-bottom:18px;max-width:56ch}}
+ .ctabtn{{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#1a1a1a;font-weight:800;font-size:15px;padding:13px 24px;border-radius:10px;text-decoration:none}}
+ .agentcard{{margin-top:20px;padding-top:16px;border-top:1px solid #262626;font-size:13px;color:#cbd5e1}}
+ .agentcard b{{color:#fff;font-size:15px}}
+ .callout{{margin-top:22px;background:#fbf8ef;border:1px solid #efe7cf;border-left:4px solid var(--gold);border-radius:10px;padding:15px 18px;font-size:12px;color:#6b5d2e;line-height:1.6}}
+ .footer{{position:fixed;bottom:0;left:0;right:0;padding:11px 52px;border-top:2px solid var(--gold);background:var(--ink);font-size:9px;color:#9ca3af;line-height:1.45}}
+ .footer b{{color:var(--gold);font-weight:600;letter-spacing:.02em}}
  @media print{{.footer{{position:fixed}} .page{{min-height:auto}}}}
 </style></head>
 <body>
  <div class="page">
-   <div class="top">
-     <div class="brand">{agent_company or agent_name}<span class="co">Home Value Report</span></div>
-     <div class="date">Prepared {today}<br>for {owner_first}</div>
+   <div class="masthead">
+     <div class="mh-top">
+       <div class="logo-lockup">{logo_svg}<div><div class="wm">Aureon Global</div><div class="tl">Quality Converts</div></div></div>
+       <div class="mh-meta">Prepared {today}<br>for <b>{owner_first}</b><br>on behalf of {agent_name}</div>
+     </div>
+     <div class="doctitle">
+       <div class="kick">Confidential Home Value Report</div>
+       <h1>What your home is worth today</h1>
+       <div class="addr">{addr}</div>
+     </div>
    </div>
 
-   <h1>Home Value Report</h1>
-   <div class="addr">{addr}</div>
+   <div class="body">
 
    <p class="greet">Hi {owner_first}, thank you for requesting your home value report. This report was prepared
       for you by Aureon Global on behalf of {agent_name}, using current public records and recent local sales.</p>
@@ -217,18 +244,21 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
    </div>
 
    <div class="cta">
-     <h3>Want your exact number?</h3>
-     <p>Book a free, no-obligation in-person valuation (CMA) with {agent_name}. You get a precise current
-        market price and a simple plan to maximise it &mdash; no pressure to list.</p>
+     <div class="kick">Your next step</div>
+     <h3>Get your exact number, in person.</h3>
+     <p>Book a free, no-obligation in-person valuation with {agent_name}. You get a precise current
+        market price and a simple plan to maximise it before you list &mdash; no pressure, no cost.</p>
      {('<a class="ctabtn" href="' + cal + '">Book your free valuation &rarr;</a>') if cal else '<a class="ctabtn" href="mailto:' + agent_email + '">Reply to book your free valuation &rarr;</a>'}
      <div class="agentcard">
-       <div><b>{agent_name}</b>{agent_company}{(' &middot; ' + agent_phone) if agent_phone else ''}{(' &middot; ' + agent_email) if agent_email else ''}</div>
+       <b>{agent_name}</b>{(' &middot; ' + agent_company) if agent_company else ''}{(' &middot; ' + agent_phone) if agent_phone else ''}{(' &middot; ' + agent_email) if agent_email else ''}
      </div>
+   </div>
    </div>
  </div>
  <div class="footer">
-   Prepared by Aureon Global on behalf of {agent_name}. Automated estimate from public county assessor records
-   and recent local sales; the property was not visited or inspected and the information has not been
-   independently verified. Not an appraisal, an offer, or a guarantee of value. For informational use only.
+   <b>Aureon Global &middot; Quality Converts</b> &nbsp;|&nbsp; Prepared by Aureon Global on behalf of {agent_name}.
+   Automated estimate from public county assessor records and recent local sales; the property was not visited
+   or inspected and the information has not been independently verified. Not an appraisal, an offer, or a
+   guarantee of value. For informational use only.
  </div>
 </body></html>"""
