@@ -3,14 +3,17 @@
 (-> PDF via headless Chrome) for the consented home-value funnel.
 
 PURPOSE (why this exists): it is the bait in a consented seller-lead funnel. A homeowner
-trades their contact details for this report; the agent gets a high-intent seller lead and
-the report makes the agent look credible enough to earn the follow-up in-person CMA (-> a
-listing -> commission). So it is built to CONVERT: detailed, professional, agent-branded,
-with a clear next-step CTA. Every number is public county-assessor data or an openly-labelled
+trades their contact details for this report. AUREON is the front door: the report is fully
+Aureon-branded (gold/black, Quality Converts), the CTA books an Aureon call
+(calendly.com/aureonglobal-info/30min), and after that call a LOCAL agent reaches out to the
+homeowner. So it is built to CONVERT + deliver real value: estimated range, equity + net
+proceeds, recent comparable sales, pre-listing moves, and a free professional CMA offer
+(normally $400-600). Every number is public county-assessor data or an openly-labelled
 estimate derived from it — never a fabricated appraisal — and a disclaimer (property not
 visited, statements not verified) sits in the footer of every page.
 
-build_report_html(lookup, agent, owner) -> str  (full HTML; feed to Chrome --print-to-pdf)
+build_report_html(lookup, agent, owner) -> str  (full HTML; feed to Chrome --print-to-pdf;
+the `agent` dict is now unused — Aureon is the front door — but kept for signature stability)
 """
 from __future__ import annotations
 import datetime as dt
@@ -75,16 +78,19 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
     esc = _html.escape
     today = dt.datetime.now().strftime("%B %d, %Y")
     addr = esc(lookup.get("address") or owner.get("address") or "your property")
-    agent_name = esc(agent.get("name") or "Your agent")
-    agent_company = esc(agent.get("company") or "")
-    agent_email = esc(agent.get("email") or "")
-    agent_phone = esc(agent.get("phone") or "")
+    # Aureon is the front door: the report is fully Aureon-branded, the homeowner books with
+    # Aureon, and Aureon hands them to a local agent after the call. No agent shown.
+    BRAND = "Aureon Global"
+    CAL = "https://calendly.com/aureonglobal-info/30min"
+    AUREON_EMAIL = "info@aureonglobal.de"
     owner_first = esc((owner.get("first_name") or "there").strip() or "there")
-    cal = esc(agent.get("cal") or "")
 
+    area_name = esc(owner.get("zip") or "your area")
     av = _num(lookup.get("assessed_value", ""))
     comps = lookup.get("comps") or {}
     lo = lookup.get("market_low"); mid = lookup.get("market_mid"); hi = lookup.get("market_high")
+    net_lo = lookup.get("net_low"); net_hi = lookup.get("net_high")
+    basis = lookup.get("basis"); equity_gain = lookup.get("equity_gain")
     conf = (lookup.get("estimate_confidence") or "").capitalize()
     methods = lookup.get("estimate_method") or []
     found = bool(lookup.get("found")) and bool(mid)
@@ -106,50 +112,98 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
       <div class="valbox">
         <div class="vlabel">Your personalised valuation is being prepared</div>
         <div class="vmid" style="margin-top:8px;">We are pulling the current comparable sales for
-          {addr} and {agent_name} will follow up with your full market range shortly.</div>
+          {addr}; book a quick call below and a local expert will walk you through your full range.</div>
       </div>"""
 
-    # Market / comps section — the real-transaction evidence behind the estimate.
+    # Equity + net-proceeds — what sellers actually care about (take-home, not list price).
+    equity_block = ""
+    if found and (net_lo or equity_gain):
+        rows = ""
+        if net_lo and net_hi:
+            rows += (f'<tr><td class="fl">Estimated proceeds after selling costs</td>'
+                     f'<td class="fv">{_money(net_lo)} &ndash; {_money(net_hi)}</td></tr>')
+        if basis:
+            rows += f'<tr><td class="fl">You bought for (on record)</td><td class="fv">{_money(basis)}</td></tr>'
+        if equity_gain and equity_gain > 0:
+            rows += (f'<tr><td class="fl">Estimated appreciation since purchase</td>'
+                     f'<td class="fv" style="color:#15803d">+{_money(equity_gain)}</td></tr>')
+        equity_block = (f'<h2>What you could walk away with</h2><table class="facts">{rows}</table>'
+                        f'<p style="font-size:12px;color:#6b7280;margin-top:8px;">Proceeds estimate assumes '
+                        f'typical selling costs (agent commission + closing, ~7.5%%) and no outstanding mortgage; '
+                        f'your actual net depends on your loan balance. We map this out exactly on your call.</p>')
+
+    # Comps list — actual recent nearby sales as evidence.
+    recent = comps.get("recent") or []
+    if recent:
+        comp_rows = "".join(
+            f"<tr><td class='fl'>{esc(c.get('street',''))}{(' &middot; sold ' + esc(c['year'])) if c.get('year') else ''}</td>"
+            f"<td class='fv'>{_money(c.get('price'))}{(' &middot; ' + format(c['sqft'],',') + ' sq ft') if c.get('sqft') else ''}</td></tr>"
+            for c in recent)
+        comps_list_block = f'<h2>Recent sales near you</h2><table class="facts">{comp_rows}</table>'
+    else:
+        comps_list_block = ""
+
+    # Market / comps evidence section.
     if comps.get("n", 0) >= 5:
         market_block = f"""
    <h2>Your local market &mdash; the evidence</h2>
    <div class="market">
      <p>This estimate is built from <strong>{comps['n']} recent arms-length sales</strong> in
-        {esc(owner.get('zip') or 'your area')}, not a generic formula.</p>
+        {area_name}, not a generic formula.</p>
      <table class="facts">
        <tr><td class="fl">Median sale price per sq ft</td><td class="fv">{_money(comps.get('median_ppsf'))}</td></tr>
        <tr><td class="fl">Typical range (25th&ndash;75th percentile)</td><td class="fv">{_money(comps.get('ppsf_lo'))} &ndash; {_money(comps.get('ppsf_hi'))} / sq ft</td></tr>
        <tr><td class="fl">Sales analysed</td><td class="fv">{comps['n']} recent transactions</td></tr>
      </table>
-     <p style="margin-top:12px;">The figure that ultimately matters is set by condition, finishes and how the
-        home shows in person &mdash; which is exactly what {esc(agent_name)} confirms with a free in-person valuation.</p>
    </div>"""
     else:
         market_block = f"""
    <h2>Your local market</h2>
    <div class="market">
-     <p>Recent comparable-sale detail is limited in the public record for {esc(owner.get('zip') or 'your area')},
-        so the range above leans on the county assessment. {esc(agent_name)} can pull live MLS comparables and
-        give you a precise current figure in a free in-person valuation.</p>
+     <p>Recent comparable-sale detail is limited in the public record for {area_name},
+        so the range above leans on the county assessment. On your call we pull live MLS comparables for an exact figure.</p>
    </div>"""
+
+    # Top moves before listing — tailored lightly to the stated condition.
+    od = lookup.get("owner_details") or {}
+    cond = (od.get("condition") or "").lower()
+    moves = []
+    if "needs work" in cond or "average" in cond:
+        moves = ["A pre-listing deep clean and decluttering &mdash; the highest-ROI move, near zero cost.",
+                 "Fresh neutral paint where it is worn; buyers price down visible wear heavily.",
+                 "Fix the small deferred items (leaky taps, sticking doors) that quietly signal neglect."]
+    else:
+        moves = ["Stage the key rooms and maximise natural light for photography day.",
+                 "A pre-listing clean + minor touch-ups so the home shows at its strongest.",
+                 "Time the listing to your local peak season (we will tell you when on the call)."]
+    moves_block = ('<h2>3 moves that add the most before you list</h2><ol class="moves">'
+                   + "".join(f"<li>{m}</li>" for m in moves) + "</ol>")
 
     facts = _ctx_pairs(lookup.get("context", ""))
     facts_rows = "".join(
         f"<tr><td class='fl'>{esc(l)}</td><td class='fv'>{esc(v) or '&mdash;'}</td></tr>"
         for l, v in facts) or "<tr><td class='fl'>Property record</td><td class='fv'>On file with the county assessor</td></tr>"
 
+    # "What you told us" — the homeowner's own inputs, reflected back.
+    od_labels = [("property_type", "Property type"), ("beds", "Bedrooms"), ("baths", "Bathrooms"),
+                 ("sqft", "Living area (your figure)"), ("year_built", "Year built"),
+                 ("condition", "Condition"), ("updates", "Recent updates"), ("sell_timeframe", "Selling timeframe")]
+    od_rows = "".join(
+        f"<tr><td class='fl'>{esc(lbl)}</td><td class='fv'>{esc(str(od[key]))}</td></tr>"
+        for key, lbl in od_labels if od.get(key))
+    owner_block = (f'<h2>What you told us</h2><table class="facts">{od_rows}</table>') if od_rows else ""
+
     ppsf = ""
-    if found:
+    if found and av:
         sqft = next((re.sub(r"[^\d]", "", v) for l, v in facts if l == "Living area"), "")
         if sqft.isdigit() and int(sqft) > 100:
             ppsf = _money(int(av / int(sqft))) + " / sq ft (assessed)"
 
-    disclaimer = ("This report was prepared by Aureon Global on behalf of %s. It is an automated estimate "
-                  "built from public county assessor records and recent local sales data. The property was "
-                  "not visited or inspected, and the information has not been independently verified. It is "
-                  "not an appraisal, an offer, or a guarantee of value, and should not be relied upon as one. "
-                  "For an accurate current market value, request a full in-person comparative market analysis "
-                  "(CMA) from %s." % (agent_name, agent_name))
+    disclaimer = ("This report was prepared by Aureon Global. It is an automated estimate built from public "
+                  "county assessor records and recent local sales data. The property was not visited or "
+                  "inspected, and the information has not been independently verified. It is not an appraisal, "
+                  "an offer, or a guarantee of value, and should not be relied upon as one. For an accurate "
+                  "current market value, book your free professional comparative market analysis (CMA) below.")
 
     logo_svg = ('<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
                 '<defs><linearGradient id="g" x1="10%" y1="10%" x2="90%" y2="90%">'
@@ -198,6 +252,7 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
  table.facts td{{padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}}
  td.fl{{color:var(--muted);width:46%}} td.fv{{color:var(--ink);font-weight:600;text-align:right}}
  .market p{{font-size:14px;color:#3f3f46;margin-bottom:10px}}
+ ol.moves{{margin:0;padding-left:20px}} ol.moves li{{font-size:14px;color:#3f3f46;margin-bottom:8px;padding-left:4px}}
  .ppsf{{display:inline-block;background:var(--cream);border:1px solid #efe7cf;border-radius:8px;padding:8px 14px;font-size:13px;color:#52525b;margin-top:4px}}
  .cta{{margin:32px 0 0;background:var(--ink);border:1px solid #1f1f1f;border-radius:16px;padding:30px 32px;position:relative;overflow:hidden}}
  .cta::after{{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.22),transparent 70%)}}
@@ -217,7 +272,7 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
    <div class="masthead">
      <div class="mh-top">
        <div class="logo-lockup">{logo_svg}<div><div class="wm">Aureon Global</div><div class="tl">Quality Converts</div></div></div>
-       <div class="mh-meta">Prepared {today}<br>for <b>{owner_first}</b><br>on behalf of {agent_name}</div>
+       <div class="mh-meta">Prepared {today}<br>for <b>{owner_first}</b></div>
      </div>
      <div class="doctitle">
        <div class="kick">Confidential Home Value Report</div>
@@ -228,37 +283,48 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
 
    <div class="body">
 
-   <p class="greet">Hi {owner_first}, thank you for requesting your home value report. This report was prepared
-      for you by Aureon Global on behalf of {agent_name}, using current public records and recent local sales.</p>
+   <p class="greet">Hi {owner_first}, thank you for requesting your home value report. Aureon Global prepared
+      this for you from current public records and recent local sales. When you are ready for the exact figure,
+      book a quick call below and a local real estate expert will reach out as soon as possible.</p>
 
    {val_block}
+
+   {equity_block}
 
    <h2>Property facts</h2>
    <table class="facts">{facts_rows}</table>
    {('<div class="ppsf">' + ppsf + '</div>') if ppsf else ''}
 
+   {owner_block}
+
    {market_block}
+
+   {comps_list_block}
+
+   {moves_block}
 
    <div class="callout">
      <strong>How this estimate was made.</strong> {esc(disclaimer)}
    </div>
 
    <div class="cta">
-     <div class="kick">Your next step</div>
-     <h3>Get your exact number, in person.</h3>
-     <p>Book a free, no-obligation in-person valuation with {agent_name}. You get a precise current
-        market price and a simple plan to maximise it before you list &mdash; no pressure, no cost.</p>
-     {('<a class="ctabtn" href="' + cal + '">Book your free valuation &rarr;</a>') if cal else '<a class="ctabtn" href="mailto:' + agent_email + '">Reply to book your free valuation &rarr;</a>'}
+     <div class="kick">Your free professional CMA &middot; normally $400&ndash;$600</div>
+     <h3>Get your exact number &mdash; free.</h3>
+     <p>This report is the automated estimate. The precise figure comes from a professional comparative
+        market analysis (CMA) &mdash; the same paid analysis used to price a listing. Book a quick call and we
+        arrange yours at no cost; a local real estate expert then reaches out as soon as possible to walk your
+        home and confirm the number. No pressure, no obligation to list.</p>
+     <a class="ctabtn" href="{CAL}">Book your free CMA call &rarr;</a>
      <div class="agentcard">
-       <b>{agent_name}</b>{(' &middot; ' + agent_company) if agent_company else ''}{(' &middot; ' + agent_phone) if agent_phone else ''}{(' &middot; ' + agent_email) if agent_email else ''}
+       <b>Aureon Global</b> &middot; {AUREON_EMAIL} &middot; calendly.com/aureonglobal-info/30min
      </div>
    </div>
    </div>
  </div>
  <div class="footer">
-   <b>Aureon Global &middot; Quality Converts</b> &nbsp;|&nbsp; Prepared by Aureon Global on behalf of {agent_name}.
-   Automated estimate from public county assessor records and recent local sales; the property was not visited
-   or inspected and the information has not been independently verified. Not an appraisal, an offer, or a
-   guarantee of value. For informational use only.
+   <b>Aureon Global &middot; Quality Converts</b> &nbsp;|&nbsp; Prepared by Aureon Global. Automated estimate from
+   public county assessor records and recent local sales; the property was not visited or inspected and the
+   information has not been independently verified. Not an appraisal, an offer, or a guarantee of value. For
+   informational use only.
  </div>
 </body></html>"""

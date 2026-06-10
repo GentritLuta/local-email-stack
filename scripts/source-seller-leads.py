@@ -820,7 +820,7 @@ def comps_for_zip(zip_code: str, max_comps: int = 400) -> dict:
     sd = ctx.get("sale date")
     if not (sp and sf):
         return {"n": 0, "note": "county layer has no sale price + sqft"}
-    out = [f for f in [sp, sf, val, sd, cfg.get("pcsz") or cfg.get("zip")] if f]
+    out = [f for f in [sp, sf, val, sd, cfg.get("stname"), cfg.get("pcsz") or cfg.get("zip")] if f]
     where = (cfg["pcsz"] + " LIKE '%%%s%%'" % zip_code) if cfg.get("pcsz") else (cfg["zip"] + "='%s'" % zip_code)
     where += " AND %s > 30000" % sp  # drop $1 intra-family transfers / nominal deeds
     url = (cfg["url"] + "/query?where=" + _up.quote(where) + "&outFields=" + _up.quote(",".join(out))
@@ -829,7 +829,8 @@ def comps_for_zip(zip_code: str, max_comps: int = 400) -> dict:
         data = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers=_CL_UA), timeout=35).read().decode("utf-8", "replace"))
     except Exception as e:
         return {"n": 0, "note": "comps query failed: %s" % str(e)[:80]}
-    ppsf, ratios = [], []
+    ppsf, ratios, sales = [], [], []
+    pstreet = ctx.get("use class") and None  # placeholder; we read street from stname/pcsz below
     for f in data.get("features", []):
         a = f.get("attributes", {})
         try:
@@ -842,45 +843,72 @@ def comps_for_zip(zip_code: str, max_comps: int = 400) -> dict:
                         av = float(a[val])
                         if av > 10000:
                             ratios.append(av / price)
+                    # capture a sample sale for the comps list (street + price + sqft + year sold)
+                    st = (a.get(cfg.get("stname")) or "").strip() if cfg.get("stname") else ""
+                    yr = ""
+                    if sd and a.get(sd):
+                        try:
+                            yr = str(1970 + int(int(a[sd]) / 31557600000))
+                        except Exception:
+                            yr = str(a.get(sd))[:4]
+                    sales.append({"street": st, "price": int(price), "sqft": int(area), "year": yr,
+                                  "ppsf": round(r)})
         except Exception:
             continue
     if len(ppsf) < 5:
         return {"n": len(ppsf), "note": "too few comps for a reliable median"}
     ppsf.sort()
     n = len(ppsf)
+    # Pick a handful of representative comps near the median for the report's "recent sales" list.
+    med = statistics.median(ppsf)
+    sales_named = [s for s in sales if s["street"]]
+    sales_named.sort(key=lambda s: abs(s["ppsf"] - med))
     return {
         "n": n,
-        "median_ppsf": round(statistics.median(ppsf), 2),
+        "median_ppsf": round(med, 2),
         "ppsf_lo": round(ppsf[int(n * 0.25)], 2),
         "ppsf_hi": round(ppsf[int(n * 0.75)], 2),
         "assess_to_sale": round(statistics.median(ratios), 3) if len(ratios) >= 5 else None,
+        "recent": sales_named[:5],
         "county": cnty,
     }
 
 
-def value_estimate(address: str, zip_code: str = "") -> dict:
+def value_estimate(address: str, zip_code: str = "", details: dict | None = None) -> dict:
     """Accurate-as-free-data-allows home value estimate. Combines the parcel's own record
     (lookup_address) with a REAL local comps median ($/sqft from actual recent sales,
-    comps_for_zip). Returns the parcel data plus market_low/mid/high + the method + comp count,
-    so the report can show a defensible range and say exactly how it was derived. Never an
-    appraisal; all estimates labelled."""
+    comps_for_zip). `details` carries any homeowner-provided facts from the capture form
+    (sqft/beds/baths/year/type/condition) — homeowner sqft is preferred for the estimate when
+    given, since it pins the property down better than a possibly-stale county record. Returns
+    the parcel data plus market_low/mid/high + method + comp count. Never an appraisal; labelled."""
+    details = details or {}
     base = lookup_address(address, zip_code)
     if not base.get("found"):
-        return base
+        # Even without a county parcel match, if the homeowner gave sqft we can still estimate
+        # from local comps — so don't bail; carry their details forward.
+        base = {"found": False, "address": address, "note": base.get("note", "")}
     zc = zip_code or ""
     if not re.fullmatch(r"\d{5}", zc or ""):
         mz = re.search(r"\b(\d{5})\b", address)
         zc = mz.group(1) if mz else ""
     comps = comps_for_zip(zc) if zc else {"n": 0}
     base["comps"] = comps
-    # Square footage from the parcel context.
+    base["owner_details"] = {k: v for k, v in details.items() if v}
+    # Square footage: prefer the homeowner's own number, else the parcel context.
     sqft = None
-    m = re.search(r"([\d,]+)\s*sqft", base.get("context", ""), re.I)
-    if m:
-        try:
-            sqft = int(m.group(1).replace(",", ""))
-        except Exception:
-            sqft = None
+    try:
+        ds = str(details.get("sqft") or "").replace(",", "")
+        if ds.isdigit() and int(ds) > 200:
+            sqft = int(ds)
+    except Exception:
+        sqft = None
+    if not sqft:
+        m = re.search(r"([\d,]+)\s*sqft", base.get("context", ""), re.I)
+        if m:
+            try:
+                sqft = int(m.group(1).replace(",", ""))
+            except Exception:
+                sqft = None
     av = None
     m = re.search(r"[\d,]+", base.get("assessed_value", "") or "")
     if m:
@@ -913,6 +941,25 @@ def value_estimate(address: str, zip_code: str = "") -> dict:
         base["estimate_method"] = method
         base["estimate_confidence"] = ("higher" if len(estimates) > 1 and comps.get("n", 0) >= 30
                                         else "moderate" if estimates else "low")
+        # If the parcel wasn't matched but the homeowner's own sqft + local comps gave us a
+        # real estimate, treat the report as found so it shows the range (clearly comp-based).
+        if not base.get("found") and sqft and comps.get("median_ppsf"):
+            base["found"] = True
+            if not base.get("address"):
+                base["address"] = address
+        # Net proceeds: market value minus typical selling costs (~7.5%: commission + closing).
+        base["net_low"] = int(base["market_low"] * 0.925)
+        base["net_high"] = int(base["market_high"] * 0.925)
+        # Equity vs. the last recorded sale price (a real, owned-since basis when present).
+        m2 = re.search(r"last sale\s+\$?([\d,]+)", base.get("context", ""), re.I)
+        if m2:
+            try:
+                basis = int(m2.group(1).replace(",", ""))
+                if basis > 10000:
+                    base["basis"] = basis
+                    base["equity_gain"] = int(mid) - basis  # appreciation since purchase
+            except Exception:
+                pass
     return base
 
 

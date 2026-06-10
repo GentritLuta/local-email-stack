@@ -112,37 +112,38 @@ def supa_patch(path: str, body: dict) -> None:
         headers={**H, "Prefer": "return=minimal"}, method="PATCH"), timeout=30).read()
 
 
-def report_html(*, owner_first: str, agent_name: str, agent_company: str,
-                address: str, av: str, context: str, found: bool) -> tuple[str, str]:
+CAL = "https://calendly.com/aureonglobal-info/30min"
+
+
+def report_html(*, owner_first: str, address: str, mid: str, found: bool) -> tuple[str, str]:
+    """Short Aureon-branded cover email; the rich detail is the attached PDF. Aureon is the
+    front door — homeowner books with us, a local agent reaches out after the call."""
     esc = _html.escape
     fn = esc(owner_first or "there")
-    if found and av:
-        headline = f"Your property at {esc(address)} has a current assessed value of <strong>{esc(av)}</strong>."
-        detail = (f"<p style='margin:0 0 14px;color:#444;'>This is drawn from the county's public assessment "
-                  f"record (the same baseline Zillow and the big data providers start from). "
-                  f"{('Property detail: ' + esc(context) + '.') if context else ''}</p>"
-                  f"<p style='margin:0 0 14px;color:#444;'>Assessed value is a tax-record figure and usually sits "
-                  f"<em>below</em> true market value. To get your real, current market price, {esc(agent_name)} "
-                  f"will prepare a full comparative market analysis (CMA) for you — free, no obligation.</p>")
-        text = (f"Hi {owner_first or 'there'},\n\nYour property at {address} has a current county-assessed value "
-                f"of {av}. {('Detail: ' + context + '.') if context else ''}\n\nAssessed value is a tax-record "
-                f"figure and usually sits below true market value. {agent_name} will prepare a full, free market "
-                f"analysis (CMA) for your real current price.\n\n{agent_name}\n{agent_company}")
+    if found and mid:
+        headline = f"Your estimated home value is around <strong>{esc(mid)}</strong>."
     else:
-        headline = f"Thanks for requesting a home value report for {esc(address)}."
-        detail = (f"<p style='margin:0 0 14px;color:#444;'>{esc(agent_name)} is pulling the current market "
-                  f"comparables for your area now and will send your full home value report shortly. "
-                  f"It is free and there is no obligation.</p>")
-        text = (f"Hi {owner_first or 'there'},\n\nThanks for requesting a home value report for {address}. "
-                f"{agent_name} is pulling current market comparables and will send your full report "
-                f"shortly, free and no obligation.\n\n{agent_name}\n{agent_company}")
+        headline = f"Your home value report for {esc(address)} is attached."
+    detail = ("<p style='margin:0 0 14px;color:#444;'>Your full report is attached as a PDF: the estimated "
+              "market range, what you could net, recent comparable sales, and the moves that add the most "
+              "before listing.</p>"
+              "<p style='margin:0 0 14px;color:#444;'>For the exact figure, book a quick call and we will arrange "
+              "your free professional CMA (normally $400&ndash;$600). A local real estate expert then reaches out "
+              "as soon as possible to confirm it. No pressure, no obligation.</p>"
+              f"<p style='margin:0 0 14px;'><a href='{CAL}' style='background:#d4af37;color:#0a0a0a;font-weight:700;"
+              f"padding:11px 18px;border-radius:8px;text-decoration:none;display:inline-block;'>Book your free CMA call</a></p>")
+    text = (f"Hi {owner_first or 'there'},\n\n{('Your estimated home value is around ' + mid + '. ') if (found and mid) else ''}"
+            f"Your full home value report for {address} is attached (estimated range, net proceeds, recent comps, "
+            f"and pre-listing tips).\n\nFor the exact figure, book a quick call and we arrange your free professional "
+            f"CMA (normally $400-600); a local real estate expert then reaches out as soon as possible. "
+            f"No pressure, no obligation.\n\nBook: {CAL}\n\nAureon Global\ninfo@aureonglobal.de")
     html = (f"<div style=\"font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:600px;color:#1e293b;\">"
             f"<p style='margin:0 0 14px;'>Hi {fn},</p>"
             f"<p style='margin:0 0 14px;font-size:17px;color:#0a0a0a;'>{headline}</p>"
             f"{detail}"
-            f"<p style='margin:18px 0 4px;'>{esc(agent_name)}<br>{esc(agent_company)}</p>"
-            f"<p style='margin:18px 0 0;font-size:12px;color:#94a3b8;'>You requested this report. "
-            f"Reply to this email to reach {esc(agent_name)} directly.</p></div>")
+            f"<p style='margin:18px 0 4px;'><strong>Aureon Global</strong></p>"
+            f"<p style='margin:4px 0 0;font-size:12px;color:#94a3b8;'>You requested this report. "
+            f"Reply to this email or book a call above and a local expert will be in touch.</p></div>")
     return html, text
 
 
@@ -197,31 +198,31 @@ def one_pass(limit: int, dry: bool) -> dict:
         # fallback from the agent email's domain, overridable later if we store it.
         agent_name = cf.get("agent_name") or "Your agent"
         agent_company = cf.get("agent_company") or (agent_email.split("@")[-1] if agent_email else "")
-        res = value_estimate(address, zipc)
+        details = cf.get("details") or {}
+        res = value_estimate(address, zipc, details=details)
+        mid = res.get("market_mid")
+        mid_str = ("$%s" % format(int(mid), ",")) if mid else ""
         print(f"  · {p['email']} | {address} -> found={res.get('found')} "
-              f"est={res.get('market_mid','')} comps={ (res.get('comps') or {}).get('n',0) }")
-        # Short email body (the rich detail lives in the attached PDF).
-        html, text = report_html(owner_first=owner_first, agent_name=agent_name,
-                                 agent_company=agent_company, address=res.get("address") or address,
-                                 av=res.get("assessed_value", ""), context=res.get("context", ""),
-                                 found=bool(res.get("found")))
-        # Rich PDF report.
-        agent = {"name": agent_name, "company": agent_company, "email": agent_email,
-                 "phone": p.get("phone_agent") or cf.get("agent_phone") or "",
-                 "cal": cf.get("agent_cal") or ""}
+              f"est={mid_str} comps={ (res.get('comps') or {}).get('n',0) } "
+              f"owner-sqft={details.get('sqft','')}")
+        # Short Aureon-branded cover email; the rich detail lives in the attached PDF.
+        html, text = report_html(owner_first=owner_first, address=res.get("address") or address,
+                                 mid=mid_str, found=bool(res.get("found")))
+        # Rich PDF report (Aureon-fronted; agent/owner dicts unused by the report now but kept for signature).
         owner = {"first_name": owner_first, "address": res.get("address") or address, "zip": zipc}
-        report_html_full = build_report_html(res, agent, owner)
+        report_html_full = build_report_html(res, {}, owner)
         subject = f"Your home value report — {res.get('address') or address}"
         if dry:
             pdf_ok = "yes" if _chrome() else "no-chrome"
-            print(f"    [DRY] would email {p['email']} (reply-to {agent_email or BCC}) subj={subject!r} pdf={pdf_ok}")
+            print(f"    [DRY] would email {p['email']} (from/reply-to Aureon) subj={subject!r} pdf={pdf_ok}")
             stats["sent"] += 1
             continue
         pdf = render_pdf(report_html_full)
         if not pdf:
             print("    ! PDF render failed — sending without attachment")
-        ok = smtp_send(to_addr=p["email"], reply_to=agent_email, subject=subject, html=html, text=text,
-                       pdf=pdf, pdf_name="Home-Value-Report.pdf")
+        # Aureon is the front door: send from + reply-to Aureon (FROM_ADDR), not the agent.
+        ok = smtp_send(to_addr=p["email"], reply_to=HOST.get("FROM_ADDR", BCC), subject=subject,
+                       html=html, text=text, pdf=pdf, pdf_name="Home-Value-Report.pdf")
         if ok:
             stats["sent"] += 1
             cf["home_value"] = {"fulfilled": True,
