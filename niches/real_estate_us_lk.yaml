@@ -1,0 +1,121 @@
+slug: real_estate_us_lk
+name: "US Real Estate Agents (LK Advertising) — independent brokerages"
+profile_slug: lk-advertising
+engine: team_pages
+
+# LK Advertising's US-Realtor ICP (per Lukas Koehler's onboarding form, 2026-06-06).
+# Same lead UNIVERSE as the proven real_estate_us niche (independent US brokerage
+# team pages with named agents + personal emails), but bound to the lk-advertising
+# profile and LK's own sequence. We reuse the hard-won seed list + ICP gate from
+# real_estate_us so LK gets a working lead source on day one instead of starting
+# discovery from scratch. seed_discover.py will keep appending fresh seeds for both.
+
+# Copy greets by {greeting}/{first_name}; a parseable first name is NOT required.
+require_first_name: false
+
+# RUN
+#   py sequences/lead_scrape.py run real_estate_us_lk
+
+seeds:
+  # Seeded from real_estate_us (proven working / auto-discovered brokerage team pages).
+  - https://whitestagrealty.com/
+  - https://edpricetriad.com/about-us/meet-our-agents
+  - https://www.agentsrealtytexas.com
+  - https://www.thestacygroup.com/our-agents
+  - https://mymetrocity.com/all-agents
+  - https://www.thekolbteam.com
+  - https://www.equitycoloradorealestate.com/agents
+  - https://colo-realty.com/agents
+  - https://exclusivegeorgiaproperties.com
+  - https://mcneelyrealestate.com/our-team
+  - https://www.raynorrealtync.com/our-team
+  - https://www.blueridgebrokerage.com
+  - https://thekeygroupohio.com/meet-our-team
+  - https://justlistedrealestateoh.com/meet-our-team
+  - https://vantagerealestateaz.com
+  - https://www.teamwilsontn.com/team
+  - https://dashcarolina.com/about-us/our-team
+  - https://keytosolutions.com/our-agents
+  - https://www.thirdtnrealty.net/our-agents
+  - https://blairrg.com/meet-our-agents
+  - https://www.seattleworksrealestate.co/agents
+  - https://www.tnrealestategroup.com/our-team
+  - https://www.ascendgroupre.com/home
+
+search_queries:
+  - "meet our agents real estate brokerage"
+  - "real estate brokerage agents page Texas"
+  - "small real estate brokerage Florida"
+  - "small real estate brokerage Arizona"
+  - "small real estate brokerage Colorado"
+  - "real estate brokerage agents Georgia"
+  - "real estate brokerage Tennessee team"
+  - "real estate brokerage North Carolina team"
+  - "real estate brokerage Ohio meet our team"
+  - "independent real estate brokerage our agents"
+
+seed_require_keywords: ["real estate", "realtor", "realty", "brokerage", "mls", "homes for sale", "listing"]
+
+discovery:
+  max_seeds_per_run: 15
+  search_country:    us
+  require_mailto:    true
+  require_keywords:  ["real estate", "realtor", "realty", "brokerage"]
+  exclude_domains:
+    - facebook.com
+    - linkedin.com
+    - zillow.com
+    - realtor.com
+    - redfin.com
+    - trulia.com
+    - youtube.com
+    - twitter.com
+    - x.com
+    - instagram.com
+    - tiktok.com
+    - reddit.com
+    - yelp.com
+    - bbb.org
+    - marketplace.microsoft.com
+    - microsoft.com
+    - azuremarketplace.microsoft.com
+
+filter:
+  exclude_local_parts:
+    - info
+    - contact
+    - hello
+    - sales
+    - admin
+    - support
+    - office
+    - team
+    - marketing
+    - recruiting
+    - press
+    - jobs
+  exclude_domains:
+    # Aureon runs its OWN realtor pipeline (real_estate_us). Exclude Aureon's own
+    # infra + peer recruiters so LK and Aureon don't email each other / overlap.
+    - teamminik.com
+    - aureonglobal.de
+    - lk-advertising.site
+    - lk-advertising.com
+    - weltmonarch.de
+    - realmadrid.com
+    - corp.realmadrid.com
+
+# LK's own sequence (LK runs the paid media + delivers booked appointments; books to
+# cal.com/lkadvertising/15min). Distinct from aureon-realestate-us (which is the
+# 30/70-commission-split call-center model). Edit copy in the variants file.
+sequence:
+  variants_file: sequences/lk-advertising-default/variants.json
+  forced_persona: lukas
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }
+    - { step_n: 2, variant_n: 2, delay_days: 2 }
+    - { step_n: 3, variant_n: 3, delay_days: 2 }
+    - { step_n: 4, variant_n: 4, delay_days: 3 }
+    - { step_n: 5, variant_n: 5, delay_days: 4 }
+    - { step_n: 6, variant_n: 6, delay_days: 7 }
+    - { step_n: 7, variant_n: 7, delay_days: 10 }

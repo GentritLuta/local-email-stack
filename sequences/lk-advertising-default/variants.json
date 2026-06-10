@@ -1,0 +1,62 @@
+{
+  "name": "LK Advertising — US Realtor 7-step (Hormozi, performance-media, books to cal.com)",
+  "slug": "lk-advertising-default",
+  "profile_slug": "lk-advertising",
+  "created_at": "2026-05-18",
+  "updated_at": "2026-06-10",
+  "target": "US real estate agents and small/independent brokerages. LK runs the paid media (Meta/Google) and delivers booked listing appointments, performance based. Books to cal.com/lkadvertising/15min.",
+  "voice_notes": "Hormozi style: concrete numbers, dream outcome, risk reversal in every step, one ask per email, strong CTA as a question. No hype, no exclamation marks, no fluff. LK's model = LK runs the ads and only gets paid on performance (not a 30/70 commission call-center). Name-optional: use {greeting} not {first_name}. NO em dashes. Renderer adds signature + logo + unsubscribe footer; do not include them.",
+  "required_merges": ["greeting"],
+  "schedule_doc": "delay_days = gap from the previous step. 0,2,2,3,4,7,10 = days 0,2,4,7,11,18,28.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "offer_and_proof",
+      "subject": "5 to 10 more listing appointments this quarter",
+      "body": "Hi {greeting},\n\nQuick one. We get real estate agents 5 to 10 more listing appointments a month with paid ads, and you only pay on performance.\n\nHere is how it works. We build and run the Meta and Google campaigns, we handle the creative and the targeting, and we send you booked appointments with sellers in your market. You are not paying a 3 to 8 thousand dollar retainer into the void. You pay on the results we deliver.\n\nA team we ran last quarter went from 6 listing appointments a month to 19 in about 7 weeks, same market, same budget envelope. Another agent booked 3 weeks out inside the first month.\n\nWe take a small number of agents per market so we are not running ads against our own clients.\n\nWorth 15 minutes to see if your market is open? cal.com/lkadvertising/15min"
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "soft_bump_risk_reversal",
+      "subject": "would you take 5 booked seller calls",
+      "body": "Hi {greeting},\n\nProbably buried by now, so I will keep it short.\n\nIf we put 5 booked seller appointments on your calendar this month and you only paid on performance, would you take that call?\n\nThat is the whole offer. We run the ads, you get the appointments. Compare that to an agency charging you up front every month with no guarantee.\n\n15 minutes: cal.com/lkadvertising/15min"
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "data_point_speed",
+      "subject": "6 to 19 appointments",
+      "body": "Hi {greeting},\n\nOne data point.\n\nAn agent we ran ads for went from 6 listing appointments a month to 19 in roughly 7 weeks. Same market, same offer, just campaigns that were actually built to book appointments instead of collect clicks.\n\nThe same setup would map onto your market. Want me to show you how on a quick call?"
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "case_study_specific",
+      "subject": "how the booked-appointment math works",
+      "body": "Hi {greeting},\n\nThe reason this works is the funnel, not the ad spend.\n\nMost agent ads send people to a generic home valuation page and lose them. We run a seller specific funnel that qualifies and books the appointment before it ever reaches you, so your time only goes to sellers who showed up to talk listings.\n\nBefore: clicks, form fills, no shows. After: booked appointments on your calendar, performance based.\n\nNot promising blind numbers for your market. The setup is repeatable. Worth 15 minutes to map it onto your area? cal.com/lkadvertising/15min"
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "forced_yes_or_no",
+      "subject": "{greeting}, yes or no",
+      "body": "Hi {greeting},\n\nReal question, takes 30 seconds.\n\nIf we ran the ads, booked the seller appointments, and you only paid on performance, is that a yes?\n\nA clear yes or no both work."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "low_risk_pilot",
+      "subject": "60 day pilot, performance based",
+      "body": "Hi {greeting},\n\nThe lowest risk version I can offer.\n\n60 day pilot. You pick your market. We build and run the campaigns and deliver booked seller appointments. Performance based, so if it does not produce, you are not locked into a retainer.\n\nWe cap how many agents we take per market so the ads do not compete with each other. Want the pilot scope for your area, or pass for now?\n\ncal.com/lkadvertising/15min"
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "breakup_door_open",
+      "subject": "last one from me",
+      "body": "Hi {greeting},\n\nWrapping up on my end.\n\nIf this is not the quarter, no hard feelings. If you ever want to revisit, a one word reply (later) is enough and I will check back.\n\nIf this was the wrong angle entirely, fair enough, and best of luck with your market this year."
+    }
+  ]
+}
