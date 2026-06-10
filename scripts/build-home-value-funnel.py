@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build-home-value-funnel.py — generate a branded "Free Home Value Report"
+"""build-home-value-funnel.py, generate a branded "Free Home Value Report"
 seller-capture page for one real-estate agent, hosted on GitHub Pages alongside
 the other static pages in docs/.
 
@@ -57,7 +57,7 @@ def page_html(*, agent_name: str, agent_company: str, agent_email: str,
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Free Home Value Report — Aureon Global</title>
+<title>Free Home Value Report, Aureon Global</title>
 <style>
  :root{{--accent:{accent}}}
  *{{box-sizing:border-box}} body{{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;
@@ -82,15 +82,40 @@ def page_html(*, agent_name: str, agent_company: str, agent_email: str,
  .foot{{color:#737373;font-size:12px;margin-top:18px;text-align:center}}
  .ok{{display:none;text-align:center;padding:20px 0}} .ok h2{{color:var(--accent)}}
  .err{{display:none;color:#f87171;font-size:13px;margin-top:10px}}
- .tag{{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:12px;text-transform:uppercase}}
+ .brandbar{{display:flex;align-items:center;gap:11px;margin-bottom:22px}}
+ .brandbar .wm{{font-weight:800;font-size:16px;color:#fff;line-height:1}}
+ .brandbar .tl{{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-top:3px;font-weight:600}}
+ .stack{{list-style:none;padding:0;margin:20px 0 8px}}
+ .stack li{{display:flex;gap:11px;align-items:flex-start;padding:9px 0;font-size:14.5px;color:#e5e5e5;border-bottom:1px solid #1e1e1e}}
+ .stack li:last-child{{border-bottom:0}}
+ .stack .ck{{flex:0 0 20px;height:20px;border-radius:50%;background:var(--accent);color:#0a0a0a;font-weight:800;
+   font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}}
+ .stack b{{color:#fff}}
+ .worth{{background:#1c1c1c;border:1px solid #2a2a2a;border-radius:11px;padding:14px 16px;margin:18px 0;
+   font-size:13px;color:#cfcfcf}} .worth b{{color:var(--accent)}}
+ .badges{{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}}
+ .badge{{font-size:11px;color:#a3a3a3;background:#1a1a1a;border:1px solid #262626;border-radius:999px;padding:5px 11px}}
+ .formtitle{{font-size:15px;font-weight:700;color:#fff;margin:26px 0 2px}}
 </style></head>
 <body><div class="wrap"><div class="card">
- <div class="tag">Aureon Global &middot; Quality Converts</div>
- <h1>What is your home worth today?</h1>
- <p class="sub">Get a free, no-obligation home value report for your property{(' in ' + z) if z else ''} &mdash;
-    estimated range, what you could net, recent comparable sales, and a free professional CMA (normally
-    $400&ndash;$600). Book a quick call and a local real estate expert reaches out as soon as possible.
-    No spam, no pushy calls.</p>
+ <div class="brandbar">
+   <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="10%" y1="10%" x2="90%" y2="90%"><stop offset="5%" stop-color="#FFF8D6"/><stop offset="35%" stop-color="#E6C259"/><stop offset="65%" stop-color="#B68E2D"/><stop offset="95%" stop-color="#755615"/></linearGradient></defs><g fill="url(#g)"><ellipse cx="50" cy="15" rx="20" ry="7"/><path d="M 18 26 Q 50 33 82 26 L 82 34 Q 50 41 18 34 Z"/><path d="M 8 40 Q 50 47 92 40 L 92 49 Q 50 56 8 49 Z"/><path d="M 8 55 Q 50 62 92 55 L 92 64 Q 50 71 8 64 Z"/><path d="M 18 70 Q 50 77 82 70 L 82 78 Q 50 85 18 78 Z"/><path d="M 32 84 Q 50 89 68 84 L 68 89 Q 50 94 32 89 Z"/></g></svg>
+   <div><div class="wm">Aureon Global</div><div class="tl">Quality Converts</div></div>
+ </div>
+ <h1>What is your home really worth?</h1>
+ <p class="sub">Most homeowners are sitting on more equity than they think. Get the real number
+    for your home{(' in ' + z) if z else ''} in minutes. Free, and you are not committing to anything.</p>
+ <ul class="stack">
+   <li><span class="ck">&check;</span><div>Your <b>estimated market value range</b>, built from real recent sales near you</div></li>
+   <li><span class="ck">&check;</span><div><b>What you could walk away with</b> after selling costs</div></li>
+   <li><span class="ck">&check;</span><div><b>Recent comparable sales</b> on your street</div></li>
+   <li><span class="ck">&check;</span><div>The <b>3 moves that add the most</b> before you list</div></li>
+   <li><span class="ck">&check;</span><div>A <b>free professional CMA</b> (the analysis agents normally charge $400 to $600 for)</div></li>
+ </ul>
+ <div class="worth">Then book a quick call and a <b>local real estate expert reaches out as soon as possible</b>
+   to confirm your exact number in person. No pressure. No obligation to ever list.</div>
+ <div class="badges"><span class="badge">100% free</span><span class="badge">No obligation</span><span class="badge">Your data is never sold</span><span class="badge">Takes 60 seconds</span></div>
+ <div class="formtitle">Get my free report</div>
  <form id="f">
    <div class="sec">Your property</div>
    <label>Property address *</label>
@@ -121,7 +146,7 @@ def page_html(*, agent_name: str, agent_company: str, agent_email: str,
    <label>How soon are you thinking of selling?</label>
    <select id="timeframe"><option value="">Select…</option>
      <option>ASAP / actively looking</option><option>Within 3 months</option>
-     <option>3–6 months</option><option>6–12 months</option>
+     <option>3, 6 months</option><option>6, 12 months</option>
      <option>Just curious about the value</option></select>
 
    <div class="sec">Where to send it</div>
@@ -131,11 +156,11 @@ def page_html(*, agent_name: str, agent_company: str, agent_email: str,
    <input id="email" type="email" required placeholder="you@email.com">
    <label>Phone (for a faster, more accurate report)</label>
    <input id="phone" placeholder="(555) 555-5555">
-   <button id="btn" type="submit">Get my free home value report</button>
+   <button id="btn" type="submit">Show me what my home is worth &rarr;</button>
    <div class="err" id="err"></div>
  </form>
  <div class="ok" id="ok"><h2>Got it.</h2>
-   <p>Your free home value report is on its way to your inbox. For your exact figure, book a quick call &mdash;
+   <p>Your free home value report is on its way to your inbox. For your exact figure, book a quick call , 
       a local real estate expert will then reach out as soon as possible to confirm it.</p>
    <p style="margin-top:14px;"><a href="https://calendly.com/aureonglobal-info/30min" style="background:var(--accent);color:#0a0a0a;font-weight:700;padding:12px 20px;border-radius:9px;text-decoration:none;display:inline-block;">Book your free CMA call</a></p></div>
  <p class="foot">Prepared by Aureon Global. Your information is used only to prepare your report and is never sold.</p>

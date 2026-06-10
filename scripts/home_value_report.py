@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""home_value_report.py — render a rich, branded Home Value Report as print-ready HTML
+"""home_value_report.py, render a rich, branded Home Value Report as print-ready HTML
 (-> PDF via headless Chrome) for the consented home-value funnel.
 
 PURPOSE (why this exists): it is the bait in a consented seller-lead funnel. A homeowner
@@ -9,11 +9,11 @@ Aureon-branded (gold/black, Quality Converts), the CTA books an Aureon call
 homeowner. So it is built to CONVERT + deliver real value: estimated range, equity + net
 proceeds, recent comparable sales, pre-listing moves, and a free professional CMA offer
 (normally $400-600). Every number is public county-assessor data or an openly-labelled
-estimate derived from it — never a fabricated appraisal — and a disclaimer (property not
+estimate derived from it, never a fabricated appraisal, and a disclaimer (property not
 visited, statements not verified) sits in the footer of every page.
 
 build_report_html(lookup, agent, owner) -> str  (full HTML; feed to Chrome --print-to-pdf;
-the `agent` dict is now unused — Aureon is the front door — but kept for signature stability)
+the `agent` dict is now unused, Aureon is the front door, but kept for signature stability)
 """
 from __future__ import annotations
 import datetime as dt
@@ -38,7 +38,7 @@ def _money(n) -> str:
     try:
         return "$%s" % format(int(n), ",")
     except Exception:
-        return "—"
+        return "n/a"
 
 
 def _ctx_pairs(context: str) -> list[tuple[str, str]]:
@@ -102,7 +102,7 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
       <div class="valbox">
         <div class="vlabel">Estimated market value range
           <span class="conf" style="background:{conf_color}">{esc(conf) or 'Estimate'} confidence</span></div>
-        <div class="vrange">{_money(lo)} <span>&ndash;</span> {_money(hi)}</div>
+        <div class="vrange">{_money(lo)}<span> to </span>{_money(hi)}</div>
         <div class="vmid">Midpoint estimate {_money(mid)}</div>
         <div class="vmethod"><span>How we calculated this</span><ul>{method_html}</ul></div>
         <div class="vassessed">County assessed value on record: <strong>{_money(av)}</strong></div>
@@ -115,13 +115,13 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
           {addr}; book a quick call below and a local expert will walk you through your full range.</div>
       </div>"""
 
-    # Equity + net-proceeds — what sellers actually care about (take-home, not list price).
+    # Equity + net-proceeds, what sellers actually care about (take-home, not list price).
     equity_block = ""
     if found and (net_lo or equity_gain):
         rows = ""
         if net_lo and net_hi:
             rows += (f'<tr><td class="fl">Estimated proceeds after selling costs</td>'
-                     f'<td class="fv">{_money(net_lo)} &ndash; {_money(net_hi)}</td></tr>')
+                     f'<td class="fv">{_money(net_lo)} to {_money(net_hi)}</td></tr>')
         if basis:
             rows += f'<tr><td class="fl">You bought for (on record)</td><td class="fv">{_money(basis)}</td></tr>'
         if equity_gain and equity_gain > 0:
@@ -132,7 +132,7 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
                         f'typical selling costs (agent commission + closing, ~7.5%%) and no outstanding mortgage; '
                         f'your actual net depends on your loan balance. We map this out exactly on your call.</p>')
 
-    # Comps list — actual recent nearby sales as evidence.
+    # Comps list, actual recent nearby sales as evidence.
     recent = comps.get("recent") or []
     if recent:
         comp_rows = "".join(
@@ -146,13 +146,13 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
     # Market / comps evidence section.
     if comps.get("n", 0) >= 5:
         market_block = f"""
-   <h2>Your local market &mdash; the evidence</h2>
+   <h2>Your local market, the evidence</h2>
    <div class="market">
      <p>This estimate is built from <strong>{comps['n']} recent arms-length sales</strong> in
         {area_name}, not a generic formula.</p>
      <table class="facts">
        <tr><td class="fl">Median sale price per sq ft</td><td class="fv">{_money(comps.get('median_ppsf'))}</td></tr>
-       <tr><td class="fl">Typical range (25th&ndash;75th percentile)</td><td class="fv">{_money(comps.get('ppsf_lo'))} &ndash; {_money(comps.get('ppsf_hi'))} / sq ft</td></tr>
+       <tr><td class="fl">Typical range (25th to 75th percentile)</td><td class="fv">{_money(comps.get('ppsf_lo'))} to {_money(comps.get('ppsf_hi'))} / sq ft</td></tr>
        <tr><td class="fl">Sales analysed</td><td class="fv">{comps['n']} recent transactions</td></tr>
      </table>
    </div>"""
@@ -164,12 +164,12 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
         so the range above leans on the county assessment. On your call we pull live MLS comparables for an exact figure.</p>
    </div>"""
 
-    # Top moves before listing — tailored lightly to the stated condition.
+    # Top moves before listing, tailored lightly to the stated condition.
     od = lookup.get("owner_details") or {}
     cond = (od.get("condition") or "").lower()
     moves = []
     if "needs work" in cond or "average" in cond:
-        moves = ["A pre-listing deep clean and decluttering &mdash; the highest-ROI move, near zero cost.",
+        moves = ["A pre-listing deep clean and decluttering, the highest-ROI move, near zero cost.",
                  "Fresh neutral paint where it is worn; buyers price down visible wear heavily.",
                  "Fix the small deferred items (leaky taps, sticking doors) that quietly signal neglect."]
     else:
@@ -181,10 +181,10 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
 
     facts = _ctx_pairs(lookup.get("context", ""))
     facts_rows = "".join(
-        f"<tr><td class='fl'>{esc(l)}</td><td class='fv'>{esc(v) or '&mdash;'}</td></tr>"
+        f"<tr><td class='fl'>{esc(l)}</td><td class='fv'>{esc(v) or ', '}</td></tr>"
         for l, v in facts) or "<tr><td class='fl'>Property record</td><td class='fv'>On file with the county assessor</td></tr>"
 
-    # "What you told us" — the homeowner's own inputs, reflected back.
+    # "What you told us", the homeowner's own inputs, reflected back.
     od_labels = [("property_type", "Property type"), ("beds", "Bedrooms"), ("baths", "Bathrooms"),
                  ("sqft", "Living area (your figure)"), ("year_built", "Year built"),
                  ("condition", "Condition"), ("updates", "Recent updates"), ("sell_timeframe", "Selling timeframe")]
@@ -308,10 +308,10 @@ def build_report_html(lookup: dict, agent: dict, owner: dict) -> str:
    </div>
 
    <div class="cta">
-     <div class="kick">Your free professional CMA &middot; normally $400&ndash;$600</div>
-     <h3>Get your exact number &mdash; free.</h3>
+     <div class="kick">Your free professional CMA &middot; normally $400 to $600</div>
+     <h3>Get your exact number, free.</h3>
      <p>This report is the automated estimate. The precise figure comes from a professional comparative
-        market analysis (CMA) &mdash; the same paid analysis used to price a listing. Book a quick call and we
+        market analysis (CMA), the same paid analysis used to price a listing. Book a quick call and we
         arrange yours at no cost; a local real estate expert then reaches out as soon as possible to walk your
         home and confirm the number. No pressure, no obligation to list.</p>
      <a class="ctabtn" href="{CAL}">Book your free CMA call &rarr;</a>
