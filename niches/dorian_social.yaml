@@ -1,0 +1,45 @@
+slug: dorian_social
+name: "Mercury Scales (Dorian) - self-made B2B founders via social"
+profile_slug: dorian
+engine: social
+
+# Dorian's ICP is social-signal (individuals on Instagram/X/YouTube with an audience),
+# NOT website team pages, so this uses the social_scrape engine instead of team_pages:
+#   py sequences/social_scrape.py instagram dorian_social niches/dorian_social_handles.txt
+#   py sequences/social_scrape.py twitter   dorian_social niches/dorian_social_handles.txt
+# Each run reads the handles file, opens each profile, extracts the bio email, verifies it,
+# and upserts to prospects with profile_slug=dorian. ~20-25% of creators expose an email.
+#
+# HANDLES come from niches/dorian_social_handles.txt (hand-seed + extend). For scaled
+# discovery, the YouTube search->discover flow (youtube_scraper.py discover) can be pointed
+# at dorian_social_yt_search_terms.txt the same way the crypto niche does it.
+#
+# ICP (per Lukas-style onboarding form): AI/automation agency founders, high-ticket sales
+# and closing coaches, business/sales/marketing coaches, money + mindset educators. Buying
+# signals: 15k+ followers, real testimonials, already running ads, building in public about
+# bootstrapping / financial independence, posting income or self-made milestones, recruiting
+# closers. Geography: English-speaking US/UK/CA/AU + Germany.
+
+require_first_name: false
+
+# Handles file (one @handle or handle per line; # comments ok). Extend over time.
+handles_file: niches/dorian_social_handles.txt
+
+filter:
+  exclude_local_parts:
+    - info
+    - contact
+    - hello
+    - support
+    - team
+    - press
+    - sales
+    - admin
+  exclude_domains:
+    - mercuryscales.com
+    - aureonglobal.de
+    - gmail.com        # personal catch-alls are low-intent for B2B outreach; keep business addresses
+
+sequence:
+  variants_file: sequences/dorian-default/variants.json
+  forced_persona: dorian

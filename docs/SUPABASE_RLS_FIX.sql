@@ -48,3 +48,21 @@ CREATE POLICY "anon can insert opt-ins"
 --     read/write headers at it. The service_role key bypasses RLS and must NEVER
 --     be shipped to a browser/page — server-side only.
 -- ============================================================================
+
+-- ============================================================================
+-- BACKEND MIGRATION (do AFTER running the RLS above + adding the service key)
+-- ============================================================================
+-- The backend reads SUPABASE_ANON_KEY in ~87 places. Once RLS is on, anon can no
+-- longer read, so the backend must use the service_role key. The lowest-risk way
+-- (no edit to 87 call-sites): the scripts read the key via env. Set BOTH in
+-- sequences/supabase.env:
+--     SUPABASE_ANON_KEY=...        (keep; still used by public pages)
+--     SUPABASE_SERVICE_KEY=...     (NEW: from Supabase -> Project Settings -> API -> service_role)
+-- Then change the key the SERVER scripts pick up to prefer the service key, e.g. in the
+-- shared env-read replace `env["SUPABASE_ANON_KEY"]` with
+--     env.get("SUPABASE_SERVICE_KEY") or env["SUPABASE_ANON_KEY"]
+-- in the server-side scripts (daily-report.py, daily-fill-and-enroll.py, the fulfillers,
+-- sequence-runner.py, imap-poll.py, etc.). NEVER put the service key in any docs/ page or
+-- anything shipped to a browser. The public capture/unsubscribe pages keep the ANON key
+-- (insert-only under RLS), which is correct.
+-- ============================================================================

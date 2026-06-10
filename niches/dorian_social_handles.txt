@@ -1,0 +1,17 @@
+# Dorian / Mercury Scales social handles to scrape for a bio email.
+# One handle per line (with or without leading @). Lines starting with # are ignored.
+# Run: py sequences/social_scrape.py instagram dorian_social niches/dorian_social_handles.txt
+#  or: py sequences/social_scrape.py twitter   dorian_social niches/dorian_social_handles.txt
+#
+# ICP = self-made B2B founders with an audience: AI/automation agency owners, high-ticket
+# sales/closing coaches, business/sales/marketing coaches, money + mindset educators.
+# Signals: 15k+ followers, real testimonials, running ads, building in public, income posts.
+# Geography: English-speaking (US/UK/CA/AU) + Germany.
+#
+# SEED THIS LIST before the first real run. Two ways to fill it:
+#   1. Hand-add handles Dorian already knows fit (fastest, highest quality).
+#   2. Scaled discovery: build dorian_social_yt_search_terms.txt and run
+#      `py sequences/youtube_scraper.py discover <terms> --out niches/dorian_social_handles.txt`
+#      (same flow the crypto niche uses), then scrape the discovered channels.
+#
+# (No handles seeded yet - add them, or generate via the YouTube discover flow above.)
