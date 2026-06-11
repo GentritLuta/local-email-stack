@@ -1,55 +1,85 @@
 slug: crypto_influencer
 name: "Crypto + trading editorial / research / community contacts"
 profile_slug: algoalpha
-engine: team_pages
+engine: team_pages   # default for plain string seeds
+
+# Crypto creators overwhelmingly use brand-handle emails (cryptosavy@gmail.com)
+# with no parseable personal name. The algoalpha copy greets "Hey {greeting},"
+# which falls back to the channel/company name, so a first name is NOT required
+# to personalize. Setting this false lets the quality gate admit named-by-company
+# leads (company still required) instead of rejecting the whole source.
+require_first_name: false
 
 # WHAT THIS NICHE SCRAPES
-# Public team pages, contributor lists, and contact pages of crypto media
-# outlets, research desks, and DAO/community sites. These are the audiences
-# most likely to engage with AlgoAlpha's product (TradingView indicators +
-# crypto signals): journalists writing on trading + on-chain, research
-# analysts at think-tanks, community leaders running TA workshops.
+# Three lead-source layers, isolated to profile_slug=algoalpha:
+#   1. EDITORIAL TEAM PAGES — crypto news team rosters
+#   2. SUBSTACK / NEWSLETTER /about pages — author bios with biz emails
+#   3. CONFERENCE SPEAKER pages — bios + (sometimes) emails
+# YouTube channels go through the separate `youtube_scraper.py` driver against
+# niches/crypto_youtube_channels.txt; results land in the same algoalpha
+# bucket via the same profile_slug guard.
 #
-# THIS IS A REAL TEST RUN — emails extracted go to Supabase prospects with
-# verified=mx_verified (or smtp_verified where port 25 is reachable).
-# No sends happen from scraping alone; that's a separate enqueue step.
+# Each seed can be either:
+#   - "url"                          → uses niche-level engine
+#   - { url: "...", engine: "..." }  → per-seed engine override
+#
+# Engines:
+#   - team_pages  : httpx fetch + bs4 (fast; auto-upgrades to playwright if static HTML is empty)
+#   - playwright  : full Chrome render (JS, SPA, soft Cloudflare). ~3-5s/seed.
 #
 # RUN
 #   py sequences/lead_scrape.py run crypto_influencer
+#   py sequences/lead_scrape.py run crypto_influencer --engine playwright  # force-all
 #
 # SCHEDULE (daily 09:00)
 #   schtasks /Create /TN "LES-lead-scrape-crypto_influencer" /SC DAILY /ST 09:00 ^
 #     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run crypto_influencer"
 
 seeds:
-  # Crypto editorial team / author pages. Mix of static (mailto: cards) and
-  # SSR (Next.js / Nuxt JSON blobs) — the scraper handles both.
+  # ── L1: Editorial team / author pages (static-mostly; works on httpx) ────
   - https://decrypt.co/team
   - https://decrypt.co/authors
   - https://www.theblock.co/about
   - https://www.theblock.co/people
   - https://bitcoinmagazine.com/about
-  - https://thedefiant.io/about
-  - https://thedefiant.io/team
   - https://www.coindesk.com/about
-  - https://blockworks.co/team
-  - https://protos.com/about-us
-  - https://www.cryptobriefing.com/about
-  - https://cryptoslate.com/about
-
-  # Research + intelligence desks
-  - https://messari.io/about
-  - https://www.tokeninsight.com/en/about-us
-  - https://kaiko.com/about
-
-  # Newsletter authors + community leaders
-  - https://www.bankless.com/about
-  - https://www.coinage.media/team
-  - https://www.unchainedcrypto.com/about
-
-  # Open contact / press pages
+  - { url: "https://thedefiant.io/about",         engine: playwright }
+  - { url: "https://thedefiant.io/team",          engine: playwright }
+  - { url: "https://blockworks.co/team",          engine: playwright }
+  - { url: "https://protos.com/about-us",         engine: playwright }
+  - { url: "https://www.cryptobriefing.com/about", engine: playwright }
+  - { url: "https://cryptoslate.com/about",       engine: playwright }
   - https://cointelegraph.com/contact-us
   - https://cointelegraph.com/about
+
+  # ── L1b: Research + intelligence desks (SPA-heavy) ───────────────────────
+  - { url: "https://messari.io/about",            engine: playwright }
+  - { url: "https://www.tokeninsight.com/en/about-us", engine: playwright }
+  - { url: "https://kaiko.com/about",             engine: playwright }
+  - { url: "https://glassnode.com/about",         engine: playwright }
+  - { url: "https://nansen.ai/about",             engine: playwright }
+  - { url: "https://www.delphidigital.io/about",  engine: playwright }
+
+  # ── L2: Substack / newsletter authors ────────────────────────────────────
+  # Substack /about pages list contributor bios with email addresses in some
+  # cases. Yield is low (most route via form), but cheap to try.
+  - { url: "https://www.bankless.com/about",      engine: playwright }
+  - { url: "https://www.milkroad.com/about",      engine: playwright }
+  - { url: "https://www.coinage.media/team",      engine: playwright }
+  - { url: "https://www.unchainedcrypto.com/about", engine: playwright }
+  - { url: "https://www.web3academy.io/about",    engine: playwright }
+  - { url: "https://www.thedailyape.io/about",    engine: playwright }
+  - { url: "https://www.bitcoinmagazine.pro/about", engine: playwright }
+  - { url: "https://www.scopesight.io/about",     engine: playwright }
+
+  # ── L3: Conference speaker pages (annual events) ────────────────────────
+  # Speaker bios sometimes include direct email. Re-scrape per event cycle.
+  - { url: "https://www.token2049.com/speakers",      engine: playwright }
+  - { url: "https://www.ethdenver.com/speakers",      engine: playwright }
+  - { url: "https://consensus.coindesk.com/speakers", engine: playwright }
+  - { url: "https://devcon.org/speakers",             engine: playwright }
+  - { url: "https://www.ethcc.io/speakers",           engine: playwright }
+  - { url: "https://www.permissionless.io/speakers",  engine: playwright }
 
 filter:
   # Skip role mailboxes — campaigns target individuals, not info@/contact@.
@@ -73,9 +103,14 @@ filter:
     - pitch
     - advertising
     - partnerships
-  # No domain exclusions — even @gmail.com personal emails for influencers
-  # are legitimate targets, just lower-confidence than corporate addresses.
-  exclude_domains: []
+    - sponsors
+    - sponsorships
+    - advertise
+    - business
+    - bizdev
+  exclude_domains:
+    - algoalpha.io          # client's own brand
+    - www.algoalpha.io
 
 # What sequence to run on verified leads from this niche.
 # (No sequence row in Supabase yet — author one before enqueuing.)

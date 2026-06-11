@@ -1,0 +1,103 @@
+slug: atal_dach_b2b
+name: "DACH B2B Mittelstand — Präventionsseminare (Atal SolidRocks)"
+profile_slug: atalsolidrocks
+engine: team_pages   # httpx + bs4, auto-upgrades to playwright if static HTML is empty
+
+# WHAT THIS NICHE SCRAPES
+# Mid-market DACH companies in HIGH-Krankenstand sectors (Industrie/Maschinenbau,
+# Gesundheit & Pflege, plus mid-market IT) — the ICP from atalsolidrocks.com:
+# HR-, BGM- und Geschäftsführungs-Entscheider in Firmen mit ~50–150+ Mitarbeitenden.
+#
+# STARTER seeds are real named firms; expand via seed_discover (now multi-backend,
+# keyword-gated below). lead_scrape --no-smtp validates yield; prune dead pages.
+
+seeds:
+  # ── Industrie / Maschinenbau ──
+  - { url: "https://www.ziehl-abegg.com/de-de/kontakt",        company: "Ziehl-Abegg SE",          city: "Künzelsau" }
+  - { url: "https://www.iwis.com/de/kontakt/",                 company: "iwis SE & Co. KG",        city: "München" }
+  - { url: "https://www.hengst.com/de/kontakt/",               company: "Hengst SE",               city: "Münster" }
+  - { url: "https://www.obo.de/de/kontakt/",                   company: "OBO Bettermann",          city: "Menden" }
+  - { url: "https://www.lohmann-tapes.com/de/kontakt/",        company: "Lohmann GmbH & Co. KG",   city: "Neuwied" }
+  - { url: "https://www.bizerba.com/de-de/kontakt/",           company: "Bizerba SE & Co. KG",     city: "Balingen" }
+
+  # ── Gesundheit & Pflege ──
+  - { url: "https://www.enzensberg.de/kontakt/",               company: "m&i Klinikgruppe Enzensberg", city: "Ichenhausen" }
+  - { url: "https://www.median-kliniken.de/de/unternehmen/kontakt/", company: "MEDIAN Kliniken",   city: "Berlin" }
+
+  # ── IT-Dienstleister Mittelstand (inhabergeführt, Team-Seiten mit Kontakten) ──
+  - { url: "https://www.hagel-it.de/kontakt/",                 company: "hagel IT-Services GmbH",  city: "Hamburg" }
+  - { url: "https://www.michael-wessel.de/kontakt/",           company: "michael wessel GmbH",     city: "Hannover" }
+  - { url: "https://www.inneo.com/de/kontakt.html",            company: "INNEO Solutions GmbH",    city: "Ellwangen" }
+  - { url: "https://www.mpdv.com/de/kontakt/",                 company: "MPDV Mikrolab GmbH",      city: "Mosbach" }
+
+# Discovery: seed_discover.py cycles Bing/Brave/Google/Mojeek (region de-de) for each
+# query, then keeps only pages that have a mailto: AND at least one ICP keyword.
+# This gates out the news/SaaS/app-store noise generic searches return.
+
+discovery:
+  max_seeds_per_run: 15
+  require_mailto: true
+  require_keywords:
+    - geschäftsführer
+    - geschäftsführung
+    - personal
+    - personalleitung
+    - gesundheit
+    - pflege
+    - produktion
+    - werkleiter
+    - mitarbeiter
+    - team
+
+# Auto-discovery DISABLED for this niche: web search returns irrelevant noise for
+# this ICP (HR/Geschäftsführung decision-makers don't surface via generic search).
+# Renamed so seed_discover skips it. Feed this niche from a purchased contact list
+# or LinkedIn export instead. Re-enable by renaming back to `search_queries`.
+_search_queries_disabled:
+  - "mittelständische Pflegedienst GmbH team \"@\" kontakt"
+  - "Produktionsbetrieb Mittelstand Geschäftsführung team \"@\""
+  - "ambulanter Pflegedienst Geschäftsführung E-Mail kontakt"
+  - "Logistik Spedition Mittelstand team Geschäftsführer kontakt"
+
+# Filter rules applied during lead_scrape extraction.
+filter:
+  exclude_local_parts:
+    - info
+    - contact
+    - kontakt
+    - support
+    - office
+    - admin
+    - sales
+    - vertrieb
+    - hello
+    - hi
+    - press
+    - presse
+    - noreply
+    - no-reply
+    - postmaster
+    - datenschutz
+    - karriere
+    - jobs
+    - bewerbung
+    - newsletter
+    - marketing
+  exclude_domains:
+    - example.com
+    - example.de
+    - example.org
+    - domain.de
+    - domain.com
+    - beispiel.de
+    - gmail.com
+    - yahoo.de
+    - hotmail.de
+    - web.de
+    - gmx.de
+    - gmx.net
+    - google.com
+    - play.google.com
+    - intercom.com
+    - heise.de
+    - dihk.de

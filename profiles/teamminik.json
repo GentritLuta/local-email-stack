@@ -1,0 +1,97 @@
+{
+  "slug": "teamminik",
+  "name": "Team Minik — Real estate agent recruitment + seller/buyer outreach (ASSETS ONLY, not wired)",
+  "created_at": "2026-06-07",
+  "active": false,
+  "_status": "ASSETS ONLY. Placeholder sending domains. NOT provisioned in Resend, no DNS, no scheduler. Provide real domains + confirm reply-to before any live wiring.",
+  "company": {
+    "legal_name": "Team Minik (Realty of America)",
+    "website": "https://teamminik.com",
+    "root_domain": "teamminik.com",
+    "office_address": "Arizona, USA",
+    "signer": "Michelle Minik",
+    "notices_email": "michelle@teamminik.com",
+    "target_market": "Real estate agents (recruitment) + home sellers/buyers (listings) across 22+ US states"
+  },
+  "relay": {
+    "backend": "resend",
+    "resend_region": "us-east-1",
+    "resend_api_key": "",
+    "_note": "PLACEHOLDER domains. Fill resend_api_key in teamminik.private.json and provision real subdomains one-at-a-time once the real sending domain is known.",
+    "from_domains": [
+      { "domain": "hello.teamminik.com", "resend_domain_id": "", "verified_at": null, "warmup": { "enabled": true, "current_day": 1, "started_at": "2026-06-07", "ramp_curve": "snowball_v1", "max_daily_sends": 50, "reputation": { "bounce_rate_7d": 0.0, "complaint_rate_7d": 0.0, "delivered_7d": 0, "last_check": null } } },
+      { "domain": "team.teamminik.com", "resend_domain_id": "", "verified_at": null, "warmup": { "enabled": true, "current_day": 1, "started_at": "2026-06-07", "ramp_curve": "snowball_v1", "max_daily_sends": 50, "reputation": { "bounce_rate_7d": 0.0, "complaint_rate_7d": 0.0, "delivered_7d": 0, "last_check": null } } }
+    ],
+    "from_domains_overrides": []
+  },
+  "personas": [
+    { "slug": "michelle-hello", "from_name": "Michelle Minik", "from_addr": "michelle@hello.teamminik.com", "reply_to": "michelle@teamminik.com", "title": "Team Lead, Team Minik | Realty of America", "voice": { "register": "founder-direct", "quirks": ["short sentences", "concrete numbers", "no buzzwords"], "avoid": ["marketing language", "exclamation marks", "emojis", "em-dashes"] }, "signature": "Michelle Minik\nTeam Lead, Team Minik | Realty of America\nteamminik.com", "full_name": "Michelle Minik" },
+    { "slug": "michelle-team", "from_name": "Michelle Minik", "from_addr": "michelle@team.teamminik.com", "reply_to": "michelle@teamminik.com", "title": "Team Lead, Team Minik | Realty of America", "voice": { "register": "founder-direct", "quirks": ["short sentences", "concrete numbers", "no buzzwords"], "avoid": ["marketing language", "exclamation marks", "emojis", "em-dashes"] }, "signature": "Michelle Minik\nTeam Lead, Team Minik | Realty of America\nteamminik.com", "full_name": "Michelle Minik" }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 30,
+    "min_seconds_between_sends_same_persona": 180
+  },
+  "send_ramp": { "started_at": null },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [
+      { "until_day": 14, "warmup_pct": 80 },
+      { "until_day": 30, "warmup_pct": 30 },
+      { "until_day": 45, "warmup_pct": 10 },
+      { "until_day": 9999, "warmup_pct": 5 }
+    ],
+    "auto_pause_thresholds": { "bounce_rate": 0.05, "complaint_rate": 0.003 },
+    "reputation": { "bounce_rate_7d": 0, "complaint_rate_7d": 0, "delivered_7d": 0, "last_check": null },
+    "started_at": "2026-06-07",
+    "current_day": 1,
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    { "from_day": 1, "daily": 15 },
+    { "from_day": 8, "daily": 25 },
+    { "from_day": 15, "daily": 35 },
+    { "from_day": 22, "daily": 50 }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/Phoenix",
+    "target_audience_note": "US real estate. America/Phoenix (Arizona HQ) default. 08:00-17:00 recipient local."
+  },
+  "brand": {
+    "wordmark": "Team Minik",
+    "site": "teamminik.com",
+    "cta_url": "",
+    "tagline": "Unlock your Real Estate Potential.",
+    "font_stack": "'Figtree', 'DM Sans', sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap",
+    "colors": {
+      "accent": "#DB1263",
+      "accent_2": "#10295A",
+      "text": "#10295A",
+      "text_2": "#333333",
+      "muted": "#9E9E9E",
+      "bg_page": "#EEF1F5",
+      "bg_card": "#FFFFFF",
+      "rule": "#E4E7EC"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/teamminik.html?t={token}",
+    "legal": {
+      "company_name": "Team Minik",
+      "address_lines": ["Team Minik | Realty of America", "Arizona, USA"],
+      "contact_email": "michelle@teamminik.com",
+      "copyright_year": 2026,
+      "privacy_policy_url": "https://teamminik.com/privacy",
+      "terms_of_service_url": "https://teamminik.com/terms",
+      "legal_disclaimer": "This message is intended for the named recipient only. If you are not the intended recipient, please delete this email and inform the sender.",
+      "partner_notice": "You are receiving this because we believe Team Minik may be relevant to your real estate business. One-click unsubscribe at the bottom."
+    },
+    "template": "teamminik-custom"
+  },
+  "_note_template": "Custom template at sequences/email_template_teamminik.py (teamminik-custom). Navy #0B1B33 + gold #C9A24B, Inter. Two sequences: teamminik-default (agent recruitment) + teamminik-sellers (seller/buyer)."
+}

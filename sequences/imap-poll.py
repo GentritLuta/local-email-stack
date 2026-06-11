@@ -28,9 +28,21 @@ import imaplib
 import json
 import os
 import re
+import smtplib
+import ssl
 import sys
 import time
-from email.utils import parseaddr
+
+# Force UTF-8 stdout/stderr on Windows so logging international characters
+# (umlauts, dashes, checkmarks etc.) doesn't crash the script with charmap
+# codec errors when scheduled-task console encoding is cp1252.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import parseaddr, formatdate, make_msgid
 from pathlib import Path
 
 import httpx
@@ -75,17 +87,126 @@ BOUNCE_FROM = re.compile(r"^(mailer-daemon|postmaster|bounce|noreply|no-reply)@"
 COMPLAINT_FROM = re.compile(r"^(abuse|feedback-loop)@", re.I)
 BOUNCE_SUBJ = re.compile(r"(undelivered|delivery (status|failure)|returned mail|mail delivery|address (not found|rejected))", re.I)
 
+# Opt-out intent in a reply. Checked only against the TOP of the reply (text
+# before quoted history) so our own quoted unsubscribe footer never self-fires.
+UNSUB_RX = re.compile(r"\b(unsubscribe|opt[\s-]?out|remove me|take me off|stop "
+                      r"(?:emailing|sending|contacting)|do not (?:contact|email)|"
+                      r"no longer.*(?:contact|email)|leave me alone|not interested.*stop)\b", re.I)
+_QUOTE_LINE = re.compile(r"^(_{5,}|-{5,}|from:|sent:|to:|subject:|on .+wrote:|>.*)", re.I)
+
+# Never treat mail from these as a prospect cold reply (no alert, no reply-stop,
+# no auto-draft). laso.finance is an ACTIVE LEGAL MATTER that must never be engaged;
+# the aureonglobal / diraya domains are our own sending + inbox infra, so a threaded
+# "Re:" from them is internal mail, not a prospect.
+EXCLUDE_FROM = re.compile(r"@([\w.-]*(?:aureonglobal|diraya)[\w.-]*|laso\.finance)$", re.I)
+# Account / transactional mail that threads as "Re:" but is never a cold-email reply.
+NOISE_SUBJ = re.compile(r"\b(invoice|settlement|receipt|refund|retoure|chargeback|"
+                        r"card on file|\bucof\b|account statement|past due|"
+                        r"verification code|reset your password|confirm your email|"
+                        r"order\s*#|return\s*#)\b", re.I)
+
+
+def top_reply_text(body: str) -> str:
+    """The sender's own words — everything before the quoted original."""
+    out = []
+    for ln in (body or "").splitlines():
+        s = ln.strip()
+        if _QUOTE_LINE.match(s) or "________" in s:
+            break
+        out.append(ln)
+    return "\n".join(out)
+
+
+ALERT_SUBJECT_PREFIX = "[REPLY ALERT] "
+
+def send_reply_alert(env: dict, *, from_addr: str, original_subject: str,
+                     snippet: str, lead_email: str,
+                     lead_name: str | None = None,
+                     run_id: str | None = None) -> bool:
+    """Send an internal alert email to info@aureonglobal.de when a real
+    cold-outreach reply lands.
+
+    Routes through Resend (the cold-outreach send infra) rather than
+    Hostinger SMTP. Why: Hostinger Email's per-mailbox quota (100/day on
+    Business plan) was getting burned by these alerts plus all the
+    bounce / auto-reply / vacation-responder inbound traffic, which left
+    the user's info@ inbox blocked from any further legitimate
+    correspondence. Resend has unlimited send capacity on the Pro plan
+    and uses a dedicated subdomain that doesn't conflict with the
+    mailbox quota.
+    """
+    import urllib.request, urllib.error, json as _json
+    resend_key = (env.get("RESEND_FULL_ACCESS_API_KEY")
+                  or env.get("RESEND_API_KEY"))
+    to_addr = env.get("ALERT_TO_ADDR", "info@aureonglobal.de")
+    if not resend_key:
+        print("  ! alert send skipped: no RESEND_FULL_ACCESS_API_KEY in env")
+        return False
+    subj = (ALERT_SUBJECT_PREFIX
+            + (f"{lead_name or lead_email} replied"
+               if lead_email else "new reply landed"))
+    body_html = f"""\
+<div style="font-family:system-ui,-apple-system,sans-serif;color:#1e293b;max-width:560px">
+  <h2 style="margin:0 0 12px 0;color:#16a34a">📨 New prospect reply</h2>
+  <p style="margin:0 0 6px 0"><b>From:</b> {from_addr}</p>
+  {f'<p style="margin:0 0 6px 0"><b>Lead:</b> {lead_name or lead_email}</p>' if (lead_name or lead_email) else ""}
+  <p style="margin:0 0 6px 0"><b>Subject:</b> {original_subject}</p>
+  {f'<p style="margin:0 0 6px 0"><b>Run:</b> <code>{run_id}</code></p>' if run_id else ""}
+  <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0">
+  <pre style="white-space:pre-wrap;background:#f8fafc;padding:12px;border-radius:8px;font-family:ui-monospace,monospace;font-size:13px;color:#334155">{snippet[:2000]}</pre>
+  <p style="margin:16px 0 0 0;color:#64748b;font-size:12px">
+    Sent automatically by imap-poll.py via Resend (not Hostinger SMTP, to
+    preserve mailbox quota). The originating sequence run has been
+    paused so no further emails fire to this prospect.
+  </p>
+</div>"""
+    payload = {
+        "from":    "Reply Alert <alerts@hi.aureonglobal.de>",
+        "to":      [to_addr],
+        "reply_to": from_addr,  # let the operator reply directly to the prospect
+        "subject": subj[:200],
+        "html":    body_html,
+        "headers": {"X-LES-Alert": "reply-alert"},
+        "tags":    [{"name": "kind", "value": "reply_alert"}],
+    }
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=_json.dumps(payload).encode(),
+        method="POST",
+        # Cloudflare bot protection (error 1010) blocks requests with no
+        # User-Agent. Mimic the same header daily-report.py uses.
+        headers={"Authorization": f"Bearer {resend_key}",
+                 "Content-Type": "application/json",
+                 "User-Agent": "local-email-stack imap-poll/1.0"},
+    )
+    try:
+        urllib.request.urlopen(req, timeout=15)
+        return True
+    except urllib.error.HTTPError as e:
+        print(f"  ! alert send failed: HTTP {e.code} {e.read().decode()[:200]}")
+        return False
+    except Exception as e:
+        print(f"  ! alert send failed: {e}")
+        return False
+
 
 def classify(msg) -> str:
     sender = parseaddr(msg.get("From", ""))[1].lower()
     subject = msg.get("Subject", "") or ""
+    # Our own outbound alert emails — never re-process them.
+    if msg.get("X-LES-Alert") or subject.startswith(ALERT_SUBJECT_PREFIX):
+        return "self_alert"
     if msg.get("Feedback-Type") or COMPLAINT_FROM.search(sender):
         return "complaint"
     if BOUNCE_FROM.search(sender) or BOUNCE_SUBJ.search(subject):
         return "bounce"
     if msg.get("X-Failed-Recipients"):
         return "bounce"
+    if EXCLUDE_FROM.search(sender):
+        return "unrelated"               # legal / internal — never a prospect reply
     if msg.get("In-Reply-To") or msg.get("References"):
+        if NOISE_SUBJ.search(subject):
+            return "unrelated"           # account / transactional, not a cold reply
         return "reply"
     return "unrelated"
 
@@ -197,6 +318,63 @@ class Supa:
                           params={"id": f"eq.{run_id}"},
                           json={"status": f"paused_{reason}"})
 
+    def pause_runs_for_email(self, email: str) -> int:
+        """Robust reply-stop: pause EVERY still-queued run for the prospect at
+        `email`, even when In-Reply-To / subject matching could not resolve the
+        run_id (Resend rewrites our Message-ID, so header matching often fails).
+        The reply's From address IS the prospect's email, so this reliably halts
+        the sequence. Returns the number of runs paused."""
+        if not email:
+            return 0
+        ps = self.client.get(f"{self.base}/prospects",
+                             params={"email": f"eq.{email.lower()}", "select": "id"})
+        if ps.status_code != 200 or not ps.json():
+            return 0
+        n = 0
+        for p in ps.json():
+            qr = self.client.get(f"{self.base}/runs",
+                                 params={"prospect_id": f"eq.{p['id']}",
+                                         "status": "eq.queued", "select": "id"})
+            for run in (qr.json() if qr.status_code == 200 else []):
+                self.client.patch(f"{self.base}/runs",
+                                 params={"id": f"eq.{run['id']}"},
+                                 json={"status": "paused_replied"})
+                n += 1
+        return n
+
+    def is_known_prospect(self, email: str) -> bool:
+        """True if `email` exists in our prospects table. Used to gate genuine cold
+        replies from inbox noise (vendor marketing, transactional, mis-threaded mail)."""
+        if not email:
+            return False
+        r = self.client.get(f"{self.base}/prospects",
+                            params={"email": f"eq.{email.lower()}", "select": "id", "limit": "1"})
+        return r.status_code == 200 and bool(r.json())
+
+    def unsubscribe_email(self, email: str) -> int:
+        """Honor an opt-out: set prospects.unsubscribed=true and cancel every
+        run for this address, so NO further email can fire. Returns count."""
+        if not email:
+            return 0
+        ps = self.client.get(f"{self.base}/prospects",
+                             params={"email": f"eq.{email.lower()}", "select": "id"})
+        if ps.status_code != 200 or not ps.json():
+            return 0
+        n = 0
+        for p in ps.json():
+            self.client.patch(f"{self.base}/prospects",
+                             params={"id": f"eq.{p['id']}"},
+                             json={"unsubscribed": True})
+            runs = self.client.get(f"{self.base}/runs",
+                                   params={"prospect_id": f"eq.{p['id']}",
+                                           "status": "in.(queued,paused_replied,paused_bounced)",
+                                           "select": "id"})
+            for run in (runs.json() if runs.status_code == 200 else []):
+                self.client.patch(f"{self.base}/runs", params={"id": f"eq.{run['id']}"},
+                                 json={"status": "cancelled"})
+            n += 1
+        return n
+
 
 # ─── IMAP loop ──────────────────────────────────────────────────────────────
 
@@ -230,6 +408,8 @@ def one_pass(verbose: bool = True) -> dict:
     user, password = hostinger_creds()
     url, key = supabase_creds()
     supa = Supa(url, key)
+    # Reload hostinger env for SMTP credentials reused by reply-alert sender
+    env = load_env(REPO_ROOT / "sequences" / "hostinger.env")
 
     stats = {"processed": 0, "reply": 0, "bounce": 0, "complaint": 0, "unrelated": 0,
              "matched_to_run": 0, "runs_paused": 0, "errors": 0}
@@ -294,6 +474,25 @@ def one_pass(verbose: bool = True) -> dict:
                         candidate_recipient = from_addr if klass == "reply" else _extract_original_recipient(msg) or from_addr
                         run_id, resend_id, send_log_id = supa.find_send_by_recipient_subject(candidate_recipient, subject)
                         if send_log_id: match_via = "subject"
+                    # Reporting + safety gate: a threaded "reply" matching none of our
+                    # sends and not from a known prospect is inbox noise (vendor marketing,
+                    # transactional, mis-threaded), never a cold reply. Downgrade it so it
+                    # cannot pause a run, alert the operator, or trigger an auto-draft.
+                    if klass == "reply" and not send_log_id and not supa.is_known_prospect(from_addr):
+                        klass = "unrelated"
+                    # Symmetric UPGRADE: a message with no In-Reply-To/References lands as
+                    # "unrelated" even when it is a genuine prospect reply (some clients drop
+                    # threading headers, or the prospect starts a fresh mail to our reply-to).
+                    # If the sender IS a known prospect and it is not bounce/complaint/self/
+                    # excluded (those were already decided in classify, which applies the
+                    # laso.finance/own-infra EXCLUDE gate), treat it as a real reply.
+                    elif (klass == "unrelated" and not EXCLUDE_FROM.search(from_addr.lower())
+                          and not NOISE_SUBJ.search(subject) and supa.is_known_prospect(from_addr)):
+                        klass = "reply"
+                        # try the recipient+subject fallback now that we know it's a reply
+                        if not send_log_id:
+                            run_id, resend_id, send_log_id = supa.find_send_by_recipient_subject(from_addr, subject)
+                            if send_log_id: match_via = "subject"
                     if run_id:
                         stats["matched_to_run"] += 1
 
@@ -318,12 +517,49 @@ def one_pass(verbose: bool = True) -> dict:
                         if   klass == "reply":     supa.mark_send_replied(send_log_id)
                         elif klass == "bounce":    supa.mark_send_bounced(send_log_id)
                         elif klass == "complaint": supa.mark_send_complained(send_log_id)
-                    if klass == "reply" and run_id:
-                        supa.pause_run(run_id, "replied")
-                        stats["runs_paused"] += 1
+                    if klass == "reply":
+                        # Robust reply-stop: pause every queued run for this
+                        # sender. Does NOT depend on resolving run_id (header /
+                        # subject matching is unreliable because Resend rewrites
+                        # Message-IDs) — this is what guarantees a reply halts
+                        # the sequence. Falls back to the matched run_id only if
+                        # the email lookup finds no prospect (e.g. alias reply).
+                        paused = supa.pause_runs_for_email(from_addr)
+                        if run_id and paused == 0:
+                            supa.pause_run(run_id, "replied"); paused = 1
+                        stats["runs_paused"] += paused
+                        # Honor opt-out requests. Check only the TOP of the reply
+                        # (+ subject) so our own quoted unsubscribe footer can not
+                        # self-trigger. A genuine "unsubscribe/stop/remove me" ->
+                        # suppress the prospect + cancel all runs (compliance).
+                        if UNSUB_RX.search(top_reply_text(snippet) + " " + subject):
+                            u = supa.unsubscribe_email(from_addr)
+                            if u:
+                                stats["unsubscribed"] = stats.get("unsubscribed", 0) + u
+                                if verbose: print(f"  ⊘ unsubscribed {from_addr} (opt-out reply)")
                     elif klass == "bounce" and run_id:
                         supa.pause_run(run_id, "bounced")
                         stats["runs_paused"] += 1
+
+                    # Send internal alert email to info@aureonglobal.de for real
+                    # prospect replies (not bounces / complaints). Lets the operator
+                    # see in their inbox + get any client-side rules to trigger.
+                    if klass == "reply":
+                        try:
+                            sent_alert = send_reply_alert(
+                                env,
+                                from_addr=from_addr,
+                                original_subject=subject,
+                                snippet=snippet,
+                                lead_email=from_addr,
+                                lead_name=None,
+                                run_id=run_id,
+                            )
+                            if sent_alert:
+                                stats.setdefault("alerts_sent", 0)
+                                stats["alerts_sent"] += 1
+                        except Exception as e:
+                            if verbose: print(f"  ! reply-alert error: {e}")
 
                     imap.store(num, "+FLAGS", "\\Seen")
                     if verbose:

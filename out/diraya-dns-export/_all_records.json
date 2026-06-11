@@ -1,0 +1,252 @@
+{
+  "cleardiraya.com": [
+    {
+      "name": "resend._domainkey.hello",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDC+Ghr4qXgJnrttcEl40aqpTsq4Juvdm56v3EupyPwDCoPvPLuEHcedaWHPsDMVEsv9xJT+4cVF7s44kzvKjGG6SWw6GdrBePr8gGupT++N87/07WH63Tzdwg8AvMROK7DG3OYQvLnFRFsPmZ1rzj5ErhxEiU02pCQv1QyLYCnGwIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.cleardiraya.com"
+    },
+    {
+      "name": "send.hello",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "hello.cleardiraya.com"
+    },
+    {
+      "name": "send.hello",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.cleardiraya.com"
+    },
+    {
+      "name": "resend._domainkey.team",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCv/fvXvGnra2TF0wUnahmBRmSW4Qz7Eegk6DeWUhIxYlubmeDtH5gV1fMeqdgxYzFVK2dvd7ZmDLX6UHW6DTMj1fW22nJP/Y8Vkf9LckJ8ocidj7LpubZed7dRP2E1MaATo8wMal/XZ3zaZJxfRcePT7RBjelTaLeSH3M1z+ZUFQIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.cleardiraya.com"
+    },
+    {
+      "name": "send.team",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "team.cleardiraya.com"
+    },
+    {
+      "name": "send.team",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.cleardiraya.com"
+    }
+  ],
+  "diraya-agency.shop": [
+    {
+      "name": "resend._domainkey.hello",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDVw/FGLXOUqkHWnKBGx/apI7MbdRblfT2fD5DKfqPo6JVRbjaRwYgmZfwTdaUpNR9ZG9NG6hwSV+EerQNrLlWeGqvc95T/O/mm+bGjldkx4aly7OUKQBMJGNKBvx8pXY3JgYV7t93vg7hl1ztDreLXRFIzbPg1dvwVN/5AGSi1+wIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.diraya-agency.shop"
+    },
+    {
+      "name": "send.hello",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "hello.diraya-agency.shop"
+    },
+    {
+      "name": "send.hello",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.diraya-agency.shop"
+    },
+    {
+      "name": "resend._domainkey.team",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+dzyhaLOnCtSmJL8IxIFFIs1G5KonF8yJ00jUxqi7S5RgaipX9MMgVOjKum8gF7JnQcJWC8rjZsrJRS3zZjty3XMR+M5Kyl/7XMViIVRGLfHI9J7CYvJPZYE7QDaq4NFSDnuEycU595ot3RmHdAKxz5BU7BWbANvwJHWfXG2/mQIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.diraya-agency.shop"
+    },
+    {
+      "name": "send.team",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "team.diraya-agency.shop"
+    },
+    {
+      "name": "send.team",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.diraya-agency.shop"
+    }
+  ],
+  "diraya.biz": [
+    {
+      "name": "resend._domainkey.hello",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCtSVKvhH3NDwzr7rFEix3TzvyyswYUc+ChwZ5r5XeSQzIHsHX70OFlOaTtmeFHH+5QiIXHsyo99j/y/TE0LjhRczkPJzvxQ/DJ932CU/EbASKVFG3jedAYwlj93EA890W1CGrVLA4MF5Xsdmca4mWAu0GRZRzEYH7fUTN8g2nhmQIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.diraya.biz"
+    },
+    {
+      "name": "send.hello",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "hello.diraya.biz"
+    },
+    {
+      "name": "send.hello",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.diraya.biz"
+    },
+    {
+      "name": "resend._domainkey.team",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjGeB5KAmEfiRjjByWWBlHlkU0km8LPkq3hIEOksEzxqQI081MtnHIR/27t1C4dpVALvdz8GWPw+nAkHqPIfYqU5YuxIEZqMuRgTUvEvGH3sNLtywsAHEUOcpx56uqc/GnqxKazradaXS4rU21wML4xZx8GFLrl2yK1U3vwl64BQIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.diraya.biz"
+    },
+    {
+      "name": "send.team",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "team.diraya.biz"
+    },
+    {
+      "name": "send.team",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.diraya.biz"
+    }
+  ],
+  "dirayaget.com": [
+    {
+      "name": "resend._domainkey.hello",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCoUdoKyFWc9m12I13oEh5Y4PPE73beB9rv4GLE9k0VAJyUqUmF1VYj+yI5I6ri6pv9cPcIY+YC6N64/oFyg8bCAQxUsFZicxiKev8TxQG2Hs4tcUsP7XUMI3Ur7QXGvIuhOky5I7yzTpDesB5m/2QK7T4e27HRQRr1xs7dNGBP5wIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.dirayaget.com"
+    },
+    {
+      "name": "send.hello",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "hello.dirayaget.com"
+    },
+    {
+      "name": "send.hello",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.dirayaget.com"
+    },
+    {
+      "name": "resend._domainkey.team",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLnqg5WuvqP/x0eMMKNKoOG1ZVog7DLLODelSXtv36i2+hQEizBlZmTLMDr0nEhTXlcDcILMP4w9lccE64BBpNcXd1XHneLqqS2pHDuuMIWN4eVNkJ//ekh1cMAZXd8f+VxmNc/MMFxBtJsM7xTLr90gP9F8g4nY8pndT6EsH+nwIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.dirayaget.com"
+    },
+    {
+      "name": "send.team",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "team.dirayaget.com"
+    },
+    {
+      "name": "send.team",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.dirayaget.com"
+    }
+  ],
+  "diraya-marketing.shop": [
+    {
+      "name": "resend._domainkey.hello",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjbYJl3bXTvwPVt1XaPgPPm6Op2LNDKS57gRDGn05hPf63KHahYwH+GqpmyfE6HPquPNGZEeR7xm2XJSYya1LCAB1LjQ/3U+SpcpXAlUkgjlfvonukZCeE677uYMPR5ltY2bv+gD+TarlUUjybrxFvghrFFGd4hU7HmL+tSse5BwIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.diraya-marketing.shop"
+    },
+    {
+      "name": "send.hello",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "hello.diraya-marketing.shop"
+    },
+    {
+      "name": "send.hello",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "hello.diraya-marketing.shop"
+    },
+    {
+      "name": "resend._domainkey.team",
+      "type": "TXT",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDD0IFOZmPwh/VK2LCigfGzGNbASL7zHRI2iJkS7eUBXkf9YT4dQ6654G+hEi2uhBx+CaQHm8J6a3xihwMDRa82J/TVyHfn12uqWpSWCRcd6Sd4xcu5+YvKEx+NaUfnfu4hZx0kffPqtXWb5iIITnrhH6b/aNgXJaO0Rt0L8FnnTQIDAQAB",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.diraya-marketing.shop"
+    },
+    {
+      "name": "send.team",
+      "type": "MX",
+      "value": "feedback-smtp.us-east-1.amazonses.com",
+      "ttl": "Auto",
+      "priority": 10,
+      "_subdomain": "team.diraya-marketing.shop"
+    },
+    {
+      "name": "send.team",
+      "type": "TXT",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "ttl": "Auto",
+      "priority": null,
+      "_subdomain": "team.diraya-marketing.shop"
+    }
+  ]
+}

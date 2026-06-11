@@ -3,6 +3,11 @@ profiles/*.private.json
 sequences/hostinger.env
 sequences/relay.env
 sequences/supabase.env
+sequences/youtube.env
+sequences/twitch.env
+sequences/cmc.env
+sequences/search.env
+sequences/producthunt.env
 docker/.env
 bootstrap.env
 
@@ -66,3 +71,15 @@ Thumbs.db
 # TypeScript build cache
 **/tsconfig.tsbuildinfo
 **/*.tsbuildinfo
+.gstack/
+
+sequences/search.env
+sequences/cloudflare.env
+
+# ─── SaaS dashboard (Vite) ────────────────────────────────────────────────
+saas/.env
+saas/dist/
+
+# ─── Local caches / tool state ────────────────────────────────────────────
+.site_cache/
+.wrangler/

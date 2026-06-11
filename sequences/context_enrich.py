@@ -75,11 +75,14 @@ class EnrichedContext:
 
 def _fetch(url: str, timeout: int = 20) -> Optional[str]:
     try:
-        with httpx.Client(timeout=timeout, follow_redirects=True,
+        # verify=False: many small-business / agent sites have expired or mismatched
+        # TLS certs; we only READ public marketing pages here (no data is sent), so a
+        # bad cert should not block enrichment. Accept any 2xx (some servers answer 218).
+        with httpx.Client(timeout=timeout, follow_redirects=True, verify=False,
                           headers={"User-Agent": USER_AGENT,
                                    "Accept": "text/html,application/xhtml+xml"}) as c:
             r = c.get(url)
-            if r.status_code == 200 and "text/html" in r.headers.get("Content-Type", ""):
+            if 200 <= r.status_code < 300 and "text/html" in r.headers.get("Content-Type", ""):
                 return r.text
     except Exception:
         return None

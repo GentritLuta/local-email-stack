@@ -33,6 +33,12 @@ import sys
 import time
 from pathlib import Path
 
+# Console output uses Unicode arrows / checkmarks — Windows cp1252 chokes.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -64,8 +70,19 @@ def _resend_full_key() -> str | None:
     return env.get("RESEND_FULL_ACCESS_API_KEY") or env.get("RESEND_API_KEY") or None
 
 
-def _hostinger_token() -> str | None:
+def _hostinger_token(profile_slug: str | None = None) -> str | None:
+    """Look up a per-profile Hostinger API token first, then fall back to the
+    default. Profiles whose root domains live in separate Hostinger accounts
+    (e.g. atalsolidrocks.io vs aureonglobal.de) need their own tokens — set
+    HOSTINGER_API_TOKEN_<PROFILE_UPPER> in sequences/hostinger.env.
+    """
     env = _load_env_file(REPO_ROOT / "sequences" / "hostinger.env")
+    if profile_slug:
+        # underscore-stripped uppercase, matches the conventional env-var style
+        key = f"HOSTINGER_API_TOKEN_{profile_slug.replace('-', '_').upper()}"
+        per_profile = env.get(key)
+        if per_profile:
+            return per_profile
     return env.get("HOSTINGER_API_TOKEN") or env.get("HOSTINGER_TOKEN")
 
 
@@ -129,10 +146,25 @@ def hostinger_push_records(token: str, root_domain: str, records: list[dict]) ->
 
 
 def _record_payload(rec: dict) -> dict:
+    # Hostinger requires ttl as INT. Resend sometimes returns "Auto" or a
+    # string-typed number, which Hostinger 422-rejects ("must be an integer").
+    raw_ttl = rec.get("ttl", 3600)
+    try:
+        ttl_int = int(raw_ttl)
+    except (TypeError, ValueError):
+        ttl_int = 3600  # sensible default for SPF/DKIM/DMARC records
+    rec_type = rec.get("type")
+    content = rec.get("content") or rec.get("value") or ""
+    # MX records on Hostinger require the priority prefixed into content
+    # ("10 mx.example.com"). Resend returns priority as a separate field.
+    if rec_type == "MX":
+        priority = rec.get("priority", 10)
+        if not str(content).strip().split(" ")[0].isdigit():
+            content = f"{priority} {content}"
     return {"name":  rec.get("name", "@"),
-            "type":  rec.get("type"),
-            "ttl":   rec.get("ttl", 3600),
-            "records": [{"content": rec.get("content") or rec.get("value")}]}
+            "type":  rec_type,
+            "ttl":   ttl_int,
+            "records": [{"content": content}]}
 
 
 def _root_of(subdomain: str) -> str:
@@ -166,7 +198,7 @@ def _fresh_domain_entry(subdomain: str, resend_id: str | None = None) -> dict:
             "current_day":     0,
             "started_at":      None,
             "ramp_curve":      "snowball_v1",
-            "max_daily_sends": 90,
+            "max_daily_sends": 50,
             "reputation":      {"bounce_rate_7d": 0.0, "complaint_rate_7d": 0.0, "delivered_7d": 0, "last_check": None},
         },
     }
@@ -228,8 +260,11 @@ def cmd_add(args: argparse.Namespace) -> int:
                 "content": args.dkim_cname,
             })
 
-    # Push to Hostinger (or print)
-    token = _hostinger_token()
+    # Push to Hostinger (or print). Use a profile-scoped token if one exists
+    # (HOSTINGER_API_TOKEN_<PROFILE>) — different Hostinger accounts hold
+    # different domains, and the default token would be 403-rejected for
+    # any domain it doesn't own.
+    token = _hostinger_token(args.profile)
     if token:
         ok, msg = hostinger_push_records(token, root, records)
         print(f"→ Hostinger DNS push: {msg}")

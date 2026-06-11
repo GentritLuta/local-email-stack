@@ -1,0 +1,105 @@
+{
+  "name": "Team Minik — 7-email sequence (agent recruitment)",
+  "slug": "teamminik-default",
+  "profile_slug": "teamminik",
+  "created_at": "2026-06-07",
+  "finalized_at": "2026-06-07",
+  "target": "Licensed real estate agents (new and experienced) in the 22+ states Team Minik covers. Buying signals: recently licensed, posting about lead-gen struggles, at a high-fee/low-split brokerage, switching brokerages, top producers feeling capped. The offer: 85/15 split, $14k annual cap then 100 percent, no monthly or desk fees, real leads, coaching, and equity.",
+  "voice_notes": "Direct B2B prospecting. Michelle writes as the team lead, not as a company. Concrete numbers in every email (85/15, $14k cap, $354M volume, top 1 percent). Named lead-magnets: NUMBERS (a one-page income comparison vs the agent's current split) and LEADS (a breakdown of how the team's lead engine works). NO em-dashes, NO smart quotes, NO ellipses, NO exclamation marks, NO emojis. P.S. on every email with a second specific give. Required merges: {first_name}. Optional: {brokerage}.",
+  "offer_facts": {
+    "value_prop": "A real estate team where agents get real leads, hands-on coaching, full marketing and CRM, an 85/15 split that caps at 14,000 dollars a year and then pays 100 percent, no monthly or desk fees, and an equity and revenue-share opportunity.",
+    "proof_points": [
+      "Michelle Minik: 25 years, 1,534-plus clients, 354.4 million in volume",
+      "team: 16 agents, 49.2 million in 2025 volume, 1,636 total closed units",
+      "top 1 percent nationally, FastExpert Top 25 Agent in Arizona",
+      "featured on the Today Show with Barbara Corcoran and Fox 10 News"
+    ],
+    "differentiators": [
+      "real leads handed to you, not bought by you",
+      "85/15 split, 14k cap, then 100 percent retention",
+      "no monthly fees, no desk fees, no hidden costs",
+      "equity and revenue share, you build ownership not just commissions"
+    ],
+    "guarantee": "A 15-minute call where we map your current split against ours on paper. If you would not make more with us, I will tell you to stay where you are.",
+    "lead_magnet_primary": "A one-page income comparison: your current split vs 85/15 with the cap, on your real numbers. Reply NUMBERS.",
+    "lead_magnet_secondary": "A breakdown of exactly how our lead engine feeds agents consistent deals. Reply LEADS."
+  },
+  "required_merges": ["first_name"],
+  "schedule_doc": "delay_days = gap from prior step. 0,2,2,3,4,7,10 = cumulative day 0,2,4,7,11,18,28.",
+  "performance": {
+    "title": "Projected performance at 600 emails/day",
+    "disclaimer": "This is an estimate, not a promise or guarantee of results. Cold-email outcomes vary with list quality, deliverability, offer, market timing, and follow-up. The numbers below are modeled from typical B2B cold-outbound conversion rates applied to your own offer economics, shown conservative and optimistic so you can judge the range.",
+    "volume": {
+      "emails_per_day": 600,
+      "working_days_per_month": 22,
+      "sends_per_month": 13200
+    },
+    "funnel_label": "Recruitment funnel (agents)",
+    "rows": [
+      { "stage": "Emails sent / month", "cons_rate": "", "cons": "13,200", "opt_rate": "", "opt": "13,200" },
+      { "stage": "Replies", "cons_rate": "2.5%", "cons": "330", "opt_rate": "5%", "opt": "660" },
+      { "stage": "Positive / interested", "cons_rate": "20% of replies", "cons": "66", "opt_rate": "30% of replies", "opt": "198" },
+      { "stage": "Calls booked", "cons_rate": "35% of positives", "cons": "23", "opt_rate": "45% of positives", "opt": "89" },
+      { "stage": "Agents recruited", "cons_rate": "8% of calls", "cons": "2", "opt_rate": "15% of calls", "opt": "13" }
+    ],
+    "value_note": "Value per recruited agent: a recruited agent who closes even ~$3M in volume/year at a 3% gross commission generates ~$90,000 in commission; on the team's 15% share before the $14k cap that is roughly $13,500 to the team in year one (conservative; top producers are worth multiples of this, and agents compound year over year).",
+    "value_per_unit": 13500,
+    "value_unit_label": "per recruited agent / year (team share, conservative)",
+    "revenue_rows": [
+      { "label": "Conservative: 2 agents/mo x 12 = 24 agents/yr", "value": "~$324,000 / year in team commission share" },
+      { "label": "Optimistic: 13 agents/mo (ramped) ", "value": "multiples higher; capacity-limited, not lead-limited" }
+    ],
+    "bottom_line": "Even at the conservative end (2 new agents a month), the math points to roughly six figures a year in added team commission share from a single 600/day channel, before counting agent compounding, referrals, and lifetime value. The realistic constraint becomes how many new agents the team can onboard and coach well, not how many leads the campaign produces."
+  },
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "seq_open_question_give",
+      "subject": "quick question, {first_name}?",
+      "body": "Hi {first_name},\n\nQuick question, no pitch.\n\nI lead Team Minik, a real estate team at Realty of America. We hand agents real leads, full coaching and marketing, and an 85/15 split that caps at 14,000 dollars a year. After the cap you keep 100 percent. No monthly fees, no desk fees.\n\nLast year our team of 16 did 49.2 million in volume. I have personally closed 354 million over 25 years. The agents who join us stop buying their own leads and start closing the ones we give them.\n\nIf you are licensed and want consistent deal flow without chasing prospects, would 15 minutes be useful?\n\nIf the timing is off, reply with a no and I stop.\n\nP.s. whether we ever work together or not, reply NUMBERS and I send you a one-page comparison of your current split against ours, on your real numbers. Free, no call."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "seq_specificity_to_company",
+      "subject": "the math on your split",
+      "body": "Hi {first_name},\n\nFollow up on the leads and split point.\n\nHere is the specific path. On a 15-minute call we map your last 12 months against our model: your current split and fees versus 85/15 with the 14k cap, then 100 percent after. For most agents doing real volume, the cap changes the picture completely.\n\nThen I show you the lead engine, the coaching cadence, and the marketing we run for you so you are not building any of it yourself.\n\nNo desk fee to weigh against it. The only cost is one 750 dollar tech fee split over your first 3 deals.\n\n15 minutes this week to run your numbers?\n\nP.s. the income comparison is still yours if you want it without a call. Reply NUMBERS."
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "seq_data_point_dream_outcome",
+      "subject": "100 percent after the cap",
+      "body": "Hi {first_name},\n\nOne number.\n\n14,000 dollars. That is the annual cap. You split 85/15 until you have paid 14k in, and from that point you keep 100 percent of your commission for the rest of the year. No monthly fees eating at it, no desk fee.\n\nMost agents at high-split or fee-heavy brokerages never see that. They pay all year and still chase their own leads.\n\nThe agents on our team hit the cap and then run the back half of the year at full commission, on deals we help feed them. That is the dream outcome: more income on more deals, with less of it going to the brokerage.\n\n15 minutes to see where your numbers would land?\n\nP.s. happy to send the lead-engine breakdown so you can see how the deals actually come in. Reply LEADS."
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "seq_busy_ack_reason_why",
+      "subject": "you are busy, here is the math",
+      "body": "Hi {first_name},\n\nFourth email, you are clearly heads-down selling. Last note before I switch to give-only mode.\n\nHere is the math on why I keep writing.\n\nIf you stay where you are and keep paying fees and a worse split while buying your own leads, that gap compounds every closing. Over a year it is real money and real deals you did not get help on.\n\nIf you move to a team that caps your cost at 14k, hands you leads, and runs your marketing, the gap goes the other way.\n\nThe offer is a 15-minute call where we map it on paper. If you would not make more with us, I will tell you to stay. The downside is 15 minutes. The upside is the rest of your year at a better split with leads coming in.\n\nReply with a time or a no. Either one lets me move on cleanly.\n\nP.s. still happy to send the income comparison with no call. Reply NUMBERS."
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "seq_forced_yes_no",
+      "subject": "{first_name}, yes or no",
+      "body": "Hi {first_name},\n\nClean question.\n\nIf Team Minik handed you real leads, ran your marketing and CRM, gave you coaching, and put you on an 85/15 split that caps at 14k and then pays 100 percent with no monthly or desk fees, would you say yes to a 15-minute call to run your numbers?\n\nA clear yes or a clear no. Either one is the right answer for me.\n\nP.s. if it is a no on joining, the income comparison and the lead-engine breakdown are still yours. Reply NUMBERS or LEADS."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "seq_pure_value_double_give",
+      "subject": "two things you can use whether you join or not",
+      "body": "Hi {first_name},\n\nSwitching to give-only mode as promised.\n\nTwo things, both yours:\n\n1) A one-page income comparison. Send me your rough last-12-months numbers and I map your current split and fees against 85/15 with the cap, so you can see the difference in dollars. Reply NUMBERS.\n\n2) The lead-engine breakdown. Exactly how we generate and route consistent deals to agents, so you can judge whether it would work for you. Reply LEADS.\n\nNo call, no obligation, no follow-up sequence after this. Take either or both."
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "seq_breakup_value_open",
+      "subject": "closing your file with Team Minik",
+      "body": "Hi {first_name},\n\nClosing your file with Team Minik today. We bring on a small number of agents at a time so we can actually coach and feed everyone, and the next spots are filling.\n\nThree last things.\n\nIf the timing was wrong, that is fine. Tell me when your current agreement ends and I will reach back out then.\n\nIf the offer was wrong, tell me what would have landed and I will listen. I read every reply.\n\nIf nothing was right, no hard feelings. The income comparison and the lead-engine breakdown are still yours. Just reply NUMBERS or LEADS and I send them with no call attached.\n\nGood luck out there."
+    }
+  ]
+}

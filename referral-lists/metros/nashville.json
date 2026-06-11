@@ -1,0 +1,297 @@
+{
+  "metro": "Nashville",
+  "label": "Nashville and Middle Tennessee",
+  "basename": "Attorney-Referral-List-Nashville",
+  "match": {
+    "area_codes": [
+      "615",
+      "629",
+      "931"
+    ],
+    "states": [
+      "TN"
+    ],
+    "cities": [
+      "nashville",
+      "franklin",
+      "brentwood",
+      "murfreesboro",
+      "hendersonville",
+      "mount juliet",
+      "gallatin",
+      "lebanon",
+      "smyrna"
+    ],
+    "zip_prefixes": [
+      "370",
+      "371",
+      "372"
+    ]
+  },
+  "firms": [
+    {
+      "firm": "Crow Estate Planning & Probate, PLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "John W. Crow",
+      "practice": "Estate planning, wills, trusts & probate",
+      "city": "Nashville",
+      "phone": "615-558-8002",
+      "email": "",
+      "website": "https://www.johnwcrow.com",
+      "address": "1503 16th Ave S, Nashville, TN 37212"
+    },
+    {
+      "firm": "Cook Tillman Law Group",
+      "type": "Estate / Probate",
+      "lead_attorney": "Russ Cook",
+      "practice": "Estate planning, probate & trust administration",
+      "city": "Brentwood",
+      "phone": "615-370-2444",
+      "email": "info@cooktillmanlaw.com",
+      "website": "https://www.cooktillmanlaw.com",
+      "address": "5141 Virginia Way, Suite 220, Brentwood, TN 37027"
+    },
+    {
+      "firm": "Judy A. Oxford, Attorney at Law",
+      "type": "Estate / Probate",
+      "lead_attorney": "Judy A. Oxford",
+      "practice": "Probate & estate administration",
+      "city": "Brentwood",
+      "phone": "615-791-8511",
+      "email": "judy@judyoxfordlaw.com",
+      "website": "https://www.judyoxfordlaw.com",
+      "address": "1616 Westgate Circle, Suite 215, Brentwood, TN 37027"
+    },
+    {
+      "firm": "Mason & Associates Law Firm",
+      "type": "Estate / Probate",
+      "lead_attorney": "Jake Mason",
+      "practice": "Estate planning, elder law & probate",
+      "city": "Gallatin",
+      "phone": "615-989-7054",
+      "email": "info@planyourlegacy.com",
+      "website": "https://www.planyourlegacy.com",
+      "address": "880 Greenlea Blvd, Suite B, Gallatin, TN 37066"
+    },
+    {
+      "firm": "The Higgins Firm PLLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Jim Higgins",
+      "practice": "Estate planning & probate",
+      "city": "Nashville",
+      "phone": "615-353-0930",
+      "email": "",
+      "website": "https://www.higginsestategroup.com",
+      "address": "200 Hart St, Nashville, TN 37210"
+    },
+    {
+      "firm": "Linville Estate Law",
+      "type": "Estate / Probate",
+      "lead_attorney": "Trent Linville",
+      "practice": "Estate planning, probate & trust administration",
+      "city": "Franklin",
+      "phone": "615-567-3874",
+      "email": "hello@linvillelegal.com",
+      "website": "https://www.linvillelegal.com",
+      "address": "830 Crescent Centre Drive, Suite 320, Franklin, TN 37067"
+    },
+    {
+      "firm": "Knight Legal",
+      "type": "Estate / Probate",
+      "lead_attorney": "Ryan Knight",
+      "practice": "Estate planning, probate & business law",
+      "city": "Franklin",
+      "phone": "615-716-2063",
+      "email": "ryan@knightlegaltn.com",
+      "website": "https://www.knightlegaltn.com",
+      "address": "751 Cool Springs Blvd, Ste. 106, Franklin, TN 37067"
+    },
+    {
+      "firm": "Frank Steiner Law, PC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Frank Steiner",
+      "practice": "Probate & probate litigation",
+      "city": "Nashville",
+      "phone": "615-730-6090",
+      "email": "",
+      "website": "https://www.franksteinerlaw.com",
+      "address": "2200 21st Avenue South, Suite 309, Nashville, TN 37212"
+    },
+    {
+      "firm": "Garner Law Firm, PLLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Patti B. Garner",
+      "practice": "Estate planning, wills & trusts",
+      "city": "Hendersonville",
+      "phone": "615-502-4336",
+      "email": "",
+      "website": "https://pattibgarner.com",
+      "address": "145 Maple Row Blvd, Hendersonville, TN 37075"
+    },
+    {
+      "firm": "Law Offices of Adrian H. Altshuler & Associates",
+      "type": "Estate / Probate",
+      "lead_attorney": "Adrian H. Altshuler",
+      "practice": "Estate planning, wills & probate",
+      "city": "Franklin",
+      "phone": "615-977-9370",
+      "email": "",
+      "website": "https://www.altshulerlaw.com",
+      "address": "219 3rd Ave N, Franklin, TN 37064"
+    },
+    {
+      "firm": "Emmack Probate and Estate Law Group",
+      "type": "Estate / Probate",
+      "lead_attorney": "Shanone Emmack",
+      "practice": "Wills, trusts, probate & estate litigation",
+      "city": "Franklin",
+      "phone": "615-920-0906",
+      "email": "",
+      "website": "https://www.emmacklaw.com",
+      "address": "219 Third Avenue North, Franklin, TN 37064"
+    },
+    {
+      "firm": "Hazard Law, PLLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Rob Hazard",
+      "practice": "Estate planning, probate & business law",
+      "city": "Brentwood",
+      "phone": "615-208-4532",
+      "email": "",
+      "website": "https://hazard.law",
+      "address": "103 Powell Court, Suite 110, Brentwood, TN 37027"
+    },
+    {
+      "firm": "Miller Upshaw Family Law, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Karla C. Miller",
+      "practice": "Divorce & family law",
+      "city": "Nashville",
+      "phone": "615-391-4200",
+      "email": "",
+      "website": "https://www.nashvillefamilylaw.com",
+      "address": "631 Woodland Street, Nashville, TN 37206"
+    },
+    {
+      "firm": "Digby Family Law, PLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Sarah Digby",
+      "practice": "Divorce, child custody & adoption",
+      "city": "Brentwood",
+      "phone": "615-997-3741",
+      "email": "",
+      "website": "https://www.digbyfamilylaw.com",
+      "address": "5123 Virginia Way, Suite C-22, Brentwood, TN 37027"
+    },
+    {
+      "firm": "Widrig Law, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "James L. Widrig",
+      "practice": "Divorce, custody & child support",
+      "city": "Brentwood",
+      "phone": "615-417-7800",
+      "email": "",
+      "website": "https://www.widriglaw.com",
+      "address": "101 Westpark Dr #260, Brentwood, TN 37027"
+    },
+    {
+      "firm": "Stratton Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Bryan Stratton",
+      "practice": "Divorce, child custody & alimony",
+      "city": "Nashville",
+      "phone": "615-252-5791",
+      "email": "",
+      "website": "https://strattonlawtn.com",
+      "address": "3102 West End Avenue, Suite 400, Nashville, TN 37203"
+    },
+    {
+      "firm": "Fort, Holloway & Saylor, LLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Michael Fort",
+      "practice": "Divorce & family law",
+      "city": "Franklin",
+      "phone": "615-791-7575",
+      "email": "",
+      "website": "https://www.franklintndivorce.com",
+      "address": "517 Cummins St., Franklin, TN 37064"
+    },
+    {
+      "firm": "Boss Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Abigail L. Burnham",
+      "practice": "Divorce, child custody & support",
+      "city": "Murfreesboro",
+      "phone": "615-890-1548",
+      "email": "",
+      "website": "https://www.bosslawtn.com",
+      "address": "1423 Kensington Square Court, Murfreesboro, TN 37130"
+    },
+    {
+      "firm": "Kane & Crowell, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Angel Kane",
+      "practice": "Divorce & family law",
+      "city": "Lebanon",
+      "phone": "615-784-4800",
+      "email": "",
+      "website": "https://www.kane-law.com",
+      "address": "133 S. College St., Lebanon, TN 37087"
+    },
+    {
+      "firm": "McCarter | East PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Gilbert W. McCarter, II",
+      "practice": "Divorce, custody & child support",
+      "city": "Murfreesboro",
+      "phone": "615-570-3047",
+      "email": "",
+      "website": "https://www.mcelaw.com",
+      "address": "316 W Main St, Murfreesboro, TN 37130"
+    },
+    {
+      "firm": "The Cassell Firm",
+      "type": "Divorce / Family",
+      "lead_attorney": "J. Caleb Cassell",
+      "practice": "Divorce & family law",
+      "city": "Nashville",
+      "phone": "615-475-7041",
+      "email": "info@thecassellfirm.com",
+      "website": "https://www.thecassellfirm.com",
+      "address": "2000 Glen Echo Rd #113, Nashville, TN 37215"
+    },
+    {
+      "firm": "Middle Tennessee Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Tiffany Johns",
+      "practice": "Divorce & family law",
+      "city": "Franklin",
+      "phone": "615-614-8798",
+      "email": "",
+      "website": "https://www.middletennesseefamilylaw.com",
+      "address": "128 Holiday Ct, Ste 112, Franklin, TN 37067"
+    },
+    {
+      "firm": "The Law Office of Laurie Y. Young",
+      "type": "Divorce / Family",
+      "lead_attorney": "Laurie Y. Young",
+      "practice": "Divorce, custody & child support",
+      "city": "Murfreesboro",
+      "phone": "615-890-3656",
+      "email": "",
+      "website": "https://murfreesborofamilylaw.com",
+      "address": "119 N Maple St., Murfreesboro, TN 37130"
+    },
+    {
+      "firm": "MC Davis Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "MC Davis",
+      "practice": "Divorce, custody & property division",
+      "city": "Franklin",
+      "phone": "615-235-5620",
+      "email": "",
+      "website": "https://www.williamsondivorce.com",
+      "address": "2000 Meridian Boulevard, Suite 200, Franklin, TN 37067"
+    }
+  ]
+}

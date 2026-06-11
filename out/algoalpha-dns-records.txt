@@ -1,0 +1,59 @@
+### partners.algoalpha.io  (registrar TLD: .io)
+TXT   | name: resend._domainkey.partners | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHenZsu3Mob0QJn/oNAtR/8HYn9Zucx2QLn2cwMHiSqaKRD+OY/uxIXGlbI5W73BvGTQlvizF3m5tO9iFDlfIq82c6DtWfnk0qkR8WKIWORHaauxBZo4acxCREMS0f628/UhYt7aEJIn9Mu7GdCgup4WTHXIdzPqequlPdxq/TrwIDAQAB | ttl: Auto
+MX    | name: send.partners | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.partners | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### team.algoalpha.io  (registrar TLD: .io)
+TXT   | name: resend._domainkey.team | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfXTX/CbiDzO9Jza8xCrt9Zm9c0c+PxUtz6QkCpAdD4xbF5GsupL7jGbnGQWDe5CRKWfVTw9cijbQIrPdDn/nKJ+jXBN/GUYO/0MenBG0oSaXktyT84ZnjH6q0MkwCa0gt9yJBD7w5rb11E7QFPdmL2ykMx6yBGK3zUhyX4Q0czQIDAQAB | ttl: Auto
+MX    | name: send.team | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.team | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### growth.algoalpha.io  (registrar TLD: .io)
+TXT   | name: resend._domainkey.growth | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEviBcq3RHFwYto/SwPHsjraW70j7UGxbapcpuT4dLldbVvs2VJ0uz6X5Mpk2XcQ7cSt3iWD55Ur/UsVRAcDYaso4971JdBPMrHC5tfS5cOKAlwZfJ4CNamDg7PnV9xurPwljArBxQCdZODXBjgFhNpGUv9o/rjARAZIOqE4r3nwIDAQAB | ttl: Auto
+MX    | name: send.growth | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.growth | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### partners.algoalpha.co  (registrar TLD: .co)
+TXT   | name: resend._domainkey.partners | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxpxZJVCdLpKcO9fPU7UNYhND+JOY6EhICQGTmj4cUi93HgvXbY+J4dgdoJOjgzPztQcul5pOP/+JLsPqW+94BE4ulu/yGZmukWfcYAs+zRPpiObxzUtQxzcUZEfUZq2uxtQTUP7SO7i9f0/btsj7SS8psG+392cnGw1oz3Q2fXQIDAQAB | ttl: Auto
+MX    | name: send.partners | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.partners | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### team.algoalpha.co  (registrar TLD: .co)
+TXT   | name: resend._domainkey.team | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5r9yEQT/mw+K1XN/17SS6J5U7LTtwzAB0oagJVPFcoTsnyBjvQXDw74PCRSXDdG6ZmVhysN14CZJzFpnQzwtbJlthiWtoLbdzqIpef+YlqNyHNVdcXzT8HczIR5KQaQb8b5SgC2ay7vgu/KwB2oHAhBLtoPMO+zgPnDw9fxXlAwIDAQAB | ttl: Auto
+MX    | name: send.team | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.team | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### growth.algoalpha.co  (registrar TLD: .co)
+TXT   | name: resend._domainkey.growth | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEV+iPAgRcsBR8OCPz5sGOOhhFiTr+1Qlp1lKhbe3Evs2jIebmkbByeaTiLisJkyibBbhmaDhHvwp6StXLTtFIwriZpCnLAQHQnNMjNKwYaWU1Fm0kLJpFyNt7UzzyH7hraTrZG+VJWM1aBCo5LEghnkzjCM43LcbxTLUW+6bXbwIDAQAB | ttl: Auto
+MX    | name: send.growth | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.growth | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### partners.algoalpha.app  (registrar TLD: .app)
+TXT   | name: resend._domainkey.partners | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/evcw3zLi1/o4Xzq9SEP1E3lvkLt47fVe5HfX80W6ZLLCAm+lz7iA39mkUuIVCb8LTa+lPRoHZ4uRaWD4cjr0QwSE81GZwKkZUKCaECJ/7pgwOv8jOdkSWgHJ4yeSApZQw520czvFeX1Ejz/uYK3meBkChjfI/8HEg96xwpQPQQIDAQAB | ttl: Auto
+MX    | name: send.partners | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.partners | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### team.algoalpha.app  (registrar TLD: .app)
+TXT   | name: resend._domainkey.team | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/Jefq097agZQ8s+O6Eszktpd84SPVaqlnAeGjz8FVVM2dLdLNg2sR9e1vMKgY4zQKuHwXy2L0Odq1/ta4TsaqwoDWCBiOE1afvxrHqjzzAEbJkbTyqiZtDQpftEYqprV/vOJRhvzW70aebn94NT7PjEsqSet05am8uDEb03/7MQIDAQAB | ttl: Auto
+MX    | name: send.team | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.team | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### growth.algoalpha.app  (registrar TLD: .app)
+TXT   | name: resend._domainkey.growth | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCYdRAPj87yd4H7lzqv6h2l1aZvJMrrdQWjm1JSpiiO2ADZGe4xilCMNVnmXi3s+lUpu2L+gi+xqpFFk2qu9oCYSAVj4xTFmgbNp+YQiwiPx7WgBQDTqjulrnHsK2mr8mustGUNvADhqs0LlJT5b7vaajLI3S2URLbVMKqMOQVn5QIDAQAB | ttl: Auto
+MX    | name: send.growth | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.growth | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### partners.algoalpha.trade  (registrar TLD: .trade)
+TXT   | name: resend._domainkey.partners | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQChg3pIpcZWfCGlI415324XloYRRPjA5B2fi9Rm9SbMVaJGUgnZSQOB4Li9khaIsDMOFx0XvGR97ROKvFmaY+TYefdYw4CoXm/80qC+9iaBWIi1Xp1ekkcYfVt9BQ5tZ3L9zj/D7j3cSDUtz2MZDxKRJhEF1Ehnqh+HkW8dxylkhQIDAQAB | ttl: Auto
+MX    | name: send.partners | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.partners | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### team.algoalpha.trade  (registrar TLD: .trade)
+TXT   | name: resend._domainkey.team | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDl8TxIp1b0BSQFHwJu4x9T2jkbXSiEFOUEKMp9A91wj/2hVVjTXLzMmfgkO4dSBXuHSPdOSY3Vrs6FEEKRYoNpXGcssVLe0jakZEO5VJi2/dPeS0Rhy2v/rZcNAXG+87PEZYVNfcAMZsuEONlG0pugKIj5Abn+lLtYub3HkKIymwIDAQAB | ttl: Auto
+MX    | name: send.team | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.team | value: v=spf1 include:amazonses.com ~all | ttl: Auto
+
+### growth.algoalpha.trade  (registrar TLD: .trade)
+TXT   | name: resend._domainkey.growth | value: p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCcyOG853GIm141GNdiGJXWJuayn7MammRVOTUmAqYaYzKbvCKqsKm6eeFh/SbanqwDoCVqAOl04Ya5KKxWuRKP0/Mqs2YFcL4P42LvJZ6nyRY+djEn7B+hS0Bzq5uM4Js2mEPTPpE4kd+DA0EV7Wm4ma6KDVfR20SeNf7sWXt7EQIDAQAB | ttl: Auto
+MX    | name: send.growth | value: feedback-smtp.eu-west-1.amazonses.com | ttl: Auto | priority: 10
+TXT   | name: send.growth | value: v=spf1 include:amazonses.com ~all | ttl: Auto

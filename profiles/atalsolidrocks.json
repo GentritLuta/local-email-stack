@@ -1,0 +1,1045 @@
+{
+  "slug": "atalsolidrocks",
+  "name": "Atal SolidRocks",
+  "created_at": "2026-05-21",
+  "active": false,
+  "company": {
+    "legal_name": "Atal SolidRocks",
+    "website": "https://atalsolidrocks.io",
+    "root_domain": "atalsolidrocks.io",
+    "target_market": "DACH (Germany, Austria, Switzerland)"
+  },
+  "_note": "Provisioned 2026-05-21 — 12 name-based subdomains added but NOT yet sending. Region eu-west-1 (Resend Frankfurt-adjacent) for DACH latency. Personas + warmup + variants to be added in a later setup pass.",
+  "relay": {
+    "backend": "resend",
+    "resend_region": "eu-west-1",
+    "resend_api_key": "",
+    "_note": "resend_api_key lives in atalsolidrocks.private.json (gitignored). Reuses the existing Resend Pro account shared by aureon/algoalpha/f2.",
+    "from_domains": [
+      {
+        "domain": "lukas.atalsolidrocks.io",
+        "resend_domain_id": "ee9cf503-f90f-451b-a825-60553628f24c",
+        "verified_at": "2026-05-21T16:16:58.320575+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "anna.atalsolidrocks.io",
+        "resend_domain_id": "2081f3ab-9921-40f4-81aa-bac4237265f1",
+        "verified_at": "2026-05-21T16:16:58.877504+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "tobias.atalsolidrocks.io",
+        "resend_domain_id": "39f4ca05-dbb5-44e1-bb8b-a633b175d5c9",
+        "verified_at": "2026-05-21T16:16:59.388684+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "lea.atalsolidrocks.io",
+        "resend_domain_id": "bea28933-7cf7-4633-8edf-f72b0fb34769",
+        "verified_at": "2026-05-21T16:17:00.063614+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "felix.atalsolidrocks.io",
+        "resend_domain_id": "c8312c85-6574-46d7-a9fd-b2c09afe58fb",
+        "verified_at": "2026-05-21T16:17:00.579498+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "sara.atalsolidrocks.io",
+        "resend_domain_id": "b000f792-f95c-43d7-b7d8-6ddbe2def334",
+        "verified_at": "2026-05-21T16:17:01.121629+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "jonas.atalsolidrocks.io",
+        "resend_domain_id": "f522159b-9b23-4741-ad94-ceae6ac3247e",
+        "verified_at": "2026-05-21T16:17:01.643303+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "mira.atalsolidrocks.io",
+        "resend_domain_id": "5bce0449-f90c-481e-9709-6a83aeec49a9",
+        "verified_at": "2026-05-21T16:17:02.158376+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "niklas.atalsolidrocks.io",
+        "resend_domain_id": "36715dca-6705-4277-bc0a-19998b39e1a1",
+        "verified_at": "2026-05-21T16:17:02.675367+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "lena.atalsolidrocks.io",
+        "resend_domain_id": "bd42b384-c06a-4a67-8c0e-d95cd499c7e9",
+        "verified_at": "2026-05-21T16:17:03.205317+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "elias.atalsolidrocks.io",
+        "resend_domain_id": "9421c3b0-f2e0-4616-9ee9-7bf5256cc387",
+        "verified_at": "2026-05-21T16:17:03.724768+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "nora.atalsolidrocks.io",
+        "resend_domain_id": "685bb3fd-e4ee-4d04-8ee4-75b7a59595ae",
+        "verified_at": "2026-05-21T16:17:04.307970+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "lukas.atalsolidrocks.com",
+        "resend_domain_id": "310b85c0-f361-4f23-be59-e6f63ca0f588",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "anna.atalsolidrocks.com",
+        "resend_domain_id": "a95fc236-2d90-4518-8c4d-6e40a326be89",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "tobias.atalsolidrocks.com",
+        "resend_domain_id": "3ab9df2e-a4be-417b-bde1-86b0dbff020d",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "lea.atalsolidrocks.com",
+        "resend_domain_id": "181785f2-145a-4d33-b4ed-c349b6dcad5a",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "felix.atalsolidrocks.com",
+        "resend_domain_id": "daab631d-e5fb-4fea-bbed-7a5d0eeb56db",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "sara.atalsolidrocks.com",
+        "resend_domain_id": "12d97687-e3b7-4ddd-9549-4fd1c6ff317a",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "jonas.atalsolidrocks.com",
+        "resend_domain_id": "a5420d39-dd23-40e8-b657-68b68c21d796",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "mira.atalsolidrocks.com",
+        "resend_domain_id": "2cafbd58-be0a-44a9-8283-02e7b3372716",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "niklas.atalsolidrocks.com",
+        "resend_domain_id": "571f10cf-f419-4543-99a8-fb75a6a29d0e",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "lena.atalsolidrocks.com",
+        "resend_domain_id": "5f656d81-114a-4bf0-8f2a-c925219a01ac",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "elias.atalsolidrocks.com",
+        "resend_domain_id": "f83e0406-cb10-41ef-af7a-0c41559d96d4",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "nora.atalsolidrocks.com",
+        "resend_domain_id": "f9b7bc3d-5de3-4d81-a1c2-bc200e22c73b",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ]
+  },
+  "personas": [
+    {
+      "slug": "lukas",
+      "from_name": "Lukas from Atal SolidRocks",
+      "from_addr": "lukas@lukas.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Lukas Becker\nAtal SolidRocks"
+    },
+    {
+      "slug": "anna",
+      "from_name": "Anna from Atal SolidRocks",
+      "from_addr": "anna@anna.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Anna Hofmann\nAtal SolidRocks"
+    },
+    {
+      "slug": "tobias",
+      "from_name": "Tobias from Atal SolidRocks",
+      "from_addr": "tobias@tobias.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Tobias Meyer\nAtal SolidRocks"
+    },
+    {
+      "slug": "lea",
+      "from_name": "Lea from Atal SolidRocks",
+      "from_addr": "lea@lea.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Lea Schmidt\nAtal SolidRocks"
+    },
+    {
+      "slug": "felix",
+      "from_name": "Felix from Atal SolidRocks",
+      "from_addr": "felix@felix.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Felix Weber\nAtal SolidRocks"
+    },
+    {
+      "slug": "sara",
+      "from_name": "Sara from Atal SolidRocks",
+      "from_addr": "sara@sara.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Sara Müller\nAtal SolidRocks"
+    },
+    {
+      "slug": "jonas",
+      "from_name": "Jonas from Atal SolidRocks",
+      "from_addr": "jonas@jonas.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Jonas Fischer\nAtal SolidRocks"
+    },
+    {
+      "slug": "mira",
+      "from_name": "Mira from Atal SolidRocks",
+      "from_addr": "mira@mira.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Mira Wagner\nAtal SolidRocks"
+    },
+    {
+      "slug": "niklas",
+      "from_name": "Niklas from Atal SolidRocks",
+      "from_addr": "niklas@niklas.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Niklas Klein\nAtal SolidRocks"
+    },
+    {
+      "slug": "lena",
+      "from_name": "Lena from Atal SolidRocks",
+      "from_addr": "lena@lena.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Lena Bauer\nAtal SolidRocks"
+    },
+    {
+      "slug": "elias",
+      "from_name": "Elias from Atal SolidRocks",
+      "from_addr": "elias@elias.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Elias Richter\nAtal SolidRocks"
+    },
+    {
+      "slug": "nora",
+      "from_name": "Nora from Atal SolidRocks",
+      "from_addr": "nora@nora.atalsolidrocks.io",
+      "reply_to": "info@atalsolidrocks.io",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Nora Schulz\nAtal SolidRocks"
+    },
+    {
+      "slug": "lukas-com",
+      "from_name": "Lukas from Atal SolidRocks",
+      "from_addr": "lukas@lukas.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Lukas Becker\nAtal SolidRocks"
+    },
+    {
+      "slug": "anna-com",
+      "from_name": "Anna from Atal SolidRocks",
+      "from_addr": "anna@anna.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Anna Hofmann\nAtal SolidRocks"
+    },
+    {
+      "slug": "tobias-com",
+      "from_name": "Tobias from Atal SolidRocks",
+      "from_addr": "tobias@tobias.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Tobias Meyer\nAtal SolidRocks"
+    },
+    {
+      "slug": "lea-com",
+      "from_name": "Lea from Atal SolidRocks",
+      "from_addr": "lea@lea.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Lea Schmidt\nAtal SolidRocks"
+    },
+    {
+      "slug": "felix-com",
+      "from_name": "Felix from Atal SolidRocks",
+      "from_addr": "felix@felix.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Felix Weber\nAtal SolidRocks"
+    },
+    {
+      "slug": "sara-com",
+      "from_name": "Sara from Atal SolidRocks",
+      "from_addr": "sara@sara.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Sara Müller\nAtal SolidRocks"
+    },
+    {
+      "slug": "jonas-com",
+      "from_name": "Jonas from Atal SolidRocks",
+      "from_addr": "jonas@jonas.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Jonas Fischer\nAtal SolidRocks"
+    },
+    {
+      "slug": "mira-com",
+      "from_name": "Mira from Atal SolidRocks",
+      "from_addr": "mira@mira.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Mira Wagner\nAtal SolidRocks"
+    },
+    {
+      "slug": "niklas-com",
+      "from_name": "Niklas from Atal SolidRocks",
+      "from_addr": "niklas@niklas.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Niklas Klein\nAtal SolidRocks"
+    },
+    {
+      "slug": "lena-com",
+      "from_name": "Lena from Atal SolidRocks",
+      "from_addr": "lena@lena.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Lena Bauer\nAtal SolidRocks"
+    },
+    {
+      "slug": "elias-com",
+      "from_name": "Elias from Atal SolidRocks",
+      "from_addr": "elias@elias.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Elias Richter\nAtal SolidRocks"
+    },
+    {
+      "slug": "nora-com",
+      "from_name": "Nora from Atal SolidRocks",
+      "from_addr": "nora@nora.atalsolidrocks.com",
+      "reply_to": "info@atalsolidrocks.com",
+      "title": "Account Executive",
+      "voice": {
+        "register": "höflich-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "Sie-Form"
+        ],
+        "avoid": [
+          "Marketing-Floskeln",
+          "Ausrufezeichen",
+          "Emojis"
+        ]
+      },
+      "signature": "Nora Schulz\nAtal SolidRocks"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin"
+  },
+  "send_ramp": {
+    "started_at": null
+  },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.003
+    },
+    "reputation": {
+      "bounce_rate_7d": 0,
+      "complaint_rate_7d": 0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "started_at": null,
+    "current_day": 0,
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    {
+      "from_day": 1,
+      "daily": 15
+    },
+    {
+      "from_day": 8,
+      "daily": 25
+    },
+    {
+      "from_day": 15,
+      "daily": 35
+    },
+    {
+      "from_day": 22,
+      "daily": 50
+    }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "Europe/Berlin",
+    "target_audience_note": "DACH B2B. 08:00-17:00 local time (DE/AT/CH). Per-prospect city lookup overrides; default Europe/Berlin for unresolved .de/.io/.com."
+  },
+  "brand": {
+    "wordmark": "Atal SolidRocks",
+    "site": "atalsolidrocks.com",
+    "tagline": "Weniger Krankenstand im Mittelstand. Messbar, in 90 Tagen.",
+    "font_stack": "\"Plus Jakarta Sans\", sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+    "colors": {
+      "accent": "#1e3a8a",
+      "accent_2": "#0f172a",
+      "text": "#0f172a",
+      "text_2": "#475569",
+      "muted": "#94a3b8",
+      "bg_page": "#f8fafc",
+      "bg_card": "#ffffff",
+      "rule": "#e2e8f0"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/atalsolidrocks.html?t={token}",
+    "legal": {
+      "company_name": "Atal SolidRocks",
+      "address_lines": [
+        "Atal SolidRocks",
+        "DACH"
+      ],
+      "contact_email": "info@atalsolidrocks.io",
+      "copyright_year": 2026,
+      "logo_url": "",
+      "logo_width": 140,
+      "privacy_policy_url": "https://atalsolidrocks.com/datenschutz",
+      "terms_of_service_url": "https://atalsolidrocks.com/agb",
+      "legal_disclaimer": "Diese Nachricht ist ausschliesslich für den Empfänger bestimmt. Wenn Sie nicht der richtige Empfänger sind, löschen Sie die E-Mail bitte und informieren Sie den Absender.",
+      "partner_notice": "Sie erhalten diese Nachricht, weil wir glauben, dass unser Angebot für Sie relevant sein könnte. Mit einem Klick abmelden."
+    },
+    "_note_legal": "Mailbox info@atalsolidrocks.io muss noch in Hostinger Email eingerichtet werden, damit DMARC-Reports + Reply-To funktionieren.",
+    "template": "atalsolidrocks-custom"
+  },
+  "_note_com": "2026-05-28: 12 .com subdomains + personas added for double output. Unverified until atalsolidrocks.com DNS is published + verified in Resend; warmup day 0 so no sends until started."
+}

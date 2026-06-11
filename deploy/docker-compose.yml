@@ -1,0 +1,55 @@
+# docker-compose.yml — VPS deployment for local-email-stack.
+#
+# Single service running cron + all scheduled tasks. Secrets live in
+# .env (gitignored, mounted at /app/secrets). State persists in named
+# volumes so container restarts don't lose warmup day counters.
+#
+# Deploy:
+#   1. Copy repo to VPS (rsync / git clone)
+#   2. Place sequences/supabase.env + sequences/hostinger.env into ./secrets/
+#      (these are loaded at runtime; gitignored on the host repo)
+#   3. docker compose up -d
+#   4. docker compose logs -f les  # live cron output
+#   5. docker compose exec les python scripts/watchdog.py  # ad-hoc
+
+version: "3.9"
+
+services:
+  les:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: local-email-stack:latest
+    container_name: les
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      # Secrets at runtime (env files)
+      - ./secrets/supabase.env:/app/sequences/supabase.env:ro
+      - ./secrets/hostinger.env:/app/sequences/hostinger.env:ro
+      - ./secrets/youtube.env:/app/sequences/youtube.env:ro
+      # Persistent state — warmup day counters, watchdog log, cron log
+      - les-state:/app/warmup-state
+      # Generated outputs (sample renders, DNS records, etc.)
+      - les-out:/app/out
+      # Live-editable profile JSONs (so you can flip warmup.started_at
+      # or update copy without rebuilding the image)
+      - ../profiles:/app/profiles
+      # Niche YAMLs (seed_urls etc.)
+      - ../niches:/app/niches
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /app/warmup-state/cron.log && tail -n 50 /app/warmup-state/cron.log | grep -q . || exit 1"]
+      interval: 10m
+      timeout: 30s
+      retries: 3
+      start_period: 5m
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: "5"
+
+volumes:
+  les-state:
+  les-out:

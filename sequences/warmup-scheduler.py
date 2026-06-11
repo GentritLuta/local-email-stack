@@ -140,16 +140,19 @@ def _tick_profile(profile: dict, force_window: bool = False) -> dict:
     print(f"\n=== {profile['name']} ({slug})")
     domains = iter_send_domains(profile, only_verified=True, only_enabled=False)
     if not domains:
-        print("  no verified sending domains in relay.from_domains — skipping")
+        print("  no verified sending domains in relay.from_domains - skipping")
         return {"slug": slug, "skipped": "no_domains"}
 
     targets = (profile.get("warmup") or {}).get("warmup_targets") or []
-    if not targets:
-        print(f"  no warmup_targets configured — fill profile.warmup.warmup_targets first")
+    advance_only = bool((profile.get("warmup") or {}).get("advance_only_mode"))
+    if not targets and not advance_only:
+        print(f"  no warmup_targets configured - fill profile.warmup.warmup_targets first")
         return {"slug": slug, "skipped": "no_targets"}
 
-    if not _within_send_window() and not force_window:
-        print(f"  outside 09:00–18:00 send window — deferring (re-run later)")
+    # In advance_only mode we still want to bump current_day even outside the
+    # 09:00-18:00 human-hours window, since no actual outbound mail is sent.
+    if not advance_only and not _within_send_window() and not force_window:
+        print(f"  outside 09:00-18:00 send window - deferring (re-run later)")
         return {"slug": slug, "deferred": True}
 
     per_domain_status = []
@@ -173,12 +176,12 @@ def _tick_domain(profile: dict, d: dict, targets: list[str]) -> dict:
     domain = d["domain"]
     w = d.setdefault("warmup", {})
     if not w.get("enabled", True):
-        print(f"  · {domain}: warmup disabled — skipping")
+        print(f"  - {domain}: warmup disabled - skipping")
         return {"domain": domain, "skipped": "disabled"}
 
     blocked, why = reputation_exceeded_for_domain(profile, d)
     if blocked:
-        print(f"  · {domain}: PAUSED — {why}")
+        print(f"  - {domain}: PAUSED - {why}")
         return {"domain": domain, "paused": True, "reason": why,
                 "current_day": current_warmup_day_for_domain(d)}
 
@@ -187,13 +190,21 @@ def _tick_domain(profile: dict, d: dict, targets: list[str]) -> dict:
         w["started_at"] = today_iso()
         w["current_day"] = 1
         day = 1
-        print(f"  · {domain}: starting warmup → day 1")
+        print(f"  - {domain}: starting warmup -> day 1")
+
+    advance_only = bool((profile.get("warmup") or {}).get("advance_only_mode"))
+    if advance_only:
+        w["current_day"] = day + 1
+        print(f"  - {domain}: advance_only -> day {day + 1} (cap will read curve next tick)")
+        return {"domain": domain, "current_day": w["current_day"],
+                "mode": "advance_only", "warmup_planned": 0,
+                "warmup_sent": 0, "warmup_failed": 0}
 
     daily = daily_target_for_domain(profile, d)
     pct   = warmup_pct_for(profile, day)
     n_warm = max(1, int(round(daily * pct)))
 
-    print(f"  · {domain}: day {day} — daily {daily}, warmup {n_warm}")
+    print(f"  - {domain}: day {day} - daily {daily}, warmup {n_warm}")
 
     sent  = 0
     fails = 0
@@ -212,9 +223,9 @@ def _tick_domain(profile: dict, d: dict, targets: list[str]) -> dict:
 
     if n_warm == 0 or sent / max(n_warm, 1) >= 0.6:
         w["current_day"] = day + 1
-        print(f"  · {domain}: advanced to day {day + 1}")
+        print(f"  - {domain}: advanced to day {day + 1}")
     else:
-        print(f"  · {domain}: send success {sent}/{n_warm} below threshold — not advancing")
+        print(f"  - {domain}: send success {sent}/{n_warm} below threshold - not advancing")
 
     return {"domain": domain, "current_day": w["current_day"],
             "daily": daily, "warmup_planned": n_warm,
@@ -284,11 +295,11 @@ def _print_status_for(profile: dict) -> None:
           f"complaint_7d={rep.get('complaint_rate_7d',0):.4f}  "
           f"delivered_7d={rep.get('delivered_7d',0)}")
     if blocked:
-        print(f"  ⚠ PAUSED:    {why}")
+        print(f"  ! PAUSED:    {why}")
     targets = w.get('warmup_targets') or []
     print(f"  targets:       {len(targets)} address(es)")
     if not targets:
-        print(f"  → add 3–5 friendly inboxes in profile.warmup.warmup_targets")
+        print(f"  -> add 3-5 friendly inboxes in profile.warmup.warmup_targets")
 
 
 def main() -> int:

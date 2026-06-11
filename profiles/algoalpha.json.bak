@@ -1,0 +1,253 @@
+{
+  "slug": "algoalpha",
+  "name": "AlgoAlpha — Creator partnership program for crypto traders",
+  "created_at": "2026-05-17",
+  "active": true,
+  "company": {
+    "name": "AlgoAlpha",
+    "site": "algoalpha.io",
+    "tagline": "TradingView indicators & crypto signals for 75k+ active traders"
+  },
+  "brand": {
+    "wordmark": "AlgoAlpha",
+    "site": "algoalpha.io",
+    "tagline": "TradingView indicators & live crypto signals for 75k+ active traders",
+    "font_stack": "Inter, \"Inter Fallback\", ui-sans-serif, system-ui, sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
+    "colors": {
+      "accent": "#ffd400",
+      "accent_2": "#c9165b",
+      "text": "#0a0a0a",
+      "text_2": "#475569",
+      "muted": "#94a3b8",
+      "bg_page": "#fafafa",
+      "bg_card": "#ffffff",
+      "rule": "#e5e7eb"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/algoalpha.html?t={token}",
+    "legal": {
+      "company_name": "AlgoAlpha",
+      "address_lines": [
+        "c/o AlgoAlpha",
+        "Lisbon, Portugal"
+      ],
+      "contact_email": "support@algoalpha.io",
+      "ceo": "Tomás Silva",
+      "vat_number": "PT-PENDING",
+      "registration_number": "PT-PENDING",
+      "copyright_year": 2026,
+      "logo_url": "https://algoalpha.io/file.svg",
+      "logo_width": 80,
+      "privacy_policy_url": "https://algoalpha.io/privacy",
+      "terms_of_service_url": "https://algoalpha.io/terms",
+      "legal_disclaimer": "This message is intended for the addressee only and may contain confidential or proprietary information. If you are not the intended recipient, please delete it and notify the sender. Unauthorised review, redistribution, or use is prohibited.",
+      "partner_notice": "You're receiving this because we believe AlgoAlpha's tooling for systematic crypto traders is relevant to your work. Unsubscribe with one click and we won't reach out again."
+    },
+    "_note_legal": "VAT/Reg numbers above are placeholders — replace with the real Portuguese registration when AlgoAlpha is formally incorporated, or leave the placeholder out of the rendered footer until then.",
+    "template": "algoalpha-custom"
+  },
+  "relay": {
+    "backend": "resend",
+    "resend_region": "eu-west-1",
+    "resend_api_key": "",
+    "_note": "resend_api_key in algoalpha.private.json (gitignored). Uses Aureon's full-access key since AlgoAlpha shares the aureonglobal.de Resend domain pool while its own *.algoalpha.io subdomains are pending.",
+    "_pool_note": "Allocated 3 of the 10 verified aureonglobal.de subdomains exclusively to AlgoAlpha. The other 7 are split: 3 → aureon (own brand), 2 → lk-advertising, 2 → f2-malergipser.",
+    "from_domains": [
+      {
+        "domain": "team.aureonglobal.de",
+        "resend_domain_id": "e95c6ecb-2cd1-47e9-8d5d-76ae0c27df4a",
+        "verified_at": "2026-05-17T18:27:07.322179Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 3,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "desk.aureonglobal.de",
+        "resend_domain_id": "864d41ed-88bd-4c0a-820e-950c6e11fb82",
+        "verified_at": "2026-05-17T18:27:10.164646Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 3,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hub.aureonglobal.de",
+        "resend_domain_id": "d6e0bf1d-087b-4b3d-941e-6fee3bfd06cc",
+        "verified_at": "2026-05-17T18:24:16.965265Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 3,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ]
+  },
+  "personas": [
+    {
+      "slug": "tomas",
+      "from_name": "Tomas from AlgoAlpha",
+      "from_addr": "tomas@team.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Creator Partnerships, AlgoAlpha",
+      "voice": {
+        "register": "calm-technical",
+        "quirks": [
+          "specific numbers"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Tomás Silva\nCreator Partnerships, AlgoAlpha"
+    },
+    {
+      "slug": "marcus",
+      "from_name": "Marcus from AlgoAlpha",
+      "from_addr": "marcus@desk.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Head of Creator Growth, AlgoAlpha",
+      "voice": {
+        "register": "direct-warm",
+        "quirks": [
+          "specific data points"
+        ],
+        "avoid": [
+          "corporate-speak"
+        ]
+      },
+      "signature": "Marcus Chen\nHead of Creator Growth, AlgoAlpha"
+    },
+    {
+      "slug": "iris",
+      "from_name": "Iris from AlgoAlpha",
+      "from_addr": "iris@hub.aureonglobal.de",
+      "reply_to": "support@algoalpha.io",
+      "title": "Creator Onboarding Lead, AlgoAlpha",
+      "voice": {
+        "register": "precise-friendly",
+        "quirks": [
+          "one question per email",
+          "names a real metric"
+        ],
+        "avoid": [
+          "fluff"
+        ]
+      },
+      "signature": "Iris Walsh\nCreator Onboarding Lead, AlgoAlpha"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 30,
+    "min_seconds_between_sends_same_persona": 180,
+    "_comment": "Capped at 2/persona × 10 personas = 20/day for first week. send_ramp below auto-scales this up."
+  },
+  "send_ramp": {
+    "_doc": "Per-profile new-sender ramp. The sequence-runner reads max_per_persona_today() from this curve at every tick. Even though our 10 subdomains are mature (shared from Aureon), the FROM addresses (tomas@, sara@...) are new identities and need their own warmup so ISPs trust them. Curve hits 20/persona × 10 personas = 200/day target on day 22.",
+    "started_at": "2026-05-18",
+    "curve": [
+      {
+        "from_day": 1,
+        "per_persona": 1
+      },
+      {
+        "from_day": 4,
+        "per_persona": 3
+      },
+      {
+        "from_day": 8,
+        "per_persona": 5
+      },
+      {
+        "from_day": 15,
+        "per_persona": 10
+      },
+      {
+        "from_day": 22,
+        "per_persona": 20
+      }
+    ]
+  },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "real_send_mix": [
+      {
+        "until_day": 14,
+        "warmup_pct": 80
+      },
+      {
+        "until_day": 30,
+        "warmup_pct": 30
+      },
+      {
+        "until_day": 45,
+        "warmup_pct": 10
+      },
+      {
+        "until_day": 9999,
+        "warmup_pct": 5
+      }
+    ],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.001
+    },
+    "started_at": "2026-05-29",
+    "current_day": 1,
+    "ramp_curve": "snowball_v1",
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    {
+      "from_day": 1,
+      "daily": 15
+    },
+    {
+      "from_day": 8,
+      "daily": 25
+    },
+    {
+      "from_day": 15,
+      "daily": 35
+    },
+    {
+      "from_day": 22,
+      "daily": 50
+    }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/New_York",
+    "target_audience_note": "Crypto/trading creators (US-skewed, global). 08:00-17:00 in recipient local time. Default America/New_York for unresolved TLDs (.com/.io). Per-prospect city lookup overrides."
+  }
+}

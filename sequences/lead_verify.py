@@ -61,10 +61,131 @@ DISPOSABLE_DOMAINS = {
 # Role-based local parts that we don't want for personalized outreach
 # (campaigns target individuals, not generic inboxes).
 GENERIC_LOCAL_PARTS = {
+    # Classic role mailboxes
     "info", "contact", "hello", "sales", "admin", "support", "noreply",
     "no-reply", "office", "team", "marketing", "recruiting", "hr", "jobs",
     "press", "media", "billing", "accounts", "help", "service", "feedback",
     "abuse", "postmaster", "webmaster", "general", "inquiries", "enquiries",
+    "careers", "legal", "privacy", "compliance", "security", "dpo",
+    # CTA / commerce junk — scraped from "Get more"/"Upgrade"/"Free trial"
+    # buttons & marketing mailtos, not real people. These drove the crypto
+    # bounce spike (free@, upgrade@, quote@, more@ all hard-bounced).
+    "free", "upgrade", "get", "try", "demo", "start", "join", "subscribe",
+    "signup", "sign-up", "download", "buy", "order", "shop", "deal", "deals",
+    "offer", "offers", "promo", "sale", "quote", "quotes", "pricing", "plans",
+    "donate", "refer", "invite", "more",
+    # Content / web junk
+    "website", "web", "site", "ai", "app", "api", "blog", "news",
+    "newsletter", "content", "social", "follow", "podcast",
+    # Text-scrape false positives (pronouns from "email him at ...")
+    "him", "her", "you", "your", "hey",
+    # Crypto/biz role addresses
+    "editor", "newsdesk", "newsroom", "tips", "pitch", "business", "bizdev",
+    "partnerships", "sponsors", "sponsorships", "advertise", "advertising",
+    "affiliate", "affiliates", "ambassador",
+    # Social / CTA / text-scrape junk (button labels, footer prompts, etc.)
+    "click", "view", "watch", "listen", "read", "learn", "find", "discover",
+    "share", "follow", "like", "comment", "post", "today", "now", "here",
+    "soon", "login", "register", "save", "search", "visit", "open", "close",
+    "us", "we", "our", "ours",
+    # Front-desk / general inboxes (incl. German) — no human name, but real
+    # monitored business contacts (see ADMITTABLE_ROLE_LOCALS below).
+    "kontakt", "hallo", "mail", "welcome", "willkommen", "reception", "empfang",
+}
+
+
+# Front-desk / general business inboxes a decision-maker (or their gatekeeper)
+# actually reads. No human name, but VALID company-level cold-outreach targets:
+# a "Hey {company} team," pitch to info@brokerage.com is legitimate B2B. This is
+# a SUBSET of GENERIC_LOCAL_PARTS, broken out so a name-optional campaign can
+# admit them while still rejecting automated / wrong-department / junk inboxes.
+ADMITTABLE_ROLE_LOCALS = {
+    "info", "contact", "kontakt", "hello", "hallo", "hey",
+    "office", "team", "mail", "general", "enquiries", "inquiries",
+    "welcome", "willkommen", "reception", "empfang",
+}
+
+# Decision-maker / title inboxes — EXCELLENT B2B cold-outreach targets (they
+# reach the buyer), but they carry NO human name. Added to BOTH sets below so
+# derive_first_name treats them as no-name (greet by "{company} team", never
+# "Hi Owner,"/"Hi Ceo,") AND the gate admits them. Catches owner@/founder@/
+# ceo@/broker@/agent@ which were leaking through as fake first names.
+_DECISION_MAKER_LOCALS = {
+    "owner", "founder", "cofounder", "co-founder", "ceo", "cto", "coo", "cfo",
+    "president", "vp", "principal", "director", "partner", "gm", "manager",
+    "broker", "realtor", "agent", "management", "leadership", "chief",
+    "hq", "headquarters", "main", "frontdesk", "desk", "missioncontrol",
+}
+GENERIC_LOCAL_PARTS = GENERIC_LOCAL_PARTS | _DECISION_MAKER_LOCALS
+ADMITTABLE_ROLE_LOCALS = ADMITTABLE_ROLE_LOCALS | _DECISION_MAKER_LOCALS
+
+# Back-office / operational real-estate inboxes. Real mailboxes, but the WRONG
+# contact for a growth-partnership pitch (they coordinate paperwork and closings,
+# they do not buy services) AND they were deriving fake first names
+# (escrow@ -> "Escrow", closing@ -> "Closing", listings@ -> "Listings"). Added
+# to GENERIC only (no-name) and NOT to ADMITTABLE, so they fall into JUNK below
+# and get rejected. Surfaced by the transactions@teamminik.com research.
+_BACKOFFICE_LOCALS = {
+    "transactions", "transaction", "escrow", "escrows", "closing", "closings",
+    "paperwork", "processing", "processor", "coordinator", "tc", "files",
+    "documents", "docs", "listings", "listing", "leasing", "rentals",
+    "propertymanagement", "maintenance", "scheduling", "showings", "title",
+}
+GENERIC_LOCAL_PARTS = GENERIC_LOCAL_PARTS | _BACKOFFICE_LOCALS
+
+# Locals to HARD-reject even in name-optional company-level mode: automated
+# system boxes (noreply/postmaster), wrong-department inboxes (a partnership
+# pitch to hr@/billing@/support@ is wasted), and CTA/scrape junk. Everything
+# generic that is NOT a front-desk inbox.
+JUNK_LOCAL_PARTS = GENERIC_LOCAL_PARTS - ADMITTABLE_ROLE_LOCALS
+
+
+# Patterns that prove the address is malformed / scrape junk — these are
+# ALWAYS invalid, regardless of MX. Tightened after the first batches
+# revealed %20-prefixed URL-encoded addresses and a few file-extension
+# artifacts slipping through the existing simplified RFC pattern.
+_MALFORMED_RE = re.compile(
+    r"%[0-9A-Fa-f]{2}"         # URL-encoded char (%20, %2E, ...)
+    r"|\s"                     # any whitespace
+    r"|\.\."                   # consecutive dots
+    r"|\.(png|jpe?g|gif|svg|webp|pdf|html?|css|js|ico|bmp|tiff?)$",  # file ext
+    re.IGNORECASE,
+)
+
+
+def _is_malformed(email: str, local: str, domain: str) -> tuple[bool, str]:
+    """Catch obvious junk patterns the simplified RFC regex lets through.
+    Returns (is_malformed, reason). These get hard-rejected by verify()."""
+    if _MALFORMED_RE.search(email):
+        return True, "malformed_pattern"
+    if email.count("@") != 1:
+        return True, "multiple_or_missing_at"
+    if local.startswith(("http", "www", "ftp", "mailto")):
+        return True, "url_prefix_in_local"
+    if len(local) < 2:
+        return True, "local_too_short"
+    if local.isdigit():
+        return True, "all_digit_local"
+    if local[0] in "._-+" or local[-1] in "._-+":
+        return True, "edge_special_char_in_local"
+    if len(domain) < 4 or "." not in domain:
+        return True, "domain_too_short_or_no_dot"
+    return False, ""
+
+# Placeholder / example domains that show up in tutorial copy-paste blocks on
+# creator About pages ("contact me: your-email@domain.de"). These are NOT
+# real recipients — verify() must hard-fail them before they reach send_log.
+PLACEHOLDER_DOMAINS = {
+    "domain.com", "domain.de", "example.com", "example.de", "example.org",
+    "example.net", "yourdomain.com", "your-domain.com", "yourcompany.com",
+    "beispiel.de", "firmenname.de", "test.com", "test.de", "localhost",
+    "company.com", "company.de", "email.com", "mydomain.com",
+}
+PLACEHOLDER_LOCALS = {
+    "your-email", "your.email", "youremail", "yourname", "your-name",
+    "deine-email", "deine.email", "deinemail", "meine-email", "meine.email",
+    "name", "user", "email", "test", "beispiel", "example",
+    "firstname.lastname", "firstname", "lastname",
 }
 
 # RFC-5322-lite: allows the practical 99% of real addresses without being strict.
@@ -145,12 +266,27 @@ def verify(email: str, *,
         return VerificationResult(email=email, verified=False, method="invalid_syntax",
                                   error="failed RFC-5322 simplified pattern")
 
+    # Strict junk-pattern rejection (catches scrape artifacts the RFC pattern
+    # tolerates: %20-prefix, double-dot, .png suffix, single-char local, etc.)
+    mal, mal_why = _is_malformed(email, local, domain)
+    if mal:
+        return VerificationResult(email=email, verified=False, method="malformed",
+                                  error=mal_why)
+
     is_generic = local in GENERIC_LOCAL_PARTS
 
     if domain in DISPOSABLE_DOMAINS:
         return VerificationResult(email=email, verified=False, method="disposable",
                                   is_generic=is_generic,
                                   error=f"{domain} is on the disposable-domain blocklist")
+
+    # Placeholder pattern (your-email@domain.de, name@example.com, etc.)
+    # These show up in creator About-page tutorials. Hard-fail before MX
+    # so they never reach send_log.
+    if domain in PLACEHOLDER_DOMAINS or local in PLACEHOLDER_LOCALS:
+        return VerificationResult(email=email, verified=False, method="placeholder",
+                                  is_generic=is_generic,
+                                  error=f"{email} matches placeholder pattern (domain/local)")
 
     mx = _mx_hosts(domain)
     if not mx:

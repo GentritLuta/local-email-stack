@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de-DE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Abmelden · LK Advertising</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #f8fafc; min-height: 100vh; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         color: #0a0a0a; padding: 32px 16px; display: grid; place-items: center; }
+  .card { width: 100%; max-width: 560px; background: #ffffff;
+          border-radius: 12px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,82,255,.08), 0 4px 16px rgba(0,82,255,.04); }
+  .top-bar { height: 5px; background: linear-gradient(90deg,#0052ff 0%,#001b73 100%); }
+  .body { padding: 38px 32px 28px; }
+  .wordmark { font-size: 22px; font-weight: 800; color: #0052ff;
+              letter-spacing: -.4px; }
+  .tagline { font-size: 12.5px; color: #64748b; margin-top: 6px; font-weight: 500; }
+  h1 { font-size: 22px; font-weight: 700; margin: 26px 0 12px; color: #0f172a; }
+  p { font-size: 15px; line-height: 1.65; margin: 0 0 14px; color: #475569; }
+  p .email { color: #0052ff; font-weight: 700; }
+  .btn { display: inline-block; margin-top: 14px; padding: 13px 28px;
+         background: #0052ff; color: #ffffff; font-size: 14px; font-weight: 700;
+         border: none; border-radius: 8px; cursor: pointer; letter-spacing: .2px; }
+  .btn:hover { background: #001b73; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .success { display: none; margin-top: 16px; padding: 14px 16px;
+             background: #eff6ff; border-left: 3px solid #0052ff;
+             font-size: 14px; line-height: 1.5; color: #0052ff; border-radius: 6px; }
+  .err { display: none; margin-top: 16px; padding: 14px 16px;
+         background: #fef2f2; border-left: 3px solid #dc2626;
+         font-size: 13.5px; line-height: 1.5; color: #991b1b; border-radius: 6px; }
+  .footer { padding: 20px 32px 26px; border-top: 1px solid #e2e8f0;
+            font-size: 12px; color: #94a3b8; }
+  .footer a { color: #0052ff; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="top-bar"></div>
+    <div class="body">
+      <div class="wordmark">LK Advertising</div>
+      <div class="tagline">Performance-Media für Maklerbüros in Deutschland</div>
+
+      <h1>Vom LK-Verteiler abmelden</h1>
+      <p id="lead">Ein Klick und wir sind aus Ihrem Postfach raus. Wir nehmen
+        Ihre Adresse aus jedem Verteiler. Wenn Sie später doch noch über
+        Performance-Werbung sprechen wollen, schreiben Sie einfach an
+        <a href="mailto:hello@lk-advertising.com" style="color:#0052ff">hello@lk-advertising.com</a>.</p>
+      <button class="btn" id="btn" type="button">Jetzt abmelden</button>
+
+      <div class="success" id="success-state">
+        <b><span id="email">Ihre Adresse</span></b> ist abgemeldet. Sie hören
+        nichts mehr von uns.
+      </div>
+
+      <div class="err" id="error-state"></div>
+      <div id="status" style="display:none"></div>
+    </div>
+
+    <div class="footer">
+      LK Advertising · c/o LK Advertising<br>
+      <a href="mailto:hello@lk-advertising.com">hello@lk-advertising.com</a><br>
+      © 2026 LK Advertising
+    </div>
+  </div>
+
+<script>
+const SUPABASE_URL  = "https://ccmqkljsjiuavpydbkva.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
+
+const params = new URLSearchParams(location.search);
+const token  = params.get("t") || "";
+const btn    = document.getElementById("btn");
+const lead   = document.getElementById("lead");
+const status = document.getElementById("status");
+const successWrap = document.getElementById("success-state");
+const errorWrap   = document.getElementById("error-state");
+const emailEl     = document.getElementById("email");
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
+
+function showSuccess(email) {
+  if (emailEl) emailEl.textContent = email || "Ihre Adresse";
+  if (successWrap) successWrap.style.display = "block";
+  if (btn) btn.style.display = "none";
+  if (lead) lead.style.display = "none";
+}
+
+function showError(msg) {
+  if (errorWrap) {
+    errorWrap.textContent = msg;
+    errorWrap.style.display = "block";
+  }
+  if (btn) btn.disabled = false;
+}
+
+async function loadProspect() {
+  if (!token) { showError("Der Link ist unvollständig. Bitte verwenden Sie den Link aus der E-Mail."); if (btn) btn.disabled = true; return; }
+  try {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email,unsubscribed`,
+      { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
+    );
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const rows = await r.json();
+    if (!rows.length) { showError("Wir konnten diesen Link nicht finden. Möglicherweise wurde er bereits verwendet."); if (btn) btn.disabled = true; return; }
+    if (rows[0].unsubscribed) {
+      showSuccess(rows[0].email);
+      if (status) status.textContent = "Sie sind bereits abgemeldet.";
+    }
+  } catch (err) { showError("Etwas ist schiefgelaufen: " + err.message); }
+}
+
+async function doUnsubscribe() {
+  if (btn) btn.disabled = true;
+  try {
+    const find = await fetch(
+      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email`,
+      { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
+    );
+    if (!find.ok) throw new Error("HTTP " + find.status);
+    const rows = await find.json();
+    if (!rows.length) { showError("Wir konnten diesen Link nicht finden. Möglicherweise wurde er bereits verwendet."); return; }
+    const email = rows[0].email;
+    const patch = await fetch(
+      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON,
+          "Content-Type": "application/json", Prefer: "return=minimal"
+        },
+        body: JSON.stringify({ unsubscribed: true, unsubscribed_at: new Date().toISOString() })
+      }
+    );
+    if (!patch.ok && patch.status !== 204) throw new Error("HTTP " + patch.status);
+    showSuccess(email);
+  } catch (err) { showError("Etwas ist schiefgelaufen: " + err.message); }
+}
+
+if (btn) btn.addEventListener("click", doUnsubscribe);
+loadProspect();
+</script>
+
+</body></html>

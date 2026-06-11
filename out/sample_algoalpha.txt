@@ -1,0 +1,41 @@
+=== ALGOALPHA step-1 sample ===
+From:    Tomas from AlgoAlpha <tomas@team.aureonglobal.de>
+To:      kriptoadam.global@gmail.com
+Reply-To:support@algoalpha.io
+Subject: Are you open?
+Headers: {
+  "Message-ID": "<195ad155d17444b18b35ef7141090ecd.1779355462@team.aureonglobal.de>",
+  "List-Unsubscribe": "<https://gentritluta.github.io/local-email-stack/unsubscribe/algoalpha.html?t=6d57a045-43e8-40e5-adb6-0d6a445037a1>, <mailto:info@aureonglobal.de?subject=unsubscribe>",
+  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+}
+
+--- merge fields ---
+first_name = Kriptoadam
+company    = Altcoin finans
+city       = 
+
+--- text body ---
+Hey Kriptoadam,
+
+Are you open to a permanent partnership?
+
+I can see your goals for your audience.
+
+We specialize in helping crypto and trading creators monetize their audience without selling out their channel.
+
+14.1 million chart adds on TradingView. 75,000 paying traders. Editor Choice badge twice.
+
+The best part is zero upfront, zero monthly fee from you, and 30 percent lifetime commission per paid signup through your link.
+
+Does it make sense to hop on a quick 15 minute call?
+
+Just hit reply with your channel link.
+
+P.s. reply no if not interested.
+
+Tomás Silva
+Creator Partnerships, AlgoAlpha
+AlgoAlpha · algoalpha.io
+
+---
+Don't want these emails? Unsubscribe: https://gentritluta.github.io/local-email-stack/unsubscribe/algoalpha.html?t=6d57a045-43e8-40e5-adb6-0d6a445037a1

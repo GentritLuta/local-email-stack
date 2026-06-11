@@ -43,6 +43,72 @@ function buildNicheLookup(prospects: DbProspect[]): Map<string, string | null> {
   return m;
 }
 
+// ─── Production-only filter ──────────────────────────────────────────────
+// Supabase contains months of pre-system test data (legacy personas like
+// daniel/marco/olivia, business-correspondence replies to info@aureonglobal.de
+// from CRM tools, invoices, Wolt signup emails, etc). The dashboard is for
+// the LIVE outreach campaigns only — filter everything to current production.
+//
+// A send counts as production iff persona_slug is one of the live ones AND
+// from_addr's subdomain is part of an active profile's pool.
+//
+// A reply counts as a real outreach reply iff it was matched to one of our
+// sends (run_id is not null) OR its To: address is an outreach sender
+// subdomain (where prospect replies land — never info@aureonglobal.de
+// which is the operator's main business inbox).
+const PRODUCTION_PERSONAS = new Set(["anna", "tomas", "lukas"]);
+const ACTIVE_PROFILE_SLUGS = new Set(["aureon", "algoalpha", "f2-malergipser"]);
+
+function buildActiveSubdomains(profiles: DbProfile[]): Set<string> {
+  const out = new Set<string>();
+  for (const p of profiles) {
+    if (!ACTIVE_PROFILE_SLUGS.has(p.slug)) continue;
+    const pool = (p.config?.relay?.from_domains ?? []) as any[];
+    for (const d of pool) if (d?.domain) out.add(d.domain);
+  }
+  return out;
+}
+
+function isProductionSend(s: DbSendLog, activeSubdomains: Set<string>): boolean {
+  if (!PRODUCTION_PERSONAS.has(s.persona_slug ?? "")) return false;
+  const domain = (s.from_addr.split("@")[1] || "").toLowerCase();
+  return activeSubdomains.has(domain);
+}
+
+function isProductionReply(r: DbReply, activeSubdomains: Set<string>): boolean {
+  if (r.class !== "reply") return false;
+  if (r.run_id) return true;
+  const domain = (r.to_addr.split("@")[1] || "").toLowerCase();
+  return activeSubdomains.has(domain);
+}
+
+// ─── Reply-intent classifier ──────────────────────────────────────────────
+// Computed client-side so we don't need a schema migration. Operates on the
+// subject + body_snippet + from_addr of a reply row. Order matters: auto and
+// unsubscribe are checked first because their keywords sometimes also appear
+// in a "positive" interpretation ("yes please remove" is unsubscribe, not
+// positive). Returns one of:
+//   positive    - explicit interest / scheduling / yes
+//   negative    - explicit no / not interested / wrong contact
+//   auto_reply  - out-of-office / vacation / autoresponder
+//   unsubscribe - hard remove / GDPR / "don't email"
+//   neutral     - has reply markers but no clear intent (forwards, questions)
+export type ReplyIntent = "positive" | "negative" | "auto_reply" | "unsubscribe" | "neutral";
+
+const AUTO_RX = /\b(out of office|out-of-office|vacation|abwesenheits?notiz|automatic(?:ally)?\s+reply|auto[-\s]?reply|abwesend|ferien|on (?:vacation|holiday|leave)|away from|automatische antwort|paternity|maternity)\b/i;
+const UNSUB_RX = /\b(unsubscribe|abmelden|austragen|remove me from|please remove|stop sending|stop emailing|do not (?:contact|email)|gdpr (?:request|removal)|cease and desist|nicht mehr (?:kontakt|email|mail))\b/i;
+const NEG_RX  = /\b(not interested|nicht interess(?:iert|ant)|kein interesse|no thanks|nein danke|not relevant|wrong person|wrong contact|wrong number|please stop|stop contact|not for us|not a fit|won'?t be|nicht passend|no thank you)\b/i;
+const POS_RX  = /\b(interested|interess(?:iert|ant)|let'?s (?:chat|talk|schedule|hop on|jump on)|gerne|sounds good|happy to (?:chat|talk|jump)|please send|share more|tell me more|book a call|book a time|schedule a (?:call|time|meeting)|when (?:are you|works for you)|sure|absolutely|yes,? (?:please|happy|absolutely)|let me know more|melde mich|melden sie sich|machen wir|passt mir|gerne ein gespr|gerne mehr)\b/i;
+
+export function classifyReplyIntent(r: DbReply): ReplyIntent {
+  const hay = `${r.subject || ""} \n ${r.body_snippet || ""}`;
+  if (AUTO_RX.test(hay))   return "auto_reply";
+  if (UNSUB_RX.test(hay))  return "unsubscribe";
+  if (NEG_RX.test(hay))    return "negative";
+  if (POS_RX.test(hay))    return "positive";
+  return "neutral";
+}
+
 // Map persona_slug to its owning profile_slug. Persona slugs are unique
 // across the personas array of every profile in our setup.
 function buildPersonaToProfile(profiles: DbProfile[]): Map<string, string> {
@@ -73,7 +139,15 @@ export function Analytics() {
       fetchSendLog(10_000),
       fetchReplies(2_000),
     ]);
-    setProfiles(ps); setProspects(pr); setSends(sl); setReplies(rp);
+    // Filter raw send_log + replies down to production rows: live personas,
+    // active subdomains, and replies actually tied to one of our sends.
+    // Without this filter the dashboard double-counts pre-system test data
+    // (legacy daniel/marco personas, business-mail replies to info@).
+    const activeSub = buildActiveSubdomains(ps);
+    setProfiles(ps);
+    setProspects(pr);
+    setSends(sl.filter(s => isProductionSend(s, activeSub)));
+    setReplies(rp.filter(r => isProductionReply(r, activeSub)));
     setLoaded(true);
   }
   useEffect(() => {
@@ -266,6 +340,122 @@ export function Analytics() {
     return [...m.entries()].map(([n, r]) => ({ step: n, ...r })).sort((a, b) => a.step - b.step);
   }, [filteredSends]);
 
+  // ─── Reply-intent breakdown (positive / negative / auto / unsub) ────────
+  // Live-classified via classifyReplyIntent. The raw `reply` rows from imap
+  // include forwards, OOO bounces, and noise; this split is the real
+  // "is this conversation going somewhere?" view.
+  const replyIntents = useMemo(() => {
+    const real = filteredReplies.filter(r => r.class === "reply");
+    const buckets: Record<ReplyIntent, number> = {
+      positive: 0, negative: 0, auto_reply: 0, unsubscribe: 0, neutral: 0,
+    };
+    for (const r of real) buckets[classifyReplyIntent(r)]++;
+    return buckets;
+  }, [filteredReplies]);
+
+  // ─── Per-step engagement funnel ─────────────────────────────────────────
+  // Each step row shows the cascade sent > delivered > opened > replied
+  // > positive_replied, with rates relative to step's own sent count.
+  // The drop-off pattern is the cadence signal: if step 6 sends a lot
+  // but yields ~0 positive replies, the cadence is too long.
+  const stepFunnel = useMemo(() => {
+    type Row = { step: number; sent: number; delivered: number; opened: number;
+                 replied: number; positive: number; };
+    const m = new Map<number, Row>();
+    // Build positive-reply lookup keyed by to_addr (lowercase). We do not
+    // have a clean send_log↔reply join key, so attribute by recipient.
+    const posByEmail = new Set(
+      filteredReplies
+        .filter(r => r.class === "reply" && classifyReplyIntent(r) === "positive")
+        .map(r => r.from_addr.toLowerCase())
+    );
+    for (const s of filteredSends) {
+      const row = m.get(s.step_n) ?? m.set(s.step_n,
+        { step: s.step_n, sent: 0, delivered: 0, opened: 0, replied: 0, positive: 0 }
+      ).get(s.step_n)!;
+      row.sent++;
+      if (s.delivered && !s.bounced) row.delivered++;
+      if (s.opened_at) row.opened++;
+      if (s.replied)   row.replied++;
+      if (posByEmail.has(s.to_addr.toLowerCase())) row.positive++;
+    }
+    return [...m.values()].sort((a, b) => a.step - b.step);
+  }, [filteredSends, filteredReplies]);
+
+  // ─── Per-subdomain rolling 7-day health ─────────────────────────────────
+  // The fast-warning view: any subdomain whose bounce-rate has spiked over
+  // the last 7 days is the next one Resend will deactivate. We compute
+  // independently from the global `sends` (not filtered by date range) so
+  // the 7-day window is exact regardless of which range filter is active.
+  const subdomainHealth = useMemo(() => {
+    const cutoff = new Date(Date.now() - 7 * 86400_000);
+    type Row = { domain: string; profile: string; sent: number; delivered: number;
+                 bounced: number; complained: number; opened: number;
+                 bounceRate: number; complaintRate: number; openRate: number; };
+    const m = new Map<string, Row>();
+    for (const p of profiles) {
+      const pool = (p.config?.relay?.from_domains ?? []) as any[];
+      for (const d of pool) {
+        if (!d.domain) continue;
+        m.set(d.domain, {
+          domain: d.domain, profile: p.name,
+          sent: 0, delivered: 0, bounced: 0, complained: 0, opened: 0,
+          bounceRate: 0, complaintRate: 0, openRate: 0,
+        });
+      }
+    }
+    for (const s of sends) {
+      if (new Date(s.sent_at) < cutoff) continue;
+      const dn = (s.from_addr.split("@")[1] || "").toLowerCase();
+      const row = m.get(dn); if (!row) continue;
+      row.sent++;
+      if (s.delivered && !s.bounced) row.delivered++;
+      if (s.bounced)    row.bounced++;
+      if (s.complained) row.complained++;
+      if (s.opened_at)  row.opened++;
+    }
+    for (const r of m.values()) {
+      r.bounceRate    = r.sent ? r.bounced / r.sent : 0;
+      r.complaintRate = r.sent ? r.complained / r.sent : 0;
+      r.openRate      = r.delivered ? r.opened / r.delivered : 0;
+    }
+    return [...m.values()]
+      .filter(r => r.sent > 0)
+      .sort((a, b) => b.bounceRate - a.bounceRate || b.sent - a.sent);
+  }, [profiles, sends]);
+
+  // ─── Persona head-to-head ───────────────────────────────────────────────
+  // Same metrics across personas so anna vs tomas vs lukas can be compared
+  // directly. Adds open-rate (now meaningful with tracker enabled) and
+  // positive-reply rate (engagement-quality signal) on top of the simpler
+  // byPersona aggregation that's already shown above.
+  const personaCompare = useMemo(() => {
+    const posByEmail = new Set(
+      filteredReplies
+        .filter(r => r.class === "reply" && classifyReplyIntent(r) === "positive")
+        .map(r => r.from_addr.toLowerCase())
+    );
+    type Row = { persona: string; profile: string; sent: number; delivered: number;
+                 opened: number; bounced: number; replied: number; positive: number; };
+    const m = new Map<string, Row>();
+    for (const s of filteredSends) {
+      const k = s.persona_slug || "(none)";
+      const profSlug = personaToProfile.get(s.persona_slug ?? "") ?? "(unknown)";
+      const profName = profiles.find(p => p.slug === profSlug)?.name ?? profSlug;
+      const row = m.get(k) ?? m.set(k,
+        { persona: k, profile: profName, sent: 0, delivered: 0, opened: 0,
+          bounced: 0, replied: 0, positive: 0 }
+      ).get(k)!;
+      row.sent++;
+      if (s.delivered && !s.bounced) row.delivered++;
+      if (s.opened_at) row.opened++;
+      if (s.bounced)   row.bounced++;
+      if (s.replied)   row.replied++;
+      if (posByEmail.has(s.to_addr.toLowerCase())) row.positive++;
+    }
+    return [...m.values()].sort((a, b) => b.sent - a.sent);
+  }, [filteredSends, filteredReplies, personaToProfile, profiles]);
+
   // ─── Reputation status (per profile) ────────────────────────────────────
   const reputation = useMemo(() => {
     return profiles
@@ -405,6 +595,147 @@ export function Analytics() {
         <FunnelRow label="Opened"               value={opened} bar={opened / Math.max(delivered, 1)} sub="tracker pixel required" />
         <FunnelRow label="Replied"              value={realReplies} bar={realReplies / Math.max(delivered, 1)} />
         <FunnelRow label="Unsubscribed"         value={unsubsInRange} bar={unsubsInRange / Math.max(uniqueSendees, 1)} negative />
+      </div>
+
+      {/* Reply quality split — positive vs negative vs auto vs unsub */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Reply quality</h3>
+        <p className="page-sub" style={{ marginTop: 0, marginBottom: 10 }}>
+          Live-classified intent of every reply. <code>positive</code> + <code>neutral</code> are the conversations worth working; <code>auto_reply</code> + <code>unsubscribe</code> are noise to filter out of raw reply counts.
+        </p>
+        {realReplies === 0
+          ? <div style={{ color: "var(--fg-2)", padding: 8 }}>No real replies in window yet.</div>
+          : (<>
+            <div className="grid grid-5" style={{ marginBottom: 8 }}>
+              <Kpi label="Positive"    value={dec(replyIntents.positive)}    accent="green" sub={pct(replyIntents.positive, realReplies)} />
+              <Kpi label="Neutral"     value={dec(replyIntents.neutral)}                    sub={pct(replyIntents.neutral, realReplies)} />
+              <Kpi label="Negative"    value={dec(replyIntents.negative)}    accent="amber" sub={pct(replyIntents.negative, realReplies)} />
+              <Kpi label="Auto-reply"  value={dec(replyIntents.auto_reply)}                 sub={pct(replyIntents.auto_reply, realReplies)} />
+              <Kpi label="Unsubscribe" value={dec(replyIntents.unsubscribe)} accent="red"   sub={pct(replyIntents.unsubscribe, realReplies)} />
+            </div>
+            <div style={{ height: 220 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { name: "Positive",    n: replyIntents.positive,    fill: "#22c55e" },
+                  { name: "Neutral",     n: replyIntents.neutral,     fill: "#9ca3af" },
+                  { name: "Negative",    n: replyIntents.negative,    fill: "#f59e0b" },
+                  { name: "Auto-reply",  n: replyIntents.auto_reply,  fill: "#3b82f6" },
+                  { name: "Unsubscribe", n: replyIntents.unsubscribe, fill: "#ef4444" },
+                ]} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                  <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} />
+                  <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} allowDecimals={false} />
+                  <Tooltip contentStyle={{ background: "#1f1f1f", border: "1px solid #2a2a2a", fontSize: 12 }} />
+                  <Bar dataKey="n" name="Replies" fill="#E6C259" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </>)}
+      </div>
+
+      {/* Per-step engagement funnel (cadence signal) */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Per-step engagement funnel</h3>
+        <p className="page-sub" style={{ marginTop: 0, marginBottom: 10 }}>
+          Where the conversation actually happens. If step 6+ shows healthy <code>sent</code> but tiny <code>positive</code>, the cadence is too long — cut it.
+        </p>
+        {stepFunnel.length === 0
+          ? <div style={{ color: "var(--fg-2)", padding: 8 }}>No step-tagged sends in window.</div>
+          : (<table className="tbl">
+            <thead>
+              <tr>
+                <th>Step</th><th>Sent</th><th>Delivered</th>
+                <th>Open rate</th><th>Reply rate</th><th>Positive</th><th>Pos rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stepFunnel.map(r => (
+                <tr key={r.step}>
+                  <td><span className="pill">step {r.step}</span></td>
+                  <td>{dec(r.sent)}</td>
+                  <td>{dec(r.delivered)}</td>
+                  <td>{pct(r.opened, r.delivered)}</td>
+                  <td>{pct(r.replied, r.delivered)}</td>
+                  <td style={{ color: r.positive > 0 ? "var(--accent-green)" : undefined }}>{r.positive || "—"}</td>
+                  <td>{pct(r.positive, r.delivered, 2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>)}
+      </div>
+
+      {/* Per-subdomain rolling 7-day health */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Subdomain health (rolling 7 days)</h3>
+        <p className="page-sub" style={{ marginTop: 0, marginBottom: 10 }}>
+          Early-warning view. Subdomains with bounce ≥ 5% or complaint ≥ 0.1% are flagged red — Resend will deactivate them if these stay elevated.
+        </p>
+        {subdomainHealth.length === 0
+          ? <div style={{ color: "var(--fg-2)", padding: 8 }}>No sends in last 7 days.</div>
+          : (<table className="tbl">
+            <thead>
+              <tr>
+                <th>Subdomain</th><th>Client</th><th>7d sent</th><th>Delivered</th>
+                <th>Bounce %</th><th>Complaint %</th><th>Open %</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subdomainHealth.map(r => {
+                const isBad = r.bounceRate > 0.05 || r.complaintRate > 0.001;
+                const isWarn = r.bounceRate > 0.025 || r.complaintRate > 0.0005;
+                const status = isBad ? "ALERT" : isWarn ? "warn" : "OK";
+                const statusColor = isBad ? "var(--accent-red)" : isWarn ? "var(--accent-amber)" : "var(--accent-green)";
+                return (
+                  <tr key={r.domain}>
+                    <td style={{ fontFamily: "var(--mono)" }}>{r.domain}</td>
+                    <td>{r.profile}</td>
+                    <td>{dec(r.sent)}</td>
+                    <td>{dec(r.delivered)}</td>
+                    <td style={{ color: r.bounceRate > 0.05 ? "var(--accent-red)" : r.bounceRate > 0.025 ? "var(--accent-amber)" : undefined }}>
+                      {pct(r.bounced, r.sent)}
+                    </td>
+                    <td style={{ color: r.complaintRate > 0.001 ? "var(--accent-red)" : undefined }}>
+                      {pct(r.complained, r.sent, 2)}
+                    </td>
+                    <td>{pct(r.opened, r.delivered)}</td>
+                    <td style={{ color: statusColor, fontWeight: 600 }}>{status}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>)}
+      </div>
+
+      {/* Persona head-to-head */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Persona head-to-head</h3>
+        <p className="page-sub" style={{ marginTop: 0, marginBottom: 10 }}>
+          Side-by-side performance per sender persona, with open-rate and positive-reply-rate. Diverging open rates between personas signal signature/tone differences worth copying — diverging delivery rates signal an underlying domain/IP reputation issue isolated to one persona.
+        </p>
+        {personaCompare.length === 0
+          ? <div style={{ color: "var(--fg-2)", padding: 8 }}>No sends in window.</div>
+          : (<table className="tbl">
+            <thead>
+              <tr>
+                <th>Persona</th><th>Client</th><th>Sent</th><th>Delivery %</th>
+                <th>Open %</th><th>Reply %</th><th>Positive</th><th>Pos rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {personaCompare.map(r => (
+                <tr key={r.persona}>
+                  <td><span className="pill">{r.persona}</span></td>
+                  <td>{r.profile}</td>
+                  <td>{dec(r.sent)}</td>
+                  <td>{pct(r.delivered, r.sent)}</td>
+                  <td>{pct(r.opened, r.delivered)}</td>
+                  <td>{pct(r.replied, r.delivered)}</td>
+                  <td style={{ color: r.positive > 0 ? "var(--accent-green)" : undefined }}>{r.positive || "—"}</td>
+                  <td>{pct(r.positive, r.delivered, 2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>)}
       </div>
 
       {/* Per-client (only when "All clients") */}

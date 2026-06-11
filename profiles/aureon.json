@@ -1,6 +1,6 @@
 {
   "slug": "aureon",
-  "name": "Aureon Global — Resend pool on mail.aureonglobal.de",
+  "name": "Aureon Global — Real estate growth partner (DACH + NL)",
   "created_at": "2026-05-17",
   "active": true,
   "company": {
@@ -12,19 +12,19 @@
     "wordmark": "Aureon Global",
     "site": "aureonglobal.de",
     "tagline": "Performance Partner for Real Estate Agents & Brokerages",
-    "font_stack": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font_stack": "Inter, ui-sans-serif, system-ui",
     "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
     "colors": {
-      "accent": "#E6C259",
-      "accent_2": "#b8941f",
+      "accent": "#d4af37",
+      "accent_2": "#4b5563",
       "text": "#0a0a0a",
-      "text_2": "#4b5563",
-      "muted": "#9ca3af",
+      "text_2": "#475569",
+      "muted": "#94a3b8",
       "bg_page": "#fafafa",
       "bg_card": "#ffffff",
-      "rule": "#ececec"
+      "rule": "#e5e7eb"
     },
-    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe.html?t={token}",
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/aureon.html?t={token}",
     "_unsubscribe_note": "If you later point unsubscribe.aureonglobal.de via CNAME at the static page host, update this template and the email link will use it automatically. The token=eq.{token} match in Supabase is the same either way.",
     "legal": {
       "company_name": "Aureon Global L.L.C.",
@@ -38,19 +38,20 @@
       "vat_number": "330681892",
       "registration_number": "812368240",
       "copyright_year": 2026,
-      "logo_url": "https://aureonglobal.de/logo.svg",
+      "logo_url": "",
       "logo_width": 50,
-      "privacy_policy_url": "https://aureonglobal.de/privacy-policy",
-      "terms_of_service_url": "https://aureonglobal.de/terms-of-service",
+      "privacy_policy_url": "https://aureonglobal.de/privacy.html",
+      "terms_of_service_url": "https://aureonglobal.de/terms.html",
       "legal_disclaimer": "The information transmitted is intended only for the person or entity to which it is addressed and may contain confidential and/or privileged material. Any review re-transmission, dissemination or other use of or taking any action in reliance upon this information by persons or entities other than the intended recipient is prohibited. If you received this in error, please contact the sender immediately by return electronic transmission and then immediately delete this transmission including all attachments without copying, distributing or disclosing the same.",
       "partner_notice": "You are receiving this email because you are a registered partner or have requested information from Aureon Global."
-    }
+    },
+    "template": "aureon-custom"
   },
   "_architecture_note": [
     "Per-persona reputation isolation: each persona sends from a unique address on a",
     "dedicated subdomain (mail.aureonglobal.de) verified at Resend. No Hostinger mailbox",
     "is required behind these From: addresses because Resend owns the SMTP egress.",
-    "Replies route back via Hostinger's normal MX on aureonglobal.de — the user adds an",
+    "Replies route back via Hostinger's normal MX on aureonglobal.de â€” the user adds an",
     "ImprovMX-style forwarder (or Cloudflare Email Routing) on mail.aureonglobal.de later",
     "if they want replies to a different inbox; for now Reply-To = info@aureonglobal.de."
   ],
@@ -66,10 +67,10 @@
         "verified_at": "2026-05-17T15:18:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 13,
+          "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
+          "max_daily_sends": 50,
           "reputation": {
             "bounce_rate_7d": 0.0,
             "complaint_rate_7d": 0.0,
@@ -84,28 +85,10 @@
         "verified_at": "2026-05-17T18:27:06.010129Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 13,
+          "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
-          "reputation": {
-            "bounce_rate_7d": 0,
-            "complaint_rate_7d": 0,
-            "delivered_7d": 0,
-            "last_check": null
-          }
-        }
-      },
-      {
-        "domain": "team.aureonglobal.de",
-        "resend_domain_id": "e95c6ecb-2cd1-47e9-8d5d-76ae0c27df4a",
-        "verified_at": "2026-05-17T18:27:07.322179Z",
-        "warmup": {
-          "enabled": true,
-          "current_day": 0,
-          "started_at": null,
-          "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
+          "max_daily_sends": 50,
           "reputation": {
             "bounce_rate_7d": 0,
             "complaint_rate_7d": 0,
@@ -120,28 +103,10 @@
         "verified_at": "2026-05-17T18:27:08.767781Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 13,
+          "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
-          "reputation": {
-            "bounce_rate_7d": 0,
-            "complaint_rate_7d": 0,
-            "delivered_7d": 0,
-            "last_check": null
-          }
-        }
-      },
-      {
-        "domain": "desk.aureonglobal.de",
-        "resend_domain_id": "864d41ed-88bd-4c0a-820e-950c6e11fb82",
-        "verified_at": "2026-05-17T18:27:10.164646Z",
-        "warmup": {
-          "enabled": true,
-          "current_day": 0,
-          "started_at": null,
-          "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
+          "max_daily_sends": 50,
           "reputation": {
             "bounce_rate_7d": 0,
             "complaint_rate_7d": 0,
@@ -156,28 +121,10 @@
         "verified_at": "2026-05-17T18:27:11.489565Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "started_at": "2026-05-29",
+          "current_day": 13,
           "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
-          "reputation": {
-            "bounce_rate_7d": 0,
-            "complaint_rate_7d": 0,
-            "delivered_7d": 0,
-            "last_check": null
-          }
-        }
-      },
-      {
-        "domain": "news.aureonglobal.de",
-        "resend_domain_id": "64d64303-8f83-4d2f-8a0f-6013bab33e65",
-        "verified_at": "2026-05-17T18:24:59.263184Z",
-        "warmup": {
-          "enabled": true,
-          "current_day": 0,
-          "started_at": null,
-          "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
+          "max_daily_sends": 50,
           "reputation": {
             "bounce_rate_7d": 0,
             "complaint_rate_7d": 0,
@@ -192,10 +139,118 @@
         "verified_at": "2026-05-17T18:27:13.022168Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "started_at": "2026-05-29",
+          "current_day": 13,
           "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.aureonglobal.de",
+        "resend_domain_id": "ec0c7ebc-968a-4165-9712-df2070e4533b",
+        "verified_at": "2026-05-26T09:13:43.464870Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 13,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "reach.aureonglobal.de",
+        "resend_domain_id": "afbebbb4-17f7-4c00-8b7e-13cb168b8277",
+        "verified_at": "2026-05-26T09:14:20.309123Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 13,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "news.aureonglobal.de",
+        "resend_domain_id": "64d64303-8f83-4d2f-8a0f-6013bab33e65",
+        "verified_at": "2026-05-17T18:24:59.263184Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 13,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "send.aureonglobal.de",
+        "resend_domain_id": "55f3a7a2-3a44-4ec7-9aef-d6cb45b7e30e",
+        "verified_at": "2026-05-17T18:27:15.000000Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 13,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.aureonglobal.de",
+        "resend_domain_id": "e95c6ecb-2cd1-47e9-8d5d-76ae0c27df4a",
+        "verified_at": "2026-05-17T18:27:07.322179Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 13,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0,
+            "complaint_rate_7d": 0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "desk.aureonglobal.de",
+        "resend_domain_id": "864d41ed-88bd-4c0a-820e-950c6e11fb82",
+        "verified_at": "2026-05-17T18:27:10.164646Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 13,
+          "started_at": "2026-05-29",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
           "reputation": {
             "bounce_rate_7d": 0,
             "complaint_rate_7d": 0,
@@ -210,28 +265,10 @@
         "verified_at": "2026-05-17T18:24:16.965265Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 13,
+          "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
-          "reputation": {
-            "bounce_rate_7d": 0,
-            "complaint_rate_7d": 0,
-            "delivered_7d": 0,
-            "last_check": null
-          }
-        }
-      },
-      {
-        "domain": "send.aureonglobal.de",
-        "resend_domain_id": "59236db7-572d-4ddf-8a3b-04c36ebb18cf",
-        "verified_at": "2026-05-17T18:26:33.230076Z",
-        "warmup": {
-          "enabled": true,
-          "current_day": 0,
-          "started_at": null,
-          "ramp_curve": "snowball_v1",
-          "max_daily_sends": 90,
+          "max_daily_sends": 50,
           "reputation": {
             "bounce_rate_7d": 0,
             "complaint_rate_7d": 0,
@@ -244,30 +281,11 @@
   },
   "personas": [
     {
-      "slug": "daniel",
-      "from_name": "Daniel Schmidt",
-      "from_addr": "daniel@mail.aureonglobal.de",
-      "reply_to": "info@aureonglobal.de",
-      "title": "Partner",
-      "voice": {
-        "register": "warm-direct",
-        "quirks": [
-          "short paragraphs"
-        ],
-        "avoid": [
-          "corporate speak",
-          "exclamation marks",
-          "em-dashes"
-        ]
-      },
-      "signature": "Daniel Schmidt\nPartner"
-    },
-    {
       "slug": "anna",
-      "from_name": "Anna Bauer",
+      "from_name": "Anna from Aureon Global",
       "from_addr": "anna@mail.aureonglobal.de",
       "reply_to": "info@aureonglobal.de",
-      "title": "Performance Lead",
+      "title": "Senior Partnership Manager",
       "voice": {
         "register": "calm-precise",
         "quirks": [
@@ -276,30 +294,209 @@
         ],
         "avoid": [
           "hype",
-          "stacked adjectives",
-          "em-dashes"
+          "stacked adjectives"
         ]
       },
-      "signature": "Anna Bauer\nPerformance Lead"
+      "signature": "Anna Bauer\nSenior Partnership Manager, Aureon Global"
     },
     {
-      "slug": "marco",
-      "from_name": "Marco Rinaldi",
-      "from_addr": "marco@mail.aureonglobal.de",
+      "slug": "lars",
+      "from_name": "Lars from Aureon Global",
+      "from_addr": "lars@outreach.aureonglobal.de",
       "reply_to": "info@aureonglobal.de",
-      "title": "Client Director",
+      "title": "Brokerage Partner Lead — AT / CH",
+      "voice": {
+        "register": "warm-direct",
+        "quirks": [
+          "short paragraphs",
+          "names the city back to them"
+        ],
+        "avoid": [
+          "corporate-speak",
+          "exclamation marks"
+        ]
+      },
+      "signature": "Lars Müller\nBrokerage Partner Lead, Aureon Global"
+    },
+    {
+      "slug": "daan",
+      "from_name": "Daan from Aureon Global",
+      "from_addr": "daan@hi.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Country Lead Netherlands",
       "voice": {
         "register": "friendly-direct",
         "quirks": [
-          "warmer opener"
+          "plain phrasing",
+          "one concrete proof per email"
         ],
         "avoid": [
           "templated phrases",
-          "marketing language",
-          "em-dashes"
+          "marketing language"
         ]
       },
-      "signature": "Marco Rinaldi\nClient Director"
+      "signature": "Daan de Vries\nCountry Lead Netherlands, Aureon Global"
+    },
+    {
+      "slug": "tomas",
+      "from_name": "Tomas from Aureon Global",
+      "from_addr": "tomas@team.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "calm-technical",
+        "quirks": [
+          "specific numbers"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Tomas\nAureon Global"
+    },
+    {
+      "slug": "marcus",
+      "from_name": "Marcus from Aureon Global",
+      "from_addr": "marcus@desk.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "direct-warm",
+        "quirks": [
+          "specific data points"
+        ],
+        "avoid": [
+          "corporate-speak"
+        ]
+      },
+      "signature": "Marcus\nAureon Global"
+    },
+    {
+      "slug": "iris",
+      "from_name": "Iris from Aureon Global",
+      "from_addr": "iris@hub.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "precise-friendly",
+        "quirks": [
+          "one question per email",
+          "names a real metric"
+        ],
+        "avoid": [
+          "fluff"
+        ]
+      },
+      "signature": "Iris\nAureon Global"
+    },
+    {
+      "slug": "jonas",
+      "from_name": "Jonas from Aureon Global",
+      "from_addr": "jonas@connect.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "calm-precise",
+        "quirks": [
+          "specific numbers",
+          "one question per email"
+        ],
+        "avoid": [
+          "hype",
+          "stacked adjectives"
+        ]
+      },
+      "signature": "Jonas\nAureon Global"
+    },
+    {
+      "slug": "sophie",
+      "from_name": "Sophie from Aureon Global",
+      "from_addr": "sophie@partners.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Brokerage Partner Lead, Aureon Global",
+      "voice": {
+        "register": "warm-direct",
+        "quirks": [
+          "short paragraphs",
+          "names the city back to them"
+        ],
+        "avoid": [
+          "corporate-speak",
+          "exclamation marks"
+        ]
+      },
+      "signature": "Sophie\nAureon Global"
+    },
+    {
+      "slug": "felix",
+      "from_name": "Felix from Aureon Global",
+      "from_addr": "felix@hello.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "friendly-direct",
+        "quirks": [
+          "plain phrasing",
+          "one concrete proof per email"
+        ],
+        "avoid": [
+          "templated phrases",
+          "marketing language"
+        ]
+      },
+      "signature": "Felix\nAureon Global"
+    },
+    {
+      "slug": "nina",
+      "from_name": "Nina from Aureon Global",
+      "from_addr": "nina@reach.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Senior Partnership Manager, Aureon Global",
+      "voice": {
+        "register": "precise-friendly",
+        "quirks": [
+          "one question per email",
+          "names a real metric"
+        ],
+        "avoid": [
+          "fluff"
+        ]
+      },
+      "signature": "Nina\nAureon Global"
+    },
+    {
+      "slug": "lukas",
+      "from_name": "Lukas from Aureon Global",
+      "from_addr": "lukas@news.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "calm-technical",
+        "quirks": [
+          "specific numbers"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Lukas\nAureon Global"
+    },
+    {
+      "slug": "emma",
+      "from_name": "Emma from Aureon Global",
+      "from_addr": "emma@send.aureonglobal.de",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth Partner, Aureon Global",
+      "voice": {
+        "register": "direct-warm",
+        "quirks": [
+          "specific data points"
+        ],
+        "avoid": [
+          "corporate-speak"
+        ]
+      },
+      "signature": "Emma\nAureon Global"
     }
   ],
   "rotation": {
@@ -309,10 +506,10 @@
   },
   "warmup": {
     "enabled": true,
-    "started_at": null,
-    "current_day": 0,
+    "started_at": "2026-05-29",
+    "current_day": 8,
     "ramp_curve": "snowball_v1",
-    "max_daily_sends": 90,
+    "max_daily_sends": 600,
     "warmup_targets": [],
     "real_send_mix": [
       {
@@ -341,28 +538,32 @@
     "auto_pause_thresholds": {
       "bounce_rate": 0.05,
       "complaint_rate": 0.001
-    }
+    },
+    "advance_only_mode": true
   },
   "ramp_curve_snowball_v1": [
     {
       "from_day": 1,
-      "daily": 9
-    },
-    {
-      "from_day": 4,
-      "daily": 18
+      "daily": 15
     },
     {
       "from_day": 8,
-      "daily": 36
+      "daily": 25
     },
     {
       "from_day": 15,
-      "daily": 60
+      "daily": 35
     },
     {
       "from_day": 22,
-      "daily": 90
+      "daily": 50
     }
-  ]
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/New_York",
+    "target_audience_note": "US real estate agents. 08:00-17:00 in their LOCAL time (per-prospect via prospect_timezone.resolve). Default if city missing = America/New_York (largest market for current seeds)."
+  }
 }

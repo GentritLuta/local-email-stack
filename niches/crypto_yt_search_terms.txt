@@ -1,0 +1,65 @@
+# YouTube search terms for crypto-influencer discovery.
+# Used by: py sequences/youtube_scraper.py discover <this file> --out <queue.txt>
+#
+# Each term = one search.list call (100 quota units, up to 5 pages × 50 = 250 channels).
+# Daily quota = 10k → ~40 terms/day fully paginated, or ~100 terms with 2 pages each.
+# Skip lines starting with #.
+
+# ── Tier A: high-volume generic terms (likely many results)
+crypto
+bitcoin
+ethereum
+altcoin
+cryptocurrency
+blockchain
+crypto trading
+crypto signals
+crypto news
+crypto analysis
+
+# ── Tier B: TA / trading focused
+crypto technical analysis
+crypto chart analysis
+TradingView crypto
+crypto indicator
+crypto strategy
+crypto scalping
+crypto day trading
+crypto swing trading
+
+# ── Tier C: DeFi / specific niches
+defi
+nft trading
+crypto staking
+yield farming
+solana ecosystem
+ethereum DeFi
+crypto layer 2
+crypto rollup
+
+# ── Tier D: specific tokens (high audience overlap with traders)
+solana
+cardano
+polkadot
+avalanche
+chainlink
+ripple xrp
+dogecoin
+shiba inu
+
+# ── Tier E: trader archetypes / styles
+crypto whale
+crypto trader
+crypto bull
+crypto bear
+crypto pump
+crypto moonshot
+crypto 100x
+crypto airdrop
+
+# ── Tier F: aggregators / podcasts
+crypto podcast
+bitcoin podcast
+crypto interview
+crypto roundtable
+crypto AMA

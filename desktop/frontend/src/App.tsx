@@ -2,7 +2,8 @@ import { NavLink, Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react";
 import {
   Activity, Database, Mail, Inbox, Layers, Users, FlaskConical, Settings,
-  Send, FileCog, ShieldCheck, Workflow, Rocket, UserRound, Rocket as RocketI, BarChart3, Globe
+  Send, FileCog, ShieldCheck, Workflow, Rocket, UserRound, Rocket as RocketI, BarChart3, Globe,
+  UserCheck,
 } from "lucide-react";
 import { Dashboard } from "./routes/Dashboard";
 import { Pipeline } from "./routes/Pipeline";
@@ -20,6 +21,7 @@ import { Profiles } from "./routes/Profiles";
 import { Domains } from "./routes/Domains";
 import { Campaigns } from "./routes/Campaigns";
 import { Analytics } from "./routes/Analytics";
+import { Leads } from "./routes/Leads";
 import { api } from "./lib/api";
 import { ensurePermission } from "./lib/notify";
 import { ProfilePicker } from "./components/ProfilePicker";
@@ -54,6 +56,7 @@ export function App() {
         <ProfilePicker />
         <nav>
           <Item to="/" icon={<Activity size={16} />} label="Overview" end />
+          <Item to="/leads" icon={<UserCheck size={16} />} label="Leads" />
           <Item to="/campaigns" icon={<RocketI size={16} />} label="Campaigns" />
           <Item to="/analytics" icon={<BarChart3 size={16} />} label="Analytics" />
           <Item to="/profiles" icon={<UserRound size={16} />} label="Profiles" />
@@ -74,6 +77,7 @@ export function App() {
       <main className="main">
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/leads" element={<Leads />} />
           <Route path="/campaigns" element={<Campaigns />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profiles" element={<Profiles />} />

@@ -1,0 +1,23 @@
+{
+  "name": "Aureon Global — 7-email Hormozi sequence (initial + 6 follow-ups, reply-stop)",
+  "slug": "aureon-default",
+  "profile_slug": "aureon",
+  "created_at": "2026-05-18",
+  "target": "Real estate agents in DACH + NL closing 3+ deals/month OR brokerage teams of 2+ agents. Pulled from agent rosters / brokerage team pages with company+city captured.",
+  "voice_notes": "7 emails over ~35 days. Each follow-up takes a different Hormozi angle: 1=initial offer, 2=bump, 3=second case study, 4=risk reversal, 5=curiosity question, 6=value audit, 7=breakup. NO apostrophes, NO em-dashes, NO word-internal hyphens. Each subject signals progression but stays subject-line short. The runner auto-stops the whole sequence the moment a reply lands (imap-poll.py pauses run on reply). Required merges: {first_name}, {company}, {city}.",
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
+  "schedule_doc": "delay_days per step. 0, 3, 4, 5, 6, 8, 9 = cumulative day 0, 3, 7, 12, 18, 26, 35 from sequence start. Each row's delay_days is the gap from the PREVIOUS step's send to this step's send (so step 1 is delay 0 from enqueue, step 2 fires 3 days after step 1, etc.).",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "aureon_initial_grand_slam",
+      "subject": "More listings. More closings. Without chasing leads.",
+      "body": "Hi {first_name}. Quick one.\n\nWe have been running ads for a team of three agents in Munich that took them from 9 closings per month to 17 in 90 days. Done for them on Google, Meta, and LinkedIn. They paid only on revenue we sourced.\n\nSame model for {company} in {city}. We eat the ad spend, you keep 100 percent of your existing book. 30 percent only on what we source. No retainer.\n\nTwo slots left before next intake closes.\n\nWhat is your average monthly closings in {city}? I will send an eight minute audit for {company}.\n\nThanks,\nAnna"
+    }
+  ]
+}

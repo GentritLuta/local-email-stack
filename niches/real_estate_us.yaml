@@ -3,6 +3,11 @@ name: "US Real Estate Agents — independent brokerages"
 profile_slug: aureon
 engine: team_pages
 
+# Copy greets by {greeting} (first name when known, else "{company} team"), so a
+# parseable first name is NOT required — don't drop brokerage leads (incl.
+# front-desk info@/office@ inboxes) just because the email carries no name.
+require_first_name: false
+
 # WHAT THIS NICHE DOES
 # Walks the seed URLs below, extracts every mailto: link with its surrounding
 # context (name, role, phone), verifies each address (syntax + disposable +
@@ -26,6 +31,226 @@ seeds:
   # Good search patterns: "agents" OR "our team" + brokerage name + city.
   # - https://...
 
+# Auto-discovery: seed_discover.py runs these DDG queries daily, validates
+# results (HTTP 200 + has mailto: link + page contains agent/broker keywords),
+# and appends new seed URLs above. New seeds get scraped on next lead_scrape.
+#
+# Query design: aim at pages real brokerage sites actually rank for —
+# "Meet Our Team", "Our Agents", "Meet our agents" — combined with
+# geographic + small-firm signals.
+
+  # auto-discovered 2026-05-18 22:12 via seed_discover.py
+  - https://edpricetriad.com/about-us/meet-our-agents
+  - https://www.agentsrealtytexas.com
+  - https://www.thestacygroup.com/our-agents
+  - https://mymetrocity.com/all-agents
+  - https://www.thekolbteam.com
+  - https://www.fastexpert.com/top-real-estate-agents/arizona
+  - https://www.equitycoloradorealestate.com/agents
+  - https://colo-realty.com/agents
+  - https://exclusivegeorgiaproperties.com
+  - https://mcneelyrealestate.com/our-team
+  - https://www.raynorrealtync.com/our-team
+  - https://www.blueridgebrokerage.com
+  - https://thekeygroupohio.com/meet-our-team
+  - https://justlistedrealestateoh.com/meet-our-team
+  - https://thekeygroupohio.org/meet-our-team
+
+  # 2026-05-29 08:04 seed_discover produced only false positives that matched
+  # the weak "agent"/"broker" gate — realmadrid.com (football club, "player
+  # agent") and kaufda.de "Real" (supermarket). Removed; gate tightened below
+  # to require a real-estate-specific phrase.
+
+  # auto-discovered 2026-05-30 08:05 via seed_discover.py
+  # REMOVED 2026-06-03 (bounce investigation): off-ICP contaminants that drove the
+  # role-address bounces — marketplace.microsoft.com (Office SaaS vendors ->
+  # contact-us@cognite.com, partner@ema.ai, website@figment.io) and independent.com
+  # (news site). discovery.exclude_domains (microsoft.com, suffix-matched) blocks
+  # re-adding; this removes the already-present bad seeds the exclude couldn't reach.
+
+  # auto-discovered 2026-06-01 08:06 via seed_discover.py
+  - https://vantagerealestateaz.com
+
+  # auto-discovered 2026-06-02 08:05 via seed_discover.py
+  - https://listwithclever.com/discount-real-estate-brokers/florida
+
+  # auto-discovered 2026-06-09 17:14 via seed_discover.py
+  - https://www.goldkeyrealtyks.com/default.asp.f-meetouragents
+  - https://www.har.com/realestatepro
+  - https://listwithclever.com/discount-real-estate-brokers/colorado
+  - https://www.teamwilsontn.com/team
+  - https://dashcarolina.com/about-us/our-team
+  - https://www.ucrealestateandauction.com/ouragents.htm
+  - https://onereal.com/search-agent
+  - https://www.texasrealestate.com/about-us/contact-us
+
+  # auto-discovered 2026-06-09 17:32 via seed_discover.py
+  - https://keytosolutions.com/our-agents
+  - https://www.thirdtnrealty.net/our-agents
+  - https://blairrg.com/meet-our-agents
+  - https://www.seattleworksrealestate.co/agents
+  - https://www.trec.texas.gov
+  - https://www.realtytexas.com/real-search
+  - https://54realty.com
+  - https://rare.realestate/usa
+  - https://onereal.com
+  - https://keyser.com
+  - https://c21northwest.com/real-estate-license-az
+  - https://oedit.colorado.gov/taxonomy/term/100466
+  - https://uniqueprop.com
+  - https://www.new.premieragentnetwork.com/colorado-real-estate-broker-service-areas.html
+  - https://www.compass.com/agents/locations/atlanta-ga/32533
+
+  # auto-discovered 2026-06-09 20:09 via seed_discover.py
+  - https://www.har.com/realestatepro/searchform?search_type=member
+  - https://www.coloradorealty4less.com
+  - https://joinreal.com
+  - https://listwithclever.com/top-real-estate-agents/tennessee
+  - https://www.tnrealestategroup.com/our-team
+  - https://www.kaimteam.com
+  - https://www.theimls.com/MLS/agentdirectory.php
+  - https://www.realtytexas.com
+  - https://www.ascendgroupre.com/home
+  - https://www2.myfloridalicense.com/real-estate-commission
+  - http://nationalrealestatebrokers.org
+
+  # auto-discovered 2026-06-10 15:12 via seed_discover.py
+  - https://www.fastexpert.com/top-real-estate-agents/bristol-va
+  - https://www.realtytexas.com/agents
+  - https://www.fastexpert.com/top-real-estate-agents/texas
+  - https://www.reprosfl.com
+  - https://www.thevirtualrealtygroup.com/join-fl
+  - https://c21northwest.com/real-estate-license-az/best-real-estate-brokerages
+  - https://listwithclever.com/discount-real-estate-brokers/arizona/surprise
+  - https://dre.colorado.gov
+  - https://www.corealestatebrokers.com
+  - https://erinkrueger.com
+  - https://www.thevirtualrealtygroup.com/join-tn
+  - https://www.realtyofamerica.com/real-estate-agents/location/state/Tennessee
+  - https://www.fastexpert.com/top-real-estate-agents/tennessee
+  - https://www.travtalks.com/about
+  - https://www.fastexpert.com/top-real-estate-agents/north-carolina
+
+  # auto-discovered 2026-06-10 15:22 via seed_discover.py
+  - https://www.calljoshroy.com/team-page
+  - https://www.fastexpert.com/top-real-estate-agents/wichita-ks
+  - https://txrealestatebrokers.com
+  - https://newalbanyohio.com/team
+  - https://www.kaimteam.com/team
+  - https://ohiorealtitle.com/2023/04/meet-our-april-all-stars
+  - https://www.fastexpert.com/top-real-estate-agents/michigan
+  - https://www.fastexpert.com/top-real-estate-agents/minnesota
+  - https://www.teamtxrealestate.com
+  - https://www.fastexpert.com/top-real-estate-agents/maryville-tn
+
+  # auto-discovered 2026-06-10 20:06 via seed_discover.py
+  - https://www.buyershome.com
+  - https://listwithclever.com/discount-real-estate-brokers/florida/miramar
+  - https://nationalrealestatebrokers.org
+
+  # auto-discovered 2026-06-10 22:52 via seed_discover.py
+  - https://www.brooklynrealproperty.com/office-bensonhurst
+  - https://www.e-merge.com
+  - https://www.reindiana.com/agentsearch/search.aspx
+  - https://c21prolink.com
+  - https://gillmangroupchicago.com
+  - https://www.compass.com/agents/locations/seattle-wa/9962
+  - https://www.ironvalleyrealestate.com/real-estate-agents
+  - https://therealestatelawgroup.org/meet-our-awesome-team
+  - https://www.gprealtors.net/find-a-realtor-member/index?member_subclass=R%2CDR%2CSDR%2CSOS%2CSR&member_business_name=&member_city=&member_zip=&member_first_name=&member_last_name=&zIndex=2
+  - https://portlandhousingcenter.org/realtors
+  - https://www.wilsongroupre.com/meet_our_team
+  - https://mayerrealtygroup.com/join-our-team
+  - https://www.charleskingre.com
+  - https://www.thefcrgroup.com/agents
+  - https://pr.mo.gov/realestate.asp
+
+
+
+
+
+
+
+
+
+
+
+
+search_queries:
+  - "meet our agents real estate brokerage"
+  - "real estate brokerage agents page Texas"
+  - "small real estate brokerage Florida"
+  - "small real estate brokerage Arizona"
+  - "small real estate brokerage Colorado"
+  - "real estate brokerage agents Georgia"
+  - "real estate brokerage Tennessee team"
+  - "real estate brokerage North Carolina team"
+  - "real estate brokerage Ohio meet our team"
+  - "real estate brokerage Michigan agents"
+  - "real estate brokerage agent directory"
+  - "Texas REALTORS brokerage team"
+  - "Florida REALTORS brokerage meet"
+  - "independent real estate brokerage our agents"
+  # broadened 2026-06-10 to lift seed yield toward the 3x daily buffer — more
+  # metros/states + varied phrasings so seed_discover keeps finding NEW seeds
+  # instead of re-hitting the same exhausted set.
+  - "real estate brokerage New York agents page"
+  - "real estate brokerage Chicago Illinois team"
+  - "real estate brokerage Seattle Washington agents"
+  - "real estate brokerage Pennsylvania meet our team"
+  - "real estate brokerage Virginia agents directory"
+  - "real estate brokerage Las Vegas Nevada team"
+  - "real estate brokerage Portland Oregon agents"
+  - "real estate brokerage Massachusetts our team"
+  - "real estate brokerage Minnesota agents page"
+  - "real estate brokerage Missouri brokerage team"
+  - "real estate brokerage Indiana meet our agents"
+  - "real estate brokerage Wisconsin team page"
+  - "real estate brokerage Maryland agents"
+  - "real estate brokerage South Carolina team"
+  - "real estate brokerage New Jersey our agents"
+  - "real estate brokerage Utah agents page"
+  - "real estate brokerage Connecticut team"
+  - "real estate brokerage Tennessee Nashville agents"
+  - "boutique real estate brokerage meet the team"
+  - "independent realty group our agents contact"
+
+# scrape-time ICP gate (lead_scrape.py): EVERY seed page — auto-discovered or
+# hand-added — must contain one of these terms or the seed is skipped before any
+# lead is extracted. This is the chokepoint the Real Madrid fan site slipped
+# past (it matched "real" upstream but carries none of these on-page).
+seed_require_keywords: ["real estate", "realtor", "realty", "brokerage", "mls", "homes for sale", "listing"]
+
+discovery:
+  max_seeds_per_run: 15
+  search_country:    us          # Brave/ddgs region — US brokerages (was defaulting to de-de)
+  require_mailto:    true
+  # Page must contain a real-estate-SPECIFIC term. The old list ("agent",
+  # "broker") was too generic — football clubs ("player agent"), supermarkets,
+  # insurance/mortgage/freight brokers all matched. These four are unambiguous
+  # real-estate signals a non-real-estate site won't carry.
+  require_keywords:  ["real estate", "realtor", "realty", "brokerage"]
+  exclude_domains:
+    - facebook.com
+    - linkedin.com
+    - zillow.com
+    - realtor.com
+    - redfin.com
+    - trulia.com
+    - youtube.com
+    - twitter.com
+    - x.com
+    - instagram.com
+    - tiktok.com
+    - reddit.com
+    - yelp.com
+    - bbb.org
+    # Microsoft marketplace pages injected a cluster of SaaS/tech vendors
+    # (iGlobe, Cognite, Fivetran, IBM...) on a fuzzy match. Never a RE seed.
+    - marketplace.microsoft.com
+    - microsoft.com
+    - azuremarketplace.microsoft.com
+
 filter:
   # Skip generic role mailboxes — campaigns need individuals.
   exclude_local_parts:
@@ -41,7 +266,29 @@ filter:
     - recruiting
     - press
     - jobs
-  exclude_domains: []   # do not exclude any domain by default
+  exclude_domains:
+    # Peer / competitor brokerages — sophisticated lead-gen recruiting teams that
+    # SELL this capability themselves; wrong-fit for the Listing Engine pitch.
+    - teamminik.com
+    # Non-ICP contamination caught in the 2026-06 lead audit: "Real Madrid" got
+    # scraped on a fuzzy "real" match (fan-club corp inboxes, not real estate),
+    # plus a stray German site. Block so they never re-enter the pool.
+    - realmadrid.com
+    - corp.realmadrid.com
+    - weltmonarch.de
+    # Tech/SaaS vendors scraped off Microsoft marketplace pages, mortgage lenders
+    # (we target real-estate AGENTS, not lenders), and a newspaper — 2026-06 deep
+    # targeting purge. All were verified=true and actively being emailed.
+    - iglobe.dk
+    - cognite.com
+    - fivetran.com
+    - maqsoftware.com
+    - ema.ai
+    - cisecurity.org
+    - independent.com
+    - ibm.com
+    - cnnmortgage.com
+    - novahomeloans.com
 
 # What sequence to run for verified leads from this niche.
 # Edit step copy in sequences/aureon-realestate-us/variants.json — those

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LK Advertising — Outreach Engine & Pipeline Projection</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#2b2a2b;--slate:#3d4848;--body:#444444;--sage:#b8c6c6;--paper:#f2f2f1;--card:#fff;--rule:#d7dede}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--body);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .deck{max-width:980px;margin:0 auto;padding:40px 24px 80px}
+  .slide{background:var(--card);border:1px solid var(--rule);border-radius:18px;padding:54px 56px;margin:0 0 26px;box-shadow:0 1px 0 rgba(43,42,43,.03)}
+  .slide.dark{background:var(--ink);color:#e9ecec;border-color:var(--ink)}
+  .slide.dark h1,.slide.dark h2{color:#fff}.slide.dark .eyebrow{color:var(--sage)}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--slate);margin-bottom:18px}
+  h1{font-size:44px;font-weight:800;line-height:1.1;color:var(--ink);letter-spacing:-.02em}
+  h2{font-size:29px;font-weight:700;color:var(--ink);letter-spacing:-.01em;margin-bottom:8px}
+  p.lead{font-size:19px;color:var(--body);margin-top:18px;max-width:62ch}
+  p.sub{font-size:16px;margin-top:10px;max-width:66ch}
+  .wordmark{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;letter-spacing:-.01em}
+  .mark{height:44px;width:auto;display:block;flex:0 0 auto}
+  .logochip{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;padding:7px 10px}
+  .logochip .mark{height:38px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:50px}
+  .topbar .tag{font-size:13px;font-weight:600}
+  .grid{display:grid;gap:18px;margin-top:28px}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+  .tile{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:22px}
+  .tile.hi{background:var(--ink)}.tile.hi .n,.tile.hi .k,.tile.hi .d{color:#fff}.tile.hi .n{color:var(--sage)}
+  .tile .n{font-size:36px;font-weight:800;color:var(--slate);letter-spacing:-.02em;line-height:1}
+  .tile .n span{font-size:17px}
+  .tile .k{font-size:14px;font-weight:700;color:var(--ink);margin-top:8px}
+  .tile .d{font-size:13px;color:var(--body);margin-top:6px}
+  .step{display:flex;gap:18px;padding:15px 0;border-bottom:1px solid var(--rule)}.step:last-child{border-bottom:0}
+  .step .num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .step .body h3{font-size:16px;color:var(--ink);font-weight:700;margin-bottom:2px}.step .body p{font-size:14px}
+  ul.clean{list-style:none;margin-top:16px}ul.clean li{padding:10px 0 10px 28px;position:relative;font-size:15.5px;border-bottom:1px solid var(--rule)}ul.clean li:last-child{border-bottom:0}
+  ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:9px;height:9px;border-radius:50%;background:var(--sage);border:2px solid var(--slate)}
+  .pill{display:inline-block;background:var(--sage);color:var(--ink);font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:999px}
+  .funnel{margin-top:22px}
+  .fbar{display:flex;align-items:center;gap:16px;margin:8px 0}
+  .fbar .bar{height:42px;border-radius:9px;background:var(--slate);display:flex;align-items:center;padding:0 16px;color:#fff;font-weight:700;font-size:14px;white-space:nowrap;min-width:120px}
+  .fbar .meta{font-size:14px;color:var(--body)}.fbar .meta b{color:var(--ink)}
+  .note{font-size:12.5px;color:#7d8585;margin-top:20px;line-height:1.55}
+  table.rev{width:100%;border-collapse:collapse;margin-top:22px;font-size:15px}
+  table.rev th,table.rev td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--rule)}
+  table.rev th{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate)}
+  table.rev td.r,table.rev th.r{text-align:right;font-variant-numeric:tabular-nums}
+  table.rev tr.tot td{font-weight:800;color:var(--ink);border-top:2px solid var(--ink);border-bottom:0}
+  .cta{display:inline-block;background:#fff;color:var(--ink);font-weight:700;font-size:16px;padding:14px 26px;border-radius:11px;text-decoration:none;margin-top:24px}
+  .foot{display:flex;justify-content:space-between;font-size:12.5px;color:#8b9292;margin-top:14px;padding:0 6px}
+  .slide.dark .foot{color:#9fb0b0}
+  .seqgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}
+  .email{background:var(--paper);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  .email .ehead{background:#fff;border-bottom:1px solid var(--rule);padding:12px 16px}
+  .email .efrom{font-size:12px;color:var(--slate);font-weight:600}
+  .email .esubj{font-size:15px;color:var(--ink);font-weight:700;margin-top:2px}
+  .email .ebody{padding:14px 16px;font-size:12.5px;color:var(--body);line-height:1.5;white-space:pre-line}
+  .email .estep{display:inline-block;background:var(--ink);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-bottom:10px}
+  .cadence{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .cadence .c{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-size:13px}
+  .cadence .c b{color:var(--ink)}
+  @media(max-width:680px){.seqgrid{grid-template-columns:1fr}}
+  @media print{body{background:#fff}.deck{max-width:100%;padding:0}.slide{break-inside:avoid;page-break-inside:avoid;box-shadow:none;margin:0 0 12px;border-radius:0;border:0;border-bottom:1px solid #ddd}.slide.dark{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  @media(max-width:680px){.g3,.g4,.g2{grid-template-columns:1fr}h1{font-size:32px}.slide{padding:34px 26px}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- COVER -->
+  <section class="slide dark">
+    <div class="topbar">
+      <div class="wordmark"><span class="logochip"><img class="mark" src="data:image/png;base64,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" alt="LK Advertising"></span></div>
+      <div class="tag" style="color:var(--sage)">Outreach engine · prepared by Aureon</div>
+    </div>
+    <div class="eyebrow">Cold outreach engine &amp; pipeline projection</div>
+    <h1>Your outreach machine,<br>and what it is projected to produce.</h1>
+    <p class="lead" style="color:#cfd6d6">Lukas, this is the engine we are running for LK Advertising into the
+       US realtor market: how it works, the live deliverability and engagement numbers from our stack, and a
+       grounded pipeline + revenue projection built on those real rates.</p>
+    <div class="foot" style="margin-top:44px"><span>For Lukas Köhler, CEO · LK Advertising</span><span>Prepared by Aureon Global · 2026</span></div>
+  </section>
+
+  <!-- THE ENGINE -->
+  <section class="slide">
+    <div class="eyebrow">The engine</div>
+    <h2>A fully managed cold-outreach system, end to end.</h2>
+    <div style="margin-top:18px">
+      <div class="step"><div class="num">1</div><div class="body"><h3>Sourcing</h3><p>We auto-discover US real-estate brokerage team pages and extract named agents with verified, deliverable email addresses. The list rebuilds itself daily.</p></div></div>
+      <div class="step"><div class="num">2</div><div class="body"><h3>Verification</h3><p>Every address is syntax, MX, SMTP and catch-all checked before it is allowed into a campaign. Only verified contacts get emailed, which is why bounce stays low.</p></div></div>
+      <div class="step"><div class="num">3</div><div class="body"><h3>Sending + warm-up</h3><p>12 dedicated sending subdomains, each warmed and capped to protect reputation, for a combined throughput of up to 600 cold emails a day. A 7-step sequence per prospect.</p></div></div>
+      <div class="step"><div class="num">4</div><div class="body"><h3>Reply handling</h3><p>Positive replies are routed straight to your cal.com booking link. Auto-replies and unsubscribes are classified and suppressed automatically.</p></div></div>
+    </div>
+  </section>
+
+  <!-- LIVE ANALYTICS -->
+  <section class="slide">
+    <div class="eyebrow">Live analytics · our sending stack, last 30 days</div>
+    <h2>The infrastructure is healthy and lands in the inbox.</h2>
+    <div class="grid g4">
+      <div class="tile hi"><div class="n">98.4<span>%</span></div><div class="k">Delivery rate</div><div class="d">Of all sent. Verification keeps this high.</div></div>
+      <div class="tile hi"><div class="n">51<span>%</span></div><div class="k">Open rate</div><div class="d">Of delivered. Strong for cold B2B.</div></div>
+      <div class="tile"><div class="n">1.5<span>%</span></div><div class="k">Bounce rate</div><div class="d">Well under the 3% reputation danger line.</div></div>
+      <div class="tile"><div class="n">0.5<span>%</span></div><div class="k">Reply rate</div><div class="d">Of delivered, current baseline. The lever we scale next.</div></div>
+    </div>
+    <p class="note">Source: our own send_log over the trailing 30 days (~2,385 production sends across the stack).
+       These are real, measured rates, not estimates. Delivery and open rate confirm the inbox placement is
+       working; reply rate is the early baseline we improve with copy, targeting and volume (see next slide).</p>
+  </section>
+
+  <!-- PIPELINE PROJECTION -->
+  <section class="slide">
+    <div class="eyebrow">Projected pipeline · LK Advertising at full ramp</div>
+    <h2>What 600 sends a day turns into.</h2>
+    <p class="sub">12 dedicated subdomains, 600 cold emails a day, across ~22 active sending days a month
+       (~13,200 sends) once the warm-up ramp reaches full volume on day 22.</p>
+    <div class="funnel">
+      <div class="fbar"><div class="bar" style="width:96%">13,200 sent / mo</div><div class="meta"><b>600/day × 22 sending days</b> at full ramp</div></div>
+      <div class="fbar"><div class="bar" style="width:86%">~12,990 delivered</div><div class="meta">98.4% delivery</div></div>
+      <div class="fbar"><div class="bar" style="width:44%">~6,620 opens</div><div class="meta">51% of delivered</div></div>
+      <div class="fbar"><div class="bar" style="width:16%;background:var(--ink)">~64 replies</div><div class="meta">0.5% baseline</div></div>
+      <div class="fbar"><div class="bar" style="width:9%;background:var(--ink)">~16–29 positive</div><div class="meta"><b>→ 10–22 booked appointments / mo</b></div></div>
+    </div>
+    <p class="note">Built on the current 0.5% reply baseline over a 22-day sending month (a 22-day warm-up
+       ramp brings the senders to full 600/day volume first; weeks 1–3 build up to it). At a 1% reply rate,
+       realistic once copy and targeting are tuned, these figures roughly double to ~32–58 positive replies a
+       month. Reply rate, not deliverability, is the growth lever from here.</p>
+  </section>
+
+  <!-- REVENUE -->
+  <section class="slide">
+    <div class="eyebrow">Estimated revenue · performance model</div>
+    <h2>Even a low-single-digit close count pays for itself.</h2>
+    <table class="rev">
+      <tr><th>Per month, at full ramp (600/day × 22 days)</th><th class="r">Conservative (0.5%)</th><th class="r">Tuned (1%)</th></tr>
+      <tr><td>Positive replies / mo</td><td class="r">16 – 29</td><td class="r">32 – 58</td></tr>
+      <tr><td>Booked listing appointments delivered</td><td class="r">10 – 22</td><td class="r">19 – 44</td></tr>
+      <tr><td>Listings won (≈30% of appointments)</td><td class="r">3 – 7</td><td class="r">6 – 13</td></tr>
+      <tr><td>Avg. commission per closed listing</td><td class="r">~$9,000</td><td class="r">~$9,000</td></tr>
+      <tr class="tot"><td>Est. commission value to the agent / mo</td><td class="r">$26k – $59k</td><td class="r">$53k – $118k</td></tr>
+    </table>
+    <div class="grid g3" style="margin-top:24px">
+      <div class="tile"><div class="n">$9k<span>+</span></div><div class="k">Per closed listing</div><div class="d">Typical US side commission on a median-priced home.</div></div>
+      <div class="tile"><div class="n">Perf.</div><div class="k">LK's billing</div><div class="d">Performance based, tied to appointments delivered, not a flat retainer.</div></div>
+      <div class="tile"><div class="n">12 mo</div><div class="k">Compounding</div><div class="d">Volume + reply-rate gains stack month over month as senders mature.</div></div>
+    </div>
+    <p class="note">Illustrative model. Appointment volume from our measured rates; close rate (~30%) and commission
+       (~$9k) are market-typical assumptions and vary by the agent's market, price band and their own close process.
+       Shown to size the opportunity, not as a guarantee.</p>
+  </section>
+
+  <!-- WHERE THE UPSIDE IS -->
+  <section class="slide">
+    <div class="eyebrow">The plan to scale it</div>
+    <h2>Three levers, in priority order.</h2>
+    <ul class="clean">
+      <li><b>Lift reply rate from 0.5% toward 1%+</b> — sharper subject lines, market-specific first lines, and A/B on the 7-step sequence. This is the single biggest multiplier.</li>
+      <li><b>Grow verified volume</b> — the sourcing engine adds fresh brokerage seeds daily; more verified contacts means more booked calls at the same rates.</li>
+      <li><b>Move sending onto lk-advertising.site</b> — your own verified domain (DNS in progress) for full brand control and an independent sender reputation.</li>
+    </ul>
+    <span class="pill" style="margin-top:22px">Deliverability is solved · Reply rate is the focus · Volume compounds</span>
+  </section>
+
+  <!-- SEQUENCE OVERVIEW -->
+  <section class="slide">
+    <div class="eyebrow">The actual outreach · what gets sent</div>
+    <h2>A 7-step sequence over 28 days, in your voice.</h2>
+    <p class="sub">Each prospect receives up to seven touches, performance-media angle throughout, every positive
+       reply routed to cal.com/lkadvertising/15min. Name-optional, so brokerage inboxes get a clean greeting too.</p>
+    <div class="cadence">
+      <span class="c"><b>Day 0</b> · Offer + proof</span>
+      <span class="c"><b>Day 2</b> · Risk reversal</span>
+      <span class="c"><b>Day 4</b> · Data point</span>
+      <span class="c"><b>Day 7</b> · How it works</span>
+      <span class="c"><b>Day 11</b> · Yes / no</span>
+      <span class="c"><b>Day 18</b> · 60-day pilot</span>
+      <span class="c"><b>Day 28</b> · Breakup</span>
+    </div>
+    <p class="note">The full copy follows. {greeting} is replaced per prospect with the agent's first name, or
+       their brokerage name when no first name is available.</p>
+  </section>
+
+  <!-- SEQUENCE 1-4 -->
+  <section class="slide">
+    <div class="eyebrow">The sequence · emails 1–4</div>
+    <div class="seqgrid">
+      <div class="email">
+        <div class="ehead"><span class="estep" style="margin:0 0 0 0"></span><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">1 · 5 to 10 more listing appointments this quarter</div></div>
+        <div class="ebody">Hi {greeting},
+
+Quick one. We get real estate agents 5 to 10 more listing appointments a month with paid ads, and you only pay on performance.
+
+We build and run the Meta and Google campaigns, handle the creative and targeting, and send you booked appointments with sellers in your market. Not a 3 to 8 thousand dollar retainer into the void. You pay on the results we deliver.
+
+A team we ran went from 6 listing appointments a month to 19 in about 7 weeks, same market, same budget.
+
+Worth 15 minutes to see if your market is open? cal.com/lkadvertising/15min</div>
+      </div>
+      <div class="email">
+        <div class="ehead"><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">2 · would you take 5 booked seller calls</div></div>
+        <div class="ebody">Hi {greeting},
+
+Probably buried by now, so I will keep it short.
+
+If we put 5 booked seller appointments on your calendar this month and you only paid on performance, would you take that call?
+
+That is the whole offer. We run the ads, you get the appointments. Compare that to an agency charging you up front every month with no guarantee.
+
+15 minutes: cal.com/lkadvertising/15min</div>
+      </div>
+      <div class="email">
+        <div class="ehead"><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">3 · 6 to 19 appointments</div></div>
+        <div class="ebody">Hi {greeting},
+
+One data point.
+
+An agent we ran ads for went from 6 listing appointments a month to 19 in roughly 7 weeks. Same market, same offer, just campaigns built to book appointments instead of collect clicks.
+
+The same setup would map onto your market. Want me to show you how on a quick call?</div>
+      </div>
+      <div class="email">
+        <div class="ehead"><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">4 · how the booked-appointment math works</div></div>
+        <div class="ebody">Hi {greeting},
+
+The reason this works is the funnel, not the ad spend.
+
+Most agent ads send people to a generic valuation page and lose them. We run a seller-specific funnel that qualifies and books the appointment before it reaches you, so your time only goes to sellers who showed up to talk listings.
+
+Before: clicks, form fills, no shows. After: booked appointments on your calendar.
+
+Worth 15 minutes to map it onto your area? cal.com/lkadvertising/15min</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEQUENCE 5-7 -->
+  <section class="slide">
+    <div class="eyebrow">The sequence · emails 5–7</div>
+    <div class="seqgrid">
+      <div class="email">
+        <div class="ehead"><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">5 · {greeting}, yes or no</div></div>
+        <div class="ebody">Hi {greeting},
+
+Real question, takes 30 seconds.
+
+If we ran the ads, booked the seller appointments, and you only paid on performance, is that a yes?
+
+A clear yes or no both work.</div>
+      </div>
+      <div class="email">
+        <div class="ehead"><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">6 · 60 day pilot, performance based</div></div>
+        <div class="ebody">Hi {greeting},
+
+The lowest risk version I can offer.
+
+60 day pilot. You pick your market. We build and run the campaigns and deliver booked seller appointments. Performance based, so if it does not produce, you are not locked into a retainer.
+
+We cap how many agents we take per market so the ads do not compete. Want the pilot scope for your area, or pass for now?
+
+cal.com/lkadvertising/15min</div>
+      </div>
+      <div class="email">
+        <div class="ehead"><div class="efrom">Lukas Köhler · LK Advertising → {greeting}</div><div class="esubj">7 · last one from me</div></div>
+        <div class="ebody">Hi {greeting},
+
+Wrapping up on my end.
+
+If this is not the quarter, no hard feelings. If you ever want to revisit, a one word reply (later) is enough and I will check back.
+
+If this was the wrong angle entirely, fair enough, and best of luck with your market this year.</div>
+      </div>
+      <div class="email" style="background:var(--ink);border-color:var(--ink)">
+        <div class="ehead" style="background:var(--ink);border-color:#3d4848"><div class="efrom" style="color:var(--sage)">Reply handling</div><div class="esubj" style="color:#fff">Positive reply → your calendar</div></div>
+        <div class="ebody" style="color:#cfd6d6">Any positive reply is routed straight to cal.com/lkadvertising/15min.
+
+Auto-replies, out-of-office and unsubscribes are detected and suppressed automatically, so the list stays clean and your reputation stays protected.
+
+You only ever see the agents worth talking to.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="slide dark">
+    <div class="eyebrow">Where we are</div>
+    <h2 style="color:#fff;font-size:32px">Engine built. Domain finishing. Ready to ramp.</h2>
+    <p class="lead" style="color:#cfd6d6">The full system is live on our infrastructure and sending. Once
+       lk-advertising.site DNS verifies we move onto your own domain and open the ramp. The numbers above are
+       what that pipeline is projected to produce, grounded in rates we are already hitting.</p>
+    <a class="cta" href="https://cal.com/lkadvertising/15min">Review &amp; green-light the ramp →</a>
+    <div class="foot" style="margin-top:38px"><span>LK Advertising · Lukas Köhler · info@lk-advertising.site</span><span>Prepared by Aureon Global</span></div>
+  </section>
+
+</div>
+</body>
+</html>

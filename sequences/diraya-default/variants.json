@@ -1,0 +1,83 @@
+{
+  "name": "Diraya — 7-email Hormozi $100M Leads sequence (seed-Series-B AI engineering, full makeover)",
+  "slug": "diraya-default",
+  "profile_slug": "diraya",
+  "created_at": "2026-05-31",
+  "finalized_at": "2026-05-31",
+  "target": "Founders, CTOs, VP Engineering, Heads of Product at seed-to-Series-B SaaS / health tech / fintech companies. Buying signals: new funding round, new technical leadership hire, public AI roadmap announcement, AI/ML hiring sprees, vendor migrations, public posts about RAG/agent/LLM reliability struggles. Exclusions: dev agencies, AI engineering studios, enterprise IT outsourcing, staffing firms.",
+  "voice_notes": "FULL Hormozi $100M Leads makeover. Each email hits dream outcome + perceived likelihood + low effort/time + low sacrifice. Mohammed writes as a founder, not as a company. Concrete numbers in every email. Named lead-magnets (REVIEW for the architecture review, GHOSTS for the agent ghost-cases list). NO em-dashes, NO smart quotes, NO ellipses, NO exclamation marks, NO emojis, NO contractions where avoidable. P.S. on every email with a second specific give. Required merges: {first_name}, {company}. Optional merges: {trigger}, {ai_signal}, {proof_line}.",
+  "offer_facts": {
+    "value_prop": "Custom AI engineering for seed-to-Series-B startups. Ship a production AI feature in 8 weeks with a written eval suite, full handover to your team, and a 14-day no-cost first milestone.",
+    "proof_points": [
+      "fintech RAG pipeline: 0 to 300-case eval suite in 8 weeks",
+      "health tech agent stack: hallucination rate from 12 percent to 0.4 percent",
+      "team across Algeria, Qatar, Canada — any time zone",
+      "23 shipped projects, 77 clients, 8 years average team experience"
+    ],
+    "differentiators": [
+      "founder-led builds, you talk to the engineer writing the code",
+      "evals written before the agent",
+      "fixed scope, fixed timeline, full handover",
+      "no white-label, no offshore handoff, no junior staff-aug"
+    ],
+    "guarantee": "Working code in 14 days that passes a written eval suite, or you owe nothing and walk with the repo.",
+    "lead_magnet_primary": "Free 30-minute architecture review with a written one-pager. Reply REVIEW.",
+    "lead_magnet_secondary": "Agent Ghost-Cases List: 40 production-killer edge cases most teams miss. Reply GHOSTS."
+  },
+  "required_merges": [
+    "first_name",
+    "company"
+  ],
+  "schedule_doc": "delay_days = gap from prior step. 0,2,2,3,4,7,10 = cumulative day 0,2,4,7,11,18,28.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "hormozi_open_question_give",
+      "subject": "open to a question, {first_name}?",
+      "body": "Hi {first_name},\n\nQuick question, no pitch.\n\nI am on the engineering team at Diraya. We help seed to Series B teams ship a working AI feature in 8 weeks with a written eval suite, not 6 months of demos.\n\nLast project at a fintech: their RAG pipeline went from a brittle demo to passing a 300-case eval suite in 8 weeks. We handed the whole repo plus the eval framework to their team. They kept shipping on top of it.\n\nIf {company} has an AI feature on the roadmap that needs to actually land in production, would 15 minutes on a call be useful?\n\nIf the timing is off, reply with a no and I stop.\n\nP.s. whether we ever work together or not, reply with the word GHOSTS and I send you our Agent Ghost-Cases List. 40 production-killer edge cases that pass every demo and break in production, each with the failure mode and the eval that catches it. Free, no call, no follow-up."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "hormozi_specificity_to_company",
+      "subject": "8 weeks for {company}",
+      "body": "Hi {first_name},\n\nFollow up on the AI feature point.\n\nThe specific path I am thinking for {company}: week 1 we write the eval suite together, week 2 the first milestone ships, weeks 3 to 8 we build out the agent and harden it against the evals. Day 56 you own the repo.\n\nThe price is fixed before we start. The first milestone lands on day 14 or you owe nothing and walk with what we have built.\n\n15 minutes this week to scope what that looks like for you? Grab a time that works here: https://calendly.com/amoura-ma-diraya/30min\n\nP.s. the Ghost-Cases List is still yours if you want it. Reply GHOSTS."
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "hormozi_data_point_dream_outcome",
+      "subject": "0.4 percent",
+      "body": "Hi {first_name},\n\nOne number.\n\n0.4 percent. Last health tech build we did, that is where the hallucination rate landed after 8 weeks. Started at 12 percent. The agent now answers patient-facing queries in production and their support team stopped manually checking outputs.\n\nThe path was not magic. It was: build the eval suite first, then the agent, then iterate against the evals until the number was low enough to ship.\n\nThe same pattern would work for {company}. The eval suite is the lever. Most teams skip it and that is why their agents look great in demo and break in production.\n\n15 minutes to look at what your eval suite would need to cover?\n\nP.s. happy to do this for you for free. Reply REVIEW and within 48 hours I send a written one-pager on the AI feature {company} is building: the stack I would pick, the three biggest risks, a realistic timeline, plus the eval template we start every build with. No call attached."
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "hormozi_busy_ack_reason_why",
+      "subject": "you are busy, here is the math",
+      "body": "Hi {first_name},\n\nFourth email, you are clearly heads-down shipping. Last note from me before I switch to give-only mode.\n\nHere is the math on why I keep writing.\n\nIf {company} delays the AI feature by 3 months while a competitor ships it, that gap compounds. Your team loses interview wins, your sales team loses the answer to 'do you have AI', and your roadmap loses 3 months you do not get back.\n\nIf {company} ships in 8 weeks instead of 6 months, the gap goes the other way.\n\nThe offer is: working code on day 14 or you owe nothing. Fixed scope, fixed price, full handover to your team. The downside is 15 minutes on a call. The upside is 4 months of compounding ahead of the people who keep promising AI without shipping it.\n\nReply with a time or a no. Either one lets me move on cleanly.\n\nP.s. still happy to send the Ghost-Cases List with no call. Reply GHOSTS."
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "hormozi_forced_yes_no",
+      "subject": "{first_name}, ja oder nein",
+      "body": "Hi {first_name},\n\nClean question.\n\nIf Diraya could ship a production AI feature for {company} in 8 weeks with a written eval suite and full handover, and the first milestone landed on day 14 or you walked with no invoice and the code we had built so far, would you say yes to a 15-minute call?\n\nA clear yes or a clear no. Either one is the right answer for me. If it is a yes, the fastest path is to grab a slot here: https://calendly.com/amoura-ma-diraya/30min\n\nP.s. if it is a no on the build, the Ghost-Cases List and the architecture review are still on the table. Reply GHOSTS or REVIEW."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "hormozi_pure_value_double_give",
+      "subject": "two things you can use whether we work together or not",
+      "body": "Hi {first_name},\n\nSwitching to give-only mode as promised.\n\nTwo things, both yours:\n\n1) The Agent Ghost-Cases List. 40 production-killer edge cases that pass every demo and break in production, each with the failure mode and the eval that catches it. Reply GHOSTS.\n\n2) A free architecture review for {company}. I look at the AI feature you are building and send a written one-pager back inside 48 hours: the stack I would pick, the three biggest risks, a realistic timeline, plus the eval template we start every build with. No sales call attached. Reply REVIEW.\n\nNo call, no obligation, no follow-up sequence after this. Take either or both."
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "hormozi_breakup_value_open",
+      "subject": "closing your file at Diraya",
+      "body": "Hi {first_name},\n\nClosing your file at Diraya today. We take a small number of new builds per quarter and the next slots are filling.\n\nThree last things:\n\nIf the timing was wrong, that is fine. Tell me when the right window is and I will reach back out then.\n\nIf the offer was wrong, tell me what would have landed and I will listen. I read every reply.\n\nIf nothing was right, no hard feelings. The Ghost-Cases List and the free architecture review are still yours, no call attached. Just reply GHOSTS or REVIEW.\n\nGood luck with what you are building."
+    }
+  ]
+}

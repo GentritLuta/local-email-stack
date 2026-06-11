@@ -1,0 +1,33 @@
+# local-email-stack crontab — VPS equivalent of the Windows LES-* tasks.
+# Each entry mirrors a Windows scheduled task. Times in container's TZ
+# (Europe/Berlin per Dockerfile). cron logs go to /app/warmup-state/cron.log.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Sequence runner — every 5 min. Equivalent of LES-sequence-runner.
+*/5 * * * * cd /app && py=python python sequences/sequence-runner.py tick >> warmup-state/cron.log 2>&1
+
+# IMAP poll — every 5 min. Equivalent of LES-imap-poll.
+*/5 * * * * cd /app && python sequences/imap-poll.py >> warmup-state/cron.log 2>&1
+
+# Pool monitor — every 2 hours. Equivalent of LES-pool-monitor.
+0 */2 * * * cd /app && python scripts/pool-monitor.py >> warmup-state/cron.log 2>&1
+
+# Watchdog — hourly health check + remediation. Equivalent of LES-watchdog.
+0 * * * * cd /app && python scripts/watchdog.py >> warmup-state/cron.log 2>&1
+
+# Daily fill + enroll — once at 09:30 (CET). Equivalent of LES-daily-fill-and-enroll.
+30 9 * * * cd /app && python sequences/daily-fill-and-enroll.py >> warmup-state/cron.log 2>&1
+
+# Daily ops report — once at 08:00. Equivalent of LES-daily-report.
+0 8 * * * cd /app && python scripts/daily-report.py >> warmup-state/cron.log 2>&1
+
+# Resend status reconciler — once at 18:00.
+0 18 * * * cd /app && python sequences/resend-status-reconcile.py >> warmup-state/cron.log 2>&1
+
+# Safeguard domain check — once at 07:30.
+30 7 * * * cd /app && python sequences/safeguard-domain-check.py >> warmup-state/cron.log 2>&1
+
+# Seed discover — once at 08:00 (before fill+enroll).
+0 8 * * * cd /app && python sequences/seed_discover.py --max-per-query 5 >> warmup-state/cron.log 2>&1

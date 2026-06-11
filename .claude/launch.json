@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "reports",
+      "runtimeExecutable": "py",
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "out"],
+      "port": 8766,
+      "openUrl": "http://localhost:8766/_diraya_report.html"
+    },
+    {
+      "name": "deck",
+      "runtimeExecutable": "py",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "docs"],
+      "port": 8765,
+      "openUrl": "http://localhost:8765/aureon-architecture-client.html"
+    }
+  ]
+}

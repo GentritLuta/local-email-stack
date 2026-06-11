@@ -1,0 +1,18 @@
+# Mercury Scales (Dorian) — DNS records for mercuryscales.com (Hostinger, Dorian's own account).
+# STATUS 2026-06-10: PUBLISHED AUTOMATICALLY via HOSTINGER_API_TOKEN_DORIAN
+# (sequences/hostinger.env) — Dorian provided his Hostinger API token, so manual
+# pasting is no longer needed. Kept for reference / DNS-drift recovery.
+# Subdomains: outreach.mercuryscales.com + team.mercuryscales.com  (Resend region eu-west-1)
+# NAME is relative to the mercuryscales.com zone root.
+
+# --- outreach.mercuryscales.com (resend id 34a50af3-c1d9-4f6a-b9b4-eff004dfd898) ---
+TXT    resend._domainkey.outreach               p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYLOPYtDTBGYfrIjgtXH6eZOCGKY8aAoiP60vGIcte3fwWHtWgzLdTd3neodm2693UUgxc+477kWDcpHOQrkaMLdwoetRTAWX2c6UEWR3Sh+yxbjJlWWGH06svy4ha4owVcV3ACspZwvihPQvBoHwZYmLguZMrq5DCRDIgno7t/wIDAQAB
+MX     send.outreach                            feedback-smtp.eu-west-1.amazonses.com [priority 10]
+TXT    send.outreach                            v=spf1 include:amazonses.com ~all
+TXT    _dmarc.outreach                          v=DMARC1; p=none; rua=mailto:dmarc@mercuryscales.com; ruf=mailto:dmarc@mercuryscales.com; pct=100; adkim=s; aspf=s
+
+# --- team.mercuryscales.com (resend id 87db9006-626b-4abe-b07e-1fd84ddc8085) ---
+TXT    resend._domainkey.team                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcPmldR33P5db6ErC+gC1kaSOfNZGIHijD6ixN0Qj247/uFrU3wU5hh7aMnz7yQDMzFkx9BXygJW1ZwlWPhQDo0DEOmQeko6MF88ddyVfs+0VeLto60AQ2ExKqGZnDlwIIgPeMWKOHmOlJTCAXDO3nSRipVRa+flbVn1fdRLOQYwIDAQAB
+MX     send.team                                feedback-smtp.eu-west-1.amazonses.com [priority 10]
+TXT    send.team                                v=spf1 include:amazonses.com ~all
+TXT    _dmarc.team                              v=DMARC1; p=none; rua=mailto:dmarc@mercuryscales.com; ruf=mailto:dmarc@mercuryscales.com; pct=100; adkim=s; aspf=s

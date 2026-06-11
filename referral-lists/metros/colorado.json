@@ -1,0 +1,295 @@
+{
+  "metro": "Colorado Front Range",
+  "label": "Denver and Colorado Springs (Front Range)",
+  "basename": "Attorney-Referral-List-Colorado-Front-Range",
+  "match": {
+    "area_codes": [
+      "719",
+      "720",
+      "303"
+    ],
+    "cities": [
+      "denver",
+      "colorado springs",
+      "aurora",
+      "littleton",
+      "lakewood",
+      "greenwood village",
+      "englewood",
+      "arvada",
+      "castle rock",
+      "centennial",
+      "monument",
+      "highlands ranch",
+      "parker",
+      "westminster",
+      "thornton"
+    ]
+  },
+  "firms": [
+    {
+      "firm": "The Hughes Law Firm, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Richard Hughes",
+      "practice": "Estate planning, probate, elder law",
+      "city": "Denver, CO",
+      "phone": "(303) 758-0680",
+      "email": "",
+      "website": "thehugheslawfirm.net",
+      "address": "3801 East Florida Avenue, Suite 640, Denver, CO 80210"
+    },
+    {
+      "firm": "Glatstein & O'Brien LLP",
+      "type": "Estate / Probate",
+      "lead_attorney": "M. Carl Glatstein",
+      "practice": "Probate, estate administration, elder law",
+      "city": "Denver, CO",
+      "phone": "(303) 731-3986",
+      "email": "",
+      "website": "denverprobatelaw.com",
+      "address": "2696 South Colorado Boulevard, Suite 350, Denver, CO 80222"
+    },
+    {
+      "firm": "Meurer & Potter, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Michael T. Meurer",
+      "practice": "Estate planning, probate, elder law, Medicaid",
+      "city": "Greenwood Village, CO",
+      "phone": "(303) 991-3544",
+      "email": "",
+      "website": "meurerlawoffices.com",
+      "address": "5347 South Valentia Way, Suite 335, Greenwood Village, CO 80111"
+    },
+    {
+      "firm": "Solem Woodward & McKinley, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Eric Solem",
+      "practice": "Estate planning, probate, elder law, Medicaid",
+      "city": "Englewood, CO",
+      "phone": "(303) 761-4900",
+      "email": "",
+      "website": "solemlaw.com",
+      "address": "750 W. Hampden Avenue, Suite 505, Englewood, CO 80110"
+    },
+    {
+      "firm": "Colorado Estate Planning Law Center",
+      "type": "Estate / Probate",
+      "lead_attorney": "Karen L. Brady",
+      "practice": "Estate planning, probate, trust settlement",
+      "city": "Arvada, CO",
+      "phone": "(303) 420-2863",
+      "email": "",
+      "website": "coloradoestateplanning.com",
+      "address": "6870 W 52nd Avenue, Suite 103, Arvada, CO 80002"
+    },
+    {
+      "firm": "Folkestad Fazekas Barrick & Patoile, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "James B. Folkestad",
+      "practice": "Estate planning, wills, trusts, probate administration",
+      "city": "Castle Rock, CO",
+      "phone": "(303) 688-3045",
+      "email": "",
+      "website": "ffcolorado.com",
+      "address": "18 South Wilcox Street, Suite 200, Castle Rock, CO 80104"
+    },
+    {
+      "firm": "Hammond Law Group PC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Catherine Hammond",
+      "practice": "Estate planning, living trusts, Medicaid, probate",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 520-1474",
+      "email": "",
+      "website": "coloradoestateplan.com",
+      "address": "2955 Professional Place, Suite 300, Colorado Springs, CO 80904"
+    },
+    {
+      "firm": "Schroer & Williams Law Offices, PLLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Ronald J. Williams",
+      "practice": "Estate planning, probate, elder law",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 473-4355",
+      "email": "",
+      "website": "schroerlaw.com",
+      "address": "7045 Campus Drive, Suite 103, Colorado Springs, CO 80920"
+    },
+    {
+      "firm": "Justin Fish Legal, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Justin Fish",
+      "practice": "Estate planning, wills, trusts, probate, Medicaid",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 493-9003",
+      "email": "Justin@justinfishlegal.com",
+      "website": "justinfishlegal.com",
+      "address": "13540 Northgate Estates Drive, Suite 100, Colorado Springs, CO 80921"
+    },
+    {
+      "firm": "Louie V. Larimer, Attorney at Law",
+      "type": "Estate / Probate",
+      "lead_attorney": "Louie V. Larimer",
+      "practice": "Estate planning, wills, trusts, probate",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 440-6410",
+      "email": "",
+      "website": "csestateplanning.com",
+      "address": "620 Southpointe Court, Suite 175, Colorado Springs, CO 80906"
+    },
+    {
+      "firm": "The Law Office of Kevin R. Hancock LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Kevin R. Hancock",
+      "practice": "Estate planning, wills, trusts, probate administration",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 575-9690",
+      "email": "",
+      "website": "cotrustattorney.com",
+      "address": "13570 Meadowgrass Drive, Suite 120, Colorado Springs, CO 80921"
+    },
+    {
+      "firm": "Gordon J. Williams, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Gordon J. Williams",
+      "practice": "Estate planning, probate, trust administration, elder law",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 471-9300",
+      "email": "",
+      "website": "gordonjwilliams.com",
+      "address": "405 South Cascade Avenue, Suite 304, Colorado Springs, CO 80903"
+    },
+    {
+      "firm": "Goldman Law, LLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Scott D. Goldman",
+      "practice": "Divorce, child custody, support, property division",
+      "city": "Denver, CO",
+      "phone": "(303) 656-9529",
+      "email": "",
+      "website": "goldmanlaw303.com",
+      "address": "1873 S Bellaire St, Suite 1105, Denver, CO 80222"
+    },
+    {
+      "firm": "Plog & Stein, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Stephen J. Plog",
+      "practice": "Divorce, custody, support, maintenance",
+      "city": "Greenwood Village, CO",
+      "phone": "(303) 781-0322",
+      "email": "",
+      "website": "plogsteinlaw.com",
+      "address": "6021 S Syracuse Way, Suite 202, Greenwood Village, CO 80111"
+    },
+    {
+      "firm": "Modern Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Nicholas Tootalian",
+      "practice": "Divorce, custody, support, family law",
+      "city": "Denver, CO",
+      "phone": "(720) 699-9255",
+      "email": "",
+      "website": "modernfamilylaw.com",
+      "address": "4500 E Cherry Creek S Dr, Suite 700, Denver, CO 80246"
+    },
+    {
+      "firm": "Epstein Patierno, LLP",
+      "type": "Divorce / Family",
+      "lead_attorney": "David Littman",
+      "practice": "Divorce, custody, complex family law",
+      "city": "Denver, CO",
+      "phone": "(303) 893-3111",
+      "email": "info@epfamilylawattorneys.com",
+      "website": "epfamilylawattorneys.com",
+      "address": "730 17th Street, Suite 230, Denver, CO 80202"
+    },
+    {
+      "firm": "Divorce Matters",
+      "type": "Divorce / Family",
+      "lead_attorney": "Douglas A. Thomas",
+      "practice": "Divorce, child custody, child support",
+      "city": "Greenwood Village, CO",
+      "phone": "(720) 542-6142",
+      "email": "info@divorce-matters.com",
+      "website": "divorce-matters.com",
+      "address": "8390 E Crescent Parkway, Suite 230, Greenwood Village, CO 80111"
+    },
+    {
+      "firm": "Colorado Legal Group",
+      "type": "Divorce / Family",
+      "lead_attorney": "David Crum",
+      "practice": "Divorce, custody, support, property division",
+      "city": "Denver, CO",
+      "phone": "(720) 594-7360",
+      "email": "info@coloradolegalgroup.com",
+      "website": "coloradolegalgroup.com",
+      "address": "1777 S Harrison St, Suite 1050, Denver, CO 80210"
+    },
+    {
+      "firm": "Rocky Mountain Legal Group",
+      "type": "Divorce / Family",
+      "lead_attorney": "M. Patricia Marrison",
+      "practice": "Divorce, custody, marital property, support",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 822-0154",
+      "email": "reception@rockymountainlegalgroup.com",
+      "website": "rockymountainlegalgroup.com",
+      "address": "2985 Broadmoor Valley Rd, Colorado Springs, CO 80906"
+    },
+    {
+      "firm": "Graham.Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Carl O. Graham",
+      "practice": "Divorce, military divorce, custody, support",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 630-1123",
+      "email": "admin@graham.law",
+      "website": "www.graham.law",
+      "address": "2 N Cascade Ave, Suite 1100, Colorado Springs, CO 80903"
+    },
+    {
+      "firm": "Janko Family Law Solutions",
+      "type": "Divorce / Family",
+      "lead_attorney": "Sabra M. Janko",
+      "practice": "Divorce, military family law, custody, support",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 344-5523",
+      "email": "",
+      "website": "jankolaw.com",
+      "address": "2 N Cascade Ave, Suite 1330, Colorado Springs, CO 80903"
+    },
+    {
+      "firm": "Moran, Allen & Associates Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Michael T. Allen",
+      "practice": "Divorce, custody, support, prenuptial agreements",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 447-0762",
+      "email": "mike@familylawcosprings.com",
+      "website": "familylawcosprings.com",
+      "address": "220 E Costilla St, Colorado Springs, CO 80903"
+    },
+    {
+      "firm": "Law Office of Greg Quimby, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Greg Quimby",
+      "practice": "Divorce, custody, support, property division",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 212-4227",
+      "email": "",
+      "website": "gregquimby.com",
+      "address": "415 S Cascade Avenue, Colorado Springs, CO 80903"
+    },
+    {
+      "firm": "Travis Law Group PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Rich Travis",
+      "practice": "Divorce, military divorce, custody, support",
+      "city": "Colorado Springs, CO",
+      "phone": "(719) 520-5011",
+      "email": "",
+      "website": "travislawgroup.com",
+      "address": "121 E Vermijo Ave, Colorado Springs, CO 80903"
+    }
+  ]
+}

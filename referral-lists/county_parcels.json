@@ -1,0 +1,61 @@
+{
+  "brown": {
+    "_discovered": true,
+    "city": "PropCity",
+    "ctx": {
+      "acreage": "Legal_Acreage",
+      "homestead": "homstead",
+      "improvement": "improvval",
+      "land value": "landvalue",
+      "last sale": "Latest_Sale_Price",
+      "sale date": "Latest_Sale_Date",
+      "sqft": "Calc_Sq_Ft",
+      "use class": "PROP_Class_Desc"
+    },
+    "klass": null,
+    "ocity": null,
+    "ocsz": "Owner_City_ST_ZIP",
+    "omail": "Owner_Street",
+    "ostate": null,
+    "owner": "Owner",
+    "ozip": "Owner_City_ST_ZIP",
+    "pcsz": "Property_City_ST_ZIP",
+    "pstate": "PropertyState",
+    "res": null,
+    "stname": "Property_Street",
+    "stno": null,
+    "url": "https://services1.arcgis.com/nYfGJ9xFTKW6VPqW/arcgis/rest/services/Monroe_County_Survey_Utility/FeatureServer/6",
+    "val": "TotalValue",
+    "zip": "PropertyZip"
+  },
+  "hamilton": null,
+  "monroe": {
+    "_discovered": true,
+    "city": "PropCity",
+    "ctx": {
+      "acreage": "Legal_Acreage",
+      "homestead": "homstead",
+      "improvement": "improvval",
+      "land value": "landvalue",
+      "last sale": "Latest_Sale_Price",
+      "sale date": "Latest_Sale_Date",
+      "sqft": "Calc_Sq_Ft",
+      "use class": "PROP_Class_Desc"
+    },
+    "klass": null,
+    "ocity": null,
+    "ocsz": "Owner_City_ST_ZIP",
+    "omail": "Owner_Street",
+    "ostate": null,
+    "owner": "Owner",
+    "ozip": "Owner_City_ST_ZIP",
+    "pcsz": "Property_City_ST_ZIP",
+    "pstate": "PropertyState",
+    "res": null,
+    "stname": "Property_Street",
+    "stno": null,
+    "url": "https://services1.arcgis.com/nYfGJ9xFTKW6VPqW/arcgis/rest/services/Monroe_County_Survey_Utility/FeatureServer/6",
+    "val": "TotalValue",
+    "zip": "PropertyZip"
+  }
+}

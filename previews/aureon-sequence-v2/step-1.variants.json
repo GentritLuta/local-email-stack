@@ -1,0 +1,23 @@
+{
+  "name": "Aureon Global — 7-email Hormozi-rigorous sequence (named mechanism, no nag, forced-answer)",
+  "slug": "aureon-default",
+  "profile_slug": "aureon",
+  "created_at": "2026-05-18",
+  "target": "Real estate agents in DACH + NL closing 3+ deals/month OR brokerage teams of 2+ agents.",
+  "voice_notes": "Hormozi rigour applied. Named mechanism (The Aureon Listing Pipeline) appears 3 times. Each follow-up takes a different angle (story-objection, new case study, refund math, forced yes/no, pure value drop, sharp breakup). Subjects are human, lowercase where natural, specific numbers > vague claims. Step 1 has no CTA button (handled by template via step_n=1). Length tapers: 90 -> 50 -> 60 -> 70 -> 40 -> 55 -> 60 words. NO apostrophes, NO em-dashes, NO word-internal hyphens. NO single quotes ('). Reply-stop wired via imap-poll. Required: {first_name}, {company}, {city}.",
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
+  "schedule_doc": "delay_days = gap from PREVIOUS step's send. 0,3,4,5,6,8,9 = cumulative day 0,3,7,12,18,26,35.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "aureon_initial_named_mechanism",
+      "subject": "9 to 17 closings, paid only on what closed",
+      "body": "Hi {first_name}. Quick one.\n\nA team of three agents in Munich went from 9 closings per month to 17 in 90 days. We ran the ads. They kept the listings.\n\nWe do this for real estate teams in DACH and NL. We call it the Aureon Listing Pipeline. Fully managed Google, Meta, and LinkedIn ads tuned to your market. You pay zero ad spend. We earn 30 percent only on revenue we source. Your existing book stays 100 percent yours.\n\nIf 5 to 10 additional verified seller meetings per month in {city} sounds useful for {company}, just reply with your average monthly closings. I will send the 8 minute audit.\n\nThanks,\nAnna"
+    }
+  ]
+}

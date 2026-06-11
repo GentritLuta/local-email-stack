@@ -1,0 +1,23 @@
+{
+  "name": "Aureon Global — 7-email Hormozi sequence (initial + 6 follow-ups, reply-stop)",
+  "slug": "aureon-default",
+  "profile_slug": "aureon",
+  "created_at": "2026-05-18",
+  "target": "Real estate agents in DACH + NL closing 3+ deals/month OR brokerage teams of 2+ agents. Pulled from agent rosters / brokerage team pages with company+city captured.",
+  "voice_notes": "7 emails over ~35 days. Each follow-up takes a different Hormozi angle: 1=initial offer, 2=bump, 3=second case study, 4=risk reversal, 5=curiosity question, 6=value audit, 7=breakup. NO apostrophes, NO em-dashes, NO word-internal hyphens. Each subject signals progression but stays subject-line short. The runner auto-stops the whole sequence the moment a reply lands (imap-poll.py pauses run on reply). Required merges: {first_name}, {company}, {city}.",
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
+  "schedule_doc": "delay_days per step. 0, 3, 4, 5, 6, 8, 9 = cumulative day 0, 3, 7, 12, 18, 26, 35 from sequence start. Each row's delay_days is the gap from the PREVIOUS step's send to this step's send (so step 1 is delay 0 from enqueue, step 2 fires 3 days after step 1, etc.).",
+  "variants": [
+    {
+      "n": 4,
+      "delay_days": 5,
+      "angle": "aureon_followup_risk_reversal",
+      "subject": "What if it does not work for {company}?",
+      "body": "Hi {first_name}.\n\nA quick thought on risk.\n\nIf {company} runs the Aureon pipeline and the deals do not close, you owe us nothing. We carry the ad budget end to end. Your existing book stays 100 percent yours. The only thing you risk is the 5000 EUR setup, and we refund that if no deals close in the first 90 days.\n\nWorth a 15 minute call to walk through the math for {city}?\n\nThanks,\nAnna"
+    }
+  ]
+}

@@ -93,11 +93,17 @@ def push_variants(c: httpx.Client) -> int:
             data = json.loads(vfile.read_text(encoding="utf-8"))
         except Exception:
             continue
-        # Infer profile_slug from file/path — for aureon-20-variants/ use 'aureon'
+        # Require explicit profile_slug. Historically we fell back to
+        # parsing the directory name (aureon-20-variants → "aureon"), but
+        # that lets stale/experimental sequence dirs upsert into a live
+        # client's variants and silently overwrite the canonical copy.
+        # Each variants file that's meant to back a live sequence must now
+        # declare its profile_slug explicitly.
         profile_slug = data.get("profile_slug")
         if not profile_slug:
-            stem = vfile.parent.name.split("-")[0]
-            profile_slug = stem
+            print(f"  - skip {vfile.relative_to(REPO_ROOT)}: no explicit profile_slug "
+                  f"(add `\"profile_slug\": \"...\"` to push)")
+            continue
         rows = []
         for v in data.get("variants", []):
             rows.append({

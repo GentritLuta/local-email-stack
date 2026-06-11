@@ -6,6 +6,7 @@ import { EmptyState } from "../components/EmptyState";
 import { api } from "../lib/api";
 import { NewProfileModal } from "../components/NewProfileModal";
 import { fetchProfiles as fetchSupabaseProfiles, isConfigured, subscribeToTable } from "../lib/supabase";
+import { TargetingPanel } from "../components/TargetingPanel";
 
 export function Profiles() {
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
@@ -136,12 +137,16 @@ export function Profiles() {
                   </button>
                   <button onClick={() => navigate(`/warmup?profile=${p.slug}`)}>Warmup details</button>
                   <button onClick={() => navigate(`/sequences?profile=${p.slug}`)}>Sequences</button>
+                  <button onClick={() => navigate(`/leads?profile=${p.slug}`)}>Leads</button>
                   <button onClick={async () => {
                     const cmd = `py sequences\\warmup-scheduler.py tick --profile ${p.slug}`;
                     try { await navigator.clipboard.writeText(cmd); alert("Tick command copied — paste in PowerShell."); }
                     catch { alert(cmd); }
                   }}><Copy size={12} /> Copy "tick" command</button>
                 </div>
+
+                {/* Per-client lead-search targeting */}
+                <TargetingPanel profileSlug={p.slug} />
               </div>
             );
           })}

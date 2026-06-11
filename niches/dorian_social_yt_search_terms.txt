@@ -1,0 +1,16 @@
+# Dorian / Mercury Scales — YouTube discover search terms (ICP: self-made B2B founders).
+# One query per line; # comments ignored. Used by:
+#   py sequences/youtube_scraper.py discover niches/dorian_social_yt_search_terms.txt \
+#      --out niches/dorian_yt_channels.txt --pages 1
+# Wired into daily-fill-and-enroll.py PROFILE_CFG["dorian"].creator_scrapers (2026-06-10).
+# Each query costs 100 YT quota units per page (shared 10k/day with the crypto discover).
+ai automation agency
+ai automation agency owner
+high ticket closer
+high ticket sales coach
+closing coach b2b
+smma agency owner
+business coach for entrepreneurs
+b2b sales coaching
+money mindset coach
+online business coach deutschland

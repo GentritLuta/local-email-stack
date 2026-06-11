@@ -109,7 +109,12 @@ def materialize_persona(persona: dict, domain_entry: dict) -> dict:
     daniel@<sub>.aureonglobal.de in the pool."""
     p = dict(persona)
     domain = domain_entry["domain"]
-    p["from_addr"] = f'{persona["slug"]}@{domain}'
+    # Localpart from the persona's declared from_addr (e.g. "sami"), NOT the slug.
+    # Aureon/Atal slugs already equal their from_addr localpart so this is a no-op
+    # for them; Diraya slugs are tier-suffixed ("sami-hello") and would otherwise
+    # send from ugly sami-hello@ addresses. Falls back to the slug if no from_addr.
+    localpart = (persona.get("from_addr") or persona["slug"]).split("@")[0]
+    p["from_addr"] = f'{localpart}@{domain}'
     # Reply-To stays on the canonical mailbox (info@<root>) so replies converge.
     return p
 

@@ -1,0 +1,297 @@
+{
+  "metro": "Charlotte",
+  "label": "Charlotte and Metro Charlotte",
+  "basename": "Attorney-Referral-List-Charlotte",
+  "match": {
+    "area_codes": [
+      "704",
+      "980"
+    ],
+    "states": [
+      "NC"
+    ],
+    "cities": [
+      "charlotte",
+      "concord",
+      "gastonia",
+      "huntersville",
+      "matthews",
+      "mooresville",
+      "cornelius",
+      "indian trail",
+      "pineville",
+      "mint hill"
+    ],
+    "zip_prefixes": [
+      "280",
+      "281",
+      "282"
+    ]
+  },
+  "firms": [
+    {
+      "firm": "Stewart Law, P.A.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Todd A. Stewart",
+      "practice": "Estate planning, wills, trusts & probate",
+      "city": "Charlotte",
+      "phone": "704-552-5160",
+      "email": "info@tstewartlaw.com",
+      "website": "https://tstewartlaw.com/",
+      "address": "909 East Boulevard, Charlotte, NC 28203"
+    },
+    {
+      "firm": "Orsbon & Fenninger, LLP",
+      "type": "Estate / Probate",
+      "lead_attorney": "R. Anthony Orsbon",
+      "practice": "Estate planning, probate & trusts",
+      "city": "Charlotte",
+      "phone": "704-556-9600",
+      "email": "",
+      "website": "https://www.orsbonandfenninger.com/",
+      "address": "4201 Congress St., Suite 110, Charlotte, NC 28209"
+    },
+    {
+      "firm": "Essex Richards, P.A.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Jon Windham",
+      "practice": "Estate planning & estate administration",
+      "city": "Charlotte",
+      "phone": "704-377-4300",
+      "email": "",
+      "website": "https://www.essexrichards.com/",
+      "address": "1701 South Boulevard, Charlotte, NC 28203"
+    },
+    {
+      "firm": "James E. Hickmon, PLLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "James E. Hickmon",
+      "practice": "Estate planning, probate & fiduciary law",
+      "city": "Charlotte",
+      "phone": "704-248-6325",
+      "email": "",
+      "website": "https://charlotteestatelawyer.com/",
+      "address": "5605 Carnegie Blvd, Ste 420, Charlotte, NC 28209"
+    },
+    {
+      "firm": "Lake Norman Wealth Counsel",
+      "type": "Estate / Probate",
+      "lead_attorney": "Andrew F. Sabourin",
+      "practice": "Wills, trusts & estate planning",
+      "city": "Huntersville",
+      "phone": "704-727-2026",
+      "email": "",
+      "website": "https://www.lknwealthcounsel.com/",
+      "address": "11330 Vanstory Dr., Huntersville, NC 28078"
+    },
+    {
+      "firm": "Nosal & Jeter, LLP",
+      "type": "Estate / Probate",
+      "lead_attorney": "Peter J. Nosal",
+      "practice": "Probate & trust administration",
+      "city": "Cornelius",
+      "phone": "704-608-3429",
+      "email": "info@nosaljeterlaw.com",
+      "website": "https://www.nosaljeterlaw.com/",
+      "address": "18525 Statesville Rd, Ste D-02, Cornelius, NC 28031"
+    },
+    {
+      "firm": "Simpson Law Firm",
+      "type": "Estate / Probate",
+      "lead_attorney": "Holly Simpson",
+      "practice": "Wills, trusts, probate & elder law",
+      "city": "Charlotte",
+      "phone": "980-999-2820",
+      "email": "info@simpsonestatelaw.com",
+      "website": "https://simpsonestatelaw.com/",
+      "address": "17250 Lancaster Hwy., Suite 601, Charlotte, NC 28277"
+    },
+    {
+      "firm": "Hands Law",
+      "type": "Estate / Probate",
+      "lead_attorney": "David W. Hands",
+      "practice": "Estate planning, wills, trusts & probate",
+      "city": "Charlotte",
+      "phone": "704-459-7410",
+      "email": "",
+      "website": "https://www.handslawonline.com/",
+      "address": "5457 Monroe Road, Charlotte, NC 28212"
+    },
+    {
+      "firm": "Conrad Trosch & Kemmy, P.A.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Louis A. Trosch, Sr.",
+      "practice": "Estate planning & elder law",
+      "city": "Charlotte",
+      "phone": "704-553-8221",
+      "email": "",
+      "website": "https://ctklawyers.com/",
+      "address": "301 S. McDowell Street, Suite 1001, Charlotte, NC 28204"
+    },
+    {
+      "firm": "Johnston, Allison & Hord, P.A.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Holly B. Norvell",
+      "practice": "Trusts & estates, estate planning",
+      "city": "Charlotte",
+      "phone": "704-332-1181",
+      "email": "hnorvell@jahlaw.com",
+      "website": "https://www.jahlaw.com/",
+      "address": "1065 East Morehead Street, Charlotte, NC 28204"
+    },
+    {
+      "firm": "Legacy Law Firm",
+      "type": "Estate / Probate",
+      "lead_attorney": "Alyssa E. Kisby-Meadows",
+      "practice": "Estate planning & trust administration",
+      "city": "Gastonia",
+      "phone": "980-485-4507",
+      "email": "info@legacylawfirmnc.com",
+      "website": "https://www.legacylawfirmnc.com/",
+      "address": "121 W. Main Ave., #201, Gastonia, NC 28052"
+    },
+    {
+      "firm": "The Law Offices of Morris W. Keeter",
+      "type": "Estate / Probate",
+      "lead_attorney": "Morris W. Keeter",
+      "practice": "Wills, trusts, probate & elder law",
+      "city": "Gastonia",
+      "phone": "704-810-2425",
+      "email": "",
+      "website": "https://www.keeterlaw.com/",
+      "address": "309 South Street, Gastonia, NC 28052"
+    },
+    {
+      "firm": "Epperson Law Group, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "James L. Epperson",
+      "practice": "Divorce & family law",
+      "city": "Charlotte",
+      "phone": "704-321-0031",
+      "email": "",
+      "website": "https://www.epplaw.com/",
+      "address": "10851 Sikes Place, Charlotte, NC 28277"
+    },
+    {
+      "firm": "Rech Law, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Kate Rech",
+      "practice": "Divorce, custody & family law",
+      "city": "Charlotte",
+      "phone": "704-659-0007",
+      "email": "",
+      "website": "https://www.rechlaw.com/",
+      "address": "1819 Charlotte Drive, Suite 100, Charlotte, NC 28203"
+    },
+    {
+      "firm": "Miller Cushing Holladay, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Brett Holladay",
+      "practice": "Divorce, custody, alimony & family law",
+      "city": "Charlotte",
+      "phone": "980-321-5590",
+      "email": "",
+      "website": "https://www.mchpllc.com/",
+      "address": "508 East Blvd., Charlotte, NC 28203"
+    },
+    {
+      "firm": "Jetton & Meredith, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Mark S. Jetton, Jr.",
+      "practice": "Divorce & family law",
+      "city": "Charlotte",
+      "phone": "704-931-5535",
+      "email": "",
+      "website": "https://www.jettonmeredithlaw.com/",
+      "address": "817 E Trade Street, Charlotte, NC 28202"
+    },
+    {
+      "firm": "Collins Family & Elder Law Group",
+      "type": "Divorce / Family",
+      "lead_attorney": "Shawna Collins",
+      "practice": "Divorce, custody & family law",
+      "city": "Charlotte",
+      "phone": "704-289-3250",
+      "email": "",
+      "website": "https://www.collinsfamilylaw.com/",
+      "address": "228 East Blvd., Charlotte, NC 28203"
+    },
+    {
+      "firm": "Lake Norman Law Firm",
+      "type": "Divorce / Family",
+      "lead_attorney": "Adam Gray Breeding",
+      "practice": "Divorce & family law",
+      "city": "Cornelius",
+      "phone": "704-765-1617",
+      "email": "Amy@lknlawfirm.com",
+      "website": "https://lknlawfirm.com/",
+      "address": "21235 Catawba Avenue, Cornelius, NC 28031"
+    },
+    {
+      "firm": "Blood Law, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Anna Blood",
+      "practice": "Divorce, custody & family law",
+      "city": "Charlotte",
+      "phone": "704-286-0570",
+      "email": "",
+      "website": "https://www.blood-law.com/",
+      "address": "1120 East Blvd., Suite 150, Charlotte, NC 28203"
+    },
+    {
+      "firm": "Cordell & Cordell",
+      "type": "Divorce / Family",
+      "lead_attorney": "Morgan L. Rich",
+      "practice": "Divorce & family law",
+      "city": "Charlotte",
+      "phone": "704-668-0000",
+      "email": "",
+      "website": "https://cordellcordell.com/",
+      "address": "6701 Carmel Road, Suite 110, Charlotte, NC 28226"
+    },
+    {
+      "firm": "Arnold & Smith, PLLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Matthew R. Arnold",
+      "practice": "Divorce & family law",
+      "city": "Charlotte",
+      "phone": "704-370-2828",
+      "email": "",
+      "website": "https://www.arnoldsmithlaw.com/",
+      "address": "200 N McDowell St, Charlotte, NC 28204"
+    },
+    {
+      "firm": "Daly Mills Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Judith M. Daly",
+      "practice": "Divorce, custody & family law",
+      "city": "Mooresville",
+      "phone": "704-878-2365",
+      "email": "",
+      "website": "https://dalymills.com/",
+      "address": "131 Plantation Ridge Drive, Suite 400, Mooresville, NC 28117"
+    },
+    {
+      "firm": "Southpark Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Molly Anthony",
+      "practice": "Divorce, custody & family law",
+      "city": "Charlotte",
+      "phone": "704-684-4504",
+      "email": "",
+      "website": "https://www.southparkfamilylaw.com/",
+      "address": "5821 Fairview Road, Suite 308, Charlotte, NC 28209"
+    },
+    {
+      "firm": "Easterling Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Lindsey Easterling",
+      "practice": "Divorce, custody & family law",
+      "city": "Matthews",
+      "phone": "980-272-1365",
+      "email": "Tandi@easterlingfamilylaw.com",
+      "website": "https://easterlingfamilylaw.com/",
+      "address": "2514 Plantation Center Drive, Matthews, NC 28105"
+    }
+  ]
+}

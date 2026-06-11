@@ -1,0 +1,387 @@
+slug: liegenschaftsverwalter_be
+name: "Deutschschweiz property-renovation buyers — Verwaltung, Genossenschaften, Facility Mgmt, Treuhand"
+profile_slug: f2-malergipser
+engine: team_pages   # default for plain string seeds
+
+# WHAT THIS NICHE SCRAPES
+# Deutschschweiz firms that commission RECURRING tenant-turnover + building-
+# renovation painter/plasterer work (Wohnungsabnahmen, Treppenhaus, Fassade,
+# Schimmel) — exactly the motion F2's step-1 cold-email copy is written for.
+# Started as Bern property managers; extended along two axes:
+#   1. CATEGORIES (same buying motion as property mgmt):
+#        • Liegenschafts-/Immobilienverwaltung & Bewirtschaftung   (core)
+#        • Hausverwaltung / STWEG-Verwaltung
+#        • Wohnbaugenossenschaften                  (own + turn over rental stock)
+#        • Facility Management / Gebäudeunterhalt    (building-maintenance budgets)
+#        • Immobilien-Treuhand MIT Bewirtschaftung   (do tenant turnovers)
+#   2. GEOGRAPHY: Bern region -> whole Deutschschweiz (F2's real service area:
+#      Zürich, Basel, Luzern, Zug, Aargau, Solothurn, St. Gallen, Winterthur).
+# DELIBERATELY EXCLUDED (hire the trade but a DIFFERENT pitch — would need a
+# new copy variant first): architects, general/total contractors, property
+# developers, pure brokerage-only, Hauswart-only.
+#
+# All 21 seeds below were WebFetch-validated as live Swiss property
+# managers actively running rental + STWEG portfolios in the target
+# region. Firms whose primary business is brokerage (Verkauf), construction
+# (Bau), or Hauswart-only services were rejected. Out-of-region firms
+# (Biel, Thun, Luzern) were rejected.
+#
+# Each seed can be either:
+#   - "url"                          → uses niche-level engine
+#   - { url: "...", engine: "..." }  → per-seed engine override
+#
+# Engines:
+#   - team_pages  : httpx fetch + bs4 (fast; auto-upgrades to playwright if static HTML is empty)
+#   - playwright  : full Chrome render (JS, SPA, soft Cloudflare). ~3-5s/seed.
+#
+# RUN
+#   py sequences/lead_scrape.py run liegenschaftsverwalter_be
+#   py sequences/lead_scrape.py run liegenschaftsverwalter_be --engine playwright  # force-all
+#
+# SCHEDULE (weekly Mon 09:00 — small niche, weekly is enough)
+#   schtasks /Create /TN "LES-lead-scrape-liegenschaftsverwalter_be" /SC WEEKLY /D MON /ST 09:00 ^
+#     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run liegenschaftsverwalter_be"
+
+seeds:
+  # ── Bern (city + agglomeration: Ittigen, Ostermundigen, Worb, Gümligen) ──
+  # Each seed declares the firm's name + city so every scraped prospect
+  # inherits these for {company} / {city} merge tags in the cold-outreach
+  # template. Without these, sequence-runner skips the prospect.
+  - { url: "https://www.tak.ch/liegenschaftsverwaltung",                         company: "TAK Immobilien AG",          city: "Gümligen" }
+  - { url: "https://www.graffenried-liegenschaften.ch/kontakt",                  company: "Von Graffenried Liegenschaften", city: "Bern" }
+  - { url: "https://www.immobrue.ch/Dienstleistungen/Liegenschaftsverwaltung.htm", company: "J. Brügger AG",            city: "Ostermundigen" }
+  - { url: "https://www.gewerbetreuhandag.ch/liegenschaftsverwaltung.html",       company: "Gewerbetreuhand AG Bern",    city: "Bern" }
+  - { url: "https://www.bvt-treuhand.ch/de/",                                    company: "BVT Baumann",                city: "Ostermundigen" }
+  - { url: "https://www.bigler-immobilien.ch/kontakt",                           company: "Bigler Immobilien",          city: "Bern" }
+  - { url: "https://www.zollinger.ch/",                                          company: "Zollinger Immobilien",       city: "Gümligen" }
+  - { url: "https://www.wotreva.ch/",                                            company: "Wotreva AG",                 city: "Bern" }
+  - { url: "https://www.liegenschaftenbern.ch/",                                 company: "Liegenschaften Bern",        city: "Bern" }
+  - { url: "https://www.immo-kuhn.ch/",                                          company: "Kuhn Immobilien",            city: "Worb" }
+  - { url: "https://www.jordi-liegenschaften.ch/ueber-uns/portrait",             company: "Jordi Liegenschaften Bern AG", city: "Bern" }
+  - { url: "https://resonus-immobilien.ch/",                                     company: "Resonus Immobilien",         city: "Bern" }
+  - { url: "https://regimo-bern.ch/ueber-uns",                                   company: "Regimo Bern",                city: "Bern" }
+  - { url: "https://immoplus-bern.ch/",                                          company: "Immoplus Bern",              city: "Bern" }
+  - { url: "https://www.atiba-ag.ch/immobilienverwaltung-bern-und-umgebung",     company: "ATIBA AG",                   city: "Ittigen" }
+
+  # ── Burgdorf / Emmental ─────────────────────────────────────────────────
+  - { url: "https://www.group46.ch/immobilienverwaltung.xhtml",                  company: "Group46 GmbH",               city: "Burgdorf" }
+  - { url: "https://www.stowebern.ch/",                                          company: "STOWE Bern",                 city: "Utzenstorf" }
+
+  # ── Oberaargau (Langenthal) ─────────────────────────────────────────────
+  - { url: "https://rieder-immobilien.ch/",                                      company: "Rieder Immobilien AG",       city: "Langenthal" }
+  - { url: "https://leuimmobilien.ch/ueber-uns/",                                company: "Leu Immobilien AG",          city: "Langenthal" }
+
+  # ── JS / CloudFlare-protected (need playwright) ─────────────────────────
+  - { url: "https://lubana.ch/kontakt/",                                         company: "Lubana AG",                  city: "Burgdorf",  engine: playwright }
+  - { url: "https://www.wirztanner.ch/",                                         company: "Wirz Tanner Immobilien",     city: "Bern",      engine: playwright }
+
+  # auto-discovered 2026-05-18 22:05 via seed_discover.py
+  - https://www.jordi-liegenschaften.ch/ueber-uns/team
+  - https://propertypros.ch
+  - https://www.webgearing.com/angebote/branchenpaket-immobilienverwaltung-makler
+  - https://www.burgdorf.de/rathaus-politik/rathaus/stadtverwaltung/fachbereiche-und-abteilungen
+  - https://emmentalverwaltungen.ch/dienstleistungen/mietliegenschaften
+  - https://www.as-immo.ch/dienstleistungen/verwaltung-stowe
+  - https://wyssliegenschaften.ch/angebot/stockwerkeigentum
+  - https://wyssliegenschaften.ch
+
+  # auto-discovered 2026-05-28 19:32 via seed_discover.py
+  - https://www.wagner-verwaltung.de
+
+  # auto-discovered 2026-05-29 08:03 via seed_discover.py
+  - https://www.haufe-akademie.de/blog/berufe/immobilienverwalter
+  - https://vdiv.de/immobilienverwaltung/verwaltersuche
+
+  # auto-discovered 2026-05-30 08:03 via seed_discover.py
+  - https://www.verbeg.de
+  - https://www.gag-ludwigshafen.de/service/wohnungsverwalter
+  - https://aj-haus.de
+  - https://www.bpb.de/kurz-knapp/lexika/handwoerterbuch-politisches-system/511486/oeffentliche-verwaltung
+  - https://www.huber-hausverwaltung-mannheim.de
+  - https://www.homewise.de/hausverwaltung-mannheim
+  - https://1892.de
+  - https://www.wohnungsbaugenossenschaften.de/regionen/berlin/ueber-uns
+  - https://www.wohnungsbau-ludwigsburg.de
+  - https://www.bg-es.de
+
+  # auto-discovered 2026-05-31 08:02 via seed_discover.py
+  - https://www.deutsche-immobilien-verwaltung.de
+  - http://domus-leipzig.de
+  - https://www.baugen1871.de/wir-ueber-uns.html
+  - https://wg-mw.de
+
+  # auto-discovered 2026-06-01 08:04 via seed_discover.py
+  - https://apps.microsoft.com/detail/xpfm5p5kdwf0jp?hl=de-de&gl=de
+  - https://giti-gmbh.de
+
+  # auto-discovered 2026-06-02 08:03 via seed_discover.py
+  - https://bayerische-immobilien-management.de
+  - https://i-v-m.de
+  - https://www.muenchen.de/service/branchenbuch/H/166.html
+  - https://www.feuerwehrverband.de/veranstaltungen/dfv-direkt
+  - https://hfv-online.de/fortbildungen
+  - https://www.promeda.de
+  - https://tolle-hausverwaltung.de
+  - https://www.bgsn.de
+
+  # auto-discovered 2026-06-03 08:05 via seed_discover.py
+  - https://www.immo-kiel.de
+  - https://eog-verwaltung.de
+  - https://www.luett-hausverwaltung.de
+  - https://www.wbg1954.de
+  - https://www.diestadtfelder.de
+  - https://www.guericke.de/wohnungssuche
+
+  # auto-discovered 2026-06-04 08:03 via seed_discover.py
+  - https://hausverwaltung-jentsch.de
+  - https://www.vewa.de
+  - https://www.hev.de
+  - https://www.bodenmueller-hausverwaltung.de
+  - https://www.wbg-ffm.de
+  - https://www.vbs-frankfurt.de/wohnen
+  - https://fwg-eg.de
+  - https://www.haendschke.de/wissen/was-ist-facility-management
+
+  # auto-discovered 2026-06-05 08:08 via seed_discover.py
+  - https://nuverta.de
+  - https://erste-hausverwaltung.de
+  - https://karriere-neubrandenburg.de
+  - https://www.bankbazaar.com/mortgage-loan.html
+  - https://www.bg1894.de
+  - https://bgried.de
+  - https://www.wohnungsbaugenossenschaften.de/genossenschaften/alle-genossenschaften
+
+  # auto-discovered 2026-06-06 08:04 via seed_discover.py
+  - https://www.dp-immobilien-management.de
+  - https://www.iwts.de
+  - https://home-verwaltung.de
+  - https://www.homeday.de/de/immobilienwissen/hausverwaltung
+  - https://www.facility-s.de
+
+  # auto-discovered 2026-06-07 08:05 via seed_discover.py
+  - https://www.verwaltung.uni-mainz.de
+  - https://immobilien-mainz.de
+  - https://www.conzen-immobilien.de
+  - https://www.sww-oa.de
+  - https://www.bsg-allgaeu.de
+
+  # auto-discovered 2026-06-08 08:04 via seed_discover.py
+  - https://www.klueppel-immobilien.de
+  - https://ross-immobilienverwaltung.de
+  - https://www.crispin-immobilien.de
+  - http://imr-essen.de
+  - https://www.berlinhaus.com
+
+  # auto-discovered 2026-06-09 08:05 via seed_discover.py
+  - https://www.simchen.com
+  - https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover/Dezernate-und-Fachbereiche-der-LHH/Wirtschaft-und-Umwelt/Fachbereich-Wirtschaft/Immobilienverwaltung
+  - https://immobilien-rex.de/immobilienverwaltung
+  - https://www.hamburg.de/branchenbuch/hamburg/10233022/n0
+  - https://www.hausmann-hausverwaltung.de
+  - https://immo-care.hamburg
+  - https://www.martharuf.ch/de
+  - https://stadelmann-candinas.ch
+  - https://www.belvedere-kassel.de
+
+  # auto-discovered 2026-06-09 17:25 via seed_discover.py
+  - https://www.livit.ch/de/livit-ag/niederlassungen/bern
+  - https://www.graffenried-liegenschaften.ch
+  - https://www.tak.ch/ueber-immobilienverwaltung
+  - https://www.dr-meyer.ch/team
+  - https://www.bvd.be.ch/de/start/ueber-uns/amt-fuer-grundstuecke-und-gebaeude.html
+  - https://www.zentrum-ti.ch/team-immobilien
+  - https://company.sbb.ch/de/jobs-karriere/berufswelten/immobilien/immobilienbewirtschafter-in.html
+  - https://www.burgergemeinde-burgdorf.ch/liegenschaften/kontakt
+  - https://lubana.ch
+  - https://minderimmobilien.ch
+  - https://www.wymobilien.ch/de
+  - https://www.glb.ch/unser-team
+  - https://www.langenthal.ch/bereiche/16909
+  - https://leuimmobilien.ch
+  - https://tona.ch
+  - https://stowezentrum.ch
+  - https://buechliag.ch/stockwerkeigentum
+  - https://www.zentrum-ti.ch
+  - https://www.immowyss.ch
+  - https://www.saxerimmo.ch
+  - https://www.villa-casa.ch
+  - https://www.sanara-immo.ch/team
+  - https://www.casa-immo.ch
+  - https://www.zh.ch/de/baudirektion/immobilienamt.html
+  - https://peterhalter.com/ueber-uns/team
+
+  # auto-discovered 2026-06-10 08:07 via seed_discover.py
+  - https://www.bs.ch/fd/ibs
+  - https://kling.ag
+  - https://www.bergerliegenschaften.ch
+  - https://welcome-immobilien.ch/team
+  - https://www.gewerbe-treuhand.ch/de/ueber-uns/team
+  - https://www.stadt-solothurn.ch/aemter/4996
+  - https://www.ag.ch/de/ueber-uns/verwaltung/dfr/organisation/immobilien-aargau
+  - https://www.livit.ch/de/livit-ag/niederlassungen/solothurn
+  - https://www.livoag.ch
+  - https://weibel-immobilien.ch/about-us
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+filter:
+  # Skip role mailboxes — outreach targets named persons, not info@/kontakt@.
+  # Heavier list than crypto_influencer because German-language sites use
+  # more language-specific role addresses (Verwaltung, Bewirtschaftung,
+  # Sekretariat, Buchhaltung etc.).
+  exclude_local_parts:
+    - info
+    - kontakt
+    - contact
+    - hello
+    - mail
+    - sekretariat
+    - empfang
+    - reception
+    - verwaltung
+    - bewirtschaftung
+    - liegenschaften
+    - immobilien
+    - buchhaltung
+    - finanzen
+    - rechnungswesen
+    - support
+    - service
+    - hotline
+    - bewerbung
+    - jobs
+    - karriere
+    - hr
+    - marketing
+    - presse
+    - medien
+    - news
+    - newsletter
+    - werbung
+    - offerte
+    - angebote
+    - office
+    - admin
+    - sales
+  exclude_domains:
+    - f2-malergipser.ch          # client's own brand
+    - www.f2-malergipser.ch
+    - aureonglobal.de            # sender infra
+    - www.aureonglobal.de
+
+# Auto-discovery: seed_discover.py runs daily, appends new validated URLs.
+# Queries span the adjacent B2B categories that commission Maler/Gipser work
+# across the Deutschschweiz (F2's actual service area per its tagline), not
+# just Bern property managers. Each category is a real buyer of repeating
+# painting/plastering jobs.
+search_queries:
+  # All categories below share the SAME buying motion the F2 step-1 copy is
+  # written for: recurring tenant-turnover + building-renovation work
+  # (Wohnungsabnahmen, Treppenhaus, Fassade). Geography widened from Bern to
+  # the whole Deutschschweiz — F2's actual service area — which is the biggest
+  # supply lever and carries zero message-relevance risk.
+  # ── Property / real-estate management (core) — Bern region ──────────────
+  - "Liegenschaftsverwaltung Bern Team Mitarbeiter Kontakt"
+  - "Immobilienverwaltung Bern Bewirtschafter Mitarbeitende"
+  - "Liegenschaftsverwaltung Burgdorf Emmental Team"
+  - "Liegenschaftsverwaltung Oberaargau Langenthal Team"
+  - "Verwaltung Stockwerkeigentum Bern Kontakt Team"
+  - "Liegenschaftsverwaltung Thun Spiez Team"
+  # ── Property management — wider Deutschschweiz (same motion, new cities) ─
+  - "Immobilienbewirtschaftung Zürich Team Mitarbeitende Kontakt"
+  - "Liegenschaftsverwaltung Basel Bewirtschaftung Team"
+  - "Immobilienverwaltung Luzern Zug Team Mitarbeitende"
+  - "Liegenschaftsverwaltung Aargau Solothurn Team Kontakt"
+  - "Immobilienbewirtschaftung St. Gallen Winterthur Team"
+  # ── Hausverwaltung / STWEG (identical motion to property mgmt) ──────────
+  - "Hausverwaltung STWEG Bewirtschaftung Deutschschweiz Team"
+  # ── Real-estate Treuhand WITH Bewirtschaftung (do tenant turnovers) ─────
+  - "Immobilientreuhand Bewirtschaftung Mietwohnungen Deutschschweiz Team"
+  # ── Housing cooperatives (own + turn over large rental stock) ───────────
+  - "Wohnbaugenossenschaft Geschäftsstelle Bewirtschaftung Team Kontakt"
+  - "Baugenossenschaft Deutschschweiz Mietwohnungen Verwaltung Team"
+  # ── Facility management / building upkeep (recurring renovation budget) ─
+  - "Facility Management Liegenschaften Gebäudeunterhalt Deutschschweiz Team"
+  - "Liegenschaftenunterhalt Bewirtschaftung Mietliegenschaften Team Kontakt"
+
+discovery:
+  max_seeds_per_run: 25
+  search_country:    de          # DACH niche — German results
+  require_mailto:    true
+  # Keyword gate spanning the property-adjacent categories that share the
+  # F2 step-1 buying motion (tenant-turnover + building renovation). Kept off
+  # architects / general contractors / developers on purpose — those hire the
+  # trade too but are a different pitch and need their own copy variant before
+  # we source them.
+  require_keywords:
+    - liegenschaft
+    - immobilien
+    - bewirtschaft
+    - verwaltung
+    - hausverwaltung
+    - stockwerkeigentum
+    - baugenossenschaft
+    - wohnbaugenossenschaft
+    - genossenschaft
+    - facility
+    - gebäudeunterhalt
+    - gebaeudeunterhalt
+    - liegenschaftenunterhalt
+    - treuhand
+  exclude_domains:
+    - facebook.com
+    - linkedin.com
+    - homegate.ch
+    - immoscout24.ch
+    - comparis.ch
+    - immobilien-bern.ch        # aggregator
+    - tutti.ch
+    - ricardo.ch
+    - youtube.com
+    - instagram.com
+    - twitter.com
+    - x.com
+    # Aggregators / job boards / non-Swiss / govt — added after first
+    # discovery pass returned too much noise.
+    - livenet.ch
+    - jobs.ch
+    - stepstone.de
+    - implenia.com
+    - realadvisor.ch
+    - local.ch
+    - search.ch
+    - karriereportal-stellen.berlin.de
+    - emploi-eglise.ch
+    - akzent-immobilien.de
+    - bern.ch                   # city govt, not target
+    - burgdorf.de               # German town govt, not target
+    - lansing.org
+    - thsca.com
+    - researchprofiles.ku.dk
+    - seligenstadt.de
+    - umzugsservice-bern.ch
+    - webgearing.com            # SaaS vendor, not a property mgmt firm
+    - propertypros.ch           # broker training, not a property mgmt firm
+
+# What sequence to run on verified leads from this niche.
+# (Documentation only — actual binding happens at enqueue-niche time:
+#   py sequences/sequence-runner.py enqueue-niche f2-malergipser-default liegenschaftsverwalter_be)
+sequence:
+  variants_file: sequences/f2-malergipser-default/variants.json
+  forced_persona: lukas        # Lukas Berger (Geschäftsführer) — direct, German-Swiss tone
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }

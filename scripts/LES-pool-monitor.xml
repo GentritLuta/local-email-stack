@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Date>2026-05-21T00:00:00</Date>
+    <Author>LAPTOP-9DDPI2EL\bernh</Author>
+    <URI>\LES-pool-monitor</URI>
+    <Description>Guarantees 2x prospect buffer for every active profile. Spawns lead_scrape when pool below target. Runs every 2 hours.</Description>
+  </RegistrationInfo>
+  <Principals>
+    <Principal id="Author">
+      <UserId>S-1-5-21-728766241-7385549-3565509079-1001</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <WakeToRun>true</WakeToRun>
+    <RestartOnFailure>
+      <Interval>PT10M</Interval>
+      <Count>3</Count>
+    </RestartOnFailure>
+    <ExecutionTimeLimit>PT15M</ExecutionTimeLimit>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Priority>7</Priority>
+  </Settings>
+  <Triggers>
+    <TimeTrigger>
+      <StartBoundary>2026-05-21T07:00:00</StartBoundary>
+      <Repetition>
+        <Interval>PT2H</Interval>
+      </Repetition>
+    </TimeTrigger>
+  </Triggers>
+  <Actions Context="Author">
+    <Exec>
+      <Command>C:\Windows\System32\cmd.exe</Command>
+      <Arguments>/c C:\Users\bernh\AppData\Local\Programs\Python\Python312\python.exe C:\Users\bernh\local-email-stack\scripts\pool-monitor.py</Arguments>
+    </Exec>
+  </Actions>
+</Task>

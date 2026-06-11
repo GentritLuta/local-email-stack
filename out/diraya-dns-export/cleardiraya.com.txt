@@ -1,0 +1,16 @@
+# DNS records to publish on cleardiraya.com
+# 6 records · publish at your DNS host (ClouDNS / Spaceship)
+# Generated for Diraya 60-subdomain cold-email setup
+
+TXT    resend._domainkey.hello
+       -> p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDC+Ghr4qXgJnrttcEl40aqpTsq4Juvdm56v3EupyPwDCoPvPLuEHcedaWHPsDMVEsv9xJT+4cVF7s44kzvKjGG6SWw6GdrBePr8gGupT++N87/07WH63Tzdwg8AvMROK7DG3OYQvLnFRFsPmZ1rzj5ErhxEiU02pCQv1QyLYCnGwIDAQAB  (ttl=Auto)
+MX     send.hello
+       -> feedback-smtp.us-east-1.amazonses.com  priority=10  (ttl=Auto)
+TXT    send.hello
+       -> v=spf1 include:amazonses.com ~all  (ttl=Auto)
+TXT    resend._domainkey.team
+       -> p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCv/fvXvGnra2TF0wUnahmBRmSW4Qz7Eegk6DeWUhIxYlubmeDtH5gV1fMeqdgxYzFVK2dvd7ZmDLX6UHW6DTMj1fW22nJP/Y8Vkf9LckJ8ocidj7LpubZed7dRP2E1MaATo8wMal/XZ3zaZJxfRcePT7RBjelTaLeSH3M1z+ZUFQIDAQAB  (ttl=Auto)
+MX     send.team
+       -> feedback-smtp.us-east-1.amazonses.com  priority=10  (ttl=Auto)
+TXT    send.team
+       -> v=spf1 include:amazonses.com ~all  (ttl=Auto)

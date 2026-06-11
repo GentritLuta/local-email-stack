@@ -151,7 +151,10 @@ def autofill_once(slug: str | None = None, email: str | None = None,
 
         print(f"\n=== summary === examined={examined} enriched={enriched} "
               f"skipped={skipped} failed={failed}")
-        return 0 if failed == 0 else 2
+        # Per-site fetch failures are normal (sites down, blocking bots, etc.) and
+        # must not flag the whole scheduled job. Only return non-zero on a SYSTEMIC
+        # failure: attempts were made and every single one failed.
+        return 0 if (enriched > 0 or failed == 0) else 2
 
 
 def main() -> int:

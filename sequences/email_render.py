@@ -14,8 +14,10 @@ Falls back to a neutral default brand when no brand block is provided
 """
 from __future__ import annotations
 
+import re
 import uuid
 import time
+from email.utils import formataddr
 from typing import Optional
 
 DEFAULT_BRAND = {
@@ -73,7 +75,60 @@ def _body_paragraphs_html(body: str, font_stack: str, text_color: str) -> str:
 
 
 def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = None,
-                brand: dict | None = None) -> str:
+                brand: dict | None = None, step_n: int = 1) -> str:
+    """Render the email HTML.
+
+    `step_n` is the sequence step number. Step 1 (the initial cold email)
+    omits the CTA button across every per-client template — best-practice
+    cold-email hygiene says the first touch should look like a plain
+    personal email, with a "just reply" ask in the body. From step 2
+    onwards the branded CTA button reappears.
+    """
+    # Per-client custom templates — dispatch by brand.template. Each brand
+    # with a non-"default" template gets its own HTML structure entirely;
+    # the generic template below only runs when no custom is declared.
+    template = (brand or {}).get("template", "default")
+    if template == "f2-custom":
+        from email_template_f2 import render_html_f2
+        return render_html_f2(body=body, persona=persona,
+                               unsubscribe_token=unsubscribe_token, brand=brand,
+                               step_n=step_n)
+    if template == "aureon-custom":
+        from email_template_aureon import render_html_aureon
+        return render_html_aureon(body=body, persona=persona,
+                                   unsubscribe_token=unsubscribe_token, brand=brand,
+                                   step_n=step_n)
+    if template == "algoalpha-custom":
+        from email_template_algoalpha import render_html_algoalpha
+        return render_html_algoalpha(body=body, persona=persona,
+                                      unsubscribe_token=unsubscribe_token, brand=brand,
+                                      step_n=step_n)
+    if template == "lk-custom":
+        from email_template_lk import render_html_lk
+        return render_html_lk(body=body, persona=persona,
+                               unsubscribe_token=unsubscribe_token, brand=brand,
+                               step_n=step_n)
+    if template == "atalsolidrocks-custom":
+        from email_template_atalsolidrocks import render_html_atalsolidrocks
+        return render_html_atalsolidrocks(body=body, persona=persona,
+                                          unsubscribe_token=unsubscribe_token, brand=brand,
+                                          step_n=step_n)
+    if template == "diraya-custom":
+        from email_template_diraya import render_html_diraya
+        return render_html_diraya(body=body, persona=persona,
+                                  unsubscribe_token=unsubscribe_token, brand=brand,
+                                  step_n=step_n)
+    if template == "energ-custom":
+        from email_template_energ import render_html_energ
+        return render_html_energ(body=body, persona=persona,
+                                 unsubscribe_token=unsubscribe_token, brand=brand,
+                                 step_n=step_n)
+    if template == "teamminik-custom":
+        from email_template_teamminik import render_html_teamminik
+        return render_html_teamminik(body=body, persona=persona,
+                                     unsubscribe_token=unsubscribe_token, brand=brand,
+                                     step_n=step_n)
+
     b = {**DEFAULT_BRAND, **(brand or {})}
     # Deep-merge colors so a profile can override one color without losing the rest.
     b["colors"] = {**DEFAULT_BRAND["colors"], **((brand or {}).get("colors") or {})}
@@ -125,9 +180,14 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
     # Corporate footer (the user's preferred style) — only renders when the
     # profile has a brand.legal block. Otherwise we fall back to the simpler
     # accent-rule + unsubscribe footer below.
+    # footer_style: "dark" (default — premium black block with white wordmark)
+    # or "light" (white block with brand-accent wordmark — fits brands whose
+    # actual website is light-themed, e.g. F2's white-with-green palette).
     legal = (brand or {}).get("legal") or {}
+    footer_style = (brand or {}).get("footer_style") or "dark"
     if legal.get("company_name"):
-        footer_html = _corporate_footer_html(legal, unsub, accent=c["accent"])
+        footer_html = _corporate_footer_html(legal, unsub, accent=c["accent"],
+                                             style=footer_style, font=font)
     else:
         footer_html = _simple_footer_html(c, font, wordmark, tagline, unsub)
 
@@ -184,14 +244,15 @@ def _simple_footer_html(c: dict, font: str, wordmark: str, tagline: str, unsub: 
         </td></tr>'''
 
 
-def _corporate_footer_html(legal: dict, unsub: str, accent: str = "#d4af37") -> str:
-    """Two-tier corporate email footer matching the user's spec:
+def _corporate_footer_html(legal: dict, unsub: str, accent: str = "#d4af37",
+                            style: str = "dark", font: str | None = None) -> str:
+    """Two-tier corporate email footer matching the user's spec.
 
-      1. Light Arial block: company name, address, email, CEO, VAT, Reg,
-         long confidentiality disclaimer.
-      2. Dark Verdana block: logo + uppercase wordmark, address, email,
-         Website | Privacy | Terms | Unsubscribe row, copyright + reg
-         numbers, partner-notice line.
+    style="dark"  — premium black wordmark block with white wordmark + accent
+                    links. Default. Fits dark-themed brand sites (Aureon, AlgoAlpha).
+    style="light" — clean white wordmark block with brand-accent wordmark +
+                    accent links + dark text. Fits brands whose website is
+                    light-themed (F2 — green-on-white).
 
     The per-prospect unsubscribe URL is slotted into the link row so legal
     compliance + the existing one-click unsubscribe flow both apply.
@@ -240,7 +301,37 @@ def _corporate_footer_html(legal: dict, unsub: str, accent: str = "#d4af37") -> 
           </div>
         </td></tr>'''
 
-    # ── DARK Verdana brand block ───────────────────────────────────────────
+    # Color palette depends on `style`. The DARK palette is the original
+    # premium-feel black block with white wordmark + muted gray text.
+    # The LIGHT palette inverts to white-on-white with the brand accent
+    # carrying the wordmark — fits brands whose own websites are light.
+    if style == "light":
+        # Light footer — white card with brand-accent wordmark
+        pal = {
+            "bg":           "#ffffff",
+            "wordmark":     accent,        # brand color carries the wordmark
+            "body_text":    "#475569",     # slate-600
+            "strong_text":  "#0f172a",     # slate-900
+            "muted_text":   "#94a3b8",     # slate-400
+            "divider":      "#e2e8f0",     # slate-200
+            "sep_pipe":     "#cbd5e1",     # slate-300
+        }
+        wordmark_font = (font or "'Inter', system-ui, sans-serif")
+        wordmark_display = name  # keep title-cased; light brands rarely want SHOUTING
+    else:
+        # Dark footer (default)
+        pal = {
+            "bg":           "#050505",
+            "wordmark":     "#ffffff",
+            "body_text":    "#888888",
+            "strong_text":  "#ffffff",
+            "muted_text":   "#555555",
+            "divider":      "#1a1a1a",
+            "sep_pipe":     "#333333",
+        }
+        wordmark_font = "Verdana, sans-serif"
+        wordmark_display = wordmark_dark
+
     logo_img = (
         f'<img src="{logo_url}" alt="{name} Logo" width="{logo_w}" '
         f'style="display:block;margin:0 auto 10px auto;border:0;">'
@@ -252,35 +343,37 @@ def _corporate_footer_html(legal: dict, unsub: str, accent: str = "#d4af37") -> 
     if privacy:  parts.append(f'<a href="{privacy}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Privacy Policy</a>')
     if terms:    parts.append(f'<a href="{terms}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Terms of Service</a>')
     if unsub:    parts.append(f'<a href="{_esc(unsub)}" style="color:{accent};text-decoration:none;margin:0 8px;font-weight:500;">Unsubscribe</a>')
-    sep = '<span style="color:#333333;margin:0 4px;">|</span>'
+    sep = f'<span style="color:{pal["sep_pipe"]};margin:0 4px;">|</span>'
     links_row = sep.join(parts)
+
+    block_font = wordmark_font
 
     dark = f'''
         <tr><td style="padding:0;">
-          <div style="background-color:#050505;padding:40px 30px;text-align:center;color:#999999;border-top:4px solid {accent};font-family:Verdana,sans-serif;">
+          <div style="background-color:{pal['bg']};padding:40px 30px;text-align:center;color:{pal['body_text']};border-top:4px solid {accent};font-family:{block_font};">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
                 <td align="center">
-                  <div style="margin-bottom:20px;padding-top:20px;border-top:1px solid #1a1a1a;">
+                  <div style="margin-bottom:20px;padding-top:20px;border-top:1px solid {pal['divider']};">
                     <a href="{website or '#'}" style="text-decoration:none;">
                       {logo_img}
-                      <span style="color:#ffffff;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px;font-family:Verdana,sans-serif;font-size:16px;">{wordmark_dark}</span>
+                      <span style="color:{pal['wordmark']};font-weight:800;letter-spacing:{'0.5px' if style == 'light' else '1px'};{'text-transform:uppercase;' if style == 'dark' else ''}display:block;margin-bottom:5px;font-family:{block_font};font-size:{'18px' if style == 'light' else '16px'};">{wordmark_display}</span>
                     </a>
                   </div>
-                  <p style="font-size:12px;line-height:1.6;margin:5px 0;color:#888888;font-family:Verdana,sans-serif;">
-                    <b style="color:#ffffff;">{name}</b><br>
+                  <p style="font-size:12px;line-height:1.6;margin:5px 0;color:{pal['body_text']};font-family:{block_font};">
+                    <b style="color:{pal['strong_text']};">{name}</b><br>
                     {addr_block}
                   </p>
-                  {f'<p style="font-size:12px;line-height:1.6;margin:5px 0;font-family:Verdana,sans-serif;"><a href="mailto:{email}" style="color:{accent};text-decoration:none;font-weight:500;">{email}</a></p>' if email else ''}
-                  <p style="font-size:12px;line-height:1.6;margin:10px 0;font-family:Verdana,sans-serif;">
+                  {f'<p style="font-size:12px;line-height:1.6;margin:5px 0;font-family:{block_font};"><a href="mailto:{email}" style="color:{accent};text-decoration:none;font-weight:500;">{email}</a></p>' if email else ''}
+                  <p style="font-size:12px;line-height:1.6;margin:10px 0;font-family:{block_font};">
                     {links_row}
                   </p>
-                  <div style="margin-top:25px;padding-top:25px;border-top:1px solid #1a1a1a;">
-                    <p style="font-size:10px;color:#555555;margin:0;font-family:Verdana,sans-serif;">
-                      © {year} {wordmark_dark}. All rights reserved.<br>
+                  <div style="margin-top:25px;padding-top:25px;border-top:1px solid {pal['divider']};">
+                    <p style="font-size:10px;color:{pal['muted_text']};margin:0;font-family:{block_font};">
+                      © {year} {wordmark_display}. All rights reserved.<br>
                       {f'VAT ID: {vat} | Reg. No: {reg}' if vat or reg else ''}
                     </p>
-                    {f'<p style="font-size:10px;color:#444444;margin-top:10px;line-height:1.4;font-family:Verdana,sans-serif;">{partner}</p>' if partner else ''}
+                    {f'<p style="font-size:10px;color:{pal["muted_text"]};margin-top:10px;line-height:1.4;font-family:{block_font};">{partner}</p>' if partner else ''}
                   </div>
                 </td>
               </tr>
@@ -306,24 +399,90 @@ def render_text(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
     )
 
 
+def _inject_tracking(html: str, track_token: str, tracker_base: str) -> str:
+    """Inject a self-hosted open-tracking pixel + rewrite click links to go
+    through our tracker. Resend's domain-level open_tracking flag is set true
+    on all subdomains but their pipeline does not actually inject the pixel
+    or rewrite links into outbound HTML (verified empirically). So we do it
+    ourselves and own the data.
+
+    track_token: a URL-safe unique id for this send (we use the hex part of
+    Message-ID, which we already generate). The Cloudflare Worker at
+    `tracker_base` resolves it back to a send_log row via LIKE-match on
+    message_id, then sets opened_at / clicked_at.
+    """
+    if not tracker_base or not track_token:
+        return html
+
+    pixel = (
+        f'<img src="{tracker_base}/open/{track_token}.gif" '
+        f'width="1" height="1" alt="" '
+        f'style="display:block;border:0;width:1px;height:1px;">'
+    )
+
+    # Inject pixel just before </body> (or append if no body close)
+    lower = html.lower()
+    body_close = lower.rfind("</body>")
+    if body_close >= 0:
+        html = html[:body_close] + pixel + html[body_close:]
+    else:
+        html = html + pixel
+
+    # Click-tracking: rewrite outbound <a href="..."> to go through the
+    # tracker. Skip anchors and unsubscribe links (those have their own
+    # one-click pathway and we don't want to break compliance).
+    def _rewrite(match: re.Match) -> str:
+        url = match.group(1)
+        if url.startswith("#") or url.startswith("mailto:"):
+            return match.group(0)
+        if "/unsubscribe/" in url or "unsubscribe" in url.lower():
+            return match.group(0)
+        import urllib.parse as _up
+        wrapped = f"{tracker_base}/click/{track_token}?u={_up.quote(url, safe='')}"
+        return match.group(0).replace(url, wrapped)
+
+    html = re.sub(r'<a[^>]+href="([^"]+)"', _rewrite, html)
+    return html
+
+
 def build_payload(*, persona: dict, to_addr: str, subject: str, body: str,
                   unsubscribe_token: Optional[str] = None,
                   brand: dict | None = None,
-                  tags: list[dict] | None = None) -> tuple[dict, str]:
-    """Build the Resend API JSON payload + the Message-ID we generated."""
+                  tags: list[dict] | None = None,
+                  step_n: int = 1,
+                  tracker_base: Optional[str] = None) -> tuple[dict, str]:
+    """Build the Resend API JSON payload + the Message-ID we generated.
+
+    step_n=1 (the cold-outreach initial touch) is rendered without a CTA
+    button so it reads as a plain personal email; step_n>=2 (follow-ups)
+    show the branded button.
+
+    tracker_base (optional): self-hosted tracker URL like
+    "https://track.aureonglobal.de". When provided, an open-pixel and
+    click-link rewrites are injected so we capture opens/clicks even though
+    Resend's domain-level tracking flag isn't actually applied on outbound.
+    """
     domain = persona["from_addr"].split("@", 1)[1]
-    msg_id = f"<{uuid.uuid4().hex}.{int(time.time())}@{domain}>"
+    track_token = uuid.uuid4().hex
+    msg_id = f"<{track_token}.{int(time.time())}@{domain}>"
     unsub = unsubscribe_url(unsubscribe_token, brand)
-    html = render_html(body=body, persona=persona, unsubscribe_token=unsubscribe_token, brand=brand)
+    html = render_html(body=body, persona=persona, unsubscribe_token=unsubscribe_token,
+                       brand=brand, step_n=step_n)
     text = render_text(body=body, persona=persona, unsubscribe_token=unsubscribe_token, brand=brand)
+    if tracker_base:
+        html = _inject_tracking(html, track_token, tracker_base)
     headers = {
         "Message-ID":            msg_id,
         # Gmail prefers URL form (RFC 8058 one-click); mailto fallback for older clients.
         "List-Unsubscribe":      f"<{unsub}>, <mailto:{FALLBACK_UNSUB_MAILTO}>",
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     }
+    # Use formataddr so non-ASCII display names (e.g. "Tomás Silva") get
+    # encoded per RFC 5322 as =?UTF-8?B?...?= instead of being sent raw.
+    # Raw UTF-8 in From headers gets reinterpreted as Latin-1 by some MTAs
+    # / receiver display layers, producing mojibake like "TomÃ¡s".
     payload = {
-        "from":     f'{persona["from_name"]} <{persona["from_addr"]}>',
+        "from":     formataddr((persona["from_name"], persona["from_addr"])),
         "to":       [to_addr],
         "reply_to": persona.get("reply_to", persona["from_addr"]),
         "subject":  subject,

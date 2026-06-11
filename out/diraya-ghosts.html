@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Agent Ghost-Cases List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a; font-size: 10.4px; line-height: 1.5; margin: 0;
+  }
+  .kanit { font-family: "Kanit", sans-serif; }
+  /* Cover */
+  .cover { border-bottom: 3px solid #FF6B00; padding-bottom: 14px; margin-bottom: 16px; }
+  .kicker { font-family: "Kanit", sans-serif; letter-spacing: 2.6px; text-transform: uppercase;
+    font-size: 9px; color: #FF6B00; font-weight: 700; margin-bottom: 9px; }
+  h1 { font-family: "Kanit", sans-serif; font-size: 29px; line-height: 1.08; margin: 0 0 7px;
+    font-weight: 800; letter-spacing: -0.3px; color: #0A0A0A; text-transform: uppercase; }
+  .sub { font-family: "Kanit", sans-serif; font-size: 13px; color: #454545; font-weight: 500; margin: 0; }
+  .note {
+    background: #FFF4EC; border-left: 3px solid #FF6B00; padding: 11px 14px;
+    margin: 14px 0 18px; font-size: 10.2px; color: #3a3a3a; border-radius: 0 4px 4px 0;
+  }
+  .note b { color: #0A0A0A; }
+  /* Category */
+  .cat { margin: 18px 0 9px; padding-bottom: 4px; border-bottom: 1.5px solid #E8E8E8; }
+  .cat .badge { font-family: "Kanit", sans-serif; display: inline-block; background: #0A0A0A; color: #fff;
+    font-weight: 700; font-size: 9px; letter-spacing: 1px; padding: 2px 8px; border-radius: 3px; vertical-align: middle; }
+  .cat h2 { font-family: "Kanit", sans-serif; display: inline-block; font-size: 14px; margin: 0 0 0 9px;
+    font-weight: 700; vertical-align: middle; color: #0A0A0A; }
+  /* Case */
+  .case { margin: 0 0 9px; padding-left: 30px; position: relative; page-break-inside: avoid; }
+  .case .n { font-family: "Kanit", sans-serif; position: absolute; left: 0; top: 0; width: 22px;
+    text-align: center; font-weight: 800; color: #FF6B00; font-size: 13px; }
+  .case .t { font-weight: 700; color: #0A0A0A; }
+  .case .d { color: #454545; }
+  .case .c { color: #2a2a2a; }
+  .case .c .lab { color: #FF6B00; font-weight: 700; }
+  /* Closing */
+  .pattern { margin-top: 20px; padding: 14px 16px; background: #0A0A0A; color: #ededed; border-radius: 6px; page-break-inside: avoid; }
+  .pattern h3 { font-family: "Kanit", sans-serif; margin: 0 0 7px; font-size: 13.5px; color: #fff;
+    letter-spacing: 0.2px; text-transform: uppercase; font-weight: 700; }
+  .pattern p { margin: 0 0 8px; font-size: 10.3px; color: #d4d4d4; }
+  .pattern .hl { color: #FF8A38; font-weight: 700; }
+  .cta { margin-top: 12px; padding: 12px 16px; border: 1.5px solid #FF6B00; border-radius: 6px; font-size: 10.3px; page-break-inside: avoid; }
+  .cta b { color: #FF6B00; }
+  .foot { margin-top: 16px; padding-top: 9px; border-top: 1px solid #E8E8E8;
+    font-size: 8.6px; color: #8A8A8A; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+  <div class="cover">
+    <div class="kicker">Diraya &nbsp;//&nbsp; Production AI Engineering</div>
+    <h1>The Agent Ghost-Cases List</h1>
+    <p class="sub">40 production-killers most teams miss when shipping their first AI agent.</p>
+  </div>
+
+  <div class="note">
+    A note from Mohammed, who runs engineering at Diraya. We have shipped 23 production AI
+    builds for seed to Series B teams. The same failures show up on almost every project, and
+    nearly none of them appear in a demo. This is the list we check every build against before
+    it reaches a customer. It is yours, with no call attached. Run it against the agent you are
+    building this week.
+  </div>
+
+  <!-- A -->
+  <div class="cat"><span class="badge">A</span><h2>Tool and function calling</h2></div>
+  <div class="case"><span class="n">1</span><span class="t">Hallucinated arguments. </span><span class="d">The model fills a required parameter with a plausible value that never appeared in the conversation or the data, so a valid-looking call runs against the wrong entity. </span><span class="c"><span class="lab">Catch it:</span> validate every argument against a source of truth before the call, and eval that ambiguous inputs make the agent ask, not guess.</span></div>
+  <div class="case"><span class="n">2</span><span class="t">Error-blind continuation. </span><span class="d">A tool returns an error body with a 200 status, the agent reads the shape and not the meaning, and it proceeds as if the call succeeded. </span><span class="c"><span class="lab">Catch it:</span> return typed failures from tools and add evals that inject errors and assert the agent stops or recovers.</span></div>
+  <div class="case"><span class="n">3</span><span class="t">Infinite tool loop. </span><span class="d">The result never satisfies the goal, so the agent calls the same tool with the same arguments until it hits the step cap or the bill. </span><span class="c"><span class="lab">Catch it:</span> cap repeats per tool, detect identical consecutive calls, and eval loop termination on unsolvable inputs.</span></div>
+  <div class="case"><span class="n">4</span><span class="t">Confident wrong tool. </span><span class="d">Two tools have similar descriptions, like refund versus credit or search versus lookup, and the model picks the plausible one. </span><span class="c"><span class="lab">Catch it:</span> write disambiguating tool descriptions and score tool-selection accuracy on near-miss prompts.</span></div>
+  <div class="case"><span class="n">5</span><span class="t">Stale tool schema. </span><span class="d">The downstream API renamed or added a required field, the agent still calls the old signature, and every call fails in production. </span><span class="c"><span class="lab">Catch it:</span> contract-test tool schemas in CI and alert on tool-error-rate spikes.</span></div>
+  <div class="case"><span class="n">6</span><span class="t">Parallel tool race. </span><span class="d">The agent issues two calls that mutate the same record, and the final state depends on which arrives first. </span><span class="c"><span class="lab">Catch it:</span> serialize mutations on a key, make writes idempotent, and eval concurrent-action ordering.</span></div>
+
+  <!-- B -->
+  <div class="cat"><span class="badge">B</span><h2>Retrieval and RAG</h2></div>
+  <div class="case"><span class="n">7</span><span class="t">Empty-retrieval hallucination. </span><span class="d">The retriever returns nothing relevant and, instead of saying so, the model answers from parametric memory with full confidence. </span><span class="c"><span class="lab">Catch it:</span> gate generation on a retrieval-score threshold and eval the no-good-context path explicitly.</span></div>
+  <div class="case"><span class="n">8</span><span class="t">Chunk-boundary amputation. </span><span class="d">The one sentence that answers the question is split across two chunks, so neither is retrieved whole and the answer is half right. </span><span class="c"><span class="lab">Catch it:</span> use overlapping chunks and test retrieval recall on boundary cases.</span></div>
+  <div class="case"><span class="n">9</span><span class="t">Citation fabrication. </span><span class="d">The agent cites a document id or URL that was not in the retrieved set, and it reads as authoritative. </span><span class="c"><span class="lab">Catch it:</span> constrain citations to retrieved ids and fail any citation outside the context.</span></div>
+  <div class="case"><span class="n">10</span><span class="t">Confident stale answer. </span><span class="d">The index lags the source system by hours or days, and the agent presents outdated facts as current. </span><span class="c"><span class="lab">Catch it:</span> stamp freshness on chunks, surface it in the answer, and alert on index lag.</span></div>
+  <div class="case"><span class="n">11</span><span class="t">Embedding drift. </span><span class="d">You upgrade the embedding model but do not re-embed the corpus, so query and document vectors live in different spaces and recall collapses. </span><span class="c"><span class="lab">Catch it:</span> version embeddings, block mixed-model search, and re-run a retrieval eval after any model change.</span></div>
+  <div class="case"><span class="n">12</span><span class="t">Near-duplicate flooding. </span><span class="d">Top-k fills with five near-identical boilerplate chunks, pushing the real answer out of the window. </span><span class="c"><span class="lab">Catch it:</span> dedupe by content hash before ranking and eval recall on duplicate-heavy corpora.</span></div>
+  <div class="case"><span class="n">13</span><span class="t">Cross-tenant leakage. </span><span class="d">A shared index returns another customer's chunk because a tenant filter was missing on one code path. </span><span class="c"><span class="lab">Catch it:</span> enforce tenant scoping at the retrieval layer and eval for zero cross-tenant hits.</span></div>
+
+  <!-- C -->
+  <div class="cat"><span class="badge">C</span><h2>Context and memory</h2></div>
+  <div class="case"><span class="n">14</span><span class="t">Silent context overflow. </span><span class="d">History exceeds the window, the oldest tokens drop with no error, and those tokens are often the system constraints. </span><span class="c"><span class="lab">Catch it:</span> budget tokens explicitly, pin system constraints, and alert when truncation occurs.</span></div>
+  <div class="case"><span class="n">15</span><span class="t">Summary amnesia. </span><span class="d">Conversation summarization compresses away the one constraint that mattered, such as never offer a discount. </span><span class="c"><span class="lab">Catch it:</span> extract and pin durable constraints outside the summary and eval constraint retention across long sessions.</span></div>
+  <div class="case"><span class="n">16</span><span class="t">Memory poisoning. </span><span class="d">A wrong fact gets written to long-term memory once and then resurfaces in every future session as ground truth. </span><span class="c"><span class="lab">Catch it:</span> validate writes, version memory, and probe for persisted false facts.</span></div>
+  <div class="case"><span class="n">17</span><span class="t">Ephemeral PII retention. </span><span class="d">Memory stores user PII that should have been transient, and it surfaces later or survives a deletion request. </span><span class="c"><span class="lab">Catch it:</span> classify and TTL sensitive fields and eval deletion and retention guarantees.</span></div>
+  <div class="case"><span class="n">18</span><span class="t">Lost in the middle. </span><span class="d">The critical instruction sits mid-context and the model under-weights it relative to the start and the end. </span><span class="c"><span class="lab">Catch it:</span> position key constraints at the edges and eval instruction following as context grows.</span></div>
+  <div class="case"><span class="n">19</span><span class="t">Cross-session bleed. </span><span class="d">A shared cache key collides and one user's state leaks into another's conversation. </span><span class="c"><span class="lab">Catch it:</span> namespace all state by session and tenant and load-test for collisions.</span></div>
+
+  <!-- D -->
+  <div class="cat"><span class="badge">D</span><h2>Prompt and injection</h2></div>
+  <div class="case"><span class="n">20</span><span class="t">Indirect prompt injection. </span><span class="d">A retrieved document, email, or web page contains instructions like ignore previous rules, and the agent obeys the data instead of the operator. </span><span class="c"><span class="lab">Catch it:</span> treat all retrieved content as untrusted, fence it, and red-team with injection eval sets.</span></div>
+  <div class="case"><span class="n">21</span><span class="t">Tool-result injection. </span><span class="d">A tool returns attacker-controlled text that redirects the agent's next action. </span><span class="c"><span class="lab">Catch it:</span> sanitize and delimit tool outputs and eval against poisoned tool returns.</span></div>
+  <div class="case"><span class="n">22</span><span class="t">System-prompt exfiltration. </span><span class="d">A user coaxes the agent into revealing its hidden rules or keys, exposing your logic and your guardrails. </span><span class="c"><span class="lab">Catch it:</span> keep secrets out of the prompt entirely and eval for prompt-leak resistance.</span></div>
+  <div class="case"><span class="n">23</span><span class="t">Instruction collision. </span><span class="d">The system prompt says be concise, a retrieved policy says be exhaustive, and the agent flips between them unpredictably. </span><span class="c"><span class="lab">Catch it:</span> define a strict precedence order and eval conflicting-instruction scenarios.</span></div>
+  <div class="case"><span class="n">24</span><span class="t">Delimiter break. </span><span class="d">User input contains the same delimiter you use to fence context, and your prompt structure collapses. </span><span class="c"><span class="lab">Catch it:</span> use unguessable delimiters or structured message roles and fuzz inputs that mimic your fences.</span></div>
+
+  <!-- E -->
+  <div class="cat"><span class="badge">E</span><h2>Output and parsing</h2></div>
+  <div class="case"><span class="n">25</span><span class="t">Markdown-wrapped JSON. </span><span class="d">The model wraps its JSON in a code fence and your strict parser throws on the backticks. </span><span class="c"><span class="lab">Catch it:</span> parse defensively, request structured output where supported, and eval parse-success rate.</span></div>
+  <div class="case"><span class="n">26</span><span class="t">Schema drift on upgrade. </span><span class="d">A new model snapshot adds, renames, or reorders fields, and your downstream code breaks silently. </span><span class="c"><span class="lab">Catch it:</span> validate against a strict schema, pin model versions, and eval output conformance on every change.</span></div>
+  <div class="case"><span class="n">27</span><span class="t">Hallucinated enum. </span><span class="d">The model returns a status or category outside your allowed set and a switch statement falls through. </span><span class="c"><span class="lab">Catch it:</span> validate enums, reject out-of-set values, and eval enum adherence.</span></div>
+  <div class="case"><span class="n">28</span><span class="t">Partial-stream commit. </span><span class="d">You act on streamed tokens before completion, and the model's final output contradicts what you already did. </span><span class="c"><span class="lab">Catch it:</span> commit only on stream completion for any side-effecting action.</span></div>
+  <div class="case"><span class="n">29</span><span class="t">Locale corruption. </span><span class="d">Numbers and dates are parsed under the wrong locale, so 1.000 reads as one or as one thousand depending on the reader. </span><span class="c"><span class="lab">Catch it:</span> force explicit formats and units and eval across locales.</span></div>
+
+  <!-- F -->
+  <div class="cat"><span class="badge">F</span><h2>State, idempotency, and recovery</h2></div>
+  <div class="case"><span class="n">30</span><span class="t">Double side-effect. </span><span class="d">A non-idempotent action, like a charge, an email, or a ticket, is retried after a timeout and fires twice. </span><span class="c"><span class="lab">Catch it:</span> attach idempotency keys to every external action and eval retry behavior.</span></div>
+  <div class="case"><span class="n">31</span><span class="t">No rollback. </span><span class="d">A five-step action fails at step three and leaves the world half changed with no compensation. </span><span class="c"><span class="lab">Catch it:</span> design compensating actions or sagas and eval partial-failure recovery.</span></div>
+  <div class="case"><span class="n">32</span><span class="t">Orphaned async job. </span><span class="d">The agent starts a background task, then crashes or moves on, and the result is never reconciled. </span><span class="c"><span class="lab">Catch it:</span> persist job handles and reconcile on restart.</span></div>
+  <div class="case"><span class="n">33</span><span class="t">Timeout mid-tool. </span><span class="d">The tool succeeds server-side but the agent times out, assumes failure, and retries or reports the wrong outcome. </span><span class="c"><span class="lab">Catch it:</span> make actions queryable by id and confirm state before retrying.</span></div>
+  <div class="case"><span class="n">34</span><span class="t">Lost human handoff. </span><span class="d">An escalation to a human silently drops because no queue or owner exists, and the user waits forever. </span><span class="c"><span class="lab">Catch it:</span> make handoffs first class with acknowledgement and eval the escalation path.</span></div>
+
+  <!-- G -->
+  <div class="cat"><span class="badge">G</span><h2>Evals, drift, and observability</h2></div>
+  <div class="case"><span class="n">35</span><span class="t">No eval suite. </span><span class="d">Without a written eval set you cannot tell a regression from noise, so every deploy is a gamble. </span><span class="c"><span class="lab">Catch it:</span> build the eval suite before the agent. That inversion is the entire Diraya method.</span></div>
+  <div class="case"><span class="n">36</span><span class="t">Eval-set leakage. </span><span class="d">Your eval cases leaked into the prompt or the few-shot examples, so scores look strong and production does not. </span><span class="c"><span class="lab">Catch it:</span> keep eval data strictly out of prompts and rotate held-out sets.</span></div>
+  <div class="case"><span class="n">37</span><span class="t">Silent model regression. </span><span class="d">The provider ships a new default snapshot, behavior shifts, and nothing alarms. </span><span class="c"><span class="lab">Catch it:</span> pin versions and run the eval suite on every provider change before promoting.</span></div>
+  <div class="case"><span class="n">38</span><span class="t">Untraceable failure. </span><span class="d">A user reports a bad answer and you have no per-step trace to reproduce it. </span><span class="c"><span class="lab">Catch it:</span> log every step, tool call, and retrieved chunk with a trace id from day one.</span></div>
+
+  <!-- H -->
+  <div class="cat"><span class="badge">H</span><h2>Cost, latency, and scale</h2></div>
+  <div class="case"><span class="n">39</span><span class="t">Runaway step budget. </span><span class="d">Hard queries drive the agent to its max-step cap every time, multiplying latency and cost. </span><span class="c"><span class="lab">Catch it:</span> set tight step budgets, detect non-convergence early, and eval cost per query.</span></div>
+  <div class="case"><span class="n">40</span><span class="t">N plus one LLM calls. </span><span class="d">A per-item loop makes one model call each, so 200 items become 200 calls and a latency wall. </span><span class="c"><span class="lab">Catch it:</span> batch where possible and eval throughput under realistic load.</span></div>
+
+  <div class="pattern">
+    <h3>The pattern behind all 40</h3>
+    <p>Every ghost on this list shares one trait. It is invisible in a demo and only appears in
+    production, usually under load, usually in front of a customer.</p>
+    <p>The teams that ship reliable agents are not smarter. They <span class="hl">write the eval
+    first, then the agent, then they harden the agent against the evals</span> until the failure
+    rate is low enough to ship. That single inversion, evals before agent, is what separates a
+    demo from a product.</p>
+  </div>
+
+  <div class="cta">
+    Want a second set of eyes on the agent you are building? Reply <b>REVIEW</b> and Mohammed
+    sends a free architecture review for your specific stack: the design he would pick, the three
+    biggest risks, and a realistic timeline, inside 48 hours. No call required. Or book 30 minutes
+    directly at <b>calendly.com/amoura-ma-diraya/30min</b>.
+  </div>
+
+  <div class="foot">
+    <span>Diraya &nbsp;//&nbsp; Custom AI engineering for seed to Series B teams.</span>
+    <span>diraya.ca</span>
+  </div>
+
+</body>
+</html>

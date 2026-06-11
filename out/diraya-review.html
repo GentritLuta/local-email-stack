@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Your AI Feature: A Reference Architecture Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 10.6px; line-height: 1.5; margin: 0; }
+  .cover { border-bottom: 3px solid #FF6B00; padding-bottom: 14px; margin-bottom: 15px; }
+  .kicker { font-family: "Kanit", sans-serif; letter-spacing: 2.6px; text-transform: uppercase; font-size: 9px; color: #FF6B00; font-weight: 700; margin-bottom: 9px; }
+  h1 { font-family: "Kanit", sans-serif; font-size: 26px; line-height: 1.1; margin: 0 0 7px; font-weight: 800; letter-spacing: -0.3px; color: #0A0A0A; text-transform: uppercase; }
+  .sub { font-family: "Kanit", sans-serif; font-size: 12.5px; color: #454545; font-weight: 500; margin: 0; }
+  .note { background: #FFF4EC; border-left: 3px solid #FF6B00; padding: 11px 14px; margin: 14px 0 16px; font-size: 10.3px; color: #3a3a3a; border-radius: 0 4px 4px 0; }
+  .note b { color: #0A0A0A; }
+  h2 { font-family: "Kanit", sans-serif; font-size: 14px; margin: 16px 0 8px; font-weight: 700; color: #0A0A0A; padding-bottom: 4px; border-bottom: 1.5px solid #E8E8E8; }
+  .row { margin: 0 0 7px; padding-left: 26px; position: relative; page-break-inside: avoid; }
+  .row .k { position: absolute; left: 0; top: 0; font-family: "Kanit", sans-serif; font-weight: 800; color: #FF6B00; font-size: 12px; }
+  .row .t { font-weight: 700; color: #0A0A0A; }
+  .row .d { color: #454545; }
+  .timeline { margin: 2px 0 0; }
+  .tl { display: flex; gap: 10px; margin: 0 0 5px; page-break-inside: avoid; }
+  .tl .w { font-family: "Kanit", sans-serif; font-weight: 700; color: #FF6B00; min-width: 74px; font-size: 10px; }
+  .tl .x { color: #454545; }
+  .guarantee { margin-top: 9px; padding: 9px 13px; background: #0A0A0A; color: #ededed; border-radius: 6px; font-size: 10.2px; page-break-inside: avoid; }
+  .guarantee b { color: #FF8A38; }
+  .cta { margin-top: 12px; padding: 12px 16px; border: 1.5px solid #FF6B00; border-radius: 6px; font-size: 10.4px; page-break-inside: avoid; }
+  .cta b { color: #FF6B00; }
+  .foot { margin-top: 15px; padding-top: 9px; border-top: 1px solid #E8E8E8; font-size: 8.6px; color: #8A8A8A; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+  <div class="cover">
+    <div class="kicker">Diraya &nbsp;//&nbsp; Production AI Engineering</div>
+    <h1>Your AI Feature: A Reference Architecture Review</h1>
+    <p class="sub">The build we start from, the three risks that kill most AI features, and a realistic 8-week timeline.</p>
+  </div>
+
+  <div class="note">
+    A note from Mohammed, who runs engineering at Diraya. You asked for a review. Below is the
+    reference architecture we start every build from, the three risks we watch kill most AI
+    features before they ship, and a realistic path to production. This is the general version.
+    For the one tailored to <b>your</b> exact stack and data, reply with two lines on what you are
+    building and I send it back inside 48 hours, or grab 15 minutes on the call link below.
+  </div>
+
+  <h2>1. The reference architecture</h2>
+  <div class="row"><span class="k">1</span><span class="t">Eval harness, built first. </span><span class="d">A written test suite that defines good enough to ship. Everything else is measured against it. This single inversion, evals before agent, is what separates a demo from a product.</span></div>
+  <div class="row"><span class="k">2</span><span class="t">Data and retrieval layer. </span><span class="d">Clean ingestion, sane chunking, and a retrieval step you can score on its own. Most failures start here, not in the model.</span></div>
+  <div class="row"><span class="k">3</span><span class="t">Model and agent layer. </span><span class="d">The smallest model and the fewest steps that pass the evals. You scale up only when the evals demand it, never the other way around.</span></div>
+  <div class="row"><span class="k">4</span><span class="t">Guardrails. </span><span class="d">Input validation, output schema enforcement, injection defense on all retrieved content, and an explicit refusal path for when the agent should not answer.</span></div>
+  <div class="row"><span class="k">5</span><span class="t">Observability. </span><span class="d">Per-step tracing with a trace id from day one, so any bad answer a user reports is reproducible instead of a mystery.</span></div>
+  <div class="row"><span class="k">6</span><span class="t">Handover. </span><span class="d">The repo, the eval suite, and the docs in your team's hands. You own it and keep shipping on top of it. No lock-in.</span></div>
+
+  <h2>2. The three risks that kill most builds</h2>
+  <div class="row"><span class="k">A</span><span class="t">No eval suite. </span><span class="d">Without it you cannot tell a regression from noise, and the gap between a demo and production stays invisible until a customer finds it for you.</span></div>
+  <div class="row"><span class="k">B</span><span class="t">Retrieval and data quality. </span><span class="d">The model is rarely the problem. Stale indexes, bad chunk boundaries, and empty-retrieval hallucinations are. Fix the data path before you touch the prompt.</span></div>
+  <div class="row"><span class="k">C</span><span class="t">No observability or guardrails. </span><span class="d">Something will break in production. When it does you need a trace to fix it fast and a guardrail to contain the blast radius. The full 40 failure modes are in our Agent Ghost-Cases List.</span></div>
+
+  <h2>3. A realistic timeline to production</h2>
+  <div class="timeline">
+    <div class="tl"><span class="w">Week 1</span><span class="x">Write the eval suite together. Agree what good enough to ship means, in numbers.</span></div>
+    <div class="tl"><span class="w">Week 2</span><span class="x">First working milestone ships against the evals.</span></div>
+    <div class="tl"><span class="w">Weeks 3 to 6</span><span class="x">Build out the agent and harden it against the evals until the failure rate is low enough.</span></div>
+    <div class="tl"><span class="w">Weeks 7 to 8</span><span class="x">Production hardening, observability, guardrails, and full handover.</span></div>
+    <div class="tl"><span class="w">Day 56</span><span class="x">You own the repo, the evals, and the docs.</span></div>
+  </div>
+  <div class="guarantee">
+    The price is fixed before we start. The first milestone lands on <b>day 14 or you owe nothing</b>
+    and walk with the code we have built so far.
+  </div>
+
+  <div class="cta">
+    This is the reference. The version tailored to your stack, your data, and your timeline is a
+    15-minute call: <b>calendly.com/amoura-ma-diraya/30min</b>. Or reply with two lines on what you
+    are building and I send the tailored review back inside 48 hours.
+  </div>
+
+  <div class="foot">
+    <span>Diraya &nbsp;//&nbsp; Custom AI engineering for seed to Series B teams.</span>
+    <span>diraya.ca</span>
+  </div>
+
+</body>
+</html>

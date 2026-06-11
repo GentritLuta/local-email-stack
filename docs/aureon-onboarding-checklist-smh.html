@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Onboarding Checklist | Aureon Global for Sales Methodology Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 16mm 18mm 16mm;
+    background: #050505;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+  html, body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #f5f5f5;
+    background: #050505;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background:
+      radial-gradient(ellipse 600px 280px at 50% 5%, rgba(212,175,55,0.07), transparent 70%),
+      #050505;
+  }
+  .doc {
+    max-width: 100%;
+    padding: 4pt 0;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12pt;
+    border-bottom: 1pt solid rgba(212,175,55,0.25);
+    margin-bottom: 14pt;
+  }
+  .brand { display: flex; align-items: center; gap: 12pt; }
+  .brand-logo { width: 34pt; height: 34pt; flex-shrink: 0; }
+  .brand-text-block { display: flex; flex-direction: column; justify-content: center; }
+  .brand-name {
+    font-size: 13pt;
+    font-weight: 900;
+    letter-spacing: 1.4pt;
+    color: #ffffff;
+    line-height: 1;
+    margin-bottom: 3pt;
+  }
+  .brand-tag {
+    font-size: 7.5pt;
+    letter-spacing: 2.4pt;
+    text-transform: uppercase;
+    color: #d4af37;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .doc-ref {
+    text-align: right;
+    font-size: 8pt;
+    color: #b3b3b3;
+    letter-spacing: 0.3pt;
+  }
+  .doc-ref .ref-label {
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 7.5pt;
+    letter-spacing: 1.8pt;
+    text-transform: uppercase;
+    margin-bottom: 2pt;
+  }
+
+  /* Title block */
+  .title-block { margin-bottom: 14pt; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 7.5pt;
+    letter-spacing: 2.2pt;
+    text-transform: uppercase;
+    color: #d4af37;
+    font-weight: 700;
+    border: 0.5pt solid rgba(212,175,55,0.4);
+    background: rgba(212,175,55,0.05);
+    padding: 3pt 8pt;
+    border-radius: 99pt;
+    margin-bottom: 8pt;
+  }
+  h1 {
+    font-size: 19pt;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 6pt;
+    letter-spacing: -0.4pt;
+    line-height: 1.05;
+  }
+  h1 .accent {
+    background: linear-gradient(90deg, #FAE5AA, #D4AF37, #8A6E2F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .intro {
+    font-size: 10pt;
+    color: #b3b3b3;
+    margin-bottom: 3pt;
+    line-height: 1.55;
+  }
+  .intro-soft {
+    font-size: 9pt;
+    color: #6a6a6a;
+    font-style: italic;
+  }
+
+  /* Section */
+  section.q-block {
+    margin-bottom: 12pt;
+    page-break-inside: avoid;
+  }
+  section.q-block h2 {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 1.8pt;
+    text-transform: uppercase;
+    color: #d4af37;
+    margin-bottom: 7pt;
+    padding-bottom: 4pt;
+    border-bottom: 0.5pt solid rgba(212,175,55,0.2);
+  }
+
+  /* Question */
+  .q {
+    margin-bottom: 9pt;
+    padding-left: 24pt;
+    position: relative;
+  }
+  .q .qnum {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18pt;
+    height: 18pt;
+    border-radius: 50%;
+    background: rgba(212,175,55,0.1);
+    border: 0.5pt solid rgba(212,175,55,0.4);
+    color: #d4af37;
+    font-size: 8.5pt;
+    font-weight: 700;
+    text-align: center;
+    line-height: 16pt;
+  }
+  .q .qtext {
+    font-size: 10pt;
+    color: #f5f5f5;
+    font-weight: 600;
+    margin-bottom: 2pt;
+  }
+  .q .qhint {
+    font-size: 8.5pt;
+    color: #b3b3b3;
+    margin-bottom: 4pt;
+    line-height: 1.45;
+  }
+  .answer-line {
+    display: block;
+    border-bottom: 0.5pt solid rgba(212,175,55,0.4);
+    min-height: 16pt;
+    margin-top: 4pt;
+  }
+  .answer-line.short { width: 65%; }
+  .answer-line + .answer-line { margin-top: 5pt; }
+
+  /* Choices */
+  .choice {
+    display: inline-block;
+    margin-right: 14pt;
+    font-size: 9pt;
+    margin-top: 4pt;
+    color: #b3b3b3;
+  }
+  .choice .box {
+    display: inline-block;
+    width: 9pt;
+    height: 9pt;
+    border: 0.6pt solid #d4af37;
+    background: transparent;
+    vertical-align: middle;
+    margin-right: 4pt;
+  }
+
+  /* Confirm box (ICP default) */
+  .confirm-box {
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+    border: 0.5pt solid rgba(212,175,55,0.4);
+    border-left: 2pt solid #d4af37;
+    padding: 9pt 11pt;
+    margin-top: 4pt;
+    font-size: 9pt;
+    color: #f5f5f5;
+    border-radius: 2pt;
+  }
+  .confirm-box .label {
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 1.4pt;
+    margin-bottom: 4pt;
+    display: block;
+  }
+  .confirm-box .yn {
+    margin-top: 6pt;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 14pt;
+    padding-top: 10pt;
+    border-top: 1pt solid rgba(212,175,55,0.25);
+  }
+  .footer .cta {
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 10pt;
+    margin-bottom: 4pt;
+  }
+  .footer .send-to {
+    font-size: 9pt;
+    color: #b3b3b3;
+  }
+  .footer .send-to .email {
+    color: #d4af37;
+    font-weight: 600;
+  }
+  .footer .meta {
+    font-size: 7.5pt;
+    color: #6a6a6a;
+    margin-top: 8pt;
+    letter-spacing: 0.3pt;
+  }
+
+  strong { font-weight: 700; color: #ffffff; }
+  .gold { color: #d4af37; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute;">
+  <symbol id="aureonGlobe" viewBox="0 0 100 100">
+    <defs>
+      <linearGradient id="globeGrad" x1="10%" y1="10%" x2="90%" y2="90%">
+        <stop offset="5%" stop-color="#FFF8D6"/>
+        <stop offset="35%" stop-color="#E6C259"/>
+        <stop offset="65%" stop-color="#B68E2D"/>
+        <stop offset="95%" stop-color="#755615"/>
+      </linearGradient>
+    </defs>
+    <g fill="url(#globeGrad)">
+      <ellipse cx="50" cy="15" rx="20" ry="7"/>
+      <path d="M 18 26 Q 50 33 82 26 L 82 34 Q 50 41 18 34 Z"/>
+      <path d="M 8 40 Q 50 47 92 40 L 92 49 Q 50 56 8 49 Z"/>
+      <path d="M 8 55 Q 50 62 92 55 L 92 64 Q 50 71 8 64 Z"/>
+      <path d="M 18 70 Q 50 77 82 70 L 82 78 Q 50 85 18 78 Z"/>
+      <path d="M 32 84 Q 50 89 68 84 L 68 89 Q 50 94 32 89 Z"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="doc">
+
+  <div class="header">
+    <div class="brand">
+      <svg class="brand-logo"><use href="#aureonGlobe"/></svg>
+      <div class="brand-text-block">
+        <div class="brand-name">AUREON GLOBAL</div>
+        <div class="brand-tag">Quality Converts</div>
+      </div>
+    </div>
+    <div class="doc-ref">
+      <div class="ref-label">Onboarding Checklist</div>
+      <div>For: Sales Methodology Hub</div>
+      <div>Ref: AG SMH 2026 01</div>
+    </div>
+  </div>
+
+  <div class="title-block">
+    <div class="eyebrow">A quick checklist to get us started</div>
+    <h1>What we need from you<br><span class="accent">to get the engine running.</span></h1>
+    <p class="intro">A short questionnaire so we can fill in the agreement and hit the ground sending. Takes about ten minutes.</p>
+    <p class="intro-soft">Reply to info@aureonglobal.de with the answers, or just write on this page and send it back. Whatever is easiest.</p>
+  </div>
+
+  <!-- Section 1 -->
+  <section class="q-block">
+    <h2>1. Your Company, for the Agreement</h2>
+
+    <div class="q">
+      <div class="qnum">1</div>
+      <div class="qtext">Is your full registered name "The Founder Academy Limited"?</div>
+      <div class="qhint">If not, please write the exact registered name as on Companies House.</div>
+      <span class="choice"><span class="box"></span> Yes, that is it</span>
+      <span class="choice"><span class="box"></span> Different name: <span class="answer-line short" style="display:inline-block;width:45%;border-bottom:0.5pt solid #d4af37;height:14pt;"></span></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">2</div>
+      <div class="qtext">What is your Companies House number?</div>
+      <div class="qhint">The 8 digit number on your Companies House page. We can also look it up if easier.</div>
+      <span class="answer-line short"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">3</div>
+      <div class="qtext">What is your registered office address?</div>
+      <div class="qhint">Street, city, postcode. As it appears on Companies House.</div>
+      <span class="answer-line"></span>
+      <span class="answer-line"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">4</div>
+      <div class="qtext">Who is going to sign on your side, and what is their email?</div>
+      <div class="qhint">Name, title, and the email we should use for the signature link.</div>
+      <span class="answer-line"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">5</div>
+      <div class="qtext">What email should we use for any formal notices?</div>
+      <div class="qhint">Can be the same one as above, or a different inbox (info@, legal@, your direct one).</div>
+      <span class="answer-line short"></span>
+    </div>
+  </section>
+
+  <!-- Section 2 -->
+  <section class="q-block">
+    <h2>2. Sending Setup, Under Your Domain</h2>
+
+    <div class="q">
+      <div class="qnum">6</div>
+      <div class="qtext">Do you control the DNS for salesmethodologyhub.com directly?</div>
+      <div class="qhint">Meaning, can you or someone on your team add records on Cloudflare, GoDaddy, Namecheap, AWS Route 53, etc.</div>
+      <span class="choice"><span class="box"></span> Yes, in house</span>
+      <span class="choice"><span class="box"></span> Our web agency handles it</span>
+      <span class="choice"><span class="box"></span> Not sure, will find out</span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">7</div>
+      <div class="qtext">Give us short term DNS access, or publish the records yourself with our instructions?</div>
+      <div class="qhint">Either works. About four records per subdomain. We will guide you either way.</div>
+      <span class="choice"><span class="box"></span> Give Aureon temporary DNS access</span>
+      <span class="choice"><span class="box"></span> We will publish the records ourselves</span>
+    </div>
+  </section>
+
+  <!-- Section 3 -->
+  <section class="q-block">
+    <h2>3. Where Booked Intros Land</h2>
+
+    <div class="q">
+      <div class="qnum">8</div>
+      <div class="qtext">When someone replies asking for a demo, where should we route them?</div>
+      <div class="qhint">A Calendly link, a personal calendar, or a shared inbox. Whatever is fastest for you to action.</div>
+      <span class="answer-line"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">9</div>
+      <div class="qtext">Who is actually taking those intro calls?</div>
+      <div class="qhint">Just you, or do you have a co founder or sales lead on the founding clients side?</div>
+      <span class="answer-line"></span>
+    </div>
+  </section>
+
+  <!-- Section 4 -->
+  <section class="q-block">
+    <h2>4. Who We Go After, Your ICP</h2>
+
+    <div class="confirm-box">
+      <span class="label">Our default ICP for you</span>
+      Series B to D B2B SaaS, 100 to 1000 employees, sales leaders (CRO, VP Sales, Director of Sales, Head of Enablement, Head of RevOps) who publicly reference MEDDIC, MEDDPICC, Challenger, SPIN, Sandler, NEAT, TAS, or SPICED.
+      <div class="yn">
+        <span class="choice" style="margin-top:0;color:#f5f5f5;"><span class="box"></span> Looks right, go with this</span>
+        <span class="choice" style="margin-top:0;color:#f5f5f5;"><span class="box"></span> Tweaks needed (write below)</span>
+      </div>
+    </div>
+
+    <div class="q" style="margin-top:9pt;">
+      <div class="qnum">10</div>
+      <div class="qtext">Any tweaks to that default ICP?</div>
+      <div class="qhint">For example, only US or UK, or only sales orgs above 200 staff. Skip if defaults are fine.</div>
+      <span class="answer-line"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">11</div>
+      <div class="qtext">Any companies or sectors we should exclude?</div>
+      <div class="qhint">Existing customers, competitors, anyone on a do not contact list, anyone you have already pitched.</div>
+      <span class="answer-line"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">12</div>
+      <div class="qtext">Which buyer titles have converted best for you so far?</div>
+      <div class="qhint">If you have a sense from pre launch conversations, this helps us weight the cadence.</div>
+      <span class="answer-line"></span>
+    </div>
+  </section>
+
+  <!-- Section 5 -->
+  <section class="q-block">
+    <h2>5. When We Start</h2>
+
+    <div class="q">
+      <div class="qnum">13</div>
+      <div class="qtext">Earliest date you can give us DNS access or publish the records?</div>
+      <div class="qhint">This is the gate that starts the three month pilot clock.</div>
+      <span class="answer-line short"></span>
+    </div>
+
+    <div class="q">
+      <div class="qnum">14</div>
+      <div class="qtext">Best day and time slot for the 15 minute kickoff call?</div>
+      <div class="qhint">We will run it within two working days of the agreement being signed.</div>
+      <span class="answer-line short"></span>
+    </div>
+  </section>
+
+  <div class="footer">
+    <div class="cta">Thanks. Once we have these we send the signed agreement via Dropbox Sign and start the kickoff.</div>
+    <div class="send-to">Send back to: <span class="email">info@aureonglobal.de</span></div>
+    <div class="meta">Aureon Global L.L.C. | Dushkaja 20, 71000 Kaçanik | Republic of Kosovo | Reg. 812368240 | VAT 330681892 | aureonglobal.de</div>
+  </div>
+
+</div>
+
+</body>
+</html>

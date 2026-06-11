@@ -1,0 +1,461 @@
+{
+  "slug": "energ",
+  "name": "ENER-G Beratung — Unabhängige Energieberatung (KMU/Gewerbe), 4-domain x 2-subdomain cold outbound",
+  "created_at": "2026-06-07",
+  "active": true,
+  "company": {
+    "legal_name": "ENER G LLC",
+    "registration_number": "",
+    "country": "",
+    "website": "https://ener-g-beratung.de",
+    "root_domain": "ener-g-beratung.de",
+    "office_address": "Rincklakeweg 9, 48153 Münster",
+    "signer": "Philipp Loisha",
+    "notices_email": "philipp.loisha@gmail.com",
+    "target_market": "KMU & Gewerbe in Deutschland, ab 30.000 kWh Stromverbrauch ohne Obergrenze (hunderttausende bis Millionen kWh), im Umkreis von ~100 km um Neuss/Düsseldorf, ein Entscheider"
+  },
+  "_note": "Private overrides for ENER-G. Gitignored. Reuses the shared Aureon Resend account key (RESEND_NEW_ACCOUNT_API_KEY) — same account as diraya / aureon / algoalpha / f2 / atalsolidrocks. Fill resend_domain_id values in profiles/energ.json as each ener-g-beratung.* subdomain verifies.",
+  "relay": {
+    "backend": "resend",
+    "resend_region": "eu-west-1",
+    "resend_api_key": "",
+    "_note": "eu-west-1: German-only ICP. Reuse the shared Aureon Resend account key (set in energ.private.json -> relay.resend_api_key). resend_domain_id values get filled per subdomain as each verifies.",
+    "from_domains": [
+      {
+        "domain": "hello.ener-g-beratung.de",
+        "resend_domain_id": "a26ab06a-dea6-4b05-a25f-b512220aa57a",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.ener-g-beratung.de",
+        "resend_domain_id": "61ae412e-c578-4784-85c5-9bdb538b417b",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.ener-g-beratung.org",
+        "resend_domain_id": "1e079b84-a225-4595-9e1f-987aec7a423d",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.ener-g-beratung.org",
+        "resend_domain_id": "016bdf6e-dc34-4a57-a085-6ccaf08900a9",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.ener-g-beratung.com",
+        "resend_domain_id": "6190cd47-df09-4b01-8288-ccaf019c88be",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.ener-g-beratung.com",
+        "resend_domain_id": "eea1607a-87da-4a8f-9b71-70c417054982",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.ener-g-beratung.store",
+        "resend_domain_id": "27c48cfb-599e-4e68-a215-1c6b1557ea89",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.ener-g-beratung.store",
+        "resend_domain_id": "00b6f59d-439d-43d3-867c-6501f9d668be",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-07",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ],
+    "from_domains_overrides": []
+  },
+  "personas": [
+    {
+      "slug": "philipp-hello",
+      "from_name": "Philipp von ENER-G",
+      "from_addr": "philipp@hello.ener-g-beratung.de",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Philipp Loisha\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Philipp Loisha"
+    },
+    {
+      "slug": "philipp-team",
+      "from_name": "Philipp von ENER-G",
+      "from_addr": "philipp@team.ener-g-beratung.de",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Philipp Loisha\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Philipp Loisha"
+    },
+    {
+      "slug": "markus-hello",
+      "from_name": "Markus von ENER-G",
+      "from_addr": "markus@hello.ener-g-beratung.org",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Markus Hofmann\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Markus Hofmann"
+    },
+    {
+      "slug": "markus-team",
+      "from_name": "Markus von ENER-G",
+      "from_addr": "markus@team.ener-g-beratung.org",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Markus Hofmann\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Markus Hofmann"
+    },
+    {
+      "slug": "stefan-hello",
+      "from_name": "Stefan von ENER-G",
+      "from_addr": "stefan@hello.ener-g-beratung.com",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Stefan Vogel\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Stefan Vogel"
+    },
+    {
+      "slug": "stefan-team",
+      "from_name": "Stefan von ENER-G",
+      "from_addr": "stefan@team.ener-g-beratung.com",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Stefan Vogel\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Stefan Vogel"
+    },
+    {
+      "slug": "daniel-hello",
+      "from_name": "Daniel von ENER-G",
+      "from_addr": "daniel@hello.ener-g-beratung.store",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Daniel Berg\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Daniel Berg"
+    },
+    {
+      "slug": "daniel-team",
+      "from_name": "Daniel von ENER-G",
+      "from_addr": "daniel@team.ener-g-beratung.store",
+      "reply_to": "loisha@energieberatung-schwabenland.de",
+      "title": "Energieberater, ENER-G",
+      "voice": {
+        "register": "berater-direkt",
+        "quirks": [
+          "kurze Sätze",
+          "konkrete Zahlen",
+          "keine Floskeln"
+        ],
+        "avoid": [
+          "Marketingsprache",
+          "Ausrufezeichen",
+          "Emojis",
+          "Gedankenstriche"
+        ]
+      },
+      "signature": "Daniel Berg\nEnergieberater, ENER-G Beratung\nener-g-beratung.de",
+      "full_name": "Daniel Berg"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 30,
+    "min_seconds_between_sends_same_persona": 180
+  },
+  "send_ramp": {
+    "started_at": null
+  },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [
+      {
+        "until_day": 14,
+        "warmup_pct": 80
+      },
+      {
+        "until_day": 30,
+        "warmup_pct": 30
+      },
+      {
+        "until_day": 45,
+        "warmup_pct": 10
+      },
+      {
+        "until_day": 9999,
+        "warmup_pct": 5
+      }
+    ],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.003
+    },
+    "reputation": {
+      "bounce_rate_7d": 0,
+      "complaint_rate_7d": 0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "started_at": "2026-06-07",
+    "current_day": 1,
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    {
+      "from_day": 1,
+      "daily": 15
+    },
+    {
+      "from_day": 8,
+      "daily": 25
+    },
+    {
+      "from_day": 15,
+      "daily": 35
+    },
+    {
+      "from_day": 22,
+      "daily": 50
+    }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "Europe/Berlin",
+    "target_audience_note": "Deutschland-only ICP. Europe/Berlin. 08:00-17:00 Empfänger-Ortszeit."
+  },
+  "brand": {
+    "wordmark": "ENER-G",
+    "site": "ener-g-beratung.de",
+    "cta_url": "",
+    "tagline": "100 % transparent. 100 % auf Ihrer Seite.",
+    "font_stack": "'Inter', sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+    "colors": {
+      "accent": "#22C55E",
+      "accent_2": "#101525",
+      "text": "#F1F5F9",
+      "text_2": "#CBD5E1",
+      "muted": "#94A3B8",
+      "bg_page": "#070A14",
+      "bg_card": "#101525",
+      "rule": "#1E293B"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/energ.html?t={token}",
+    "legal": {
+      "company_name": "ENER-G Beratung",
+      "address_lines": [
+        "ENER G LLC",
+        "Rincklakeweg 9, 48153 Münster"
+      ],
+      "contact_email": "info@ener-g-beratung.de",
+      "copyright_year": 2026,
+      "privacy_policy_url": "https://ener-g-beratung.de/datenschutz",
+      "terms_of_service_url": "https://ener-g-beratung.de/impressum",
+      "legal_disclaimer": "Diese Nachricht ist ausschließlich für den genannten Empfänger bestimmt. Sollten Sie nicht der richtige Empfänger sein, löschen Sie diese E-Mail bitte und informieren Sie den Absender.",
+      "partner_notice": "Sie erhalten diese E-Mail, weil unsere unabhängige Energieberatung für Ihr Unternehmen relevant sein könnte. Abmeldung mit einem Klick unten."
+    },
+    "template": "energ-custom",
+    "cta_fallback_note": "cta_url leer -> Vorgespräch per Antwort buchen (Philipp ist abends ab 19:00 CET frei). Sobald ein Buchungslink existiert, hier eintragen."
+  },
+  "_note_template": "Custom template at sequences/email_template_energ.py (energ-custom). Green #16A34A, Inter, transparenz-Positionierung. Reply-to aller Personas: loisha@energieberatung-schwabenland.de."
+}

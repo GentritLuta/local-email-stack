@@ -1,0 +1,607 @@
+{
+  "slug": "dorian",
+  "name": "Mercury Scales — client acquisition for self-made B2B founders",
+  "created_at": "2026-06-10",
+  "active": true,
+  "company": {
+    "name": "Skiljo Enterprise (Dorian Skiljo)",
+    "site": "mercuryscales.com",
+    "tagline": "Predictable client acquisition for founders scaling past $15k/mo"
+  },
+  "brand": {
+    "wordmark": "Mercury Scales",
+    "site": "mercuryscales.com",
+    "tagline": "Predictable client acquisition for founders scaling past $15k/mo",
+    "font_stack": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    "colors": {
+      "accent": "#0a0a0a",
+      "accent_2": "#3730a3",
+      "text": "#0a0a0a",
+      "text_2": "#475569",
+      "muted": "#94a3b8",
+      "bg_page": "#ffffff",
+      "bg_card": "#ffffff",
+      "rule": "#e5e7eb"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/dorian.html?t={token}",
+    "legal": {
+      "company_name": "Skiljo Enterprise (Dorian Skiljo, Einzelunternehmen)",
+      "address_lines": [
+        "Skiljo Enterprise",
+        "Paulckestrasse 5",
+        "80933 Muenchen, Germany"
+      ],
+      "contact_email": "skiljodorian@gmail.com",
+      "vat_id": "DE361791498",
+      "copyright_year": 2026,
+      "logo_url": "",
+      "logo_width": 50,
+      "privacy_policy_url": "https://mercuryscales.com/privacy",
+      "terms_of_service_url": "https://mercuryscales.com/terms",
+      "legal_disclaimer": "This message is intended only for the named recipient. If you are not the intended recipient, please delete it and let us know.",
+      "partner_notice": "You are receiving this because we believe Mercury Scales' client-acquisition work could be relevant to your business. Unsubscribe with one click."
+    },
+    "template": "dorian-custom"
+  },
+  "relay": {
+    "backend": "resend",
+    "resend_region": "us-east-1",
+    "resend_api_key": "",
+    "_note": "Sends on the PRO Resend account (RESEND_NEW_ACCOUNT_API_KEY, re_iPPp8...), the SAME account as aureon + diraya. Migrated off the full-access account 2026-06-10 (delete+recreate; SES re-issued identical DKIM so no DNS change was needed). Key is mirrored into profiles/dorian.private.json. mercuryscales.com DNS is on Dorian's own Hostinger (HOSTINGER_API_TOKEN_DORIAN). from_domains: outreach.mercuryscales.com then team.mercuryscales.com.",
+    "from_domains": [
+      {
+        "domain": "outreach.mercuryscales.com",
+        "resend_domain_id": "6b578339-6232-4cbd-a628-0f239216cda4",
+        "verified_at": "2026-06-10T17:38:47.765393Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.mercuryscales.com",
+        "resend_domain_id": "e0a0d435-ad7b-4ae8-b25a-e4ac9e1f7a28",
+        "verified_at": "2026-06-10T17:31:58.578341Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "mail.mercuryscales.com",
+        "resend_domain_id": "1287ece0-b602-4f8a-bdb0-8be4680c7745",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hi.mercuryscales.com",
+        "resend_domain_id": "e66a861b-ac89-4c5a-8513-bd513a4e49eb",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "connect.mercuryscales.com",
+        "resend_domain_id": "0c4e1313-e37a-4278-a8ee-1a8fa5bb45e3",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "partners.mercuryscales.com",
+        "resend_domain_id": "12e62854-2ea8-45d1-b103-09fbc49d1abf",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.mercuryscales.com",
+        "resend_domain_id": "c5c7e52b-7f1f-4a94-aaf8-b8e33e3a7b57",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "reach.mercuryscales.com",
+        "resend_domain_id": "0ef07110-eb22-40ff-875b-52f8561fbb77",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "news.mercuryscales.com",
+        "resend_domain_id": "b12ce7c8-433b-4ab8-95da-068e4fafd234",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "send.mercuryscales.com",
+        "resend_domain_id": "b79028b0-1de2-43be-b7d7-8e515b288482",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "desk.mercuryscales.com",
+        "resend_domain_id": "a98d94f1-58c3-4330-a830-0f38f7af828c",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hub.mercuryscales.com",
+        "resend_domain_id": "808548e4-b84b-45f1-817b-0a8f9019e5be",
+        "verified_at": "2026-06-10T00:00:00Z",
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ]
+  },
+  "personas": [
+    {
+      "slug": "dorian",
+      "from_name": "Dorian Skiljo",
+      "from_addr": "dorian@outreach.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Founder, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "speaks founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Dorian Skiljo\nFounder, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "mara",
+      "from_name": "Mara Devlin",
+      "from_addr": "mara@team.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "warm-direct",
+        "quirks": [
+          "leads with a specific observation",
+          "one clear next step per email"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "buzzwords"
+        ]
+      },
+      "signature": "Mara Devlin\nGrowth Partner, Mercury Scales"
+    },
+    {
+      "slug": "leo",
+      "from_name": "Leo Hartmann",
+      "from_addr": "leo@mail.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Leo Hartmann\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "ava",
+      "from_name": "Ava Klein",
+      "from_addr": "ava@hi.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Ava Klein\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "noah",
+      "from_name": "Noah Brandt",
+      "from_addr": "noah@connect.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Noah Brandt\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "mia",
+      "from_name": "Mia Vogel",
+      "from_addr": "mia@partners.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Mia Vogel\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "finn",
+      "from_name": "Finn Larsen",
+      "from_addr": "finn@hello.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Finn Larsen\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "ella",
+      "from_name": "Ella Novak",
+      "from_addr": "ella@reach.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Ella Novak\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "jack",
+      "from_name": "Jack Mercer",
+      "from_addr": "jack@news.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Jack Mercer\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "nina",
+      "from_name": "Nina Falk",
+      "from_addr": "nina@send.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Nina Falk\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "sam",
+      "from_name": "Sam Reuter",
+      "from_addr": "sam@desk.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Sam Reuter\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    },
+    {
+      "slug": "ruby",
+      "from_name": "Ruby Aldridge",
+      "from_addr": "ruby@hub.mercuryscales.com",
+      "reply_to": "skiljodorian@gmail.com",
+      "title": "Growth Partner, Mercury Scales",
+      "voice": {
+        "register": "direct-peer",
+        "quirks": [
+          "founder-to-founder, no agency-speak",
+          "one concrete question per email",
+          "references a real signal about their business"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "guru language",
+          "fake scarcity"
+        ]
+      },
+      "signature": "Ruby Aldridge\nGrowth Partner, Mercury Scales\nmercuryscales.com"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 2,
+    "min_seconds_between_sends_same_persona": 180,
+    "_comment": "Capped per send_ramp; 12 subdomains x 12 personas (full kit), warmup-gated."
+  },
+  "send_ramp": {
+    "_doc": "Per-profile new-sender ramp. The FROM identities are brand new and need their own ramp even though the subdomains will verify quickly.",
+    "started_at": null,
+    "curve": [
+      {
+        "from_day": 1,
+        "per_persona": 1
+      },
+      {
+        "from_day": 4,
+        "per_persona": 3
+      },
+      {
+        "from_day": 8,
+        "per_persona": 5
+      },
+      {
+        "from_day": 15,
+        "per_persona": 10
+      },
+      {
+        "from_day": 22,
+        "per_persona": 20
+      }
+    ]
+  },
+  "warmup": {
+    "enabled": false,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.003
+    },
+    "reputation": {
+      "bounce_rate_7d": 0,
+      "complaint_rate_7d": 0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    {
+      "from_day": 1,
+      "daily": 9
+    },
+    {
+      "from_day": 4,
+      "daily": 18
+    },
+    {
+      "from_day": 8,
+      "daily": 36
+    },
+    {
+      "from_day": 15,
+      "daily": 60
+    },
+    {
+      "from_day": 22,
+      "daily": 90
+    }
+  ],
+  "_note": "Dorian sends on RESEND_NEW_ACCOUNT_API_KEY (the PRO account, same as aureon/diraya). Mirrored into dorian.private.json. Reply routing + call booking: skiljodorian@gmail.com / calendly.com/skiljodorian/new-meeting."
+}

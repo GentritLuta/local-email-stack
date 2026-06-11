@@ -1,0 +1,117 @@
+slug: diraya_saas
+name: "Software / digital agencies + SMB software cos — AI-engineering buyers (scrapeable)"
+profile_slug: diraya
+engine: team_pages
+
+# REFRAMED 2026-06-02: VC-backed SaaS founders proved un-scrapeable (they hide
+# emails). This niche instead targets segments that DO publish staff emails on
+# "our team / meet the team" pages — digital & software agencies and SMB software
+# companies — and that plausibly need a custom AI feature built. Same proven
+# team-page pattern Aureon uses for brokerages.
+# NOTE: Diraya's email copy is highly technical (RAG / eval suites). It lands for
+# software/CTO buyers; for non-technical agency owners it may need a lighter
+# variant. Flagged for a copy fit-check once leads start landing.
+require_first_name: true
+
+seeds: []   # auto-populated by seed_discover.py from the queries below
+
+# NOTE 2026-06-04: seed_discover keeps returning OFF-ICP junk for this ICP every
+# run (apps.microsoft.com, dictionaries, big-brand product pages) and corrupted
+# this file by appending a seed under `seeds: []`. Diraya's B2B-tech buyers are
+# NOT publicly scrapeable — leads come via the LinkedIn motion + CSV import, not
+# cold scraping. Seeds intentionally empty; this niche is NOT scheduled to run.
+
+  # auto-discovered 2026-06-09 17:20 via seed_discover.py
+  - https://www.swhouse.com/contact-us
+  - https://www.aisoftwarellc.com/team
+  - https://softwaremill.com/contact
+  - https://daxima.com/team
+  - https://softwaremill.com/team
+  - https://infinitysoftware.com/team
+  - https://devoxsoftware.com/about-us
+  - https://www.softwaredevelopersinc.com/about
+  - https://www.leewayhertz.com/software-development-company
+  - https://www.directom.com/contact-us
+  - https://www.sapphiredigitalagency.com/about-us
+  - https://designbox.co.uk/meet-our-team
+  - https://www.fifteendesign.co.uk/about-us/meet-the-team
+  - https://www.opusdesign.us
+  - https://www.designrush.com/agency/software-development/texas
+
+
+search_queries:
+  - "software company our team contact"
+  - "software development company meet our team"
+  - "digital agency our team contact email"
+  - "web design agency meet the team"
+  - "software company Texas our team"
+  - "software company Florida meet the team"
+  - "digital agency California our team"
+  - "software company Colorado team contact"
+  - "creative digital agency our team contact"
+  - "custom software company meet the team"
+  - "app development company our team contact"
+  - "technology company about us our team email"
+
+seed_require_keywords: ["software", "digital agency", "web design", "app development", "technology", "developers", "engineering team", "our team", "saas", "platform"]
+
+discovery:
+  max_seeds_per_run: 15
+  search_country: us
+  require_mailto: true
+  require_keywords: ["software", "agency", "developers", "technology", "web design", "app development"]
+  exclude_domains:
+    - linkedin.com
+    - facebook.com
+    - twitter.com
+    - x.com
+    - crunchbase.com
+    - github.com
+    - ycombinator.com
+    - producthunt.com
+    - g2.com
+    - capterra.com
+    - getapp.com
+    - clutch.co
+    - medium.com
+    - youtube.com
+    - reddit.com
+    - wikipedia.org
+    # junk surfaced by the first run — topic articles, not company pages
+    - shopify.com
+    - businessnewsdaily.com
+    - pluto.tv
+    - forbes.com
+    - hubspot.com
+    - investopedia.com
+    - indeed.com
+    - glassdoor.com
+
+filter:
+  exclude_local_parts:
+    - info
+    - contact
+    - hello
+    - sales
+    - admin
+    - support
+    - office
+    - team
+    - marketing
+    - press
+    - jobs
+    - careers
+    - hr
+    - legal
+    - privacy
+    - billing
+    - help
+    - security
+    - noreply
+    - no-reply
+  exclude_domains:
+    - upwork.com
+    - fiverr.com
+    - toptal.com
+
+sequence_slug: diraya-default

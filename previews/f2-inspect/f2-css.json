@@ -1,0 +1,60 @@
+{
+  "body": {
+    "color": "rgb(26, 35, 50)",
+    "bg": "rgb(255, 255, 255)",
+    "fontFamily": "\"Plus Jakarta Sans\", sans-serif",
+    "fontSize": "16px"
+  },
+  "h1_text": "Maler und Gipser in Bern, Burgdorf und Umgebung",
+  "headings": {
+    "h1": {
+      "fontSize": "72px",
+      "fontWeight": "800",
+      "color": "rgb(255, 255, 255)",
+      "fontFamily": "\"Plus Jakarta Sans\", sans-serif",
+      "lineHeight": "72px",
+      "text": "Maler und Gipser in Bern, Burgdorf und Umgebung"
+    },
+    "h2": {
+      "fontSize": "36px",
+      "fontWeight": "800",
+      "color": "rgb(26, 35, 50)",
+      "fontFamily": "\"Plus Jakarta Sans\", sans-serif",
+      "lineHeight": "40px",
+      "text": "Warum F2 Maler Gipser wählen?"
+    },
+    "h3": {
+      "fontSize": "20px",
+      "fontWeight": "700",
+      "color": "rgb(26, 35, 50)",
+      "fontFamily": "\"Plus Jakarta Sans\", sans-serif",
+      "lineHeight": "28px",
+      "text": "17 Jahre Erfahrung"
+    }
+  },
+  "button": {
+    "bg": "rgb(107, 169, 76)",
+    "color": "rgb(255, 255, 255)",
+    "borderRadius": "10px",
+    "padding": "8px 16px",
+    "fontSize": "14px",
+    "fontWeight": "700",
+    "text": "Kostenlose Offerte anfordern"
+  },
+  "sections": [
+    {
+      "padding": "0px",
+      "background": "rgba(0, 0, 0, 0)"
+    },
+    {
+      "padding": "96px 0px",
+      "background": "rgb(255, 255, 255)"
+    },
+    {
+      "padding": "96px 0px",
+      "background": "rgba(243, 245, 247, 0.3)"
+    }
+  ],
+  "contact_block": "F2 Maler Gipser\nHANDWERKSKUNST SEIT 2007\nHome\nLeistungen\nÜber uns\nKontakt\nKostenlose Offerte anfordern",
+  "page_text_sample": "Zum Hauptinhalt springen\nF2 Maler Gipser\nHANDWERKSKUNST SEIT 2007\nHome\nLeistungen\nÜber uns\nKontakt\nKostenlose Offerte anfordern\nMaler und Gipser in Bern, Burgdorf und Umgebung\n\nMalerarbeiten, Gipserarbeiten und Renovationen, die den Unterschied machen. Gueti Arbeit, wo mä gseht – das ist unser Versprechen.\n\n17 Jahre Erfahrung\n500+ zufriedene Kunden\nIhre kostenlose Offerte wartet\nKostenlose Offerte anfordern\nWarum F2 Maler Gipser wählen?\n\nErfahren Sie mehr über uns und unseren Standard, den Sie bei jedem Projekt in Bern, Burgdorf und Umgebung erwarten können.\n\n17 Jahre Erfahrung\n\nSeit 2007 bieten wir Premium-Materialien und Handwerkskunst für alle 7 Leistungsbereiche in Bern, Burgdorf und Umgebung.\n\nProfessionelle Handwerker\n\nVon Malerarbeiten bis zur Schimmelsanierung – wir koordinieren alle Schritte nahtlos und termingerecht.\n\nSaubere Baustelle\n\nWir decken alles penibel ab und hinterlassen Ihre Räume nach den Arbeiten besenrein.\n\nKostenlose Offerte\n\nKeine versteckten Kosten. Sie erhalten eine detaillierte, kostenlose Offerte und zahlen genau das, was vereinbart wurde.\n\nUnsere Dienstleistungen in Bern, Burgdorf und Umgebung\n\nWir decken alle essenziellen Bereiche für den perfekten Innenausbau und Fassadenschutz ab.\n\nMalerarbeiten\n\nInnen- und Aussenmalerei in Bern und Umgebung\n\nGipserarbeiten\n\nTrockenbau & Verputz in Burgdorf und Umgebung\n\nInnenrenovationen\n\nKomplette Umbauten\n\nDämmungen\n\nWärmeschutz & Fassaden\n\nSchimmelsanierung\n\nNachhaltige Bekämpfung\n\nFlüssigkunststoff\n\nBode"
+}

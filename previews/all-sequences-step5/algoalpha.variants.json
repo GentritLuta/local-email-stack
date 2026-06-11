@@ -1,0 +1,22 @@
+{
+  "name": "AlgoAlpha — 7-email Hormozi sequence for crypto/trading influencers (named mechanism, personalised hook, reply-stop)",
+  "slug": "algoalpha-default",
+  "profile_slug": "algoalpha",
+  "created_at": "2026-05-18",
+  "target": "Crypto + trading content creators (YouTube, TradingView authors, Substacks). {company} = channel/brand. {personal_hook} populated by personal_hook_worker.py — only required on step 1; follow-ups reference back without re-quoting the video.",
+  "voice_notes": "Named mechanism: The AlgoAlpha Creator Partner Program (steps 1, 2, 4). Step 1 has the {personal_hook} opener; follow-ups omit it. Length tapers 110 -> 55 -> 60 -> 70 -> 45 -> 60 -> 55. NO apostrophes, em-dashes, single quotes, or word-internal hyphens. CTA button hidden on step 1 by template. Required merges: {first_name}, {company} on every step; {personal_hook} on step 1 only (auto-detected by runner).",
+  "required_merges": [
+    "first_name",
+    "company"
+  ],
+  "schedule_doc": "delay_days = gap from prior step. 0,3,4,5,6,8,9 cumulative = day 0,3,7,12,18,26,35.",
+  "variants": [
+    {
+      "n": 5,
+      "delay_days": 6,
+      "angle": "algoalpha_followup_forced_yes_or_no",
+      "subject": "{first_name} a yes or a no",
+      "body": "Hi {first_name}.\n\nIf we could put a custom branded indicator in your audience hands for free and pay {company} 30 percent lifetime commission on every paid signup, would you say yes?\n\nA clear yes or a clear no both work.\n\nTomas"
+    }
+  ]
+}

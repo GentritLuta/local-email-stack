@@ -1,0 +1,124 @@
+slug: dtc_b2b_founders
+name: "DTC + mid-market B2B brand founders — agency switcher candidates"
+profile_slug: lk-advertising
+engine: team_pages   # default for plain string seeds
+
+# WHAT THIS NICHE SCRAPES
+# Founders and CMOs of DTC and B2B brands spending ~$20k-$200k/month on paid
+# acquisition (Meta + Google) and likely to consider switching from their
+# current performance-marketing agency. LK Advertising's grand-slam offer
+# ("pay only when we beat your current ROAS") only converts if the prospect
+# (a) has a current agency, and (b) can be persuaded to A/B test.
+#
+# Each seed can be either:
+#   - "url"                          → uses niche-level engine
+#   - { url: "...", engine: "..." }  → per-seed engine override
+#
+# Engines:
+#   - team_pages  : httpx fetch + bs4 (fast; auto-upgrades to playwright if static HTML is empty)
+#   - playwright  : full Chrome render (JS, SPA, soft Cloudflare). ~3-5s/seed.
+#
+# RUN
+#   py sequences/lead_scrape.py run dtc_b2b_founders
+#   py sequences/lead_scrape.py run dtc_b2b_founders --engine playwright   # force-all
+#
+# SCHEDULE (weekly Mon 10:00 — seed pool is small, weekly is enough)
+#   schtasks /Create /TN "LES-lead-scrape-dtc_b2b_founders" /SC WEEKLY /D MON /ST 10:00 ^
+#     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run dtc_b2b_founders"
+#
+# ICP CAVEAT (research-agent flagged this — please read before running)
+# Of the 15 validated seeds below, only 7 are strong agency-switcher fits.
+# The other 8 are enterprise-scale B2B SaaS (HubSpot, ZoomInfo, Salesloft,
+# Rippling, Klaviyo, Lattice, Attentive, ShipBob) — they all have in-house
+# performance teams of 50+ people and rarely outsource to small/mid agencies.
+# They're kept in the file for completeness but commented out by default —
+# uncomment if you want to also surface their non-marketing C-suite (e.g.
+# for future B2B SaaS-targeted niches).
+#
+# For higher-yield future expansion: scrape Modern Retail / Marketing Brew
+# "founder spotlight" article archives rather than guessing /about URLs on
+# random DTC brand sites — most modern DTC sites hide leadership behind
+# generic marketing copy or 403-block scrapers.
+
+seeds:
+  # ── PRIMARY ICP FIT: DTC brands w/ named founders (likely agency-run) ───
+  - https://www.gymshark.com/pages/about-us
+  - { url: "https://www.tonal.com/about/", engine: playwright }
+  - { url: "https://www.allbirds.com/pages/our-story", engine: playwright }
+  - { url: "https://www.outdoorvoices.com/pages/about", engine: playwright }
+  - { url: "https://www.brightland.co/pages/about-brightland-olive-oil", engine: playwright }
+
+  # ── PRIMARY ICP FIT: mid-market B2B SaaS (sub-1000 headcount) ───────────
+  - https://www.gainsight.com/leadership/
+  - https://www.pipedrive.com/en/about
+
+  # ── SPECULATIVE: enterprise B2B SaaS (weak agency-switcher fit) ─────────
+  # Uncomment only if you want enterprise B2B SaaS C-suite contacts in this
+  # bucket. Default OFF because LK's offer presumes external-agency reliance,
+  # and 1000+ employee SaaS companies overwhelmingly run paid in-house.
+  # - https://www.hubspot.com/company/management
+  # - { url: "https://www.klaviyo.com/about", engine: playwright }
+  # - { url: "https://www.attentive.com/about", engine: playwright }
+  # - { url: "https://www.lattice.com/about", engine: playwright }
+  # - { url: "https://www.rippling.com/about", engine: playwright }
+  # - { url: "https://www.zoominfo.com/about/leadership", engine: playwright }
+  # - { url: "https://www.salesloft.com/company/leadership/", engine: playwright }
+  # - { url: "https://www.shipbob.com/about/", engine: playwright }
+
+filter:
+  # Skip role mailboxes — outreach targets named persons, not info@/contact@.
+  # press@, help@, hello@, visitors@, goodday@ are common on DTC team
+  # pages and would otherwise leak through.
+  exclude_local_parts:
+    - info
+    - contact
+    - hello
+    - hi
+    - hey
+    - support
+    - help
+    - service
+    - sales
+    - admin
+    - office
+    - team
+    - marketing
+    - press
+    - newsroom
+    - pr
+    - media
+    - news
+    - tips
+    - pitch
+    - advertising
+    - partnerships
+    - sponsors
+    - sponsorships
+    - advertise
+    - business
+    - bizdev
+    - careers
+    - jobs
+    - hr
+    - recruiting
+    - privacy
+    - legal
+    - dpo
+    - visitors
+    - goodday
+    - holler
+    - howdy
+  exclude_domains:
+    - lk-advertising.com         # client's own brand
+    - www.lk-advertising.com
+    - aureonglobal.de            # sender infra
+    - www.aureonglobal.de
+
+# What sequence to run on verified leads from this niche.
+# (Documentation only — actual binding happens at enqueue-niche time:
+#   py sequences/sequence-runner.py enqueue-niche lk-advertising-default dtc_b2b_founders)
+sequence:
+  variants_file: sequences/lk-advertising-default/variants.json
+  forced_persona: olivia       # Olivia Carter (Strategy Director) — calm-direct
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }

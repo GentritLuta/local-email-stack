@@ -1,0 +1,627 @@
+{
+  "slug": "diraya",
+  "name": "Diraya — Custom AI engineering (seed-Series-B), 5-domain x 2-subdomain cold outbound",
+  "created_at": "2026-05-31",
+  "rebuilt_at": "2026-06-02",
+  "active": true,
+  "company": {
+    "legal_name": "Diraya Inc",
+    "registration_number": "1603166-8",
+    "country": "Canada",
+    "website": "https://diraya.ca",
+    "root_domain": "diraya.ca",
+    "office_address": "500 Sedgebrook Way, Canada",
+    "signer": "Mohammed El Amine Amoura, Director (and incorporator)",
+    "notices_email": "info@diraya.ca",
+    "target_market": "Seed to Series B SaaS / health tech / fintech startups and scaleups needing AI engineering"
+  },
+  "_note": "Private overrides for Diraya. Gitignored. Populate resend_api_key + verified resend_domain_ids here once domains are provisioned in Resend. Reuse the shared Aureon Resend Pro API key — same account as aureon / algoalpha / f2 / atalsolidrocks.",
+  "relay": {
+    "backend": "resend",
+    "resend_region": "us-east-1",
+    "resend_api_key": "",
+    "_note": "Full-access key = RESEND_FULL_ACCESS_API_KEY in sequences/hostinger.env. us-east-1: global English-speaking ICP.",
+    "from_domains": [
+      {
+        "domain": "hello.cleardiraya.com",
+        "resend_domain_id": "68521f6e-e500-4b67-bb86-6d5b59a61243",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.cleardiraya.com",
+        "resend_domain_id": "ca609401-aeda-47df-9019-4b935705a394",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.diraya-agency.shop",
+        "resend_domain_id": "c98b103d-9d9d-46b0-ba91-4f6c52ad111c",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.diraya-agency.shop",
+        "resend_domain_id": "e7969444-e756-4619-b26f-71a49ea2c97c",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.diraya.biz",
+        "resend_domain_id": "2d4c188e-f032-4ae7-9d68-816561447475",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.diraya.biz",
+        "resend_domain_id": "7fcd75e5-f1fa-4c02-8ca3-a9561fedc394",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.dirayaget.com",
+        "resend_domain_id": "86bf94c6-e5f7-48e6-a89c-93b72afe4ccc",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.dirayaget.com",
+        "resend_domain_id": "62be6755-19f9-415a-88c4-41dc46212604",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.diraya-marketing.shop",
+        "resend_domain_id": "739529c8-5ec7-4178-90a0-cab20d8a4d60",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.diraya-marketing.shop",
+        "resend_domain_id": "2714b797-cbe0-4ac1-a87a-9cb96012f211",
+        "verified_at": "2026-06-03T00:00:00+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 7,
+          "started_at": "2026-06-04",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "reach.cleardiraya.com",
+        "resend_domain_id": "3391b59b-3ef6-4467-8d63-c3e3dcaa2223",
+        "verified_at": "2026-06-05T13:25:13+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 6,
+          "started_at": "2026-06-06",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "mail.dirayaget.com",
+        "resend_domain_id": "326530dd-d5bb-4f39-a508-5a561f645469",
+        "verified_at": "2026-06-05T13:25:13+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 6,
+          "started_at": "2026-06-06",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ],
+    "from_domains_overrides": []
+  },
+  "personas": [
+    {
+      "slug": "mohammed-hello",
+      "from_name": "Mohammed from Diraya",
+      "from_addr": "mohammed@hello.cleardiraya.com",
+      "reply_to": "info@diraya.ca",
+      "title": "Founder & Lead AI Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Mohammed El Amine Amoura\nFounder & Lead AI Engineer, Diraya\ndiraya.ca",
+      "full_name": "Mohammed El Amine Amoura"
+    },
+    {
+      "slug": "amine-team",
+      "from_name": "Amine from Diraya",
+      "from_addr": "amine@team.cleardiraya.com",
+      "reply_to": "info@diraya.ca",
+      "title": "AI Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Amine Haddad\nAI Engineer, Diraya\ndiraya.ca",
+      "full_name": "Amine Haddad"
+    },
+    {
+      "slug": "yacine-hello",
+      "from_name": "Yacine from Diraya",
+      "from_addr": "yacine@hello.diraya-agency.shop",
+      "reply_to": "info@diraya.ca",
+      "title": "ML Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Yacine Cherif\nML Engineer, Diraya\ndiraya.ca",
+      "full_name": "Yacine Cherif"
+    },
+    {
+      "slug": "khalil-team",
+      "from_name": "Khalil from Diraya",
+      "from_addr": "khalil@team.diraya-agency.shop",
+      "reply_to": "info@diraya.ca",
+      "title": "AI Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Khalil Brahimi\nAI Engineer, Diraya\ndiraya.ca",
+      "full_name": "Khalil Brahimi"
+    },
+    {
+      "slug": "sami-hello",
+      "from_name": "Sami from Diraya",
+      "from_addr": "sami@hello.diraya.biz",
+      "reply_to": "info@diraya.ca",
+      "title": "Solutions Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Sami Toumi\nSolutions Engineer, Diraya\ndiraya.ca",
+      "full_name": "Sami Toumi"
+    },
+    {
+      "slug": "omar-team",
+      "from_name": "Omar from Diraya",
+      "from_addr": "omar@team.diraya.biz",
+      "reply_to": "info@diraya.ca",
+      "title": "AI Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Omar Khelifi\nAI Engineer, Diraya\ndiraya.ca",
+      "full_name": "Omar Khelifi"
+    },
+    {
+      "slug": "nadia-hello",
+      "from_name": "Nadia from Diraya",
+      "from_addr": "nadia@hello.dirayaget.com",
+      "reply_to": "info@diraya.ca",
+      "title": "ML Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Nadia Mansouri\nML Engineer, Diraya\ndiraya.ca",
+      "full_name": "Nadia Mansouri"
+    },
+    {
+      "slug": "lina-team",
+      "from_name": "Lina from Diraya",
+      "from_addr": "lina@team.dirayaget.com",
+      "reply_to": "info@diraya.ca",
+      "title": "AI Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Lina Saidi\nAI Engineer, Diraya\ndiraya.ca",
+      "full_name": "Lina Saidi"
+    },
+    {
+      "slug": "sara-hello",
+      "from_name": "Sara from Diraya",
+      "from_addr": "sara@hello.diraya-marketing.shop",
+      "reply_to": "info@diraya.ca",
+      "title": "Solutions Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Sara Belkacem\nSolutions Engineer, Diraya\ndiraya.ca",
+      "full_name": "Sara Belkacem"
+    },
+    {
+      "slug": "hana-team",
+      "from_name": "Hana from Diraya",
+      "from_addr": "hana@team.diraya-marketing.shop",
+      "reply_to": "info@diraya.ca",
+      "title": "ML Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Hana Belaid\nML Engineer, Diraya\ndiraya.ca",
+      "full_name": "Hana Belaid"
+    },
+    {
+      "slug": "noah-reach",
+      "from_name": "Noah from Diraya",
+      "from_addr": "noah@reach.cleardiraya.com",
+      "reply_to": "info@diraya.ca",
+      "title": "AI Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Noah Belkaid\nAI Engineer, Diraya\ndiraya.ca",
+      "full_name": "Noah Belkaid"
+    },
+    {
+      "slug": "leila-mail",
+      "from_name": "Leila from Diraya",
+      "from_addr": "leila@mail.dirayaget.com",
+      "reply_to": "info@diraya.ca",
+      "title": "ML Engineer, Diraya",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Leila Mansour\nML Engineer, Diraya\ndiraya.ca",
+      "full_name": "Leila Mansour"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 30,
+    "min_seconds_between_sends_same_persona": 180
+  },
+  "send_ramp": {
+    "started_at": null
+  },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [
+      {
+        "until_day": 14,
+        "warmup_pct": 80
+      },
+      {
+        "until_day": 30,
+        "warmup_pct": 30
+      },
+      {
+        "until_day": 45,
+        "warmup_pct": 10
+      },
+      {
+        "until_day": 9999,
+        "warmup_pct": 5
+      }
+    ],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.003
+    },
+    "reputation": {
+      "bounce_rate_7d": 0,
+      "complaint_rate_7d": 0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "started_at": "2026-06-04",
+    "current_day": 1,
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    {
+      "from_day": 1,
+      "daily": 15
+    },
+    {
+      "from_day": 8,
+      "daily": 25
+    },
+    {
+      "from_day": 15,
+      "daily": 35
+    },
+    {
+      "from_day": 22,
+      "daily": 50
+    }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/Toronto",
+    "target_audience_note": "Global ICP. Default America/Toronto (client HQ) for unresolved; per-prospect city lookup overrides. 08:00-17:00 recipient local."
+  },
+  "brand": {
+    "wordmark": "DIRAYA",
+    "site": "diraya.ca",
+    "cta_url": "https://calendly.com/amoura-ma-diraya/30min",
+    "tagline": "The Future Starts Now. Custom AI engineering for ambitious startups.",
+    "font_stack": "'Kanit', sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap",
+    "colors": {
+      "accent": "#FF6B00",
+      "accent_2": "#0A0A0A",
+      "text": "#0A0A0A",
+      "text_2": "#454545",
+      "muted": "#8A8A8A",
+      "bg_page": "#FFFFFF",
+      "bg_card": "#FFFFFF",
+      "rule": "#E8E8E8"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/diraya.html?t={token}",
+    "legal": {
+      "company_name": "Diraya Inc",
+      "address_lines": [
+        "Diraya Inc",
+        "500 Sedgebrook Way, Canada"
+      ],
+      "contact_email": "info@diraya.ca",
+      "copyright_year": 2026,
+      "logo_url": "https://diraya.ca/logo.png",
+      "logo_width": 140,
+      "privacy_policy_url": "https://diraya.ca/privacy",
+      "terms_of_service_url": "https://diraya.ca/terms",
+      "legal_disclaimer": "This message is intended for the named recipient only. If you are not the intended recipient, please delete this email and inform the sender.",
+      "partner_notice": "You are receiving this because we believe our work may be relevant to your roadmap. One-click unsubscribe at the bottom."
+    },
+    "template": "diraya-custom"
+  },
+  "_note_template": "Custom template at sequences/email_template_diraya.py (matches live diraya.ca: orange #FF6B00, Kanit, founder-led). CTA button -> brand.cta_url (Calendly)."
+}

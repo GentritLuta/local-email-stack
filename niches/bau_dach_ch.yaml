@@ -1,0 +1,129 @@
+slug: bau_dach_ch
+name: "Bau / Architektur / GU — Deutschschweiz (F2 Subunternehmer-Track)"
+profile_slug: f2-bau
+engine: team_pages
+
+# WHAT THIS NICHE SCRAPES
+# Deutschschweiz B2B firms that hire a Maler-/Gipser SUBCONTRACTOR for the
+# finishing phase of Neubau / Umbau / Sanierung projects — a DIFFERENT buying
+# motion than property managers, so it has its own copy (f2-bau-default):
+#   • Architekturbüros            (spec + recommend the trade on projects)
+#   • General- / Totalunternehmer (subcontract the Maler/Gipser scope)
+#   • Bauunternehmen (Hochbau)
+#   • Bauträger / Immobilienentwickler
+# Pain pitched: the Maler/Gipser part blowing the Bauprogramm, Nachträge, and
+# Abnahme defects. Sends through F2's shared senders (news/send.aureonglobal.de).
+
+seeds: []   # purely auto-discovered via seed_discover; no hand-curated seeds yet
+
+  # auto-discovered 2026-05-30 08:01 via seed_discover.py
+  - https://www.ortsdienst.de/niedersachsen/uelzen/bienenbuettel/branchenbuch-architekturbuero
+  - https://www.dba-bau.com/netzwerk/architekten-und-architekturbueros
+  - https://constructionx.de/unterschied-generalunternehmer-generaluebernehmer-gu-gue
+  - https://www.bauunternehmen.org
+
+
+filter:
+  # Outreach targets named persons (architects, project leads, GF), not role
+  # mailboxes. Same German role-address blocklist shape as the property niche.
+  exclude_local_parts:
+    - info
+    - kontakt
+    - contact
+    - hello
+    - mail
+    - sekretariat
+    - empfang
+    - reception
+    - verwaltung
+    - buchhaltung
+    - finanzen
+    - rechnungswesen
+    - support
+    - service
+    - hotline
+    - bewerbung
+    - jobs
+    - karriere
+    - hr
+    - marketing
+    - presse
+    - medien
+    - news
+    - newsletter
+    - offerte
+    - angebote
+    - office
+    - admin
+    - sales
+    - bauleitung
+  exclude_domains:
+    - f2-malergipser.ch          # client's own brand
+    - www.f2-malergipser.ch
+    - aureonglobal.de            # sender infra
+    - www.aureonglobal.de
+
+# Auto-discovery: seed_discover.py appends new validated URLs.
+search_queries:
+  # ── Architekturbüros ────────────────────────────────────────────────────
+  - "Architekturbüro Zürich Team Mitarbeiter Kontakt"
+  - "Architekturbüro Bern Mitarbeitende Team"
+  - "Architekturbüro Basel Luzern Team Kontakt"
+  - "Architekt Innenausbau Sanierung Deutschschweiz Team"
+  # ── General- / Totalunternehmer ─────────────────────────────────────────
+  - "Generalunternehmer Deutschschweiz Hochbau Team Kontakt"
+  - "Totalunternehmer Umbau Sanierung Schweiz Team Mitarbeitende"
+  - "Generalunternehmung Wohnbau Zürich Bern Team"
+  # ── Bauunternehmen (Hochbau) ────────────────────────────────────────────
+  - "Bauunternehmen Hochbau Mittelland Team Mitarbeitende"
+  - "Bauunternehmen Sanierung Umbau Aargau Solothurn Team"
+  # ── Bauträger / Entwickler ──────────────────────────────────────────────
+  - "Bauträger Immobilienentwicklung Deutschschweiz Team Kontakt"
+
+discovery:
+  max_seeds_per_run: 25
+  search_country:    de          # DACH niche — German results
+  require_mailto:    true
+  require_keywords:
+    - architekt
+    - architektur
+    - generalunternehm
+    - generalunternehmung
+    - totalunternehm
+    - bauunternehm
+    - bauunternehmung
+    - hochbau
+    - bauträger
+    - bautraeger
+    - immobilienentwicklung
+    - innenausbau
+    - sanierung
+    - umbau
+    - neubau
+  exclude_domains:
+    - facebook.com
+    - linkedin.com
+    - homegate.ch
+    - immoscout24.ch
+    - comparis.ch
+    - tutti.ch
+    - youtube.com
+    - instagram.com
+    - twitter.com
+    - x.com
+    - jobs.ch
+    - stepstone.de
+    - local.ch
+    - search.ch
+    - wikipedia.org
+    - sia.ch                     # industry association, not a firm
+    - baumeister.ch              # association
+    - constructionjobs.ch
+
+# Binding (documentation only — actual binding happens at enqueue time):
+#   py sequences/sequence-runner.py enqueue-niche f2-bau-default bau_dach_ch
+sequence:
+  variants_file: sequences/f2-bau-default/variants.json
+  forced_persona: lukas
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }

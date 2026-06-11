@@ -1,0 +1,99 @@
+slug: immobilienmakler_de
+name: "Immobilienmakler — Deutschland (Maklerbüros mit 2+ Maklern)"
+profile_slug: lk-advertising
+engine: team_pages   # default for plain string seeds
+
+# WHAT THIS NICHE SCRAPES
+# Deutsche Maklerbüros (Immobilienmakler / real estate brokerages) with
+# named teams that already spend on paid acquisition. LK Advertising's
+# Hormozi offer ("zahlen erst wenn wir Ihre ROAS schlagen") only converts
+# if the prospect already runs paid media — so we bias toward
+# multi-broker firms (≥2 Makler) with their own website.
+#
+# Each seed can be either:
+#   - "url"                          → uses niche-level engine
+#   - { url: "...", engine: "..." }  → per-seed engine override
+#
+# RUN
+#   py sequences/lead_scrape.py run immobilienmakler_de
+#   py sequences/lead_scrape.py run immobilienmakler_de --engine playwright
+#
+# SEED SOURCES TO EXTEND (RESEARCH GAP)
+# The starter list below is small and unvalidated. Higher-yield sources to
+# add by either WebSearch agent or operator-provided URLs:
+#   1. IVD (Immobilienverband Deutschland) Mitgliederverzeichnis — official
+#      directory of German real-estate professionals by city.
+#   2. Engel & Völkers, Von Poll, Aigner, Aigner Immobilien — regional
+#      branch /team pages (each branch has its own team roster).
+#   3. ImmoScout24 / Immowelt "Top-Makler" pages list named brokerage
+#      websites — visit each.
+#   4. Google "Immobilienmakler {Stadt} Team" for top 20 German cities.
+
+seeds:
+  # ── STARTER SEEDS (3 candidates, needs operator validation) ─────────────
+  # These are well-known German brokerage chains; team pages vary by branch.
+  # Operator: replace / extend before scraping. Run --dry first.
+  #
+  # IMPORTANT: Engel & Völkers and Von Poll central /team/ pages aggregate
+  # MULTIPLE cities. Without per-branch URLs we can't reliably set a `city`,
+  # which means the strict merge gate in sequence-runner WILL SKIP all those
+  # prospects. To activate them, replace each with per-city URLs, e.g.
+  #   https://www.engelvoelkers.com/de/standorte/muenchen/  (then label city)
+  # Aigner is München-focused so it works as-is.
+  - { url: "https://www.engelvoelkers.com/de/team/",   company: "Engel & Völkers",   engine: playwright }   # city: unset (multi-city) → prospects will skip
+  - { url: "https://www.von-poll.com/de/team/",        company: "Von Poll Immobilien", engine: playwright }   # city: unset (multi-city) → prospects will skip
+  - { url: "https://www.aigner-immobilien.de/team/",   company: "Aigner Immobilien", city: "München", engine: playwright }
+
+filter:
+  # Skip role mailboxes — outreach targets named Makler, not info@/kontakt@.
+  exclude_local_parts:
+    - info
+    - kontakt
+    - contact
+    - hello
+    - mail
+    - sekretariat
+    - empfang
+    - reception
+    - verwaltung
+    - immobilien
+    - vermietung
+    - verkauf
+    - buchhaltung
+    - finanzen
+    - rechnungswesen
+    - support
+    - service
+    - hotline
+    - bewerbung
+    - jobs
+    - karriere
+    - hr
+    - personal
+    - marketing
+    - presse
+    - medien
+    - news
+    - newsletter
+    - werbung
+    - offerte
+    - angebote
+    - office
+    - admin
+    - sales
+    - team
+  exclude_domains:
+    - lk-advertising.com           # client's own brand
+    - www.lk-advertising.com
+    - aureonglobal.de              # sender infra
+    - www.aureonglobal.de
+    - aureon-global.de             # avoid confusion if Aureon is also targeting
+
+# What sequence to run on verified leads from this niche.
+# (Documentation only — actual binding happens at enqueue-niche time:
+#   py sequences/sequence-runner.py enqueue-niche lk-advertising-default immobilienmakler_de)
+sequence:
+  variants_file: sequences/lk-advertising-default/variants.json
+  forced_persona: klara
+  steps:
+    - { step_n: 1, variant_n: 1, delay_days: 0 }

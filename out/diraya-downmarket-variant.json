@@ -1,0 +1,79 @@
+{
+  "name": "Diraya — downmarket variant (SMB software / digital-product owners, plain-language AI build)",
+  "slug": "diraya-smb",
+  "profile_slug": "diraya",
+  "created_at": "2026-06-05",
+  "status": "DRAFT — for review. Deployment needs: (1) new sequence row wired to profile diraya, (2) niche/routing so SMB-software leads enroll here not in diraya-default, (3) fulfill-diraya-magnets.py taught the PLAN + GUIDE keywords, (4) the two magnet assets (one-page plan template + 5-features list) created.",
+  "target": "Owners, founders, CEOs of established small-to-midsize software, SaaS, and digital-product companies that want to add an AI feature but have no in-house AI engineering team. Chosen because they publish contact emails far more than stealth VC startups while still genuinely fitting the build offer. Exclusions kept from the main offer: dev agencies, AI engineering studios, IT outsourcing, staffing firms (they build software themselves, so they are competitors not buyers).",
+  "voice_notes": "Same Hormozi $100M Leads spine as diraya-default, but de-jargoned. No RAG, no eval suite, no hallucination percentages, no architecture talk. Lead with the business outcome (ship the AI feature you keep putting off, without hiring an AI team). Mohammed writes as a builder, not a company. NO em-dashes, NO smart quotes, NO ellipses, NO exclamation marks, NO emojis, NO contractions where avoidable. P.s. give on emails 1 to 5; emails 6 and 7 fold the give into the body. Named magnets: PLAN (one-page AI feature plan) and GUIDE (5 AI features paying off / 3 wasting money). Required merges: {first_name}, {company}.",
+  "offer_facts": {
+    "value_prop": "We build the one AI feature your product needs, ship it in 8 weeks, and hand the whole thing to your team. A working version lands in 14 days or you pay nothing and keep what we built.",
+    "proof_points": [
+      "fintech: an in-product AI assistant that cut the easy half of their support load",
+      "health company: an AI feature that went from a demo that broke to one their team trusts with real customers",
+      "23 projects shipped, 77 clients, team across three countries so any time zone works"
+    ],
+    "differentiators": [
+      "you talk to the person building it, not a salesperson",
+      "fixed price and fixed timeline, agreed before we start",
+      "full handover, no lock-in, no white-label, no junior staff",
+      "built to survive real customers, not just a demo"
+    ],
+    "guarantee": "A working version in 14 days that you can actually use, or you owe nothing and keep the code.",
+    "lead_magnet_primary": "Free one-page plan for the single AI feature worth building first for {company}. Reply PLAN.",
+    "lead_magnet_secondary": "The 5 AI features actually paying off for software companies right now, and the 3 quietly wasting money. Reply GUIDE."
+  },
+  "required_merges": ["first_name", "company"],
+  "schedule_doc": "delay_days = gap from prior step. 0,2,2,3,4,7,10 = cumulative day 0,2,4,7,11,18,28. Mirrors diraya-default.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "open_question_give",
+      "subject": "open to a question, {first_name}?",
+      "body": "Hi {first_name},\n\nQuick question, no pitch.\n\nI build AI features for software companies. The kind of thing you have probably had on your list for a while but never had the right person to actually ship.\n\nMost teams I talk to are stuck in the same spot. They know AI belongs in their product. They have tried a demo or two. Nothing reached customers because no one owned it end to end.\n\nThat is the gap we fill. We build the feature, ship it in 8 weeks, and hand the whole thing to your team so you are not tied to us afterward.\n\nIf {company} has an AI feature you keep meaning to ship, would 15 minutes be useful?\n\nIf the timing is off, reply with a no and I stop.\n\nP.s. whether we ever talk or not, reply GUIDE and I send you a short list: the 5 AI features actually paying off for software companies right now, and the 3 quietly wasting money."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "specificity_to_company",
+      "subject": "8 weeks for {company}",
+      "body": "Hi {first_name},\n\nFollowing up on the AI feature point.\n\nHere is how it would actually go for {company}. Week one we agree on the one feature worth building and what a good result looks like. Week two a first working piece is in your hands. Weeks three to eight we build it out and make it solid. At the end you own all of it.\n\nThe price is fixed before we start. If there is nothing usable by day 14, you owe nothing and keep what we have built.\n\n15 minutes this week to work out which feature is worth it?\n\nP.s. the 5-features list is still yours if you want it. Reply GUIDE."
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "proof_outcome",
+      "subject": "the AI feature that paid for itself",
+      "body": "Hi {first_name},\n\nOne short story.\n\nA fintech company we worked with wanted an AI assistant inside their product. They had tried twice on their own. Both times it looked great in a demo and fell apart with real customers.\n\nWe built it properly in 8 weeks. It now answers customer questions inside the app, and their support team stopped handling the easy ones. That time went back into the work that actually grows the company.\n\nThe same pattern would fit {company}. The real trick is building it to hold up with real users, not just in a demo. That is the part most teams underestimate.\n\n15 minutes to look at what your version would need?\n\nP.s. happy to put it in writing first. Reply PLAN and I send a one-page plan for the single AI feature I would build for {company}, free, no call needed."
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "busy_ack_reason_why",
+      "subject": "you are busy, here is the math",
+      "body": "Hi {first_name},\n\nFourth note, so you are clearly heads down. Last real email before I switch to give-only.\n\nHere is why I keep writing.\n\nEvery month {company} puts the AI feature off, two things happen. A competitor gets closer to shipping theirs, and your team gets more used to it simply not existing. Both are quietly expensive.\n\nShip it in 8 weeks instead and the same momentum runs in your favor. You get the feature, your sales team gets a real answer when a customer asks about AI, and your roadmap moves.\n\nThe offer is simple. A working version in 14 days or you pay nothing. Fixed price, fixed scope, full handover. The only cost to find out is 15 minutes.\n\nReply with a time or a no. Either one is fine.\n\nP.s. still happy to send the 5-features list with no call. Reply GUIDE."
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "forced_yes_no",
+      "subject": "{first_name}, yes or no",
+      "body": "Hi {first_name},\n\nClean question.\n\nIf we could build and ship one AI feature for {company} in 8 weeks, hand it fully to your team, and put a working version in your hands by day 14 or you pay nothing, would that be worth 15 minutes?\n\nA clear yes or a clear no. Either one is the right answer for me.\n\nP.s. if it is a no on the build, the one-page plan and the 5-features list are still yours. Reply PLAN or GUIDE."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "pure_value_double_give",
+      "subject": "two things you can use either way",
+      "body": "Hi {first_name},\n\nSwitching to give-only as promised.\n\nTwo things, both yours, no call attached.\n\nOne. The short list of the 5 AI features actually paying off for software companies right now, and the 3 wasting money. Reply GUIDE.\n\nTwo. A free one-page plan for {company}. I look at your product, then send back the single AI feature I would build first, why, and a realistic timeline. Inside 48 hours. Reply PLAN.\n\nNo obligation and no follow-up after this. Take either or both."
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "breakup_value_open",
+      "subject": "closing your file at Diraya",
+      "body": "Hi {first_name},\n\nClosing your file today. We take on a small number of builds each quarter and the next slots are filling.\n\nThree last things.\n\nIf the timing was wrong, tell me when the right window is and I will reach back out then.\n\nIf the offer was wrong, tell me what would have landed. I read every reply.\n\nIf none of it fit, no hard feelings. The one-page plan and the 5-features list are still yours. Reply PLAN or GUIDE and I send them with no call attached.\n\nGood luck with what you are building."
+    }
+  ]
+}

@@ -125,12 +125,15 @@ def pick_persona(profile: dict) -> dict:
 
 
 def send_resend(api_key: str, persona: dict, to_addr: str, subject: str, body: str,
-                unsubscribe_token: str | None = None, brand: dict | None = None) -> dict:
+                unsubscribe_token: str | None = None, brand: dict | None = None,
+                step_n: int = 1) -> dict:
     payload, msg_id = build_payload(
         persona=persona, to_addr=to_addr, subject=subject, body=body,
         unsubscribe_token=unsubscribe_token, brand=brand,
         tags=[{"name": "profile", "value": "aureon"},
-              {"name": "persona", "value": persona["slug"]}],
+              {"name": "persona", "value": persona["slug"]},
+              {"name": "step_n", "value": str(step_n)}],
+        step_n=step_n,
     )
     started = dt.datetime.now().isoformat()
     try:
@@ -182,7 +185,11 @@ def record(slug: str, persona: dict, to: str, subject: str, outcome: dict) -> No
             "message_id":   outcome.get("message_id"),
             "delivered":    bool(outcome.get("sent")),
             "error":        outcome.get("error"),
-            "sent_at":      dt.datetime.fromtimestamp(ts).isoformat() + "Z",
+            # fromtimestamp(ts) returns NAIVE LOCAL time; +"Z" then falsely
+            # claims UTC. On a CEST host that stores +2h-shifted timestamps
+            # into send_log, which makes check_rate_limit see "future" sends
+            # for hours and block all real sends. Use UTC explicitly.
+            "sent_at":      dt.datetime.fromtimestamp(ts, dt.timezone.utc).isoformat(),
         }
         with httpx.Client(timeout=8) as c:
             c.post(f"{url}/rest/v1/send_log",
@@ -279,9 +286,13 @@ def main() -> int:
     # Otherwise try to look up the recipient in Supabase prospects (so even
     # test sends to a known address get a real one-click unsubscribe URL).
     unsub_token = merge.get("unsub_token") or _lookup_token(args.to, args.slug)
+    # step_n drives whether the CTA button renders. Variant n IS the step in
+    # our schema, so default to the variant being sent. Override allowed.
+    step_n = int(merge.get("step_n") or args.variant_n)
     outcome = send_resend(api_key, persona, args.to, subject, body,
                           unsubscribe_token=unsub_token,
-                          brand=profile.get("brand"))
+                          brand=profile.get("brand"),
+                          step_n=step_n)
     record(args.slug, persona, args.to, subject, outcome)
     print(json.dumps(outcome, indent=2))
     return 0 if outcome.get("sent") else 2

@@ -33,7 +33,8 @@ from bs4 import BeautifulSoup, Tag
 
 # Local module — colocated.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lead_verify import verify, VerificationResult, GENERIC_LOCAL_PARTS  # noqa: E402
+from lead_verify import verify, VerificationResult, JUNK_LOCAL_PARTS  # noqa: E402
+from name_derive import derive_first_name, derive_company, is_free_or_isp_domain  # noqa: E402
 
 REPO_ROOT  = Path(__file__).resolve().parent.parent
 NICHES_DIR = REPO_ROOT / "niches"
@@ -144,7 +145,7 @@ def supa_upsert_prospect(url: str, key: str, profile_slug: str, lead: ScrapedLea
 
 # ─── Page fetching + extraction ────────────────────────────────────────────
 
-def fetch_html(url: str, timeout: int = 25) -> Optional[str]:
+def fetch_html(url: str, timeout: int = 10) -> Optional[str]:
     try:
         with httpx.Client(timeout=timeout, follow_redirects=True,
                           headers={"User-Agent": USER_AGENT,
@@ -155,6 +156,120 @@ def fetch_html(url: str, timeout: int = 25) -> Optional[str]:
     except Exception as e:
         print(f"  ! fetch failed {url}: {e}")
     return None
+
+
+# Module-level singleton so callers in tight loops (e.g. crypto_projects_scrape
+# iterating 5k+ project sites) don't pay ~3s Chromium launch per call.
+# Call start_playwright_pool() once, fetch_html_playwright() many times,
+# stop_playwright_pool() at the end.
+_PW_STATE: dict = {"started": False, "p": None, "browser": None}
+
+def start_playwright_pool() -> None:
+    if _PW_STATE["started"]:
+        return
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return
+    p = sync_playwright().start()
+    browser = p.chromium.launch(headless=True, args=[
+        "--disable-blink-features=AutomationControlled",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+    ])
+    _PW_STATE.update({"started": True, "p": p, "browser": browser})
+
+
+def stop_playwright_pool() -> None:
+    if not _PW_STATE["started"]:
+        return
+    try: _PW_STATE["browser"].close()
+    except Exception: pass
+    try: _PW_STATE["p"].stop()
+    except Exception: pass
+    _PW_STATE.update({"started": False, "p": None, "browser": None})
+
+
+def fetch_html_playwright(url: str, timeout: int = 15) -> Optional[str]:
+    """Render `url` in a real Chromium (Playwright). Returns the post-JS DOM.
+
+    Use for SPA sites (The Block, Bankless, Messari, etc.) where httpx
+    returns an empty shell because the page mounts client-side. Soft bot
+    protections (basic Cloudflare, Akamai bot manager, simple JS challenges)
+    are bypassed because we ARE a real browser. We don't try to defeat
+    CAPTCHA / Turnstile — those just get skipped (None return).
+
+    A fresh browser context is launched per call so cookies/fingerprints
+    don't carry across seeds. Each call costs ~3-5s; acceptable for a
+    once-daily scrape cadence.
+    """
+    # Reuse the pooled browser if it's been started; otherwise launch + tear
+    # down per call (the slow path, kept for backward compatibility).
+    owns_pool = not _PW_STATE["started"]
+    if owns_pool:
+        start_playwright_pool()
+    browser = _PW_STATE["browser"]
+    if browser is None:
+        return None
+    ctx = None
+    try:
+        ctx = browser.new_context(
+            user_agent=USER_AGENT.replace("LocalEmailStack/0.4", "").strip(),
+            viewport={"width": 1366, "height": 900},
+            locale="en-US",
+        )
+        page = ctx.new_page()
+        page.route("**/*.{png,jpg,jpeg,gif,svg,webp,woff,woff2,mp4,webm}",
+                   lambda r: r.abort())
+        try:
+            page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+        except Exception:
+            try:
+                page.goto(url, wait_until="commit", timeout=timeout * 1000)
+            except Exception as e:
+                print(f"  ! playwright fetch failed {url}: {e}")
+                return None
+        try:
+            page.wait_for_timeout(800)
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+            page.wait_for_timeout(400)
+        except Exception:
+            pass
+        html = page.content()
+        if _looks_like_challenge(html):
+            print(f"  ! challenge page detected at {url} — skipping")
+            return None
+        return html
+    except Exception as e:
+        print(f"  ! playwright fetch failed {url}: {e}")
+        return None
+    finally:
+        if ctx is not None:
+            try: ctx.close()
+            except Exception: pass
+        if owns_pool:
+            stop_playwright_pool()
+
+
+def _looks_like_challenge(html: str) -> bool:
+    """Detect Cloudflare/CAPTCHA challenge pages. Heuristic: very short body
+    that prominently advertises a verification check. We deliberately don't
+    blocklist 'cf-challenge' alone because it shows up as a tiny embedded
+    script tag on many legitimate Cloudflare-hosted pages."""
+    if not html:
+        return True
+    if len(html) < 800:
+        # Tiny page that mentions verification → almost always a challenge
+        low = html.lower()
+        if any(p in low for p in ("just a moment", "checking your browser",
+                                  "cf-challenge", "cf-turnstile",
+                                  "g-recaptcha")):
+            return True
+    # Heuristic for slightly larger challenge shells: page is dominated by
+    # the challenge keyword and has no real text.
+    if "<title>just a moment" in html.lower()[:2000]:
+        return True
+    return False
 
 
 _NAME_RX = re.compile(r"^([A-Z][a-z'`\-]+)(?:\s+[A-Z]\.?)?\s+([A-Z][a-zA-Z'`\-]+)$")
@@ -342,17 +457,53 @@ def list_niches() -> None:
             print(f"  {p.name:30}  (broken: {e})")
 
 
-def run(niche_slug: str, *, dry: bool = False, smtp: bool = True) -> int:
+def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
+        force_engine: Optional[str] = None, max_seconds: int = 500) -> int:
+    # Internal time budget. The orchestrator kills this subprocess at 600s
+    # (SUBPROCESS_TIMEOUT) with rc=-1, losing the clean exit. We stop the seed
+    # loop at `max_seconds` (default 540, 60s under the kill) and return 0 —
+    # leads found so far are already upserted incrementally, so a partial pass
+    # is real progress, not a failure. Next pass continues from fresh seeds.
+    import time as _time
+    deadline = _time.monotonic() + max_seconds
     niche = load_niche(niche_slug)
     profile_slug = niche.get("profile_slug") or "aureon"
-    seeds: list[str] = niche.get("seeds") or []
+    # Seeds may be plain strings or dicts. Dict form supports per-seed:
+    #   - engine    : overrides niche-level engine
+    #   - company   : applied as fallback to every ScrapedLead from this seed
+    #   - city      : applied as fallback to every ScrapedLead from this seed
+    #   - state     : applied as fallback to every ScrapedLead from this seed
+    # The fallbacks fill in only what the page extractor didn't already capture.
+    # Required for downstream merge-tag personalization in cold-outreach
+    # variants (sequence-runner skips a prospect if {company}/{city} is null).
+    raw_seeds = niche.get("seeds") or []
+    niche_engine = (force_engine or niche.get("engine") or "team_pages").lower()
+    seeds: list[tuple[str, str, dict]] = []
+    for s in raw_seeds:
+        if isinstance(s, str):
+            seeds.append((s, niche_engine, {}))
+        elif isinstance(s, dict) and s.get("url"):
+            meta = {k: v for k, v in s.items()
+                    if k in ("company", "city", "state") and v}
+            seeds.append((s["url"], (s.get("engine") or niche_engine).lower(), meta))
     if not seeds:
         sys.exit(f"niche {niche_slug} has no seeds")
-    exclude_locals = set(niche.get("filter", {}).get("exclude_local_parts", [])) | GENERIC_LOCAL_PARTS
+    exclude_locals = set(niche.get("filter", {}).get("exclude_local_parts", [])) | JUNK_LOCAL_PARTS
     exclude_domains = set(niche.get("filter", {}).get("exclude_domains", []))
+    # Seed-level ICP gate: a seed page must carry at least one of these keywords
+    # or the WHOLE seed is skipped before any lead is extracted. Catches non-ICP
+    # contamination that fuzzy-matched its way into the seed list (e.g. a "Real
+    # Madrid" fan site matching "real"). Niche-driven via `seed_require_keywords`,
+    # so niches without the field (crypto, trades) are unaffected.
+    seed_require_kw = [k.lower() for k in (niche.get("seed_require_keywords") or [])]
+    # Niches whose copy greets by {greeting} (name-optional, company fallback)
+    # set require_first_name: false so the quality gate admits leads that have a
+    # company but no parseable personal name (e.g. crypto brand-handle emails).
+    require_name = bool(niche.get("require_first_name", True))
 
     print(f"=== lead-scrape: {niche_slug} ({len(seeds)} seeds) ===")
     print(f"  profile_slug = {profile_slug}")
+    print(f"  default eng  = {niche_engine}")
     print(f"  smtp probe   = {smtp}")
     print(f"  dry          = {dry}\n")
 
@@ -361,12 +512,33 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True) -> int:
 
     summary = {"seeds_fetched": 0, "candidates": 0, "verified": 0,
                "rejected": 0, "skipped_generic": 0, "skipped_domain": 0,
-               "upserted": 0}
+               "skipped_low_quality": 0, "upserted": 0}
 
-    for seed in seeds:
-        print(f"-- seed: {seed}")
-        html = fetch_html(seed)
+    for seed_i, (seed, eng, seed_meta) in enumerate(seeds):
+        if _time.monotonic() > deadline:
+            print(f"  TIME BUDGET {max_seconds}s reached after {seed_i}/{len(seeds)} "
+                  f"seeds — stopping cleanly (leads found are already saved).")
+            break
+        print(f"-- seed [{eng}]: {seed}"
+              + (f"  (defaults: {seed_meta})" if seed_meta else ""))
+        if eng == "playwright":
+            html = fetch_html_playwright(seed)
+        else:
+            html = fetch_html(seed)
+            # If team_pages came back near-empty (SPA shell), auto-upgrade
+            # to playwright as a single retry — common on SSR-but-hydrated
+            # sites where the static HTML has no team data.
+            if html is not None and len(html) > 0 and not re.search(
+                r"@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", html
+            ):
+                print(f"   (no email markers in static HTML, retrying via playwright)")
+                html = fetch_html_playwright(seed) or html
         if not html:
+            continue
+        # ── SEED-LEVEL ICP GATE ──────────────────────────────────────────
+        if seed_require_kw and not any(k in html.lower() for k in seed_require_kw):
+            print(f"   [SKIP SEED] no real-estate signal on page — non-ICP, skipping")
+            summary["skipped_seed_non_icp"] = summary.get("skipped_seed_non_icp", 0) + 1
             continue
         summary["seeds_fetched"] += 1
         leads = extract_leads_from_page(seed, html)
@@ -374,19 +546,49 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True) -> int:
         summary["candidates"] += len(leads)
 
         for lead in leads:
+            # Mid-seed budget check: a single page can yield many leads, each
+            # costing a DNS/MX verify. Bail here too so a lead-heavy seed can't
+            # overshoot the budget by minutes (the outer check is per-seed only).
+            if _time.monotonic() > deadline:
+                print(f"   TIME BUDGET reached mid-seed — saved {summary['upserted']} so far, stopping.")
+                break
             local, _, domain = lead.email.partition("@")
             if local in exclude_locals:
                 summary["skipped_generic"] += 1; continue
             if domain in exclude_domains:
                 summary["skipped_domain"] += 1; continue
 
+            # Inherit seed-level metadata (company / city / state) as fallback.
+            # Only fills when the page extractor didn't capture the field —
+            # per-page data always wins over per-seed defaults.
+            for field, value in seed_meta.items():
+                if not getattr(lead, field, None):
+                    setattr(lead, field, value)
+
             # Domain heuristic: company website = email's domain root (e.g. whitestagrealty.com).
-            # Skip free-mail providers — gmail.com etc. aren't anyone's company site.
-            FREE_MAIL = {"gmail.com","yahoo.com","outlook.com","hotmail.com","icloud.com",
-                          "aol.com","proton.me","protonmail.com","web.de","gmx.de","gmx.com",
-                          "mail.com","live.com","msn.com","yandex.com","yandex.ru","zoho.com"}
-            if not lead.website and domain not in FREE_MAIL:
+            # Skip free-mail / ISP / parked domains — a personal inbox is not the
+            # firm's site (audit caught comcast.net / triad.rr.com / godaddy.com
+            # becoming fake websites + companies on otherwise-real agents).
+            if not lead.website and not is_free_or_isp_domain(domain):
                 lead.website = f"https://{domain}"
+
+            # ── QUALITY GATE ──────────────────────────────────────────────
+            # Derive first_name + company from the email when the page
+            # extractor didn't capture them, then HARD-REJECT any lead still
+            # missing either. Person-based outreach needs a real {first_name}
+            # and {company}; a lead lacking either can never enroll, so
+            # admitting it only pads the pool with un-sendable junk and starves
+            # the 3x buffer. Rejecting here (before the MX verify) keeps the
+            # verified pool ~100% enrollable and saves the DNS lookup.
+            if not lead.first_name:
+                lead.first_name = derive_first_name(lead.email, lead.company)
+            if not lead.company:
+                lead.company = derive_company(lead.email)
+            if (require_name and not lead.first_name) or not lead.company:
+                summary["skipped_low_quality"] += 1
+                print(f"     [SKIP] low-quality (no "
+                      f"{'name' if require_name and not lead.first_name else 'company'}): {lead.email}")
+                continue
 
             v = verify(lead.email, do_smtp_probe=smtp, do_catchall_probe=smtp)
             status = "OK " if v.verified else "BAD"
@@ -418,12 +620,18 @@ def main() -> int:
     p_run.add_argument("--dry", action="store_true")
     p_run.add_argument("--no-smtp", action="store_true",
                        help="skip SMTP probe (MX-only verification, ~10x faster)")
+    p_run.add_argument("--engine", choices=["team_pages", "playwright"],
+                       help="force fetch engine for all seeds")
+    p_run.add_argument("--max-seconds", type=int, default=500,
+                       help="internal time budget; stop the seed loop cleanly "
+                            "before the orchestrator's 600s kill (default 540)")
     args = ap.parse_args()
 
     if args.cmd == "list":
         list_niches(); return 0
     if args.cmd == "run":
-        return run(args.niche_slug, dry=args.dry, smtp=not args.no_smtp)
+        return run(args.niche_slug, dry=args.dry, smtp=not args.no_smtp,
+                   force_engine=args.engine, max_seconds=args.max_seconds)
     return 0
 
 

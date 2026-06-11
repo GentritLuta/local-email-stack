@@ -1,0 +1,23 @@
+{
+  "name": "Aureon Global — 7-email Hormozi-rigorous sequence (named mechanism, no nag, forced-answer)",
+  "slug": "aureon-default",
+  "profile_slug": "aureon",
+  "created_at": "2026-05-18",
+  "target": "Real estate agents in DACH + NL closing 3+ deals/month OR brokerage teams of 2+ agents.",
+  "voice_notes": "Hormozi rigour applied. Named mechanism (The Aureon Listing Pipeline) appears 3 times. Each follow-up takes a different angle (story-objection, new case study, refund math, forced yes/no, pure value drop, sharp breakup). Subjects are human, lowercase where natural, specific numbers > vague claims. Step 1 has no CTA button (handled by template via step_n=1). Length tapers: 90 -> 50 -> 60 -> 70 -> 40 -> 55 -> 60 words. NO apostrophes, NO em-dashes, NO word-internal hyphens. NO single quotes ('). Reply-stop wired via imap-poll. Required: {first_name}, {company}, {city}.",
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
+  "schedule_doc": "delay_days = gap from PREVIOUS step's send. 0,3,4,5,6,8,9 = cumulative day 0,3,7,12,18,26,35.",
+  "variants": [
+    {
+      "n": 7,
+      "delay_days": 9,
+      "angle": "aureon_followup_breakup_forced_response",
+      "subject": "closing your file in {city}",
+      "body": "Hi {first_name}.\n\nClosing your file at Aureon today since the next intake fills this week in {city}.\n\nIf the timing is wrong, I get it. If it is the offer, tell me. If it is something else, I am all ears.\n\nA one line reply is enough. Otherwise I will not write again.\n\nAnna"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# Curated "best crypto/trading YouTubers" lists.
+# Each article typically embeds dozens of YouTube channel links.
+#
+# Used by:
+#   py sequences/youtube_scraper.py enrich <this file> --out niches/crypto_yt_discovered.txt
+#
+# Yield is much higher than blind search.list discovery because every channel
+# listed was already vetted by the article author for having an audience.
+
+https://www.coingecko.com/learn/best-crypto-youtubers
+https://crypto.news/best-crypto-youtube-channels/
+https://blockchainmagazine.net/top-cryptocurrency-youtube-channels/
+https://www.fxleaders.com/news/2024/06/05/top-10-crypto-youtube-channels/
+https://www.coinpedia.org/news/best-crypto-youtube-channels/
+https://decrypt.co/resources/top-crypto-youtubers
+https://101blockchains.com/top-cryptocurrency-youtube-channels/
+https://academy.binance.com/en/articles/top-crypto-youtube-channels
+https://www.benzinga.com/money/best-crypto-trading-youtube-channels
+https://www.investinblockchain.com/top-cryptocurrency-youtube-channels/
+https://medium.com/coinmonks/top-crypto-youtube-channels-2024
+https://www.bitdegree.org/crypto/tutorials/best-crypto-youtube-channels

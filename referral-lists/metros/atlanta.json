@@ -1,0 +1,292 @@
+{
+  "metro": "Atlanta",
+  "label": "Atlanta and Metro Atlanta",
+  "basename": "Attorney-Referral-List-Atlanta",
+  "match": {
+    "area_codes": [
+      "404",
+      "678",
+      "770",
+      "470",
+      "762"
+    ],
+    "states": [
+      "GA"
+    ],
+    "cities": [
+      "atlanta",
+      "marietta",
+      "alpharetta",
+      "roswell",
+      "sandy springs",
+      "decatur",
+      "smyrna",
+      "duluth",
+      "lawrenceville",
+      "johns creek",
+      "kennesaw",
+      "woodstock"
+    ],
+    "zip_prefixes": [
+      "300",
+      "301",
+      "302",
+      "303"
+    ]
+  },
+  "firms": [
+    {
+      "firm": "Morgan & DiSalvo, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Richard M. Morgan",
+      "practice": "Estate planning, wills, trusts & probate",
+      "city": "Alpharetta",
+      "phone": "678-720-0750",
+      "email": "info@morgandisalvo.com",
+      "website": "https://morgandisalvo.com",
+      "address": "5755 North Point Pkwy, Ste 17, Alpharetta, GA 30022"
+    },
+    {
+      "firm": "Walker Estate Planning",
+      "type": "Estate / Probate",
+      "lead_attorney": "Kent Walker",
+      "practice": "Wills, trusts & estate administration",
+      "city": "Atlanta",
+      "phone": "404-422-2710",
+      "email": "",
+      "website": "https://walkerestateplanning.com",
+      "address": "6075 Barfield Road, Atlanta, GA 30328"
+    },
+    {
+      "firm": "Meyring Law Firm",
+      "type": "Estate / Probate",
+      "lead_attorney": "Robert S. Meyring",
+      "practice": "Estate planning, probate & elder law",
+      "city": "Atlanta",
+      "phone": "678-257-3332",
+      "email": "",
+      "website": "https://www.meyringlaw.com",
+      "address": "2931 Paces Ferry Road SE, Suite 201, Atlanta, GA 30339"
+    },
+    {
+      "firm": "The Law Office of Paul Black",
+      "type": "Estate / Probate",
+      "lead_attorney": "Paul Black",
+      "practice": "Estate planning, probate & elder law",
+      "city": "Decatur",
+      "phone": "404-537-3857",
+      "email": "info@georgia-estatelaw.com",
+      "website": "https://georgia-estatelaw.com",
+      "address": "836 Sycamore St, Decatur, GA 30030"
+    },
+    {
+      "firm": "Susan Floyd Law LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Susan Floyd",
+      "practice": "Wills, trusts & probate",
+      "city": "Roswell",
+      "phone": "404-939-4989",
+      "email": "sf@susanfloydlaw.com",
+      "website": "https://www.susanfloydlaw.com",
+      "address": "599 W. Crossville Road, Suite 111, Roswell, GA 30075"
+    },
+    {
+      "firm": "The Libby Law Firm",
+      "type": "Estate / Probate",
+      "lead_attorney": "Kasey Libby",
+      "practice": "Probate, estate administration & will contests",
+      "city": "Atlanta",
+      "phone": "404-445-7771",
+      "email": "",
+      "website": "http://thelibbylawfirm.com",
+      "address": "1579 Monroe Drive NE, F-315, Atlanta, GA 30324"
+    },
+    {
+      "firm": "Hughes & Associates, PC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Robby Hughes",
+      "practice": "Probate, estate & dispute resolution",
+      "city": "Lawrenceville",
+      "phone": "770-469-8887",
+      "email": "",
+      "website": "https://hughespclaw.com",
+      "address": "390 West Crogan Street, Suite 230, Lawrenceville, GA 30046"
+    },
+    {
+      "firm": "Aitkens & Aitkens, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "Robert Aitkens",
+      "practice": "Estate planning, wills & probate",
+      "city": "Atlanta",
+      "phone": "770-952-4000",
+      "email": "",
+      "website": "https://www.aitkenslawfirm.com",
+      "address": "1827 Powers Ferry Road SE, Bldg 1, Suite 100, Atlanta, GA 30339"
+    },
+    {
+      "firm": "Estate Attorneys of Atlanta",
+      "type": "Estate / Probate",
+      "lead_attorney": "Althea DeBarr-Johnson",
+      "practice": "Estate planning, probate & guardianship",
+      "city": "Atlanta",
+      "phone": "404-584-5555",
+      "email": "info@estateattorneys-atlanta.com",
+      "website": "https://www.atlantaestateattorneys.com",
+      "address": "236 Auburn Ave NE, Suite 207, Atlanta, GA 30303"
+    },
+    {
+      "firm": "Brian M. Douglas & Associates LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Brian M. Douglas",
+      "practice": "Estate planning, wills, trusts & probate",
+      "city": "Atlanta",
+      "phone": "770-933-9009",
+      "email": "",
+      "website": "https://www.atlantagaestateplanning.com",
+      "address": "900 Circle 75 Parkway SE, Suite 800, Atlanta, GA 30339"
+    },
+    {
+      "firm": "Turner Law, LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Robert Turner",
+      "practice": "Probate, estate planning & elder law",
+      "city": "Decatur",
+      "phone": "404-377-6941",
+      "email": "",
+      "website": "https://www.decaturestateplanning.com",
+      "address": "160 Clairemont Ave, Suite 450, Decatur, GA 30030"
+    },
+    {
+      "firm": "Weyer Law LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Stephen Weyer",
+      "practice": "Estate planning & probate administration",
+      "city": "Decatur",
+      "phone": "404-860-1313",
+      "email": "",
+      "website": "https://www.weyer-law.com",
+      "address": "520 W. Ponce de Leon Ave, Unit 1064, Decatur, GA 30031"
+    },
+    {
+      "firm": "Hobson & Hobson, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Christopher F. Hobson",
+      "practice": "Divorce, child custody & support",
+      "city": "Alpharetta",
+      "phone": "770-284-6153",
+      "email": "",
+      "website": "https://thehobsonlawfirm.com",
+      "address": "44 Milton Ave, Suite H, Alpharetta, GA 30009"
+    },
+    {
+      "firm": "Tannen Law Group",
+      "type": "Divorce / Family",
+      "lead_attorney": "David R. Tannen",
+      "practice": "Divorce, child custody & asset division",
+      "city": "Johns Creek",
+      "phone": "470-560-7798",
+      "email": "info@tannenlawgroup.com",
+      "website": "https://tannenlawgroup.com",
+      "address": "6455 E Johns Crossing, Suite 425, Johns Creek, GA 30097"
+    },
+    {
+      "firm": "Stearns-Montgomery & Proctor",
+      "type": "Divorce / Family",
+      "lead_attorney": "Mary A. Montgomery",
+      "practice": "Divorce & family law",
+      "city": "Marietta",
+      "phone": "678-971-3413",
+      "email": "info@stearns-law.com",
+      "website": "https://stearns-law.com",
+      "address": "291 SE Alexander St, Marietta, GA 30060"
+    },
+    {
+      "firm": "Vayman & Teitelbaum, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Gregory Teitelbaum",
+      "practice": "Divorce, child custody & support",
+      "city": "Alpharetta",
+      "phone": "678-736-7700",
+      "email": "info@vandtlaw.com",
+      "website": "https://www.vandtlaw.com",
+      "address": "3625 Brookside Parkway, Suite 130, Alpharetta, GA 30022"
+    },
+    {
+      "firm": "Atlanta Divorce Law Group",
+      "type": "Divorce / Family",
+      "lead_attorney": "Sara Khaki",
+      "practice": "Divorce, custody & family law",
+      "city": "Alpharetta",
+      "phone": "678-203-9893",
+      "email": "",
+      "website": "https://atlantadivorcelawgroup.com",
+      "address": "12735 Morris Rd Ext, Building 200, Suite 300, Alpharetta, GA 30004"
+    },
+    {
+      "firm": "Kessler & Solomiany, LLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Randall Kessler",
+      "practice": "Divorce & family law",
+      "city": "Atlanta",
+      "phone": "404-688-8810",
+      "email": "mail@ksfamilylaw.com",
+      "website": "https://www.ksfamilylaw.com",
+      "address": "101 Marietta Street NW, Suite 3500, Atlanta, GA 30303"
+    },
+    {
+      "firm": "Atlanta Holistic Family Law",
+      "type": "Divorce / Family",
+      "lead_attorney": "Jeanette Soltys",
+      "practice": "Divorce, custody & mediation",
+      "city": "Marietta",
+      "phone": "770-214-4767",
+      "email": "team@atlholisticfamilylaw.com",
+      "website": "https://atlholisticfamilylaw.com",
+      "address": "1229 Johnson Ferry Rd, Suite 203, Marietta, GA 30068"
+    },
+    {
+      "firm": "Abbott Law Group",
+      "type": "Divorce / Family",
+      "lead_attorney": "B. J. Abbott",
+      "practice": "Divorce, custody & property division",
+      "city": "Marietta",
+      "phone": "678-941-4133",
+      "email": "",
+      "website": "https://www.abbottandabbott.net",
+      "address": "31 Atlanta Street, Marietta, GA 30060"
+    },
+    {
+      "firm": "Levine Smith Coburn & Koslin, LLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Jonathan R. Levine",
+      "practice": "Divorce & domestic relations",
+      "city": "Atlanta",
+      "phone": "404-237-5700",
+      "email": "",
+      "website": "https://www.lscklaw.com",
+      "address": "3490 Piedmont Road NE, Suite 1150, Atlanta, GA 30305"
+    },
+    {
+      "firm": "Boyd Collar Nolen Tuggle & Roddenbery",
+      "type": "Divorce / Family",
+      "lead_attorney": "Robert D. Boyd",
+      "practice": "Divorce, custody & property division",
+      "city": "Atlanta",
+      "phone": "770-953-4300",
+      "email": "",
+      "website": "https://www.bcntrlaw.com",
+      "address": "3330 Cumberland Blvd, 100 City View, Suite 999, Atlanta, GA 30339"
+    },
+    {
+      "firm": "Stern Edlin Graham Family Law, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Shiel G. Edlin",
+      "practice": "High-net-worth divorce & custody",
+      "city": "Atlanta",
+      "phone": "404-256-0010",
+      "email": "shiel@segfamilylaw.com",
+      "website": "https://stern-edlin.com",
+      "address": "6190 Powers Ferry Road, Suite 100, Atlanta, GA 30339"
+    }
+  ]
+}

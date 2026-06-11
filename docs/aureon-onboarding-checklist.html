@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Aureon onboarding</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #202020;
+    --ink-2: #555;
+    --muted: #888;
+    --rule: #e0e0e0;
+    --gold: #b69136;
+    --focus: #d4af37;
+  }
+  @page { size: A4; margin: 18mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: #f6f6f4;
+  }
+  .doc {
+    max-width: 720px;
+    margin: 32px auto;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    padding: 36px 40px;
+    border-radius: 6px;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--gold);
+    margin-bottom: 22px;
+  }
+  .head svg { width: 32px; height: 32px; flex-shrink: 0; }
+  .head .name { font-weight: 700; font-size: 15px; letter-spacing: 0.4px; }
+  .head .sub { font-size: 11px; color: var(--muted); letter-spacing: 0.3px; margin-top: 1px; }
+
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .lead { font-size: 14px; color: var(--ink-2); margin-bottom: 6px; }
+  .lead-soft { font-size: 12.5px; color: var(--muted); margin-bottom: 24px; }
+
+  section.s { margin-bottom: 18px; padding-top: 14px; border-top: 1px solid var(--rule); }
+  section.s h2 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 10px; letter-spacing: 0.2px; page-break-after: avoid; break-after: avoid; }
+
+  .field { margin-bottom: 13px; page-break-inside: avoid; break-inside: avoid; }
+  .field label.qlabel { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 3px; page-break-after: avoid; break-after: avoid; }
+  .field .qhint { font-size: 12px; color: var(--ink-2); margin-bottom: 6px; line-height: 1.5; }
+
+  input[type="text"], textarea {
+    width: 100%;
+    border: 1px solid var(--rule);
+    background: #fff;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 2px rgba(212,175,55,0.15);
+  }
+  textarea { min-height: 48px; resize: vertical; line-height: 1.45; }
+
+  .choice-row { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+  .choice { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); cursor: pointer; padding: 4px 0; }
+  .choice input[type="radio"] { accent-color: var(--gold); width: 14px; height: 14px; cursor: pointer; margin: 0; }
+
+  .submit-bar { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .submit-info { font-size: 12px; color: var(--muted); flex: 1; min-width: 220px; }
+  .send-btn { background: var(--ink); color: #fff; border: none; font-family: inherit; font-weight: 600; font-size: 14px; padding: 10px 22px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+  .send-btn:hover { background: #000; }
+
+  .footer { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 11px; color: var(--muted); text-align: center; }
+  .footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
+
+  @media print {
+    body { background: #fff; }
+    .doc { border: none; padding: 0; margin: 0; max-width: none; }
+    .submit-bar, .send-btn { display: none; }
+    section.s { break-inside: avoid-page; page-break-inside: avoid; }
+    .field { break-inside: avoid; page-break-inside: avoid; }
+    .footer { break-inside: avoid; page-break-inside: avoid; margin-top: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute;">
+  <symbol id="aureonGlobe" viewBox="0 0 100 100">
+    <defs>
+      <linearGradient id="globeGrad" x1="10%" y1="10%" x2="90%" y2="90%">
+        <stop offset="5%" stop-color="#FFF8D6"/>
+        <stop offset="35%" stop-color="#E6C259"/>
+        <stop offset="65%" stop-color="#B68E2D"/>
+        <stop offset="95%" stop-color="#755615"/>
+      </linearGradient>
+    </defs>
+    <g fill="url(#globeGrad)">
+      <ellipse cx="50" cy="15" rx="20" ry="7"/>
+      <path d="M 18 26 Q 50 33 82 26 L 82 34 Q 50 41 18 34 Z"/>
+      <path d="M 8 40 Q 50 47 92 40 L 92 49 Q 50 56 8 49 Z"/>
+      <path d="M 8 55 Q 50 62 92 55 L 92 64 Q 50 71 8 64 Z"/>
+      <path d="M 18 70 Q 50 77 82 70 L 82 78 Q 50 85 18 78 Z"/>
+      <path d="M 32 84 Q 50 89 68 84 L 68 89 Q 50 94 32 89 Z"/>
+    </g>
+  </symbol>
+</svg>
+
+<form id="onboardingForm" class="doc" action="https://formsubmit.co/info@aureonglobal.de" method="POST" onsubmit="return submitOnboarding(event)">
+
+  <!-- Formsubmit configuration -->
+  <input type="hidden" name="_subject" value="Aureon onboarding response">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_autoresponse" value="Thanks. We have your responses and will send the pilot agreement via Dropbox Sign within one working day.">
+  <input type="hidden" name="_next" value="https://aureonglobal.de">
+
+  <div class="head">
+    <svg><use href="#aureonGlobe"/></svg>
+    <div>
+      <div class="name">Aureon Global</div>
+      <div class="sub">Onboarding checklist</div>
+    </div>
+  </div>
+
+  <h1>Onboarding</h1>
+  <p class="lead">A short questionnaire so we can fill in the agreement and start sending. About ten minutes.</p>
+  <p class="lead-soft">Fill in the fields and click Send. It opens your email pre filled with your answers.</p>
+
+  <!-- Section 1 -->
+  <section class="s">
+    <h2>1. Your company</h2>
+
+    <div class="field">
+      <label class="qlabel" for="company_name">Full registered company name</label>
+      <div class="qhint">This goes on the contract as the legal counterparty. We need it exactly as it appears on Companies House or your local company register, including the suffix like Limited, GmbH, LLC.</div>
+      <input type="text" id="company_name" name="company_name" placeholder="e.g. Acme Limited">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="company_number">Company registration number</label>
+      <div class="qhint">The official number from your company register (8 digits for UK Companies House, similar elsewhere). We use it to identify your legal entity unambiguously on the agreement. If you do not have it handy, we can look it up for you.</div>
+      <input type="text" id="company_number" name="company_number">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="incorporation_country">Country of incorporation</label>
+      <div class="qhint">Where your company is legally registered, for example England and Wales, Delaware USA, Germany. This tells us which legal framework applies on your side.</div>
+      <input type="text" id="incorporation_country" name="incorporation_country" placeholder="e.g. England and Wales">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="registered_address">Registered office address</label>
+      <div class="qhint">The official address on your company filing. Goes into the parties block of the contract and is used for any formal notice by post. If your trading address is different, we only need the registered one.</div>
+      <textarea id="registered_address" name="registered_address"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="signer">Who is signing on your side?</label>
+      <div class="qhint">Whoever has authority to sign on your side, usually the CEO, founder, or a Director. We send the signature link via Dropbox Sign to the email you give us. Name, title, email.</div>
+      <input type="text" id="signer" name="signer" placeholder="Jane Smith, CEO, jane@company.com">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="notice_email">Email for formal notices</label>
+      <div class="qhint">Where to send any formal notices about the agreement, things like renewals, terminations, material changes. Can be the same as the signer above, or a dedicated info@, legal@, or your direct one. Day to day communication still happens on whatever email we already use.</div>
+      <input type="text" id="notice_email" name="notice_email">
+    </div>
+  </section>
+
+  <!-- Section 2 -->
+  <section class="s">
+    <h2>2. Sending setup</h2>
+
+    <div class="field">
+      <label class="qlabel" for="sending_domain">Which domain should we send under?</label>
+      <div class="qhint">Your main brand domain, for example yourcompany.com. We provision up to ten sending subdomains underneath it (like outreach.yourcompany.com, hi.yourcompany.com) so emails go out under your brand. The sending reputation belongs to you, not us.</div>
+      <input type="text" id="sending_domain" name="sending_domain" placeholder="yourcompany.com">
+    </div>
+
+    <div class="field">
+      <label class="qlabel">Do you control DNS for that domain?</label>
+      <div class="qhint">DNS is the system that controls how your domain works. We need to add four small text records to it for each subdomain so email providers know our sends are authorised. We just want to know who handles DNS on your side, so we know who to ask.</div>
+      <div class="choice-row">
+        <label class="choice"><input type="radio" name="dns_control" value="in_house"> Yes, in house</label>
+        <label class="choice"><input type="radio" name="dns_control" value="agency"> Our web agency handles it</label>
+        <label class="choice"><input type="radio" name="dns_control" value="unsure"> Not sure, will find out</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="qlabel">DNS handover method</label>
+      <div class="qhint">Two paths, both fine. Option one, you give us temporary access to your DNS provider (Cloudflare, GoDaddy, Route 53, etc) and we publish the records ourselves in about ten minutes. Option two, you publish them yourself using our written instructions. Self publishing keeps full control on your side but takes a bit longer.</div>
+      <div class="choice-row">
+        <label class="choice"><input type="radio" name="dns_method" value="access"> Give Aureon temporary DNS access</label>
+        <label class="choice"><input type="radio" name="dns_method" value="self_publish"> We will publish the records ourselves</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3 -->
+  <section class="s">
+    <h2>3. Where booked intros land</h2>
+
+    <div class="field">
+      <label class="qlabel" for="routing_endpoint">Where should we route positive replies?</label>
+      <div class="qhint">When a prospect replies asking for a demo, we forward that reply (plus a one page brief on the company) to one endpoint of your choice within sixty minutes. A Calendly or similar booking link is fastest because the prospect self serves. A personal inbox works too. Whichever you can action quickest.</div>
+      <input type="text" id="routing_endpoint" name="routing_endpoint" placeholder="Calendly link or inbox">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="intro_taker">Who takes the intro calls?</label>
+      <div class="qhint">The person who actually shows up to the intro call. We send them a one page brief beforehand with the company info of the prospect, the trigger event we used to reach out, and the buyer role, so they walk in already prepared. Just you, your co founder, or a sales lead, whatever works.</div>
+      <input type="text" id="intro_taker" name="intro_taker" placeholder="name and role">
+    </div>
+  </section>
+
+  <!-- Section 4 -->
+  <section class="s">
+    <h2>4. Your ICP</h2>
+
+    <div class="field">
+      <label class="qlabel" for="icp">Describe your ideal customer</label>
+      <div class="qhint">The kind of company you want as a customer, as specific as you can make it. At minimum cover: industry or sector, company size (employees or revenue band), maturity stage (early, scale up, enterprise), and geography. The tighter you describe it, the higher the conversion rate.</div>
+      <textarea id="icp" name="icp" placeholder="e.g. B2B SaaS, 100 to 1000 employees, Series B to D, EMEA and North America"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="buyer_titles">Best converting buyer titles</label>
+      <div class="qhint">The job titles of the people who actually say yes to your product. If you have done any sales already, who closes fastest? CRO, VP Sales, Head of Enablement, RevOps Lead, Procurement, founder, etc. Comma separated. We weight the outbound to land in front of these titles first.</div>
+      <input type="text" id="buyer_titles" name="buyer_titles" placeholder="e.g. CRO, VP Sales, Head of RevOps">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="exclusions">Companies or sectors to exclude</label>
+      <div class="qhint">Companies we should never contact, in any format you have them. Current customers, competitors, anyone you have already pitched in the last six months, anyone on a do not contact list. Drop them in here and we suppress the entire engine from touching them.</div>
+      <textarea id="exclusions" name="exclusions"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="signals">Any buying signals that matter for your category</label>
+      <div class="qhint">Buying signals are public events that suggest a company is ready to act now. The standard ones are new funding rounds, a new VP or CRO joining, sales hiring sprees, competitor contracts coming up for renewal. If you know of category specific signals (a vendor migration, a regulation, an industry event), tell us and we will scan for those too.</div>
+      <textarea id="signals" name="signals"></textarea>
+    </div>
+  </section>
+
+  <!-- Section 5 -->
+  <section class="s">
+    <h2>5. Timing</h2>
+
+    <div class="field">
+      <label class="qlabel" for="dns_ready_date">Earliest DNS handover date</label>
+      <div class="qhint">Once DNS is set, sending goes live within seven days. The three month pilot clock starts on the day DNS is set, not the day you sign. Give us your realistic earliest date so we both know when first emails go out.</div>
+      <input type="text" id="dns_ready_date" name="dns_ready_date" placeholder="e.g. Friday this week">
+    </div>
+
+    <div class="field">
+      <label class="qlabel" for="kickoff_slot">Best slot for the 15 minute kickoff call</label>
+      <div class="qhint">We run a 15 minute call within two working days of the agreement being signed. On it we confirm your ICP, the reply routing endpoint, and any last tweaks. Give us a day, time, and timezone that works and we will send a calendar invite to lock it in.</div>
+      <input type="text" id="kickoff_slot" name="kickoff_slot" placeholder="day, time, timezone">
+    </div>
+  </section>
+
+  <div class="submit-bar">
+    <div class="submit-info">Click Send. Opens your email client with everything pre filled. Review and hit send.</div>
+    <button type="submit" class="send-btn">Send</button>
+  </div>
+
+  <div class="footer">
+    Or email directly: <a href="mailto:info@aureonglobal.de">info@aureonglobal.de</a><br>
+    Aureon Global L.L.C. | aureonglobal.de
+  </div>
+
+</form>
+
+<script>
+  const LABELS = {
+    company_name: 'Full registered company name',
+    company_number: 'Company registration number',
+    incorporation_country: 'Country of incorporation',
+    registered_address: 'Registered office address',
+    signer: 'Signer (name, title, email)',
+    notice_email: 'Email for formal notices',
+    sending_domain: 'Sending domain',
+    dns_control: 'DNS control',
+    dns_method: 'DNS handover method',
+    routing_endpoint: 'Routing endpoint for booked intros',
+    intro_taker: 'Who takes the intro calls',
+    icp: 'Ideal customer profile',
+    buyer_titles: 'Best converting buyer titles',
+    exclusions: 'Excluded companies or sectors',
+    signals: 'Relevant buying signals',
+    dns_ready_date: 'Earliest DNS handover date',
+    kickoff_slot: 'Preferred kickoff slot',
+  };
+
+  function submitOnboarding(event) {
+    // When the form is hosted online (aureonglobal.de/onboarding.html, GitHub Pages, etc.)
+    // it submits via Formsubmit which emails info@aureonglobal.de directly.
+    //
+    // When the form is opened locally as a file (file://), Formsubmit blocks the
+    // submission because of cross-origin restrictions. In that case we fall back
+    // to opening the email client with answers pre-filled.
+    if (location.protocol === 'file:') {
+      event.preventDefault();
+      const form = document.getElementById('onboardingForm');
+      const data = new FormData(form);
+      const collected = {};
+      for (const [key, value] of data.entries()) {
+        if (key.indexOf('_') === 0) continue;
+        if (collected[key]) collected[key] += ', ' + value;
+        else collected[key] = value;
+      }
+      let body = 'Aureon onboarding responses\n';
+      body += '===========================\n\n';
+      for (const [key, label] of Object.entries(LABELS)) {
+        const value = collected[key] || '(not provided)';
+        body += label + ':\n' + value + '\n\n';
+      }
+      const subject = encodeURIComponent('Aureon onboarding response');
+      const bodyEncoded = encodeURIComponent(body);
+      window.location.href = 'mailto:info@aureonglobal.de?subject=' + subject + '&body=' + bodyEncoded;
+      return false;
+    }
+    // Hosted online — let Formsubmit handle the POST
+    return true;
+  }
+</script>
+
+</body>
+</html>

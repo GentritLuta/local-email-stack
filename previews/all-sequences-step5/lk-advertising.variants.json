@@ -1,0 +1,23 @@
+{
+  "name": "LK Advertising — 7-email Hormozi-Sequenz für deutsche Maklerbüros (named mechanism, Reply-Stop)",
+  "slug": "lk-advertising-default",
+  "profile_slug": "lk-advertising",
+  "created_at": "2026-05-18",
+  "target": "Maklerbüros (Immobilienmakler) in Deutschland mit 2+ Maklern und ≥5.000 EUR/Monat aktuellem Werbebudget. {company} = Maklerbüro, {city} = Stadt.",
+  "voice_notes": "Named mechanism: Die LK Performance Garantie (Schritte 1, 2, 4). Schreibsprache, direkt, agenturartig. KEINE Apostrophe, Gedankenstriche, einfache Anführungszeichen oder Word-interne Bindestriche. CTA-Button erst ab Schritt 2. Required: {first_name}, {company}, {city}.",
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
+  "schedule_doc": "delay_days = Abstand zum vorigen Schritt. 0,3,4,5,6,8,9 = kumulativ Tag 0,3,7,12,18,26,35.",
+  "variants": [
+    {
+      "n": 5,
+      "delay_days": 6,
+      "angle": "lk_followup_forced_yes_or_no",
+      "subject": "{first_name} ja oder nein",
+      "body": "Guten Tag {first_name}.\n\nWenn wir Ihre aktuelle 30 Tage ROAS in {city} schlagen und Sie erst zahlen, wenn wir es geschafft haben, würde {company} ja sagen?\n\nEin klares ja oder ein klares nein reichen beide.\n\nKlara"
+    }
+  ]
+}

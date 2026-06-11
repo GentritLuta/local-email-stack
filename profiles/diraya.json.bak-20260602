@@ -1,0 +1,197 @@
+{
+  "slug": "diraya",
+  "name": "Diraya",
+  "created_at": "2026-05-31",
+  "active": false,
+  "company": {
+    "legal_name": "Diraya Inc",
+    "website": "https://diraya.ca",
+    "root_domain": "diraya.ca",
+    "target_market": "Global English-speaking startups and scaleups, ~seed to Series B, in SaaS / health tech / fintech, needing AI engineering"
+  },
+  "_note": "Provisioned 2026-05-31. Sending under diraya.ca with Aureon-controlled subdomains. Client retains DNS in house (per onboarding); Aureon to publish records via temporary DNS access. NOT yet sending — needs Resend domain provisioning + warmup ramp. Persona = Mohammed El Amine Amoura (Director / Co-Founder).",
+  "relay": {
+    "backend": "resend",
+    "resend_region": "us-east-1",
+    "resend_api_key": "",
+    "_note": "resend_api_key lives in diraya.private.json (gitignored). Reuses the existing Resend Pro account. us-east-1 chosen because ICP is global English-speaking — neutral latency vs DACH-specific eu-west-1.",
+    "from_domains": [
+      {
+        "domain": "mohammed.diraya.ca",
+        "resend_domain_id": "",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "amine.diraya.ca",
+        "resend_domain_id": "",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.diraya.ca",
+        "resend_domain_id": "",
+        "verified_at": null,
+        "warmup": {
+          "enabled": true,
+          "current_day": 0,
+          "started_at": null,
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ]
+  },
+  "personas": [
+    {
+      "slug": "mohammed",
+      "from_name": "Mohammed from Diraya",
+      "from_addr": "mohammed@mohammed.diraya.ca",
+      "reply_to": "info@diraya.ca",
+      "title": "Director and Co-Founder",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "first-person from the founder",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes",
+          "apostrophes in contractions where avoidable"
+        ]
+      },
+      "signature": "Mohammed El Amine Amoura\nDirector, Diraya Inc"
+    },
+    {
+      "slug": "amine",
+      "from_name": "Amine from Diraya",
+      "from_addr": "amine@amine.diraya.ca",
+      "reply_to": "info@diraya.ca",
+      "title": "Director and Co-Founder",
+      "voice": {
+        "register": "founder-direct",
+        "quirks": [
+          "short sentences",
+          "concrete numbers",
+          "first-person from the founder",
+          "no buzzwords"
+        ],
+        "avoid": [
+          "marketing language",
+          "exclamation marks",
+          "emojis",
+          "em-dashes"
+        ]
+      },
+      "signature": "Mohammed El Amine Amoura\nDirector, Diraya Inc"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin"
+  },
+  "send_ramp": {
+    "started_at": null
+  },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.003
+    },
+    "reputation": {
+      "bounce_rate_7d": 0,
+      "complaint_rate_7d": 0,
+      "delivered_7d": 0,
+      "last_check": null
+    },
+    "started_at": null,
+    "current_day": 0,
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    { "from_day": 1,  "daily": 15 },
+    { "from_day": 8,  "daily": 25 },
+    { "from_day": 15, "daily": 35 },
+    { "from_day": 22, "daily": 50 }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/Toronto",
+    "target_audience_note": "Global ICP. Default America/Toronto (client HQ) for unresolved domains; per-prospect city lookup overrides for US/EU/MENA prospects. 08:00-17:00 recipient local time."
+  },
+  "brand": {
+    "wordmark": "DIRAYA",
+    "site": "diraya.ca",
+    "tagline": "The Future Starts Now. Custom AI engineering for ambitious startups.",
+    "font_stack": "'Inter', sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap",
+    "colors": {
+      "accent":   "#0A66FF",
+      "accent_2": "#0B1220",
+      "text":     "#0B1220",
+      "text_2":   "#3B4255",
+      "muted":    "#8A91A3",
+      "bg_page":  "#FFFFFF",
+      "bg_card":  "#FFFFFF",
+      "rule":     "#E6E9F0"
+    },
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/diraya.html?t={token}",
+    "legal": {
+      "company_name": "Diraya Inc",
+      "address_lines": [
+        "Diraya Inc",
+        "500 Sedgebrook Way, Canada"
+      ],
+      "contact_email": "info@diraya.ca",
+      "copyright_year": 2026,
+      "logo_url": "https://diraya.ca/logo.png",
+      "logo_width": 140,
+      "privacy_policy_url": "https://diraya.ca/privacy",
+      "terms_of_service_url": "https://diraya.ca/terms",
+      "legal_disclaimer": "This message is intended for the named recipient only. If you are not the intended recipient, please delete this email and inform the sender.",
+      "partner_notice": "You are receiving this because we believe our work may be relevant to your roadmap. One-click unsubscribe at the bottom."
+    },
+    "template": "diraya-custom"
+  },
+  "_note_template": "Custom template at sequences/email_template_diraya.py. Editorial/SaaS-clean aesthetic — white sheet, Inter sans, near-black headings (#0B1220), electric-blue CTA (#0A66FF), sharp 4px corners. Founder-led signature block."
+}

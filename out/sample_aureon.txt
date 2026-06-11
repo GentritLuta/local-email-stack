@@ -1,0 +1,39 @@
+=== AUREON step-1 sample ===
+From:    Anna from Aureon Global <anna@mail.aureonglobal.de>
+To:      erica@thekeygroupohio.com
+Reply-To:info@aureonglobal.de
+Subject: Are you open?
+Headers: {
+  "Message-ID": "<c440f2341bc943d3871e0ac75318e2c0.1779355462@mail.aureonglobal.de>",
+  "List-Unsubscribe": "<https://gentritluta.github.io/local-email-stack/unsubscribe/aureon.html?t=d5a357f6-5a3f-465c-bb08-eae732ea77e9>, <mailto:info@aureonglobal.de?subject=unsubscribe>",
+  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+}
+
+--- merge fields ---
+first_name = Erica
+company    = The Key Group Ohio
+city       = 
+
+--- text body ---
+Hey Erica,
+
+Are you guys open right now?
+
+I see what The Key Group Ohio is building in real estate.
+
+We built a tool called The Listing Engine that helps small brokerages add 3 to 8 listing appointments every month without paying for leads or running ads.
+
+We need 12 brokerages to run it on for 60 days. Free. You get full setup, done for you outbound, live appointment alerts, and a weekly numbers report. You keep 100 percent of every commission. Walk away anytime and keep every lead we sourced.
+
+One closed listing at average US prices pays you 9k. For 15 minutes on a setup call.
+
+Erica, worth 15 minutes this week?
+
+P.s. reply no if not interested.
+
+Anna Bauer
+Senior Partnership Manager, Aureon Global
+Aureon Global · aureonglobal.de
+
+---
+Don't want these emails? Unsubscribe: https://gentritluta.github.io/local-email-stack/unsubscribe/aureon.html?t=d5a357f6-5a3f-465c-bb08-eae732ea77e9

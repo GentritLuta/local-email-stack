@@ -1,0 +1,64 @@
+{
+  "name": "Aureon Global - 7-email give-first Hormozi sequence (The Listing Engine beta, lead-magnet led)",
+  "slug": "aureon-default",
+  "profile_slug": "aureon",
+  "created_at": "2026-05-19",
+  "target": "Real estate agents in the US closing 3+ deals/month OR brokerage teams of 2+ agents. Sourced via real_estate_us.yaml niche.",
+  "voice_notes": "GIVE-FIRST Hormozi $100M Leads structure. E1+E2 lead with a free attorney referral list (reply LIST). E3 names the pain (shared bought leads) + the mechanism The Listing Engine. E4 the free 60-day beta offer with reason-why. E5 binary yes/no. E6 second give (reply PROBATE). E7 breakup, give still open. PROOF: {proof_line} is an optional merge, empty by default. When you have a real beta result, set it in sequence-runner.synthesize_optional_merges (e.g. 'Our first beta brokerage booked 14 listing appointments in 30 days.'). The give itself is the live proof of competence. Strict char rules: NO apostrophes, em-dashes, en-dashes, smart quotes, ellipses, contractions, word-internal hyphens. Required merges {greeting} {company}; optional {geo_clause} {team_phrase} {proof_line}. Lead-magnet fulfilment: scripts/pull-referral-list.py <city> --type divorce|estate|probate.",
+  "required_merges": [
+    "company"
+  ],
+  "schedule_doc": "delay_days = gap from prior step. 0,2,2,3,4,7,10 = cumulative day 0,2,4,7,11,18,28.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "free_seller_lead_test_grand_slam_offer",
+      "subject": "a seller test for {company}",
+      "_ab_note": "STEP-1 SUBJECT A/B ENDED 2026-06-08 on winner A (a seller test for {company}, 5.4% reply / 64% open vs 0.3-0.5%). Both sides now = winner.",
+      "body": "Hey {greeting},\n\nStraight offer, free.\n\nGive me the main zip you work. For 14 days I run seller outreach into that area and hand you every home seller lead and listing appointment it produces. You keep all of them. No card, no contract, stop any day.\n\nWhy free: we are building a few case studies{geo_clause} before we set a price. The only catch is one honest review at the end if it works. If it produces nothing, you are out nothing.\n\nMost agents fight over the same shared Zillow buyers. This puts motivated sellers in front of {company} instead, the listings that build a business.\n\nRoom for a few agents near you this week. Reply with your zip and I will set it up.\n\nP.s. want something smaller first? Reply LIST and I send 40 to 50 divorce and estate attorneys{geo_clause} who refer home sellers, each with name, firm, and direct email. Free, no strings."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "give_repeat_soft_bridge",
+      "subject": "still yours if you want it",
+      "body": "Hey {greeting},\n\nQuick follow up. That attorney list for {company} still stands. Reply LIST and I send back 40 to 50 divorce and estate attorneys{geo_clause}, each one a name, firm, and direct email, the kind who hand a home sale to one agent they trust. Yours free, no strings.\n\nWhy I have these ready: we run seller outbound for a small group of brokerages, and a list like this is one small piece of it. More on that another day.\n\nFor now, want it?"
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "pain_shared_leads_mechanism",
+      "subject": "the problem with bought leads",
+      "body": "Hey {greeting},\n\nHere is the trap most agents{geo_clause} are stuck in. You buy leads from Zillow or Realtor that 5 or 6 other agents buy at the same second. You race to call first, you cut your fee to win, and you end up chasing buyers instead of taking listings.\n\nWe built The Listing Engine to flip that. It runs done for you seller outbound so {team_phrase} gets listing appointments that belong to you alone. {proof_line}\n\nWorth 15 minutes to see how it works?"
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "offer_beta_reason_why",
+      "subject": "60 days at zero cost for {company}",
+      "body": "Hey {greeting},\n\nHere is the straight offer.\n\nWe are taking 12 brokerages into a 60 day beta. You get full setup, all the seller outbound done for you, live appointment alerts, and a weekly numbers report. You keep 100 percent of every commission and every lead we source.\n\nWhy it is free: we want 12 clean case studies before we set the price. That is the whole catch. One honest review at the end. {proof_line}\n\nOne closed listing at average US prices pays you about 9k, for 15 minutes on a setup call. Open to it this week?"
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "forced_yes_or_no",
+      "subject": "{company}, a clear yes or no",
+      "body": "Hey {greeting},\n\nIf we ran The Listing Engine on {company} for 60 days at zero cost, you kept every commission, and you could walk away any day with every lead we sourced, would you try it?\n\nA clear yes or a clear no both help me."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "pure_value_second_give",
+      "subject": "one more thing you can use",
+      "body": "Hey {greeting},\n\nBeta or no beta, here is something you can use today.\n\nReply with the word PROBATE and I pull you a fresh list of 30 to 40 probate and estate attorneys{geo_clause} who handle home sales for families. Name, firm, and direct email for each. These attorneys refer the listing to one trusted agent, the family does not shop it, and most of these names are not worked yet by anyone near you. Free, no call, yours to keep.\n\nWant it?"
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "breakup",
+      "subject": "closing your file",
+      "body": "Hey {greeting},\n\nI am closing your file at Aureon today. The beta has 12 slots and they fill this week.\n\nIf the timing is off for {company}, I understand. If the offer is off, tell me what would land and I will listen. Either way, the attorney list is still yours, 40 to 50 names with direct emails, free. Just reply LIST."
+    }
+  ]
+}

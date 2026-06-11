@@ -1,0 +1,69 @@
+{
+  "name": "Atal SolidRocks — 7-email Hormozi $100M Leads sequence (DACH, Präventionsseminare)",
+  "slug": "atalsolidrocks-default",
+  "profile_slug": "atalsolidrocks",
+  "created_at": "2026-05-21",
+  "finalized_at": "2026-05-28",
+  "target": "DACH B2B Entscheider (HR, BGM, Geschäftsführung) in mittelständischen Unternehmen mit 50 bis 150 plus Mitarbeitenden. Branchen: Industrie, Gesundheit, Dienstleistung, IT. {first_name}, {company}, {city} required.",
+  "voice_notes": "Hormozi $100M Leads Struktur (sind-Sie-offen + checking-out + Datenpunkt + sind-Sie-beschäftigt + forced-yes-no + pure-value + breakup). DACH Sie-Form, kurze Sätze, konkrete Zahlen aus dem echten Angebot. Echte Umlaute (ä ö ü) verwenden, ß als ss schreiben (DACH-tauglich inkl. CH). KEINE Apostrophe, KEINE Gedankenstriche, KEINE Word-Bindestriche, KEINE Ausrufezeichen, KEINE Emojis. Required: {first_name}, {company}, {city}.",
+  "offer_facts": {
+    "value_prop": "Krankenstand in 90 Tagen um rund 22 Prozent senken via sechs Präventionsseminaren (Schlaf, Stress, Resilienz, Regeneration, Konzentration, Leistung)",
+    "proof_points": ["Krankenstand 11 auf 7,8 Prozent", "Burnout Werte 42 auf 26", "47 Führungskräfte seit 2019 begleitet", "14 dokumentierte Mandate", "ROI 6,4x im ersten Jahr (DAK Daten 2025)"],
+    "differentiators": ["vom Gründer persönlich", "Gruppen bis zehn Personen", "kein Trainer Pool, kein White Label, kein Subunternehmer", "Vorher Nachher Audit mit validierten Skalen (PSQI, Maslach, Connor Davidson)"],
+    "guarantee": "Wirkungsgarantie: zeigt das Vorher Nachher Audit keinen Effekt, gibt es sechs Coaching Sitzungen kostenlos. Antwort in vier Arbeitsstunden. Ausstieg nach der ersten Sitzung ohne Kosten.",
+    "lead_magnet": "kostenloser Schlaf Check als PDF für HR Teams, alternativ 30 Minuten Gespräch (Wert 1.600 Euro)"
+  },
+  "required_merges": ["first_name", "company", "city"],
+  "schedule_doc": "delay_days = Abstand zum vorigen Schritt. 0,2,2,3,4,7,10 = Tag 0,2,4,7,11,18,28.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "hormozi_sind_sie_offen_de",
+      "subject": "Sind Sie offen?",
+      "body": "Guten Tag {first_name},\n\nsind Sie gerade offen für etwas?\n\nIch sehe, was {company} in {city} aufgebaut hat.\n\nWir helfen mittelständischen Unternehmen in der DACH Region, den Krankenstand in 90 Tagen um rund 22 Prozent zu senken. Mit sechs Präventionsseminaren zu Schlaf, Stress, Resilienz, Regeneration, Konzentration und Leistung.\n\nLetztes Mandat: Krankenstand von 11 auf 7,8 Prozent, Burnout Werte von 42 auf 26. Gemessen mit einem Vorher Nachher Audit.\n\nDas Beste ist die Wirkungsgarantie. Zeigt das Audit keinen Effekt, gibt es sechs Coaching Sitzungen kostenlos.\n\nMacht ein 15 Minuten Telefonat Sinn?\n\nP.s. einfach mit nein antworten, falls kein Interesse."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "hormozi_was_checking_out_de",
+      "subject": "kurz nach {company} geschaut",
+      "body": "Guten Tag {first_name},\n\nhabe kurz nach {company} geschaut.\n\nKurzer Kontext: wir senken den Krankenstand im Mittelstand mit messbaren Präventionsseminaren. Vom Gründer persönlich, Gruppen bis zehn Personen, kein Trainer Pool.\n\n15 Minuten am Telefon?"
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "hormozi_data_point_de",
+      "subject": "Krankenstand von 11 auf 7,8 Prozent",
+      "body": "Guten Tag {first_name},\n\nnoch ein Datenpunkt.\n\nEin DACH Mandat hat den Krankenstand in einem Jahr von 11 auf 7,8 Prozent gesenkt. Der ROI lag bei 6,4x im ersten Jahr, gerechnet mit DAK Daten 2025.\n\nDas gleiche Modell könnte für {company} in {city} funktionieren."
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "hormozi_sind_sie_beschaeftigt_de",
+      "subject": "viel zu tun..?",
+      "body": "Guten Tag {first_name},\n\nich nochmal, das ist die vierte Mail, ich nehme an Sie haben viel zu tun.\n\nProblem: bleibt der Krankenstand bei {company} auf dem aktuellen Niveau, kostet jeder Krankheitstag pro Mitarbeitenden mehrere hundert Euro, Jahr für Jahr.\n\nLösung: 15 Minuten am Telefon und ich zeige, welche der sieben Hebel bei Ihnen am schnellsten wirken.\n\nWann passt es?"
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "hormozi_forced_yes_or_no_de",
+      "subject": "{first_name}, ja oder nein",
+      "body": "Guten Tag {first_name},\n\nwenn wir den Krankenstand bei {company} in 90 Tagen messbar senken würden, mit Vorher Nachher Audit und Wirkungsgarantie, würden Sie ja sagen?\n\nEin klares ja oder nein, beides reicht."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "hormozi_pure_value_de",
+      "subject": "Schlaf Check für {company}",
+      "body": "Guten Tag {first_name},\n\nob {company} mit uns arbeitet oder nicht, der Schlaf Check für Ihr HR Team gehört Ihnen.\n\nAntworten Sie mit dem Wort Check und ich schicke das PDF innerhalb von 24 Stunden. Kein Anruf, kein Verkaufsgespräch."
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "hormozi_breakup_de",
+      "subject": "schliesse Ihre Akte",
+      "body": "Guten Tag {first_name},\n\nich schliesse Ihre Akte bei Atal SolidRocks heute, da ich pro Quartal nur eine begrenzte Zahl an Mandaten persönlich begleite.\n\nFalls der Zeitpunkt nicht passt, verstehe ich das. Falls das Angebot nicht passt, sagen Sie es kurz. Sonst melde ich mich nicht mehr."
+    }
+  ]
+}

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Provisional Pilot Services Agreement</title>
+<style>
+  @page {
+    size: A4;
+    margin: 22mm 22mm 24mm 22mm;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 11pt;
+    line-height: 1.45;
+    color: #000;
+    background: #fff;
+  }
+  body { padding: 0; }
+  .doc { max-width: 100%; }
+
+  .title-page {
+    text-align: center;
+    padding: 0 0 18pt;
+    border-bottom: 1pt solid #000;
+    margin-bottom: 18pt;
+  }
+  .title-page .company { font-size: 10pt; letter-spacing: 1pt; text-transform: uppercase; margin-bottom: 4pt; }
+  .title-page h1 {
+    font-size: 18pt;
+    font-weight: 700;
+    margin: 8pt 0 4pt;
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+  }
+  .title-page .subline { font-size: 10.5pt; margin-top: 6pt; font-style: italic; }
+  .title-page .meta { font-size: 9.5pt; margin-top: 12pt; color: #000; }
+
+  .notice {
+    border: 1pt solid #000;
+    padding: 8pt 12pt;
+    margin-bottom: 14pt;
+    font-size: 10pt;
+    text-align: center;
+  }
+  .notice strong { letter-spacing: 1pt; }
+
+  .parties { width: 100%; border-collapse: collapse; margin-bottom: 16pt; }
+  .parties td { border: 1pt solid #000; padding: 8pt 10pt; vertical-align: top; width: 50%; font-size: 10.5pt; }
+  .parties .label { font-size: 9.5pt; letter-spacing: 0.5pt; text-transform: uppercase; font-weight: 700; margin-bottom: 4pt; }
+  .parties .name { font-weight: 700; font-size: 11pt; margin-bottom: 4pt; }
+  .placeholder { display: inline-block; min-width: 120pt; border-bottom: 1pt dotted #555; font-style: italic; color: #555; }
+
+  h2.heading-l1 {
+    font-size: 12pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5pt;
+    margin-top: 14pt;
+    margin-bottom: 6pt;
+    border-bottom: 0.5pt solid #000;
+    padding-bottom: 2pt;
+    page-break-after: avoid;
+  }
+  .recitals { margin-bottom: 12pt; }
+  .recitals p { text-indent: 0; margin-bottom: 4pt; text-align: justify; padding-left: 28pt; position: relative; }
+  .recitals p .letter { position: absolute; left: 0; font-weight: 700; }
+
+  .operative { margin: 12pt 0; font-style: italic; text-align: justify; text-indent: 14pt; }
+
+  section.clause { margin-bottom: 10pt; }
+  section.clause > h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3pt;
+    margin-top: 10pt;
+    margin-bottom: 4pt;
+    page-break-after: avoid;
+  }
+  section.clause ol { list-style: none; padding: 0; margin: 0; }
+  section.clause > ol > li {
+    padding-left: 32pt;
+    position: relative;
+    margin-bottom: 4pt;
+    text-align: justify;
+  }
+  section.clause > ol > li > .num {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28pt;
+    font-weight: 600;
+  }
+  section.clause ol ol { margin-top: 2pt; margin-bottom: 2pt; }
+  section.clause ol ol li {
+    padding-left: 36pt;
+    margin-bottom: 2pt;
+    text-align: justify;
+    position: relative;
+  }
+  section.clause ol ol li .num { position: absolute; left: 0; width: 32pt; font-weight: 600; }
+  em.term { font-style: italic; font-weight: 600; }
+
+  table.dns { width: 100%; border-collapse: collapse; margin: 6pt 0 4pt; font-size: 10pt; }
+  table.dns th, table.dns td { border: 0.5pt solid #000; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  table.dns th { font-weight: 700; font-size: 9.5pt; text-transform: uppercase; }
+  table.dns code { font-family: "Courier New", Courier, monospace; font-size: 9pt; }
+
+  .schedule { page-break-before: always; padding-top: 8pt; }
+  .schedule h2.sched-title { font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5pt; text-align: center; margin-bottom: 4pt; }
+  .schedule .sched-sub { text-align: center; font-size: 10pt; font-style: italic; margin-bottom: 12pt; padding-bottom: 6pt; border-bottom: 0.5pt solid #000; }
+  .schedule h3 { font-size: 10.5pt; font-weight: 700; text-transform: uppercase; margin-top: 10pt; margin-bottom: 4pt; page-break-after: avoid; }
+  .schedule p { text-align: justify; margin-bottom: 4pt; }
+  .schedule ul { list-style: disc; padding-left: 24pt; margin-bottom: 6pt; }
+  .schedule ul li { margin-bottom: 2pt; }
+
+  .execution { page-break-before: always; padding-top: 8pt; }
+  .execution h2.sched-title { font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5pt; text-align: center; margin-bottom: 4pt; }
+  .execution-intro { font-style: italic; text-align: justify; margin: 8pt 0 24pt; }
+  .sig-grid { width: 100%; border-collapse: collapse; margin-top: 12pt; }
+  .sig-grid td { width: 50%; vertical-align: top; padding: 0 12pt; }
+  .sig-grid td:first-child { padding-left: 0; padding-right: 18pt; }
+  .sig-grid td:last-child { padding-right: 0; padding-left: 18pt; }
+  .sig-header { font-size: 9.5pt; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5pt; margin-bottom: 4pt; }
+  .sig-entity { font-size: 11pt; font-weight: 700; margin-bottom: 16pt; }
+  .sig-field { margin-bottom: 18pt; }
+  .sig-field .label { display: block; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5pt; margin-bottom: 2pt; }
+  .sig-line { display: block; border-bottom: 1pt solid #000; height: 18pt; line-height: 18pt; padding-left: 2pt; }
+  .sig-line.filled { font-weight: 500; }
+
+  .footer-block { margin-top: 18pt; padding-top: 6pt; border-top: 0.5pt solid #000; font-size: 9pt; text-align: center; }
+
+  strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+  <div class="title-page">
+    <div class="company">Aureon Global L.L.C.</div>
+    <h1>Provisional Pilot Services Agreement</h1>
+    <div class="subline">between Aureon Global L.L.C. and Diraya Inc.</div>
+    <div class="meta">Reference: AG DIRAYA 2026 01 v1.0 | Execution copy</div>
+  </div>
+
+  <div class="notice">
+    <strong>PROVISIONAL INSTRUMENT.</strong> This Agreement is provisional and expires automatically three (3) calendar months after the Activation Date. If not signed by both parties within thirty (30) days of the first signature, this Agreement is void. See clauses 1.1, 2, and 3.
+  </div>
+
+  <table class="parties">
+    <tr>
+      <td>
+        <div class="label">The Provider</div>
+        <div class="name">Aureon Global L.L.C.</div>
+        a limited liability company incorporated in the Republic of Kosovo<br>
+        Registered office: Dushkaja 20, 71000 Kaçanik, Republic of Kosovo<br>
+        Company registration number: 812368240<br>
+        VAT identification: 330681892<br>
+        Chief Executive Officer: Gentrit Luta<br>
+        Email for notices: info@aureonglobal.de
+      </td>
+      <td>
+        <div class="label">The Client</div>
+        <div class="name">Diraya Inc.</div>
+        a corporation<br>
+        Registered office: <span class="placeholder">&nbsp;</span> <em>(to be provided by Client)</em><br>
+        Company registration number: <span class="placeholder">&nbsp;</span> <em>(to be provided by Client)</em><br>
+        Jurisdiction of incorporation: Canada<br>
+        Principal business: artificial intelligence engineering services<br>
+        Authorised representative: Mohammed El Amine Amoura, Founder<br>
+        Email for notices: amoura.ma@diraya.ca
+      </td>
+    </tr>
+  </table>
+
+  <h2 class="heading-l1">Background</h2>
+  <div class="recitals">
+    <p><span class="letter">A.</span> The Provider operates a proprietary outbound pipeline engine that identifies, researches, qualifies, and routes business to business prospects on behalf of its customers (the <strong>Engine</strong>).</p>
+    <p><span class="letter">B.</span> The Client operates Diraya, a provider of artificial intelligence engineering services to technology companies, and is presently developing its client base among early stage technology companies.</p>
+    <p><span class="letter">C.</span> The parties wish to conduct a short, provisional pilot of the Engine on terms that are time limited, non binding beyond the pilot period, and intended to inform any future commercial relationship.</p>
+    <p><span class="letter">D.</span> No fees are payable for the pilot. Any continued service after expiry of this Agreement requires a separate written agreement executed by both parties (a <strong>Definitive Agreement</strong>).</p>
+  </div>
+
+  <p class="operative">Now therefore, in consideration of the mutual covenants and undertakings set out below, and for other good and valuable consideration the receipt and sufficiency of which are acknowledged, the parties agree as follows.</p>
+
+  <section class="clause">
+    <h3>1. Interpretation and Definitions</h3>
+    <ol>
+      <li><span class="num">1.1</span> In this Agreement, the following terms have the following meanings:</li>
+      <ol>
+        <li><span class="num">1.1.1</span> <em class="term">Activation Date</em> means the date on which the Provider has notified the Client in writing that all conditions precedent set out in clause 4.6 have been satisfied and the Provider has commenced the warmup ramp.</li>
+        <li><span class="num">1.1.2</span> <em class="term">Agreement</em> means this Provisional Pilot Services Agreement, including its Schedules, as amended in accordance with clause 19.</li>
+        <li><span class="num">1.1.3</span> <em class="term">Business Day</em> means a day other than a Saturday, Sunday, or public holiday in England and Wales.</li>
+        <li><span class="num">1.1.4</span> <em class="term">Client Data</em> means all data, materials, and information provided by the Client to the Provider or generated through operation of the Engine on behalf of the Client, including the Sourced Account Data.</li>
+        <li><span class="num">1.1.5</span> <em class="term">Definitive Agreement</em> means any written agreement executed by both parties before the Expiry Date that governs continued provision of services beyond the Term.</li>
+        <li><span class="num">1.1.6</span> <em class="term">Effective Date</em> means the date on which this Agreement has been signed by the duly authorised representatives of both parties, being the later of the two signature dates appearing in the Execution block; provided that if the second signature is not affixed on or before the Longstop Date, this Agreement shall be void <em>ab initio</em> and of no force or effect.</li>
+        <li><span class="num">1.1.7</span> <em class="term">Engine</em> means the proprietary outbound pipeline software and infrastructure operated by the Provider, including signal capture, account research, personalised email sequencing, deliverability infrastructure, reply detection, and intent classification.</li>
+        <li><span class="num">1.1.8</span> <em class="term">Expiry Date</em> means the date falling three (3) calendar months after the Activation Date.</li>
+        <li><span class="num">1.1.9</span> <em class="term">ICP</em> means the Ideal Customer Profile for the Pilot Services as confirmed by the Client in writing at the Kickoff Call and as varied by written agreement of the parties from time to time.</li>
+        <li><span class="num">1.1.10</span> <em class="term">Kickoff Call</em> means the meeting referred to in clause 5.1(c).</li>
+        <li><span class="num">1.1.11</span> <em class="term">Longstop Date</em> means the date falling thirty (30) calendar days after the date of the first signature appearing in the Execution block.</li>
+        <li><span class="num">1.1.12</span> <em class="term">Outbound Subdomain</em> means each sending subdomain provisioned, owned, and controlled by the Provider for the purpose of the Pilot Services pursuant to Schedule 1, including subdomains of the Provider's Diraya pilot domains such as cleardiraya.com, dirayaget.com, diraya.biz, diraya-agency.shop, and diraya-marketing.shop.</li>
+        <li><span class="num">1.1.13</span> <em class="term">Pilot Services</em> means the services described in clause 4 and further specified in Schedule 1.</li>
+        <li><span class="num">1.1.14</span> <em class="term">Sourced Account Data</em> means all company records, contact records, reply transcripts, intent classifications, and related metadata identified, researched, contacted, or replied through operation of the Engine in the course of the Pilot Services.</li>
+        <li><span class="num">1.1.15</span> <em class="term">Term</em> means the period commencing on the Effective Date and ending on the Expiry Date, unless this Agreement is terminated earlier in accordance with its terms.</li>
+      </ol>
+      <li><span class="num">1.2</span> References to clauses and Schedules are to clauses of and Schedules to this Agreement. Headings are for convenience only and do not affect interpretation.</li>
+      <li><span class="num">1.3</span> The Schedules form part of this Agreement and have the same force and effect as if expressly set out in the body of this Agreement. In the event of any conflict between the body of this Agreement and any Schedule, the body prevails.</li>
+      <li><span class="num">1.4</span> Words importing the singular include the plural and vice versa. Words importing any gender include all genders. References to a statute or statutory provision include that statute or provision as amended or re enacted from time to time.</li>
+      <li><span class="num">1.5</span> The expressions <em class="term">including</em>, <em class="term">includes</em>, and <em class="term">in particular</em> are illustrative only and do not limit the generality of the preceding words.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>2. Nature and Provisional Status of this Agreement</h3>
+    <ol>
+      <li><span class="num">2.1</span> This Agreement is, and is intended by the parties to be, a <strong>provisional, time limited instrument</strong> entered into for the sole purpose of conducting a short pilot of the Engine.</li>
+      <li><span class="num">2.2</span> Nothing in this Agreement constitutes an offer or undertaking by either party to enter into any further or continuing commercial relationship. Any such further relationship is conditional on the negotiation and execution of a Definitive Agreement.</li>
+      <li><span class="num">2.3</span> This Agreement does not contain any commitment to renew, extend, or roll over beyond the Term. Any service rendered after the Expiry Date is rendered, if at all, exclusively under and pursuant to a Definitive Agreement.</li>
+      <li><span class="num">2.4</span> Statistics, benchmarks, scenarios, forecasts, or projected outcomes communicated by either party in connection with the Pilot Services, whether before or during the Term, are non binding estimates and do not constitute representations, warranties, or contractual commitments.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>3. Term, Activation, Expiry, and No Renewal</h3>
+    <ol>
+      <li><span class="num">3.1</span> This Agreement comes into force on the Effective Date. The Pilot Services shall commence on the Activation Date. This Agreement continues until the Expiry Date, on which date it shall <strong>expire automatically and without further notice or act of any party</strong>, unless terminated earlier under clause 14.</li>
+      <li><span class="num">3.2</span> If the Activation Date has not occurred within forty five (45) calendar days of the Effective Date, either party may terminate this Agreement on written notice without liability.</li>
+      <li><span class="num">3.3</span> There is no automatic renewal, extension, or rollover. Any continuation of the relationship beyond the Expiry Date requires a Definitive Agreement signed by both parties before the Expiry Date.</li>
+      <li><span class="num">3.4</span> The parties may, by mutual written agreement signed by their authorised representatives before the Expiry Date, extend the Term by one or more periods of one (1) calendar month each, provided that no such extension or series of extensions shall cause the total Term to exceed six (6) calendar months from the Activation Date. Beyond that ceiling, the parties shall proceed only under a Definitive Agreement.</li>
+      <li><span class="num">3.5</span> For the avoidance of doubt, neither continued performance, continued correspondence, nor continued use of any artefact of the Engine after the Expiry Date shall be construed as renewal, extension, or waiver of the automatic expiry under clause 3.1.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>4. Pilot Services</h3>
+    <ol>
+      <li><span class="num">4.1</span> During the Term, and from the Activation Date, the Provider shall operate the Engine for the benefit of the Client in accordance with this Agreement and Schedule 1.</li>
+      <li><span class="num">4.2</span> The Pilot Services comprise: signal capture against the ICP, per account research, personalised cold email sequencing across a seven (7) touch cadence over twenty eight (28) days, reply detection, intent classification, and routing of positive intent replies to the endpoint designated by the Client in Schedule 3.</li>
+      <li><span class="num">4.3</span> Sending throughput shall ramp from approximately one hundred and fifty (150) sends per day in Week 1 of the warmup to a target of five hundred (500) sends per day at full warmup, distributed across the Outbound Subdomains in accordance with the warmup profile set out in Schedule 1.</li>
+      <li><span class="num">4.4</span> All sends shall be dispatched within the local working hours of each recipient, being Monday to Friday between 08:00 and 17:00 in the timezone of the recipient.</li>
+      <li><span class="num">4.5</span> First sends shall be dispatched within seven (7) calendar days of the Activation Date.</li>
+      <li><span class="num">4.6</span> The Activation Date is conditional upon: (a) this Agreement having been duly executed by both parties; (b) the Client having complied with clause 5.1(b); (c) the Client having confirmed in writing the ICP and the reply routing endpoint; and (d) successful technical verification of the Outbound Subdomains by the Provider.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>5. Client Responsibilities</h3>
+    <ol>
+      <li><span class="num">5.1</span> The Client shall: (a) execute and return this Agreement to the Provider; (b) confirm the sender personas, brand naming, and any sectoral exclusions to be applied to the Outbound Subdomains, the Provider being solely responsible for provisioning, owning, controlling, and authenticating those subdomains and for publishing the DNS records set out in Schedule 1; (c) attend a Kickoff Call of approximately fifteen (15) minutes within two (2) Business Days of the Effective Date; (d) designate at least one inbox or calendar endpoint to receive positive intent replies routed by the Provider; (e) confirm the ICP, target buyer titles, and any sectoral exclusions; and (f) respond to operational queries from the Provider within two (2) Business Days during the Term.</li>
+      <li><span class="num">5.2</span> The Provider provisions, owns, and controls the Outbound Subdomains used for the Pilot Services and is responsible for publishing the DNS records necessary for deliverability. The Client is not required to own, control, or grant access to any domain for the Pilot Services. The Client warrants that it has the authority to authorise the sending of communications promoting Diraya's services under the Outbound Subdomains for the purposes contemplated by this Agreement.</li>
+      <li><span class="num">5.3</span> The Client shall not use the Pilot Services to send communications that are unlawful, defamatory, infringing, deceptive, or that violate the rights of any third party, and shall not direct the Provider to do so.</li>
+      <li><span class="num">5.4</span> <em class="term">Additional technical resources.</em> During the Term, the Provider may from time to time reasonably request additional technical resources from the Client, including without limitation: (a) additional Outbound Subdomains; (b) additional or revised DNS records; (c) additional reply routing endpoints, inboxes, or calendar endpoints; (d) authentication credentials or scoped, read only access to Client systems where reasonably necessary to operate the Pilot Services efficiently; and (e) integration access to commonly used third party platforms (such as customer relationship management or calendaring tools) operated by the Client. The Client shall consider any such request in good faith and shall not unreasonably refuse, withhold, condition, or delay the provision of such resources, provided that the Client may refuse any request that would, in its reasonable opinion, expose it to material legal, security, regulatory, or commercial risk. Any resources provided under this clause shall be subject to the data protection, confidentiality, and termination handover obligations of this Agreement on the same basis as the resources provided at Activation.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>6. Provider Responsibilities</h3>
+    <ol>
+      <li><span class="num">6.1</span> The Provider shall: (a) provision and warm the Outbound Subdomains under the domain of the Client in accordance with Schedule 1; (b) operate the Engine in accordance with applicable law, including the anti spam, electronic communications, and bulk sender requirements referenced in clause 15; (c) include a working one click unsubscribe mechanism in every email and honour suppression requests within twenty four (24) hours of receipt; (d) route classified positive intent replies to the Client endpoint within sixty (60) minutes during Provider business hours; (e) deliver a weekly written brief covering sends, opens, replies, intent classification, intros booked, bounce rate by Outbound Subdomain, and any operational incidents; and (f) automatically pause sending from any Outbound Subdomain whose bounce rate exceeds three percent (3%) over a rolling twenty four (24) hour window, and notify the Client of such pause within one (1) hour.</li>
+      <li><span class="num">6.2</span> The Provider shall not send to any recipient who has previously unsubscribed, marked any Provider send as spam, or otherwise opted out, irrespective of the source of that suppression.</li>
+      <li><span class="num">6.3</span> The Provider may use commercially reasonable subcontractors and third party service providers in the operation of the Engine (including email service providers, hosting providers, and infrastructure vendors), provided that the Provider remains responsible for the acts and omissions of such subcontractors as if they were its own.</li>
+      <li><span class="num">6.4</span> Where the Provider proposes to engage a new sub processor that will process personal data on behalf of the Client, the Provider shall give the Client not less than fourteen (14) calendar days advance written notice of the proposed engagement. The Client may object to the proposed engagement on reasonable grounds within that notice period, in which case the parties shall in good faith discuss whether the engagement may proceed; failing agreement, either party may terminate this Agreement under clause 14.1.</li>
+      <li><span class="num">6.5</span> <em class="term">Client review of sequence copy.</em> Before commencement of sends to a new ICP segment or material modification of any sequence template, the Provider shall make the proposed sequence copy available to the Client for review. The Client may, within three (3) Business Days of receipt, request reasonable changes to or object to the proposed copy. If the Client does not respond within that period, the copy is deemed approved for use. The Client is under no obligation to review or approve any copy under this clause. If the Client declines to review or fails to respond, the responsibility of the Provider for compliance under clauses 5.3, 6.1(b), and 13.1 remains unaffected. If the Client expressly approves any specific copy, the Client shall be responsible for, and shall indemnify the Provider in respect of, any third party claim arising specifically from such approved copy save to the extent the claim arises from a breach by the Provider of this Agreement.</li>
+      <li><span class="num">6.6</span> <em class="term">Sender persona.</em> In operating the Pilot Services, the Provider may dispatch communications under a sender persona that reflects the identity of the Client, including by combining a given name and a surname with the trading name of the Client (for example, a persona of the form "[First name] from Diraya"). The Client authorises such use of its trading name in combination with such persona names for the duration of the Term. The persona shall not impersonate any specific natural person known to be employed by or affiliated with the Client, save where such person has approved the use in writing.</li>
+      <li><span class="num">6.7</span> <em class="term">No service levels.</em> The parties acknowledge that this Agreement is a provisional pilot. No service level commitments are made or implied. The Provider is under no obligation to provide any minimum uptime, response time, throughput, bug fix turnaround, feature update, new functionality, or any other measurable service level during the Term. The Provider shall use commercially reasonable efforts to operate the Engine in a manner consistent with the description in Schedule 1 and to remedy material operational issues promptly upon becoming aware of them.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>7. Fees and Expenses During the Pilot</h3>
+    <ol>
+      <li><span class="num">7.1</span> No fees, charges, or other consideration are payable by the Client to the Provider in respect of the Pilot Services during the Term.</li>
+      <li><span class="num">7.2</span> Each party shall bear its own costs of performance of this Agreement, including the costs of its own personnel, systems, customer relationship management software, calendaring software, and any third party platforms separately contracted by such party.</li>
+      <li><span class="num">7.3</span> Commercial terms for any continued service beyond the Term shall be discussed in good faith during the final two (2) weeks of the Term and recorded only in a Definitive Agreement. No statement made in such discussions binds either party unless and until reduced to writing and signed in a Definitive Agreement.</li>
+      <li><span class="num">7.4</span> For the avoidance of doubt, the parties shall have no payment obligations to one another arising under this Agreement, save in respect of any indemnification claim that may arise under clause 13.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>8. Data, Intellectual Property, Domain, and Reputation</h3>
+    <ol>
+      <li><span class="num">8.1</span> <em class="term">Ownership of Sourced Account Data.</em> As between the parties, the Provider is, and shall remain, the sole and exclusive owner of all right, title, and interest in and to the Sourced Account Data, including all intellectual property rights and database rights subsisting in or relating to it. The Client acknowledges and agrees that, by signing this Agreement, it grants and assigns to the Provider all such ownership, rights, title, and interest in and to the Sourced Account Data on a perpetual, irrevocable, worldwide, and royalty free basis, to the maximum extent permitted by applicable law. During the Term, the Client receives a non exclusive, non transferable, non sublicensable, royalty free licence to use the Sourced Account Data solely for the purposes of (a) participating in the Pilot Services, (b) engaging with prospects routed to the Client by the Provider, and (c) pursuing the client acquisition programme of the Client. Such licence expires on expiry or termination of this Agreement, save that, in respect of any individual or organisation that has, during the Term, become a paying customer, trial user, or contracted counterparty of the Client through the Pilot Services, the Client may continue to use the relevant contact details and engagement history of that customer for the legitimate purpose of that ongoing customer relationship after the Term.</li>
+      <li><span class="num">8.2</span> <em class="term">Engine and Provider intellectual property.</em> The Provider is, and shall remain, the <strong>sole and exclusive owner</strong> of all right, title, and interest in and to the Engine, including without limitation: (a) all source code, object code, executable code, scripts, binaries, and application or platform builds in any form whatsoever; (b) all software architecture, design, signal taxonomies, prompts, prompt chains, sequence designs, copy templates, deliverability methodology, classification rules, scoring systems, and infrastructure configuration; (c) all machine learning models, model weights, fine tuning data, training data, embeddings, and inference pipelines; (d) all documentation, know how, trade secrets, processes, and methodology used to operate the Engine; and (e) all modifications, enhancements, updates, fixes, improvements, derivative works, and successor versions of any of the foregoing, whether created before, during, or after the Term, together with all intellectual property rights subsisting in or relating to any of the foregoing in every jurisdiction worldwide (collectively, the <em class="term">Engine IP</em>). Nothing in this Agreement transfers, assigns, licences, grants, or implies any ownership of, or any right to use, copy, modify, distribute, sublicense, sell, lease, rent, host, expose, reverse engineer, decompile, disassemble, or create derivative works of, the Engine, the Engine IP, or any part of either, to the Client. The Client has no right of access to the Engine, the Engine IP, or any system, server, repository, build artefact, or environment hosting, processing, or storing the same. The rights of the Client under this Agreement are strictly limited to the receipt of the outputs and deliverables expressly identified in clauses 6, 8.1, 8.3, 8.4, and Schedule 1.5; all other rights are reserved by the Provider.</li>
+      <li><span class="num">8.3</span> The Outbound Subdomains, and the sending reputation accumulated on them, are provisioned, owned, and controlled by the Provider and remain with the Provider on expiry or termination of this Agreement. The Provider may retire, retain, or repurpose the Outbound Subdomains after the Term. The Client acquires no right, title, or interest in the Outbound Subdomains or their accumulated reputation.</li>
+      <li><span class="num">8.4</span> <em class="term">Termination handover.</em> Within seven (7) calendar days of expiry or termination of this Agreement, the Provider shall deliver to the Client, in CSV or other commonly readable structured format, the contact details and engagement history of each prospect that has, during the Term, become a paying customer, trial user, or contracted counterparty of the Client through the Pilot Services (each, a <em class="term">Converted Customer</em>). For the avoidance of doubt, the Provider has no obligation to deliver, and the Client has no right to receive, any other Sourced Account Data on expiry or termination of this Agreement; all such other Sourced Account Data shall be retained by the Provider as its sole property in accordance with clauses 8.1 and 8.9.</li>
+      <li><span class="num">8.5</span> Neither party may use the name, trademark, or logo of the other in any marketing, sales, press, or public communication without the prior written consent of that other party, such consent not to be unreasonably withheld or delayed. Identification of the other party in confidential communications with bona fide investors, advisors, professional auditors, or counsel is not restricted by this clause.</li>
+      <li><span class="num">8.6</span> The Outbound Subdomains are at all times provisioned, owned, and controlled by the Provider. Nothing in this Agreement transfers, assigns, licences, or grants any interest in or right over the Outbound Subdomains, or the domains of which they form part, to the Client, save the benefit of the Pilot Services performed by the Provider during the Term.</li>
+      <li><span class="num">8.7</span> <em class="term">Client undertakings in respect of the Engine IP.</em> The Client shall not, and shall not permit any third party to: (a) reverse engineer, decompile, disassemble, or otherwise attempt to derive the source code, underlying ideas, algorithms, prompts, model weights, training data, or trade secrets of the Engine or the Engine IP; (b) copy, modify, distribute, sublicense, sell, lease, rent, host, mirror, or expose the Engine, the Engine IP, or any part of either; (c) create any derivative work based on the Engine or the Engine IP; (d) attempt to access any system, server, repository, or environment hosting or processing the Engine or the Engine IP; or (e) circumvent any technical, contractual, or operational measure restricting access to the Engine or the Engine IP. The foregoing applies save to the extent expressly permitted by mandatory applicable law that cannot be excluded by contract.</li>
+      <li><span class="num">8.8</span> This Agreement is non exclusive. The Provider may operate the Engine for any other person, including persons in the same sector as the Client, provided that the Provider shall not knowingly use Client Confidential Information for the benefit of any third party in breach of clause 9.</li>
+      <li><span class="num">8.9</span> <em class="term">Use of artificial intelligence and training rights.</em> The Client acknowledges that the Provider uses artificial intelligence and machine learning models, including large language models, as part of the Engine. The Client hereby grants the Provider an unrestricted, perpetual, irrevocable, worldwide, royalty free, transferable, and sublicensable right to use, retain, copy, store, modify, analyse, and process the Client Data, the Sourced Account Data, all outputs of the Pilot Services, and all data and metadata processed in connection with this Agreement, for the purposes of operating, training, fine tuning, evaluating, benchmarking, improving, productising, and commercialising the Engine and any successor, derivative, or related product or service of the Provider. This right survives expiry or termination of this Agreement indefinitely. The Provider may exercise this right by itself or through its sub processors. In respect of personal data, the Provider acts as data controller for the purposes of this clause 8.9 and shall, as such, comply with the Data Protection Laws applicable to it as controller.</li>
+      <li><span class="num">8.10</span> <em class="term">Client warranties and indemnity in respect of rights granted.</em> The Client warrants and undertakes that it has, and shall maintain throughout the Term, all rights, authorisations, consents, lawful bases, and licences necessary to grant the rights granted to, and to assign the ownership transferred to, the Provider under clauses 8.1, 8.4, and 8.9. The Client shall indemnify the Provider and keep it indemnified against all liabilities, damages, losses, costs, and expenses (including reasonable legal fees) suffered or incurred by the Provider arising out of any claim by any third party (including any data subject, regulator, supervisory authority, licensor, or other claimant) alleging that the use, ownership, or processing of any data by the Provider in accordance with clauses 8.1, 8.4, or 8.9 was not duly authorised or otherwise lacked a lawful basis, save to the extent the claim arises from a breach by the Provider of its own obligations under the Data Protection Laws as controller in respect of clause 8.9.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>9. Confidentiality</h3>
+    <ol>
+      <li><span class="num">9.1</span> Each party (the <em class="term">Receiving Party</em>) shall hold in strict confidence and shall not use otherwise than for the purposes of this Agreement any information disclosed to it by the other party (the <em class="term">Disclosing Party</em>) that is identified as confidential or that would reasonably be understood to be confidential by reason of its nature or the circumstances of disclosure (the <em class="term">Confidential Information</em>). Confidential Information includes commercial terms, pricing, internal communications, prospect data, weekly briefs, sequence copy, technical configuration, and the business plans of either party.</li>
+      <li><span class="num">9.2</span> Confidential Information does not include information that: (a) is or becomes publicly available through no breach of this clause by the Receiving Party; (b) was lawfully in the possession of the Receiving Party free of any obligation of confidentiality before disclosure by the Disclosing Party; (c) is rightfully received by the Receiving Party from a third party who is not bound by any obligation of confidentiality; or (d) is independently developed by the Receiving Party without reference to the Confidential Information.</li>
+      <li><span class="num">9.3</span> The Receiving Party may disclose Confidential Information to the extent required by applicable law, regulation, or order of a court of competent jurisdiction, provided that, to the extent legally permitted, the Receiving Party first gives the Disclosing Party prompt written notice of the requirement and a reasonable opportunity to seek protective relief.</li>
+      <li><span class="num">9.4</span> The obligations in this clause 9 shall survive the expiry or termination of this Agreement for a period of three (3) years.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>10. Data Protection</h3>
+    <ol>
+      <li><span class="num">10.1</span> Each party shall comply with all data protection laws applicable to its processing of personal data in connection with this Agreement, including as applicable the UK General Data Protection Regulation, the EU General Data Protection Regulation (Regulation (EU) 2016/679), the Law on Protection of Personal Data of the Republic of Kosovo, and any successor or implementing legislation (collectively, the <em class="term">Data Protection Laws</em>).</li>
+      <li><span class="num">10.2</span> <em class="term">Roles of the parties.</em> The parties acknowledge that, in connection with the activities under this Agreement, the role of the Provider in respect of personal data depends on the specific processing activity, as follows: (a) for the operational delivery of the Pilot Services on documented instructions from the Client (including sending communications under the Outbound Subdomains, routing replies to the Client, and reporting to the Client), the Client acts as data controller and the Provider acts as data processor; (b) for the own purposes of the Provider set out in clause 8.9, including training, fine tuning, evaluating, improving, and commercialising the Engine, the Provider acts as data controller in its own right and is solely responsible for compliance with the Data Protection Laws in respect of such processing; and (c) the sourcing of prospect data from publicly available sources, including the application by the Provider of its proprietary signals to identify prospects, is the activity of the Provider as controller, conducted in support of the Pilot Services. Clauses 10.3 to 10.5 apply to the Provider in its capacity as processor under (a); the obligations of the Provider as controller under (b) and (c) are governed by the Data Protection Laws applicable to it as controller.</li>
+      <li><span class="num">10.3</span> The Provider shall: (a) process personal data only on documented instructions from the Client (which include the instructions set out in this Agreement and Schedule 1), unless required to do otherwise by applicable law (in which case the Provider shall, where legally permitted, notify the Client of that legal requirement before processing); (b) ensure that persons authorised to process personal data are bound by appropriate obligations of confidentiality; (c) implement and maintain appropriate technical and organisational security measures having regard to the state of the art, costs of implementation, nature, scope, context, and purposes of processing, and the risk to data subjects, including without limitation the measures set out in <strong>Schedule 4</strong>; (d) assist the Client, taking into account the nature of processing, by appropriate technical and organisational measures, insofar as possible, to fulfil the obligations of the Client to respond to requests from data subjects; (e) assist the Client in ensuring compliance with obligations relating to security of processing, notification of Personal Data Breaches, data protection impact assessments, and prior consultation under Articles 32 to 36 of the UK or EU GDPR; (f) at the choice of the Client, delete or return all personal data to the Client after the end of the provision of services relating to processing, and delete existing copies unless applicable law requires storage; (g) make available to the Client all information necessary to demonstrate compliance with the obligations laid down in this clause 10; (h) notify the Client without undue delay, and in any event within seventy two (72) hours of the Provider becoming aware of the same, of any Personal Data Breach affecting personal data processed under this Agreement, together with such information as is reasonably necessary to enable the Client to comply with its obligations under the Data Protection Laws; (i) maintain a written record of processing activities carried out on behalf of the Client to the extent required by Article 30(2) of the UK or EU GDPR, and make such records available to the Client and to any competent supervisory authority on reasonable request; (j) cooperate, on reasonable request and at no cost to the Client, with any competent supervisory authority in connection with the processing of personal data under this Agreement; (k) where required by applicable law, designate a data protection officer in accordance with Article 37 of the UK or EU GDPR and notify the Client of the contact details of such officer; and (l) notify the Client without undue delay, and in any event within five (5) Business Days, of the receipt of any inquiry, request, complaint, investigation, or order from a competent supervisory authority concerning personal data processed under this Agreement, save to the extent prohibited by applicable law from doing so.</li>
+      <li><span class="num">10.4</span> The Provider may engage sub processors in accordance with clauses 6.3 and 6.4. The Provider shall impose on each sub processor data protection obligations no less protective than those set out in this clause 10. The Provider remains liable to the Client for the acts and omissions of its sub processors as if they were its own.</li>
+      <li><span class="num">10.5</span> The Client may, on not less than thirty (30) calendar days advance written notice and not more than once in any twelve (12) month period (save where required by a competent data protection authority or following a personal data breach notified under clause 10.3(h)), audit the compliance of the Provider with this clause 10 by means of a documentary review or, where reasonably necessary, an on site inspection conducted during business hours and in a manner that does not unreasonably disrupt the operations of the Provider. The Client shall bear its own costs of such audit. Any auditor engaged by the Client shall be bound by reasonable confidentiality obligations equivalent to those in clause 9.</li>
+      <li><span class="num">10.6</span> <em class="term">Cross border transfers.</em> Where personal data is transferred from the United Kingdom, the European Economic Area, or any other jurisdiction recognising adequacy regimes, to a jurisdiction lacking an adequacy determination in respect of the personal data exporter, the parties shall implement appropriate safeguards as required by the relevant Data Protection Laws, including (a) execution of the UK International Data Transfer Agreement (IDTA) or the International Data Transfer Addendum to the EU Standard Contractual Clauses, in each case as issued by the Information Commissioner of the United Kingdom, (b) execution of the EU Standard Contractual Clauses adopted by Commission Implementing Decision (EU) 2021/914 of 4 June 2021, or (c) such other transfer mechanism as the parties may agree in writing and as is permitted under the applicable Data Protection Laws. The Provider acknowledges that personal data processed by it under this Agreement may be processed in the Republic of Kosovo and, through its sub processors as notified under clause 6.4, in such other jurisdictions as may be required for operation of the Engine. The parties shall carry out a transfer impact assessment where required by the Data Protection Laws.</li>
+      <li><span class="num">10.7</span> <em class="term">Direct GDPR liability and apportionment.</em> The parties acknowledge that under Article 82 of the UK and EU GDPR, both controller and processor may be directly liable to data subjects for damage caused by processing, and that under Articles 83 and 84 each may be subject to administrative fines or other measures imposed by a competent supervisory authority. Each party shall bear, and is solely responsible for, any regulatory fine, administrative penalty, or compensation imposed directly on it by a competent supervisory authority or court in respect of its own acts or omissions, and such direct regulatory liability of a party falls outside the limitation of liability in clause 12 to the extent it cannot lawfully be limited or shifted. Inter party indemnification, being one party reimbursing the other for amounts paid out to a third party or to a regulator, remains governed by, and subject to the caps in, clause 13.</li>
+      <li><span class="num">10.8</span> <em class="term">Personal Data Breach.</em> For the purposes of this clause 10, <em class="term">Personal Data Breach</em> has the meaning given in Article 4(12) of the UK and EU GDPR, namely a breach of security leading to the accidental or unlawful destruction, loss, alteration, unauthorised disclosure of, or access to, personal data transmitted, stored, or otherwise processed.</li>
+      <li><span class="num">10.9</span> <em class="term">Lawful basis.</em> The Client warrants that, in respect of all personal data processed under this Agreement, it has identified a lawful basis for processing under Article 6 of the UK or EU GDPR and, where applicable, has satisfied the requirements of any other applicable provision of the Data Protection Laws (including without limitation Regulation 22 of the UK Privacy and Electronic Communications Regulations 2003 in respect of any electronic marketing communications). The parties acknowledge that the lawful basis intended to be relied on for outbound business to business marketing communications sent under the Pilot Services is the legitimate interests of the Client in promoting Diraya's services, balanced against the rights and freedoms of the data subjects, and the Client confirms that it has, or shall before the Activation Date, carry out and document a legitimate interests assessment in respect of such processing.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>11. Warranties and Representations</h3>
+    <ol>
+      <li><span class="num">11.1</span> Each party warrants and represents to the other that: (a) it is duly incorporated and validly existing under the laws of its jurisdiction of incorporation; (b) it has full power and authority to enter into and perform this Agreement; (c) the execution and performance of this Agreement has been duly authorised by all necessary corporate action; and (d) this Agreement, when executed, will constitute a valid and binding obligation enforceable against it in accordance with its terms.</li>
+      <li><span class="num">11.2</span> The Provider warrants that, to the best of its knowledge as at the Effective Date, the Engine and the Pilot Services do not infringe any patent, copyright, trademark, trade secret, or other intellectual property right of any third party.</li>
+      <li><span class="num">11.3</span> Except as expressly stated in this clause 11, the Pilot Services are provided on an <strong>as is</strong> and <strong>as available</strong> basis, and the Provider does not give and disclaims all other warranties, conditions, terms, undertakings, or representations of any kind, whether express or implied, statutory or otherwise, including any implied warranties of merchantability, satisfactory quality, fitness for a particular purpose, title, non infringement, accuracy, or that the Pilot Services will be uninterrupted, error free, or achieve any specific result.</li>
+      <li><span class="num">11.4</span> Without limiting clause 11.3, the Provider makes no warranty, representation, or guarantee with respect to the number of sends, opens, replies, positive intent replies, intros booked, demos held, trials started, clients signed, revenue generated, or any other outcome of the Pilot Services. Any benchmark, projection, or scenario shared by the Provider in any pre contract document is an estimate only and is not contractual.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>12. Limitation of Liability</h3>
+    <ol>
+      <li><span class="num">12.1</span> Nothing in this Agreement limits or excludes any liability that cannot be limited or excluded under applicable law, including any liability for death or personal injury caused by negligence, fraud, fraudulent misrepresentation, gross negligence, or wilful misconduct.</li>
+      <li><span class="num">12.2</span> Subject to clauses 12.1 and 13, the total aggregate liability of each party to the other in respect of all claims arising out of or in connection with this Agreement, whether in contract, tort (including negligence), breach of statutory duty, misrepresentation, restitution, or otherwise, shall be limited to five thousand euros (EUR 5,000) for the entire Term.</li>
+      <li><span class="num">12.3</span> Subject to clause 12.1, neither party shall be liable to the other for any of the following losses, whether direct or indirect: (a) loss of profit, revenue, or anticipated savings; (b) loss of pipeline, customers, or business opportunity; (c) loss of goodwill or reputation; (d) loss or corruption of data not attributable to a breach of clause 8; (e) any indirect, consequential, special, exemplary, or punitive loss or damage of any kind, however arising.</li>
+      <li><span class="num">12.4</span> The parties acknowledge that the limitations and exclusions in this clause 12 are reasonable in light of the no fee nature of the Pilot Services, the carve out for indemnities under clause 13.4, and the express disclaimers in clauses 11.3 and 11.4.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>13. Indemnities</h3>
+    <ol>
+      <li><span class="num">13.1</span> The Client shall indemnify the Provider and keep it indemnified against all liabilities, damages, losses, costs, and expenses (including reasonable legal fees) suffered or incurred by the Provider arising out of any third party claim relating to (a) the lawfulness of the ICP, target list, or content directed by the Client; or (b) any breach by the Client of clauses 5.2, 5.3, or 8.7.</li>
+      <li><span class="num">13.2</span> The Provider shall indemnify the Client and keep it indemnified against all liabilities, damages, losses, costs, and expenses (including reasonable legal fees) suffered or incurred by the Client arising out of any third party claim that the Engine, as supplied and used in accordance with this Agreement, infringes the intellectual property rights of any third party. The indemnity in this clause 13.2 shall not apply to the extent the claim arises from (i) modification of the Engine by anyone other than the Provider, or (ii) use of the Engine in combination with any data or system not approved by the Provider.</li>
+      <li><span class="num">13.3</span> The party seeking indemnity shall (a) give the indemnifying party prompt written notice of the claim; (b) allow the indemnifying party to control the defence and settlement of the claim, provided that no settlement that imposes any non monetary obligation or admission of wrongdoing on the indemnified party shall be made without the prior written consent of the indemnified party; and (c) cooperate reasonably in the defence at the cost of the indemnifying party.</li>
+      <li><span class="num">13.4</span> The aggregate liability cap in clause 12.2 shall not apply to liability under the indemnities in this clause 13. Liability under this clause 13 is instead subject to a separate aggregate cap of one hundred thousand euros (EUR 100,000) for the entire Term, save that the carve outs in clause 12.1 (mandatory exclusions) continue to apply without limit.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>14. Termination and Consequences of Expiry or Termination</h3>
+    <ol>
+      <li><span class="num">14.1</span> Either party may terminate this Agreement at any time during the Term for convenience on fourteen (14) calendar days written notice to the other.</li>
+      <li><span class="num">14.2</span> Either party may terminate this Agreement immediately on written notice to the other if the other party: (a) commits a material breach of this Agreement which, if capable of remedy, is not remedied within seven (7) calendar days of written notice specifying the breach; or (b) is the subject of an insolvency event, including a petition for winding up, the appointment of an administrator or receiver, the entry into any composition or arrangement with creditors, or any analogous event in any jurisdiction.</li>
+      <li><span class="num">14.3</span> Either party may terminate this Agreement immediately on written notice to the other if, in the reasonable opinion of the terminating party, continued performance by it under this Agreement would cause it to breach applicable law, including any anti spam, electronic communications, data protection, sanctions, or anti money laundering law. The terminating party shall use reasonable efforts to first consult with the other party to identify whether the issue can be remedied without termination.</li>
+      <li><span class="num">14.4</span> On expiry of the Term or earlier termination of this Agreement for any reason: (a) the Provider shall cease all further sends within twenty four (24) hours; (b) the Provider shall deliver the Sourced Account Data to the Client in accordance with clause 8.4; (c) on Client request, the Provider shall provide reasonable assistance to remove DKIM keys, modify or remove DNS records published by or on behalf of the Provider, and revoke any sending credentials issued by the Provider for the Outbound Subdomains; (d) each party shall promptly return or, at the option of the Disclosing Party, destroy all Confidential Information of the other party in its possession, subject to clause 19.10; and (e) any accrued rights or remedies of either party as at the date of expiry or termination shall not be affected.</li>
+      <li><span class="num">14.5</span> Clauses 1 (Interpretation), 2.2 (Provisional Status), 8 (Data, IP, Domain, Reputation), 9 (Confidentiality), 10 (Data Protection), 11 (Warranties), 12 (Limitation of Liability), 13 (Indemnities), 14 (this clause), 17 (Notices), 19 (General Provisions), and 20 (Governing Law) shall survive expiry or termination of this Agreement.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>15. Compliance with Law and Anti Spam Rules</h3>
+    <ol>
+      <li><span class="num">15.1</span> Each party shall comply with all laws, regulations, and codes of practice applicable to its performance under this Agreement, including the CAN SPAM Act of 2003 (where applicable), the UK Privacy and Electronic Communications Regulations 2003, the EU ePrivacy Directive (2002/58/EC as amended), the Data Protection Laws, and the bulk sender requirements published by major inbox providers including Google and Yahoo in February 2024.</li>
+      <li><span class="num">15.2</span> Neither party shall, in connection with this Agreement, engage in any act or omission that constitutes a breach of any anti bribery, anti corruption, anti money laundering, or applicable trade or economic sanctions law.</li>
+      <li><span class="num">15.3</span> <em class="term">Anti corruption and sanctions specifics.</em> Without limiting clause 15.2, each party represents, warrants, and undertakes that: (a) it shall comply with the UK Bribery Act 2010, the United States Foreign Corrupt Practices Act of 1977, and any other anti corruption or anti bribery law applicable to it or to the performance of this Agreement; (b) it is not, and is not directly or indirectly owned or controlled by, any person or entity designated under any economic sanctions or restrictive measures administered by the United Nations, the European Union, the United Kingdom (including by HM Treasury Office of Financial Sanctions Implementation), or the United States (including by the US Department of the Treasury Office of Foreign Assets Control); (c) it shall not knowingly direct, request, or permit any communication to be sent under the Pilot Services to any person or entity reasonably believed to be subject to such sanctions; and (d) it shall promptly notify the other party in writing if any of the foregoing representations becomes, or is reasonably likely to become, untrue during the Term.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>16. Force Majeure</h3>
+    <ol>
+      <li><span class="num">16.1</span> Neither party shall be liable for any delay or failure to perform any obligation under this Agreement (other than an obligation to pay money) to the extent caused by an event beyond its reasonable control, including acts of war, civil unrest, terrorism, natural disaster, pandemic, governmental action, internet or third party infrastructure failure. The affected party shall promptly notify the other and use reasonable efforts to mitigate the effect.</li>
+      <li><span class="num">16.2</span> If a force majeure event continues for more than thirty (30) consecutive days, the unaffected party may terminate this Agreement on written notice without liability, in which case the provisions of clause 14.4 shall apply.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>17. Notices</h3>
+    <ol>
+      <li><span class="num">17.1</span> Any notice or other communication given under or in connection with this Agreement shall be in writing and shall be delivered: (a) by hand or courier to the registered office of the recipient; or (b) by email to the address specified for that party in the parties block at the head of this Agreement (or to such other address as the recipient may notify in accordance with this clause); provided that any notice given under clauses 13 (Indemnities), 14.2 (termination for material breach or insolvency), 14.3 (compliance termination), or 16.2 (force majeure termination), or any other notice that purports to terminate this Agreement or initiate a claim for indemnification, shall in addition be sent by registered post or international courier to the registered office of the recipient, and shall be deemed received on the date of the later of the two methods of delivery.</li>
+      <li><span class="num">17.2</span> A notice is deemed received: (a) if delivered by hand or courier, at the time of delivery; (b) if sent by email, at the time of transmission, provided that no failure or rejection message has been received and that, if such transmission occurs after 17:00 in the place of receipt or on a non Business Day, the notice is deemed received at 09:00 on the next Business Day in the place of receipt.</li>
+      <li><span class="num">17.3</span> This clause 17 does not apply to the service of any proceedings or other documents in any legal action or, where applicable, any arbitration or other method of dispute resolution.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>18. Assignment, Subcontracting, and Third Party Rights</h3>
+    <ol>
+      <li><span class="num">18.1</span> Neither party may assign, transfer, charge, sub contract, declare a trust over, or deal in any other manner with any of its rights or obligations under this Agreement without the prior written consent of the other party (such consent not to be unreasonably withheld or delayed), save that either party may assign this Agreement in its entirety to a successor in connection with a merger, acquisition, or sale of all or substantially all of its assets, on prior written notice to the other party.</li>
+      <li><span class="num">18.2</span> Subject to clause 6.3, neither party shall delegate the performance of any of its obligations to a third party.</li>
+      <li><span class="num">18.3</span> This Agreement does not confer any rights on any person other than the parties to it. A person who is not a party to this Agreement shall have no right under the Contracts (Rights of Third Parties) Act 1999 to enforce any term of this Agreement, and the consent of any third party is not required for any variation, rescission, or termination of this Agreement.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>19. General Provisions</h3>
+    <ol>
+      <li><span class="num">19.1</span> <em class="term">Entire agreement.</em> This Agreement, together with the Schedules, constitutes the entire agreement between the parties in respect of its subject matter and supersedes all prior agreements, representations, proposals, presentations, discussions, and understandings, whether written or oral. Each party acknowledges that, in entering into this Agreement, it has not relied on any statement, representation, assurance, or warranty other than as expressly set out in this Agreement; provided that nothing in this clause shall exclude or limit liability for fraud or fraudulent misrepresentation. No course of dealing, trade usage, or prior performance shall modify the terms of this Agreement.</li>
+      <li><span class="num">19.2</span> <em class="term">Variation.</em> No variation of this Agreement is effective unless made in writing and signed by an authorised representative of each party.</li>
+      <li><span class="num">19.3</span> <em class="term">Waiver.</em> A failure or delay in exercising any right or remedy under this Agreement does not constitute a waiver of that right or remedy. No waiver is effective unless given in writing and signed by the waiving party. A waiver of any breach is not a waiver of any subsequent breach.</li>
+      <li><span class="num">19.4</span> <em class="term">Severability.</em> If any provision of this Agreement is or becomes invalid, illegal, or unenforceable, it shall be deemed modified to the minimum extent necessary to make it valid, legal, and enforceable, or, if such modification is not possible, deemed deleted. The remaining provisions shall continue in full force and effect. If a survival clause is itself held unenforceable, it shall be deemed replaced by the closest enforceable equivalent that preserves the parties intention.</li>
+      <li><span class="num">19.5</span> <em class="term">Counterparts and electronic execution.</em> This Agreement may be executed in any number of counterparts, each of which when executed shall be an original, and all the counterparts together shall constitute one and the same instrument. Delivery of an executed counterpart by electronic mail in PDF format, or by execution through a recognised electronic signature platform (including Dropbox Sign, DocuSign, Adobe Sign, or comparable services), shall be as effective as delivery of an original signed counterpart, and the signatures of the parties need not appear on the same counterpart.</li>
+      <li><span class="num">19.6</span> <em class="term">Independent contractors.</em> The parties are independent contractors. Nothing in this Agreement creates a partnership, joint venture, agency, employment, or fiduciary relationship between the parties.</li>
+      <li><span class="num">19.7</span> <em class="term">No publicity.</em> Save as provided in clause 8.5, neither party shall issue any press release or public announcement concerning this Agreement without the prior written consent of the other party.</li>
+      <li><span class="num">19.8</span> <em class="term">Further assurance.</em> Each party shall, at its own cost, do all such acts and execute all such documents as are reasonably necessary to give full effect to this Agreement.</li>
+      <li><span class="num">19.9</span> <em class="term">Cooperation in good faith.</em> The parties shall cooperate in good faith with one another in the performance of this Agreement, and shall promptly inform one another of any matter that is reasonably likely to affect the performance of this Agreement or the achievement of its purpose.</li>
+      <li><span class="num">19.10</span> <em class="term">Permitted retention.</em> Notwithstanding any obligation of return or deletion in this Agreement, each party may retain (a) anonymised, de identified, or aggregate operational data; (b) records reasonably necessary for compliance with applicable law, regulation, or external audit; and (c) Confidential Information of the other party that exists in routine system backups, until such backups are overwritten in the ordinary course; provided that any such retained Confidential Information remains subject to clause 9 and any such retained personal data remains subject to clause 10.</li>
+      <li><span class="num">19.11</span> <em class="term">Non solicitation of personnel.</em> During the Term and for a period of six (6) months thereafter, neither party shall directly solicit for employment any personnel of the other party who was actively involved in the performance of this Agreement, save that this clause shall not restrict (a) general advertising not specifically targeted at such personnel, or (b) any response by such personnel to such general advertising.</li>
+      <li><span class="num">19.12</span> <em class="term">Cumulative remedies.</em> The rights and remedies provided to each party under this Agreement are cumulative and are in addition to, and not exclusive of, any other rights and remedies available to it at law or in equity.</li>
+    </ol>
+  </section>
+
+  <section class="clause">
+    <h3>20. Governing Law and Dispute Resolution</h3>
+    <ol>
+      <li><span class="num">20.1</span> <em class="term">Governing law.</em> This Agreement and any dispute or claim (including non contractual disputes or claims) arising out of or in connection with it, or its subject matter or formation, shall be governed by and construed in accordance with the laws of <strong>England and Wales</strong>.</li>
+      <li><span class="num">20.2</span> <em class="term">Arbitration.</em> Any dispute, controversy, or claim arising out of or in connection with this Agreement, including any question regarding its existence, validity, breach, or termination, shall be referred to and finally resolved by arbitration under the <strong>Rules of the London Court of International Arbitration</strong> (the <em class="term">LCIA Rules</em>), which Rules are deemed to be incorporated by reference into this clause and may be amended by the LCIA from time to time. The number of arbitrators shall be <strong>one (1)</strong>. The seat, or legal place, of arbitration shall be <strong>London, England</strong>. The language used in the arbitral proceedings shall be <strong>English</strong>. The arbitral award shall be final and binding on the parties and may be entered and enforced in any court of competent jurisdiction.</li>
+      <li><span class="num">20.3</span> <em class="term">Interim and injunctive relief.</em> Notwithstanding clause 20.2, either party may at any time apply to any court of competent jurisdiction for interim, conservatory, or injunctive relief, including without limitation to restrain any actual or threatened breach of clause 8 (Data, Intellectual Property, Domain, and Reputation) or clause 9 (Confidentiality), without thereby waiving the obligation to arbitrate any underlying dispute, and without prejudice to the powers of the arbitrator under the LCIA Rules.</li>
+      <li><span class="num">20.4</span> <em class="term">Costs of arbitration.</em> Each party shall bear its own legal costs of any arbitration unless the arbitrator orders otherwise. The arbitrator shall have the power to award costs in accordance with the LCIA Rules.</li>
+      <li><span class="num">20.5</span> <em class="term">Confidentiality of proceedings.</em> The existence and contents of any arbitration under this clause 20, and all submissions, evidence, transcripts, awards, and rulings made in connection with it, shall be treated as Confidential Information under clause 9, save to the extent disclosure is required by applicable law, regulation, or order of a competent court, or is necessary for the enforcement of an arbitral award.</li>
+      <li><span class="num">20.6</span> <em class="term">Enforcement.</em> The parties acknowledge that the Republic of Kosovo and the United Kingdom are each party to the New York Convention on the Recognition and Enforcement of Foreign Arbitral Awards 1958, and that any award issued under this clause 20 shall be enforceable in either jurisdiction in accordance with that Convention.</li>
+    </ol>
+  </section>
+
+  <div class="schedule">
+    <h2 class="sched-title">Schedule 1</h2>
+    <div class="sched-sub">Scope of Pilot Services</div>
+
+    <h3>1.1 Engine Components</h3>
+    <p>The Engine, for the purposes of the Pilot Services, comprises: (a) five signal streams (methodology mentions, new revenue leader announcements, funding round triggers, hiring velocity, and coaching platform displacement); (b) per account research; (c) personalised seven (7) touch cadence over twenty eight (28) days; (d) reply detection at intervals of not less than every five (5) minutes; (e) intent classification (positive, soft no with detail, hard no, auto reply, forward to colleague, junk); and (f) routing of positive intent replies to the endpoint designated by the Client in Schedule 3.</p>
+
+    <h3>1.2 Ideal Customer Profile (Default)</h3>
+    <ul>
+      <li>Sector: B2B SaaS.</li>
+      <li>Funding stage: Series B to D, or equivalent revenue band.</li>
+      <li>Employee count: approximately 100 to 1000.</li>
+      <li>Buyer titles: CRO, VP Sales, Director of Sales, Head of Sales Enablement, Head of RevOps.</li>
+      <li>Bonus signals: public reference to MEDDIC, MEDDPICC, Challenger, SPIN, Sandler, NEAT, TAS, SPICED; recent leadership hire; recent funding round; competitor coaching platform under contractual review.</li>
+    </ul>
+
+    <h3>1.3 Sending Architecture</h3>
+    <ul>
+      <li>Up to ten (10) Outbound Subdomains provisioned and controlled by the Provider under the Provider's Diraya pilot domains (cleardiraya.com, dirayaget.com, diraya.biz, diraya-agency.shop, and diraya-marketing.shop).</li>
+      <li>Snowball warmup: 15 sends per subdomain per day in Week 1, 25 in Week 2, 35 in Week 3, 50 in Week 4 onward.</li>
+      <li>Aggregate pool throughput at full warmup: approximately 500 sends per day, weekdays only.</li>
+      <li>All sends in the local working hours of the recipient, Monday to Friday, 08:00 to 17:00 in the timezone of the recipient.</li>
+      <li>One sender persona per account end to end; the same sending address is used for every touch in a single sequence.</li>
+    </ul>
+
+    <h3>1.4 DNS Records to be Published</h3>
+    <p>For each Outbound Subdomain, the records below shall be published by the Provider under the Provider's Diraya pilot domains. The Provider may publish additional records technically necessary for deliverability.</p>
+    <table class="dns">
+      <thead>
+        <tr><th>Record type</th><th>Purpose</th><th>Example value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TXT</td><td>SPF authorisation for sending IPs</td><td><code>v=spf1 include:_spf.provider.tld ~all</code></td></tr>
+        <tr><td>TXT or CNAME</td><td>DKIM cryptographic signing key</td><td><code>selector._domainkey.subdomain</code></td></tr>
+        <tr><td>TXT</td><td>DMARC alignment and reporting policy</td><td><code>v=DMARC1; p=quarantine; rua=mailto:dmarc@subdomain</code></td></tr>
+        <tr><td>CNAME</td><td>Click and open tracking endpoint</td><td><code>track.subdomain CNAME track.provider.tld</code></td></tr>
+        <tr><td>MX (optional)</td><td>Receive bounces and out of office messages</td><td><code>subdomain MX 10 mx.provider.tld</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.5 Reporting</h3>
+    <p>The Provider shall deliver a written brief to the Client every Monday during the Term covering the prior calendar week: total sends, total opens and open rate, total replies and reply rate, intent classification breakdown, positive reply count, intros booked, bounce rate per Outbound Subdomain, and any operational incidents. The first brief shall be delivered following the first full calendar week of sending after the Activation Date.</p>
+
+    <h3>1.6 Termination Handover</h3>
+    <p>On expiry or termination of this Agreement the Provider shall: (a) cease further sends within twenty four (24) hours; (b) deliver to the Client, within seven (7) calendar days and in CSV or other commonly readable structured format, the contact details and engagement history of each Converted Customer in accordance with clause 8.4 only (and not the broader Sourced Account Data); and (c) on Client request, deliver instructions for DKIM key removal, confirm in writing that all Provider issued sending credentials for the Outbound Subdomains have been revoked, and provide technical instructions for the removal of any DNS records published by or on behalf of the Provider that the Client wishes to remove. All Sourced Account Data other than the data delivered under (b) remains the sole property of the Provider and shall be retained, used, and processed by the Provider in accordance with clauses 8.1, 8.9, and Schedule 2.9.</p>
+  </div>
+
+  <div class="schedule">
+    <h2 class="sched-title">Schedule 2</h2>
+    <div class="sched-sub">Data Processing Particulars</div>
+
+    <h3>2.1 Subject Matter and Duration</h3>
+    <p>Operation of the Engine on behalf of the Client during the Term, for the purpose of identifying, researching, contacting, and qualifying prospective customers for Diraya's services.</p>
+
+    <h3>2.2 Nature and Purpose of Processing</h3>
+    <p>Collection of business contact data from publicly available sources, enrichment with research metadata, personalised outbound electronic communication, receipt and classification of replies, and delivery of routed positive intent replies to the Client.</p>
+
+    <h3>2.3 Categories of Data Subjects</h3>
+    <ul>
+      <li>Business professionals at companies matching the ICP, principally sales leaders, revenue operations leaders, and sales enablement leaders.</li>
+    </ul>
+
+    <h3>2.4 Categories of Personal Data</h3>
+    <ul>
+      <li>Full name, business email address, business telephone number, role title, employer, and publicly observable professional metadata (such as LinkedIn profile URL, public posts, and quoted statements).</li>
+    </ul>
+
+    <h3>2.5 Special Category Data</h3>
+    <p>None. The Provider shall not knowingly process any special category personal data within the meaning of Article 9 of the UK or EU GDPR in connection with the Pilot Services.</p>
+
+    <h3>2.6 Authorised Sub Processors</h3>
+    <p>The Provider may engage commercially reasonable sub processors for email delivery, hosting, monitoring, large language model inference, and analytics, subject to clause 6.4. A current list of sub processors, including the name, the processing activity, and the jurisdiction in which each operates, shall be made available to the Client on request.</p>
+
+    <h3>2.7 Categories of Recipients</h3>
+    <p>Personal data processed under this Agreement may be disclosed to the following categories of recipients: (a) personnel of the Provider engaged in the operation of the Engine; (b) sub processors of the Provider notified to the Client under clause 6.4; (c) the Client and personnel of the Client; (d) recipients of the outbound communications to the extent inherent in sending such communications; and (e) any third party to whom disclosure is required by applicable law or order of a competent court, regulator, or supervisory authority.</p>
+
+    <h3>2.8 International Transfers</h3>
+    <p>Personal data processed by the Provider under this Agreement is processed primarily in the Republic of Kosovo and, through sub processors notified to the Client under clause 6.4, may be processed in the United States, the European Economic Area, the United Kingdom, and such other jurisdictions as may be necessary for operation of the Engine. Where such processing involves a transfer requiring safeguards under the Data Protection Laws, the parties shall implement such safeguards in accordance with clause 10.6.</p>
+
+    <h3>2.9 Retention Periods</h3>
+    <p>In its capacity as processor on behalf of the Client (clause 10.2(a)), the Provider retains personal data for the duration of the Term and thereafter for such period as is necessary to complete the termination handover under clause 8.4 and Schedule 1.6. In its capacity as controller in its own right (clauses 10.2(b) and (c)), the Provider may retain personal data, including for the purposes of clause 8.9, for such period as is permitted by the Data Protection Laws applicable to it as controller, and shall apply appropriate retention and minimisation policies in accordance with Schedule 4.</p>
+
+    <h3>2.10 Lawful Basis</h3>
+    <p>The lawful basis identified by the Client under Article 6 of the UK or EU GDPR in respect of personal data processed under this Agreement is, in the first instance, the legitimate interests of the Client in conducting business to business marketing of Diraya's services to contacts at companies matching the ICP, as further described in clause 10.9.</p>
+  </div>
+
+  <div class="schedule">
+    <h2 class="sched-title">Schedule 3</h2>
+    <div class="sched-sub">Authorised Contacts and Endpoints</div>
+
+    <p style="font-style:italic;">To be completed by the parties at execution. May be updated by exchange of email between the authorised contacts named below without further amendment to this Agreement.</p>
+
+    <h3>3.1 Provider Authorised Contact</h3>
+    <p>Name: Gentrit Luta<br>
+    Role: Chief Executive Officer<br>
+    Email: info@aureonglobal.de</p>
+
+    <h3>3.2 Client Authorised Contact</h3>
+    <p>Name: Mohammed El Amine Amoura<br>
+    Role: Director<br>
+    Email: <span class="placeholder">&nbsp;</span> <em>(to be provided by Client)</em></p>
+
+    <h3>3.3 Positive Reply Routing Endpoint</h3>
+    <p>Inbox or calendar endpoint to which classified positive intent replies will be routed by the Provider within sixty (60) minutes during Provider business hours:</p>
+    <p>Endpoint: <span class="placeholder">&nbsp;</span> <em>(to be confirmed at Kickoff Call)</em></p>
+
+    <h3>3.4 ICP and Buyer Titles</h3>
+    <p>Default ICP and buyer titles are as set out in Schedule 1.2. Any variation shall be confirmed in writing at the Kickoff Call and may be further varied by exchange of email between the authorised contacts above.</p>
+  </div>
+
+  <div class="schedule">
+    <h2 class="sched-title">Schedule 4</h2>
+    <div class="sched-sub">Technical and Organisational Measures</div>
+
+    <p style="font-style:italic;">This Schedule sets out the technical and organisational measures implemented by the Provider in connection with the processing of personal data under this Agreement, in accordance with Article 32 of the UK and EU GDPR. The Provider shall maintain measures appropriate to the risk and proportionate to the size, complexity, scope, and stage of operations of the Provider, and shall review and update such measures periodically as appropriate to maintain their effectiveness.</p>
+
+    <h3>4.1 Access Control and Authentication</h3>
+    <ul>
+      <li>All Engine systems require authenticated access by named individuals.</li>
+      <li>Multi factor authentication is required for all administrative access to production systems holding personal data.</li>
+      <li>The principle of least privilege is applied to all system accounts.</li>
+      <li>Production access is limited to personnel whose role requires it and is reviewed periodically.</li>
+      <li>Access is revoked promptly on cessation of role, employment, or engagement.</li>
+    </ul>
+
+    <h3>4.2 Encryption</h3>
+    <ul>
+      <li>All personal data in transit between systems controlled by the Provider is protected by Transport Layer Security version 1.2 or higher.</li>
+      <li>All personal data at rest in systems controlled by the Provider is protected by AES 256 or industry equivalent encryption.</li>
+      <li>DKIM cryptographic signing is applied to all outbound email sent under the Outbound Subdomains.</li>
+      <li>Cryptographic keys are managed using industry standard key management practices and are rotated periodically.</li>
+    </ul>
+
+    <h3>4.3 Confidentiality, Integrity, and Availability</h3>
+    <ul>
+      <li>All personnel and authorised contractors with access to personal data are bound by written confidentiality obligations no less protective than those in clause 9.</li>
+      <li>Production systems are logically segregated from development and test environments. Personal data of the Client is not used in development or test environments save in pseudonymised form.</li>
+      <li>Integrity checks are applied to data processing pipelines handling Sourced Account Data.</li>
+      <li>Operational monitoring is implemented with alerting on anomalies relevant to security, integrity, or availability.</li>
+      <li>Time synchronisation, log retention, and audit logging are implemented across production systems.</li>
+    </ul>
+
+    <h3>4.4 Restoration and Resilience</h3>
+    <ul>
+      <li>Automated backups of Sourced Account Data and other personal data are performed not less than daily.</li>
+      <li>Backups are retained for a minimum of thirty (30) days and stored in a geographically separate location from the primary production environment.</li>
+      <li>Documented incident response and disaster recovery procedures are maintained and reviewed periodically.</li>
+      <li>The Provider has the ability to restore the availability of and access to personal data in a timely manner in the event of a physical or technical incident.</li>
+    </ul>
+
+    <h3>4.5 Data Minimisation and Sensitive Data</h3>
+    <ul>
+      <li>Personal data collected and processed is limited to that which is necessary for the Pilot Services and is as set out in Schedule 2.</li>
+      <li>The Provider does not knowingly collect or process special category personal data within the meaning of Article 9 of the UK or EU GDPR, personal data relating to criminal convictions or offences within the meaning of Article 10, or personal data of any individual known to be under the age of eighteen (18).</li>
+      <li>Pseudonymisation is applied where reasonably practicable in non production environments.</li>
+    </ul>
+
+    <h3>4.6 Personnel Security</h3>
+    <ul>
+      <li>All personnel and authorised contractors of the Provider are bound by written confidentiality undertakings before being granted access to personal data.</li>
+      <li>Personnel receive data protection and information security awareness training appropriate to their role.</li>
+      <li>The Provider maintains acceptable use, access control, and information security policies applicable to its personnel.</li>
+    </ul>
+
+    <h3>4.7 Sub Processor Management</h3>
+    <ul>
+      <li>A documented inventory of sub processors is maintained by the Provider.</li>
+      <li>Each sub processor is bound by data protection obligations no less protective than those imposed on the Provider under this Agreement.</li>
+      <li>New sub processors are subject to the notice and objection procedure set out in clause 6.4.</li>
+      <li>Sub processor security postures are reviewed before engagement and periodically thereafter.</li>
+    </ul>
+
+    <h3>4.8 Vulnerability and Patch Management</h3>
+    <ul>
+      <li>Production systems are kept current with security updates within a commercially reasonable time, having regard to the severity of the relevant vulnerability.</li>
+      <li>Periodic vulnerability assessments of internet facing systems are performed.</li>
+    </ul>
+
+    <h3>4.9 Incident Response</h3>
+    <ul>
+      <li>The Provider maintains a documented Personal Data Breach response procedure.</li>
+      <li>The Provider shall notify the Client of any Personal Data Breach in accordance with clause 10.3(h).</li>
+    </ul>
+
+    <h3>4.10 Cooperation and Audit</h3>
+    <ul>
+      <li>The Provider shall cooperate with the Client and any competent supervisory authority in connection with any audit, investigation, or enquiry concerning personal data processed under this Agreement, on the terms set out in clause 10.5.</li>
+    </ul>
+  </div>
+
+  <div class="execution">
+    <h2 class="sched-title">Execution</h2>
+
+    <p class="execution-intro">In witness whereof, the parties have caused this Provisional Pilot Services Agreement to be executed by their duly authorised representatives as of the respective dates below. The Effective Date of this Agreement is the later of the two signature dates appearing below, subject to the Longstop Date defined in clause 1.1.11. This Agreement is executed in two counterparts, one for each party, each of which when so executed shall be deemed an original.</p>
+
+    <table class="sig-grid">
+      <tr>
+        <td>
+          <div class="sig-header">For and on behalf of the Provider</div>
+          <div class="sig-entity">Aureon Global L.L.C.</div>
+          <div class="sig-field"><span class="label">Name</span><span class="sig-line filled">Gentrit Luta</span></div>
+          <div class="sig-field"><span class="label">Title</span><span class="sig-line filled">Chief Executive Officer</span></div>
+          <div class="sig-field"><span class="label">Date</span><span class="sig-line">&nbsp;</span></div>
+          <div class="sig-field"><span class="label">Signature</span><span class="sig-line">&nbsp;</span></div>
+          <div class="sig-field"><span class="label">Place of signature</span><span class="sig-line filled">Kaçanik, Republic of Kosovo</span></div>
+        </td>
+        <td>
+          <div class="sig-header">For and on behalf of the Client</div>
+          <div class="sig-entity">Diraya Inc.</div>
+          <div class="sig-field"><span class="label">Name</span><span class="sig-line filled">Mohammed El Amine Amoura</span></div>
+          <div class="sig-field"><span class="label">Title</span><span class="sig-line filled">Founder</span></div>
+          <div class="sig-field"><span class="label">Date</span><span class="sig-line">&nbsp;</span></div>
+          <div class="sig-field"><span class="label">Signature</span><span class="sig-line">&nbsp;</span></div>
+          <div class="sig-field"><span class="label">Place of signature</span><span class="sig-line">&nbsp;</span></div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer-block">
+    Aureon Global L.L.C. | Dushkaja 20, 71000 Kaçanik | Republic of Kosovo | Reg. 812368240 | VAT 330681892<br>
+    Provisional Pilot Services Agreement | Reference AG DIRAYA 2026 01 v1.0
+  </div>
+
+</div>
+
+</body>
+</html>

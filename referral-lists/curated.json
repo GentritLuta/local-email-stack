@@ -1,0 +1,788 @@
+{
+  "_comment": "Curated, hand-verified attorney referral lists per metro. The auto-fulfiller (scripts/fulfill-referral-requests.py) matches an agent's metro (phone area code -> city -> state) to one of these and emails the verified list. Add a new metro by building its list the way Attorney-Referral-List-Indianapolis was built (research agents, no fabrication), dropping the .csv + .xlsx in referral-lists/, and adding an entry here. Files are relative to referral-lists/.",
+  "lists": [
+    {
+      "metro": "Indianapolis",
+      "label": "Indianapolis and Central Indiana",
+      "csv": "Attorney-Referral-List-Indianapolis.csv",
+      "xlsx": "Attorney-Referral-List-Indianapolis.xlsx",
+      "match": {
+        "area_codes": [
+          "317",
+          "463"
+        ],
+        "states": [
+          "IN"
+        ],
+        "cities": [
+          "indianapolis",
+          "indy",
+          "greenwood",
+          "carmel",
+          "fishers",
+          "noblesville",
+          "westfield",
+          "zionsville",
+          "avon",
+          "brownsburg",
+          "plainfield",
+          "franklin",
+          "beech grove",
+          "greenfield",
+          "mooresville",
+          "bargersville",
+          "whiteland",
+          "new whiteland",
+          "speedway",
+          "lawrence",
+          "fortville",
+          "mccordsville",
+          "danville",
+          "cumberland",
+          "southport"
+        ],
+        "zip_prefixes": [
+          "460",
+          "461",
+          "462"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 30,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.767,
+        "phone_pct": 1.0,
+        "email_mx_pct": 0.9,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Columbus",
+      "label": "Columbus and Central Ohio",
+      "csv": "Attorney-Referral-List-Columbus-OH.csv",
+      "xlsx": "Attorney-Referral-List-Columbus-OH.xlsx",
+      "match": {
+        "area_codes": [
+          "614",
+          "380"
+        ],
+        "cities": [
+          "columbus",
+          "dublin",
+          "westerville",
+          "worthington",
+          "gahanna",
+          "grove city",
+          "hilliard",
+          "reynoldsburg",
+          "pickerington",
+          "new albany",
+          "upper arlington",
+          "bexley",
+          "grandview heights",
+          "powell",
+          "delaware"
+        ],
+        "zip_prefixes": [
+          "430",
+          "431",
+          "432",
+          "433"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.833,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Colorado Front Range",
+      "label": "Denver and Colorado Springs (Front Range)",
+      "csv": "Attorney-Referral-List-Colorado-Front-Range.csv",
+      "xlsx": "Attorney-Referral-List-Colorado-Front-Range.xlsx",
+      "match": {
+        "area_codes": [
+          "719",
+          "720",
+          "303"
+        ],
+        "cities": [
+          "denver",
+          "colorado springs",
+          "aurora",
+          "littleton",
+          "lakewood",
+          "greenwood village",
+          "englewood",
+          "arvada",
+          "castle rock",
+          "centennial",
+          "monument",
+          "highlands ranch",
+          "parker",
+          "westminster",
+          "thornton"
+        ],
+        "zip_prefixes": [
+          "800",
+          "801",
+          "802",
+          "808",
+          "809"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.875,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Southeastern NC",
+      "label": "Wilmington, Fayetteville and Southeastern NC",
+      "csv": "Attorney-Referral-List-Southeastern-NC.csv",
+      "xlsx": "Attorney-Referral-List-Southeastern-NC.xlsx",
+      "match": {
+        "area_codes": [
+          "910"
+        ],
+        "cities": [
+          "wilmington",
+          "fayetteville",
+          "jacksonville",
+          "leland",
+          "lumberton",
+          "hampstead",
+          "wrightsville beach",
+          "hope mills",
+          "spring lake",
+          "carolina beach",
+          "southport",
+          "shallotte"
+        ],
+        "zip_prefixes": [
+          "283",
+          "284",
+          "285"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.917,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Washington",
+      "label": "Seattle and Western Washington",
+      "csv": "Attorney-Referral-List-Washington.csv",
+      "xlsx": "Attorney-Referral-List-Washington.xlsx",
+      "match": {
+        "area_codes": [
+          "206",
+          "425",
+          "253",
+          "564",
+          "360"
+        ],
+        "cities": [
+          "seattle",
+          "bellevue",
+          "tacoma",
+          "everett",
+          "kent",
+          "kirkland",
+          "redmond",
+          "renton",
+          "bothell",
+          "lynnwood",
+          "federal way",
+          "auburn",
+          "sammamish",
+          "issaquah",
+          "shoreline",
+          "edmonds",
+          "puyallup"
+        ],
+        "zip_prefixes": [
+          "980",
+          "981",
+          "982",
+          "983",
+          "984",
+          "985"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.875,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Texas",
+      "label": "Texas \u2014 Houston, Dallas, Austin, San Antonio",
+      "csv": "Attorney-Referral-List-Texas.csv",
+      "xlsx": "Attorney-Referral-List-Texas.xlsx",
+      "match": {
+        "area_codes": [
+          "713",
+          "281",
+          "832",
+          "346",
+          "214",
+          "469",
+          "972",
+          "945",
+          "512",
+          "737",
+          "210",
+          "726",
+          "830"
+        ],
+        "states": [
+          "TX"
+        ],
+        "cities": [
+          "houston",
+          "dallas",
+          "austin",
+          "san antonio",
+          "sugar land",
+          "katy",
+          "the woodlands",
+          "pearland",
+          "plano",
+          "frisco",
+          "irving",
+          "arlington",
+          "fort worth",
+          "mckinney",
+          "round rock",
+          "cedar park",
+          "georgetown",
+          "new braunfels",
+          "schertz",
+          "el segundo"
+        ],
+        "zip_prefixes": [
+          "750",
+          "751",
+          "752",
+          "753",
+          "754",
+          "760",
+          "761",
+          "762",
+          "766",
+          "767",
+          "770",
+          "772",
+          "773",
+          "774",
+          "775",
+          "776",
+          "777",
+          "778",
+          "779",
+          "780",
+          "781",
+          "782",
+          "783",
+          "784",
+          "785",
+          "786",
+          "787",
+          "788",
+          "789"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 1.0,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "California",
+      "label": "California \u2014 Los Angeles, Bay Area, San Diego, Sacramento",
+      "csv": "Attorney-Referral-List-California.csv",
+      "xlsx": "Attorney-Referral-List-California.xlsx",
+      "match": {
+        "area_codes": [
+          "213",
+          "310",
+          "323",
+          "818",
+          "747",
+          "626",
+          "424",
+          "661",
+          "415",
+          "650",
+          "408",
+          "510",
+          "925",
+          "707",
+          "669",
+          "628",
+          "619",
+          "858",
+          "760",
+          "916",
+          "279"
+        ],
+        "states": [
+          "CA"
+        ],
+        "cities": [
+          "los angeles",
+          "san francisco",
+          "san diego",
+          "sacramento",
+          "san jose",
+          "oakland",
+          "beverly hills",
+          "el segundo",
+          "encino",
+          "south pasadena",
+          "la mesa",
+          "mather",
+          "pasadena",
+          "santa monica",
+          "long beach",
+          "irvine",
+          "san mateo",
+          "palo alto",
+          "berkeley",
+          "elk grove",
+          "roseville"
+        ],
+        "zip_prefixes": [
+          "900",
+          "901",
+          "902",
+          "903",
+          "904",
+          "905",
+          "906",
+          "907",
+          "908",
+          "910",
+          "911",
+          "912",
+          "913",
+          "914",
+          "915",
+          "916",
+          "917",
+          "918",
+          "919",
+          "920",
+          "921",
+          "922",
+          "923",
+          "924",
+          "925",
+          "926",
+          "927",
+          "928",
+          "930",
+          "931",
+          "932",
+          "933",
+          "934",
+          "935",
+          "936",
+          "939",
+          "940",
+          "941",
+          "943",
+          "944",
+          "945",
+          "946",
+          "947",
+          "948",
+          "949",
+          "950",
+          "951",
+          "952",
+          "953",
+          "954",
+          "955",
+          "956",
+          "957",
+          "958",
+          "959",
+          "960",
+          "961"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.875,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Florida",
+      "label": "Florida \u2014 Miami, Orlando, Tampa, Jacksonville",
+      "csv": "Attorney-Referral-List-Florida.csv",
+      "xlsx": "Attorney-Referral-List-Florida.xlsx",
+      "match": {
+        "area_codes": [
+          "305",
+          "786",
+          "954",
+          "561",
+          "407",
+          "321",
+          "813",
+          "727",
+          "904",
+          "941",
+          "239",
+          "850",
+          "352",
+          "863"
+        ],
+        "states": [
+          "FL"
+        ],
+        "cities": [
+          "miami",
+          "fort lauderdale",
+          "orlando",
+          "tampa",
+          "jacksonville",
+          "coral gables",
+          "north miami",
+          "plantation",
+          "winter park",
+          "brandon",
+          "south miami",
+          "hollywood",
+          "st petersburg",
+          "clearwater",
+          "boca raton",
+          "west palm beach",
+          "kissimmee",
+          "sarasota"
+        ],
+        "zip_prefixes": [
+          "320",
+          "321",
+          "322",
+          "323",
+          "324",
+          "325",
+          "326",
+          "327",
+          "328",
+          "329",
+          "330",
+          "331",
+          "332",
+          "333",
+          "334",
+          "335",
+          "336",
+          "337",
+          "338",
+          "339",
+          "341",
+          "342",
+          "344",
+          "346",
+          "347",
+          "349"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 29,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.931,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Arizona",
+      "label": "Arizona \u2014 Phoenix Metro and Tucson",
+      "csv": "Attorney-Referral-List-Arizona.csv",
+      "xlsx": "Attorney-Referral-List-Arizona.xlsx",
+      "match": {
+        "area_codes": [
+          "602",
+          "480",
+          "623",
+          "520",
+          "928"
+        ],
+        "states": [
+          "AZ"
+        ],
+        "cities": [
+          "phoenix",
+          "scottsdale",
+          "tempe",
+          "mesa",
+          "chandler",
+          "gilbert",
+          "tucson",
+          "glendale",
+          "peoria",
+          "surprise",
+          "queen creek",
+          "goodyear",
+          "avondale",
+          "paradise valley",
+          "fountain hills"
+        ],
+        "zip_prefixes": [
+          "850",
+          "851",
+          "852",
+          "853",
+          "855",
+          "856",
+          "857",
+          "859",
+          "860",
+          "863",
+          "864",
+          "865"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.958,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Atlanta",
+      "label": "Atlanta and Metro Atlanta",
+      "csv": "Attorney-Referral-List-Atlanta.csv",
+      "xlsx": "Attorney-Referral-List-Atlanta.xlsx",
+      "match": {
+        "area_codes": [
+          "404",
+          "678",
+          "770",
+          "470",
+          "762"
+        ],
+        "states": [
+          "GA"
+        ],
+        "cities": [
+          "atlanta",
+          "marietta",
+          "alpharetta",
+          "roswell",
+          "sandy springs",
+          "decatur",
+          "smyrna",
+          "duluth",
+          "lawrenceville",
+          "johns creek",
+          "kennesaw",
+          "woodstock"
+        ],
+        "zip_prefixes": [
+          "300",
+          "301",
+          "302",
+          "303"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 23,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 1.0,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Nashville",
+      "label": "Nashville and Middle Tennessee",
+      "csv": "Attorney-Referral-List-Nashville.csv",
+      "xlsx": "Attorney-Referral-List-Nashville.xlsx",
+      "match": {
+        "area_codes": [
+          "615",
+          "629",
+          "931"
+        ],
+        "states": [
+          "TN"
+        ],
+        "cities": [
+          "nashville",
+          "franklin",
+          "brentwood",
+          "murfreesboro",
+          "hendersonville",
+          "mount juliet",
+          "gallatin",
+          "lebanon",
+          "smyrna"
+        ],
+        "zip_prefixes": [
+          "370",
+          "371",
+          "372"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 1.0,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Charlotte",
+      "label": "Charlotte and Metro Charlotte",
+      "csv": "Attorney-Referral-List-Charlotte.csv",
+      "xlsx": "Attorney-Referral-List-Charlotte.xlsx",
+      "match": {
+        "area_codes": [
+          "704",
+          "980"
+        ],
+        "states": [
+          "NC"
+        ],
+        "cities": [
+          "charlotte",
+          "concord",
+          "gastonia",
+          "huntersville",
+          "matthews",
+          "mooresville",
+          "cornelius",
+          "indian trail",
+          "pineville",
+          "mint hill"
+        ],
+        "zip_prefixes": [
+          "280",
+          "281",
+          "282"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 24,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 1.0,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    },
+    {
+      "metro": "Bloomington",
+      "label": "Bloomington and South-Central Indiana",
+      "csv": "Attorney-Referral-List-Bloomington.csv",
+      "xlsx": "Attorney-Referral-List-Bloomington.xlsx",
+      "match": {
+        "area_codes": [
+          "812",
+          "930"
+        ],
+        "states": [
+          "IN"
+        ],
+        "cities": [
+          "bloomington",
+          "ellettsville",
+          "spencer",
+          "bedford",
+          "gosport",
+          "bloomfield",
+          "ellettsville"
+        ],
+        "zip_prefixes": [
+          "474",
+          "472"
+        ]
+      },
+      "quality": {
+        "checked_at": "2026-06-07",
+        "firms": 17,
+        "verified_pct": 1.0,
+        "live_pct": 1.0,
+        "name_pct": 0.882,
+        "phone_pct": 1.0,
+        "email_mx_pct": 1.0,
+        "flagged": [],
+        "passed": true
+      }
+    }
+  ]
+}

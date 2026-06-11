@@ -1,0 +1,581 @@
+"""daily-fill-and-enroll.py — auto-fill the verified-prospect pool per
+profile each day, then enroll new eligible prospects up to that day's
+warmup cap.
+
+This is the orchestrator that runs the full daily pipeline so each
+profile auto-produces enough verified leads for the day. Designed to be
+the single scheduled task that ties scrape -> context -> backfill ->
+enroll -> tick together. Idempotent.
+
+PIPELINE (per profile, in order):
+  1. Run that profile's lead_scrape (re-walks team-page seeds)
+  2. If profile has creator niches, run youtube + tradingview scrape
+  3. Run the per-profile name-derivation backfill so first_name +
+     company exist on as many newly-scraped rows as possible
+  4. Compute the day's effective cap from the warmup curve:
+        cap = sum_per_subdomain( daily_target_for_domain ) - sent_today
+  5. Pick eligible unenrolled prospects (verified, not unsub, has
+     first_name + company + city-if-required), enroll up to `cap`
+  6. Tick sequence-runner once so newly-enrolled fire today
+
+Each profile loops scrape -> backfill -> count up to MAX_PASSES times
+to give the scrapers a chance to fill the pool (e.g. lead_verify SMTP
+delays). If two passes in a row produce no net new eligible prospects,
+the profile is considered exhausted for the day and the orchestrator
+moves on without retrying further.
+
+Usage:
+    py sequences/daily-fill-and-enroll.py            # all profiles
+    py sequences/daily-fill-and-enroll.py --profile aureon
+    py sequences/daily-fill-and-enroll.py --no-scrape  # skip scraping (debug)
+    py sequences/daily-fill-and-enroll.py --dry        # plan, no enroll/tick
+
+Scheduled task: LES-daily-fill-and-enroll runs daily after the
+LES-lead-scrape-* tasks complete (recommended 09:30 local).
+"""
+from __future__ import annotations
+import argparse
+import datetime as dt
+import json
+import subprocess
+import sys
+import urllib.parse
+import urllib.request
+import urllib.error
+from collections import Counter
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+ENV  = REPO / "sequences" / "supabase.env"
+
+env = {}
+for line in ENV.read_text().splitlines():
+    if "=" in line and not line.strip().startswith("#"):
+        k, v = line.split("=", 1)
+        env[k.strip()] = v.strip()
+URL = env["SUPABASE_URL"]; KEY = env["SUPABASE_ANON_KEY"]
+H_R = {"apikey": KEY, "Authorization": f"Bearer {KEY}"}
+H_W = {**H_R, "Content-Type": "application/json"}
+
+# Per-profile pipeline config
+# - niche_slug: argument to lead_scrape.py run <slug>
+# - backfill_script: path to the profile-specific backfill (relative to repo)
+# - creator_scrapers: extra scrapers to run before backfill (algoalpha only)
+# - requires_city: True iff first_name+company+city are all in required_merges
+PROFILE_CFG = {
+    "aureon": {
+        "niche_slug":      "real_estate_us",
+        "backfill_script": "scripts/backfill-aureon-prospects.py",
+        "creator_scrapers": [],
+        "requires_city":   False,
+        # Real-estate copy now greets "{greeting}" (first name when known, else
+        # "{company} team"), so a brokerage lead with a company but no parseable
+        # personal name — incl. front-desk info@/office@ inboxes — is a valid
+        # target. Named leads are still enrolled first (see enroll_up_to).
+        "requires_first_name": False,
+    },
+    "algoalpha": {
+        "niche_slug":      "crypto_influencer",
+        "backfill_script": "scripts/backfill-algoalpha-prospects.py",
+        "creator_scrapers": [
+            # (script, args)
+            ("sequences/youtube_scraper.py",     ["run", "crypto_influencer",
+                                                  "niches/crypto_youtube_channels.txt",
+                                                  "--no-smtp"]),
+            ("sequences/tradingview_scrape.py",  ["run", "crypto_influencer",
+                                                  "niches/tv_handles.txt",
+                                                  "--no-smtp", "--limit", "50"]),
+        ],
+        "requires_city":   False,
+        # crypto copy greets "{greeting}" (company fallback), so leads with a
+        # company but no parseable first name are still enrollable.
+        "requires_first_name": False,
+    },
+    "f2-malergipser": {
+        "niche_slug":      "liegenschaftsverwalter_be",
+        # Per-seed company/city flow in via YAML for hand-curated seeds.
+        # For auto-discovered seeds we also need to (a) quarantine the
+        # Sentry/version-string false-match emails and (b) derive
+        # first_name from the local-part. clean-f2-prospects.py does both.
+        "backfill_script": "scripts/clean-f2-prospects.py",
+        "creator_scrapers": [],
+        "requires_city":   True,
+    },
+    "atalsolidrocks": {
+        "niche_slug":      "atal_dach_b2b",
+        # Reuse f2's clean-* shape pattern adapted for DACH first_name +
+        # company derivation. For now uses the aureon-style backfill which
+        # handles email-local-part name parsing + free-mail filtering.
+        # Until atal-specific backfill is written, the aureon one is the
+        # closest match (English/DACH name patterns are similar enough).
+        "backfill_script": "scripts/backfill-aureon-prospects.py",
+        "creator_scrapers": [],
+        "requires_city":   True,
+    },
+    "f2-bau": {
+        # Architect / GU / developer Subunternehmer track — shares F2's senders
+        # but its own copy (f2-bau-default). Same Swiss-firm backfill as f2,
+        # called with the f2-bau slug. City optional (only step 3 uses {city};
+        # variant required_merges = first_name + company).
+        "niche_slug":      "bau_dach_ch",
+        "backfill_script": "scripts/clean-f2-prospects.py",
+        "backfill_args":   ["f2-bau"],
+        "creator_scrapers": [],
+        "requires_city":   False,
+    },
+    "diraya": {
+        # IMPORT-ONLY profile: leads are not cold-scrapeable (proven dead 3x).
+        # They come from yc-guess-verify.py / the YC site-email scrape via
+        # import-prospects-csv.py. So we skip the scrape/backfill phase entirely
+        # (import_only) and just enroll the verified imported pool into
+        # diraya-default. Sends from the separate "Pro" Resend account (the key
+        # lives in profiles/diraya.private.json -> relay.resend_api_key).
+        "niche_slug":      None,
+        "backfill_script": None,
+        "creator_scrapers": [],
+        "requires_city":   False,
+        "requires_first_name": True,   # diraya copy personalizes by {first_name}
+        "import_only":     True,       # skip scrape/backfill; enroll-only
+    },
+    "energ": {
+        # Energy-intensive German KMU/Gewerbe in NRW. Leads come from German
+        # Impressum/Kontakt pages (energ_gewerbe_nrw niche). ENER-G copy was
+        # rewritten to a name-optional Sie-Anrede ("Guten Tag,") keyed on
+        # {company}, so a role inbox (info@/kontakt@) with a company but no
+        # parseable first name is a valid target. lead_scrape already sets
+        # company + verifies the address, and the aureon backfill is hardcoded
+        # to profile_slug=aureon (would no-op here), so skip the backfill phase.
+        "niche_slug":      "energ_gewerbe_nrw",
+        "backfill_script": None,
+        "creator_scrapers": [],
+        "requires_city":   False,
+        "requires_first_name": False,
+    },
+    "lk-advertising": {
+        # Performance media for US REAL ESTATE AGENTS (repointed 2026-06-10 per
+        # Lukas Koehler's onboarding form; was German Maklerbueros). Leads come
+        # from the real_estate_us_lk niche — the same proven US-brokerage
+        # team-page source as Aureon's real_estate_us, bound to lk-advertising
+        # with LK's own English sequence. Copy is name-optional ({greeting}), so
+        # first name is NOT required. No aureon backfill (no-op here), skip it.
+        # Senders: lk-advertising.site subdomains once DNS verifies on Lukas's
+        # Hostinger (collaboration invite -> publish records via hPanel); the
+        # aureonglobal.de connect./partners. subs are the fallback meanwhile.
+        "niche_slug":      "real_estate_us_lk",
+        "backfill_script": None,
+        "creator_scrapers": [],
+        "requires_city":   False,
+        "requires_first_name": False,
+    },
+    "dorian": {
+        # Mercury Scales (Dorian Skiljo): client acquisition for self-made B2B
+        # founders (AI/automation agencies, sales/closing coaches, high-ticket
+        # offer owners) in English-speaking markets + Germany. This ICP is NOT
+        # website-team-page scrapeable (targets are individuals on social, not
+        # firms with a /team page), so niche_slug stays None (steps 1+2 skip)
+        # and sourcing runs via creator_scrapers (wired 2026-06-10):
+        #   a. youtube discover — grows niches/dorian_yt_channels.txt from the
+        #      ICP search terms (100 quota units/query/page, shared YT key).
+        #   b. youtube run — pulls business emails from channel About text.
+        #   c+d. social_scrape instagram/twitter — bio emails from the
+        #      hand-curated niches/dorian_social_handles.txt (no-op while empty).
+        # CSV import via scripts/import-prospects-csv.py dorian <file.csv> still
+        # works on top. Sends from mercuryscales.com subdomains on the
+        # full-access Resend key. The dorian-default variant only needs
+        # {first_name} (company is optional — many targets are personal brands).
+        "niche_slug":      None,
+        "backfill_script": None,
+        "creator_scrapers": [
+            ("sequences/youtube_scraper.py", ["discover",
+                                              "niches/dorian_social_yt_search_terms.txt",
+                                              "--out", "niches/dorian_yt_channels.txt",
+                                              "--pages", "1"]),
+            ("sequences/youtube_scraper.py", ["run", "dorian_social",
+                                              "niches/dorian_yt_channels.txt",
+                                              "--no-smtp"]),
+            ("sequences/social_scrape.py",   ["instagram", "dorian_social",
+                                              "niches/dorian_social_handles.txt",
+                                              "--no-smtp", "--limit", "50"]),
+            ("sequences/social_scrape.py",   ["twitter", "dorian_social",
+                                              "niches/dorian_social_handles.txt",
+                                              "--no-smtp", "--limit", "50"]),
+        ],
+        "requires_city":   False,
+        "requires_first_name": True,
+        "import_only":     False,
+    },
+}
+
+MAX_PASSES = 4  # scrape passes per profile to reach the buffer target
+SUBPROCESS_TIMEOUT = 600  # seconds
+BUFFER_DAYS = 3  # keep the eligible-lead pool stocked to 3x the daily send need
+
+
+def http_get(path: str) -> list:
+    req = urllib.request.Request(f"{URL}/rest/v1/{path}", headers=H_R)
+    return json.loads(urllib.request.urlopen(req, timeout=60).read())
+
+
+def http_post(path: str, body: dict) -> None:
+    req = urllib.request.Request(
+        f"{URL}/rest/v1/{path}",
+        data=json.dumps(body).encode(),
+        method="POST",
+        headers={**H_W, "Prefer": "return=minimal"},
+    )
+    urllib.request.urlopen(req, timeout=60)
+
+
+def run_subprocess(script: str, args: list[str]) -> tuple[int, str]:
+    """Run a Python script in a subprocess from the repo root. Capture
+    output. Return (exit_code, last 30 lines of stdout+stderr)."""
+    cmd = ["py", script, *args]
+    try:
+        p = subprocess.run(
+            cmd, cwd=str(REPO), capture_output=True, text=True,
+            timeout=SUBPROCESS_TIMEOUT, encoding="utf-8", errors="replace",
+        )
+        out = (p.stdout or "") + (p.stderr or "")
+        tail = "\n".join(out.splitlines()[-30:])
+        return p.returncode, tail
+    except subprocess.TimeoutExpired:
+        return -1, f"  ! TIMEOUT after {SUBPROCESS_TIMEOUT}s"
+    except Exception as e:
+        return -1, f"  ! exception: {e}"
+
+
+def get_sequence_id(profile_slug: str) -> str | None:
+    rows = http_get(f"sequences?profile_slug=eq.{profile_slug}&select=id")
+    return rows[0]["id"] if rows else None
+
+
+def _warmup_day(w: dict) -> int:
+    """Warmup day (1-based) derived from warmup.started_at as CALENDAR days.
+
+    Calendar-based on purpose: the old stored `current_day` counter relied on a
+    daily advance tick that silently stalled, freezing every subdomain at the
+    week-1 cap (15) forever. Deriving from started_at means the ramp advances on
+    its own (15 -> 25 -> 35 -> 50) and can never get stuck. Falls back to the
+    stored current_day only when started_at is missing."""
+    w = w or {}
+    sa = w.get("started_at")
+    if sa:
+        try:
+            start = dt.date.fromisoformat(str(sa)[:10])
+            return (dt.date.today() - start).days + 1
+        except ValueError:
+            pass
+    return int(w.get("current_day", 0))
+
+
+def cap_target_for_profile(profile_slug: str) -> tuple[int, dict[str, int]]:
+    """Today's room across all subdomains in this profile = sum(
+    daily_target - sent_today ) per from_domain."""
+    pf = REPO / "profiles" / f"{profile_slug}.json"
+    if not pf.exists(): return 0, {}
+    d = json.loads(pf.read_text(encoding="utf-8"))
+    curve = d.get("ramp_curve_snowball_v1", [])
+    # Today's send_log per subdomain (UTC midnight cutoff is close enough)
+    today_iso = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT00:00:00Z")
+    rows = http_get(f"send_log?sent_at=gte.{urllib.parse.quote(today_iso)}&select=from_addr&limit=500")
+    sent_by_sub = Counter(r["from_addr"].split("@")[-1] for r in rows if r.get("from_addr"))
+
+    room_by_sub: dict[str, int] = {}
+    total_room = 0
+    for fd in d.get("relay", {}).get("from_domains", []):
+        # Profile JSONs store the verification status as a `verified_at`
+        # timestamp (set by Resend onboarding), not as a `verified` bool.
+        # Treat any non-empty verified_at as verified.
+        if not (fd.get("verified") or fd.get("verified_at")): continue
+        w = fd.get("warmup", {})
+        day = _warmup_day(w)
+        # Look up daily cap from curve
+        cap = 0
+        for row in sorted(curve, key=lambda r: r["from_day"]):
+            if day >= row["from_day"]: cap = row["daily"]
+        cap = min(cap, int(w.get("max_daily_sends", cap)))
+        sub = fd["domain"]
+        sent_today = sent_by_sub.get(sub, 0)
+        room = max(0, cap - sent_today)
+        room_by_sub[sub] = room
+        total_room += room
+    return total_room, room_by_sub
+
+
+def daily_need_for_profile(profile_slug: str) -> int:
+    """Gross daily send capacity = sum of per-subdomain warmup caps (NOT
+    reduced by what's already been sent today). This is 'the daily need' the
+    lead-pool buffer is sized against (BUFFER_DAYS x this). Grows on its own as
+    the calendar-based warmup ramp climbs 15 -> 25 -> 35 -> 50."""
+    pf = REPO / "profiles" / f"{profile_slug}.json"
+    if not pf.exists(): return 0
+    d = json.loads(pf.read_text(encoding="utf-8"))
+    curve = d.get("ramp_curve_snowball_v1", [])
+    total = 0
+    for fd in d.get("relay", {}).get("from_domains", []):
+        if not (fd.get("verified") or fd.get("verified_at")): continue
+        w = fd.get("warmup", {})
+        day = _warmup_day(w)
+        cap = 0
+        for row in sorted(curve, key=lambda r: r["from_day"]):
+            if day >= row["from_day"]: cap = row["daily"]
+        cap = min(cap, int(w.get("max_daily_sends", cap)))
+        total += cap
+    return total
+
+
+def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
+                              requires_first_name: bool = True) -> int:
+    SID = get_sequence_id(profile_slug)
+    if not SID: return 0
+    # Only count active enrollments — cancelled runs from a prior cleanup
+    # pass shouldn't block a clean re-enrollment.
+    enrolled = {r["prospect_id"] for r in
+                http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
+    rows = http_get(
+        f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
+        f"&select=id,first_name,company,city&limit=2000"
+    )
+    n = 0
+    for p in rows:
+        if p["id"] in enrolled: continue
+        if not p.get("company"): continue
+        if requires_first_name and not p.get("first_name"): continue
+        if requires_city and not p.get("city"): continue
+        n += 1
+    return n
+
+
+def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
+                 requires_first_name: bool = True) -> int:
+    """Insert run rows for up to `target` eligible unenrolled prospects.
+    Returns how many were inserted."""
+    if target <= 0: return 0
+    SID = get_sequence_id(profile_slug)
+    if not SID: return 0
+    # Only count active enrollments — cancelled runs from a prior cleanup
+    # pass shouldn't block a clean re-enrollment.
+    enrolled = {r["prospect_id"] for r in
+                http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
+    rows = http_get(
+        f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
+        f"&select=id,email,first_name,company,city&limit=2000"
+    )
+    eligible = [p for p in rows
+                if p["id"] not in enrolled
+                and p.get("company")
+                and (p.get("first_name") or not requires_first_name)
+                and (not requires_city or p.get("city"))]
+    # Prefer leads we can personalize by NAME — send to the best prospects first,
+    # leaving company-only / front-desk (info@) leads as overflow. Stable sort
+    # keeps prior ordering within each tier.
+    eligible.sort(key=lambda p: 0 if (p.get("first_name") or "").strip() else 1)
+    eligible = eligible[:target]
+    # Find any prior cancelled runs for these prospects — we'll PATCH those
+    # back to queued instead of INSERTing (the runs table has a unique key
+    # on (sequence_id, prospect_id) that doesn't care about status).
+    eligible_ids = [p["id"] for p in eligible]
+    cancelled_run_by_pid: dict[str, str] = {}
+    for i in range(0, len(eligible_ids), 50):
+        batch = ",".join(eligible_ids[i:i+50])
+        for r in http_get(
+            f"runs?sequence_id=eq.{SID}&status=eq.cancelled"
+            f"&prospect_id=in.({batch})&select=id,prospect_id"
+        ):
+            cancelled_run_by_pid[r["prospect_id"]] = r["id"]
+    # If we're resurrecting, the recipient may already have received some
+    # steps before the cancel. Look up max(step_n) in send_log scoped to
+    # THIS run_id (not by to_addr, which could pick up cross-profile sends
+    # if the same email ever existed in another profile's send_log) so we
+    # resume at last_sent_step + 1 instead of restarting at step 1 (which
+    # would just bounce off check_recipient_dedup forever).
+    resume_step_by_pid: dict[str, int] = {}
+    for pid, rid in cancelled_run_by_pid.items():
+        rows = http_get(
+            f"send_log?run_id=eq.{rid}"
+            f"&order=step_n.desc&select=step_n&limit=1"
+        )
+        if rows and rows[0].get("step_n"):
+            resume_step_by_pid[pid] = int(rows[0]["step_n"])
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
+    n = 0
+    for p in eligible:
+        try:
+            if p["id"] in cancelled_run_by_pid:
+                # Resurrect the cancelled run instead of inserting a duplicate.
+                # Resume at next-step-after-last-send so we don't re-fire a
+                # step the recipient already received.
+                rid = cancelled_run_by_pid[p["id"]]
+                last_sent = resume_step_by_pid.get(p["id"], 0)
+                resume_step = min(last_sent + 1, 7)  # variants top out at step 7
+                if last_sent >= 7:
+                    # Already finished the sequence — mark completed, skip.
+                    urllib.request.urlopen(urllib.request.Request(
+                        f"{URL}/rest/v1/runs?id=eq.{rid}", method="PATCH",
+                        data=json.dumps({"status": "completed"}).encode(),
+                        headers={**H_W, "Prefer": "return=minimal"},
+                    ), timeout=60)
+                    continue
+                req = urllib.request.Request(
+                    f"{URL}/rest/v1/runs?id=eq.{rid}",
+                    method="PATCH",
+                    data=json.dumps({
+                        "status": "queued",
+                        "current_step": resume_step,
+                        "next_send_at": now,
+                    }).encode(),
+                    headers={**H_W, "Prefer": "return=minimal"},
+                )
+                urllib.request.urlopen(req, timeout=60)
+            else:
+                http_post("runs", {
+                    "sequence_id":  SID,
+                    "prospect_id":  p["id"],
+                    "status":       "queued",
+                    "current_step": 1,
+                    "next_send_at": now,
+                })
+            n += 1
+        except urllib.error.HTTPError as e:
+            print(f"  ! enroll error for {p['email']}: {e.code} {e.read().decode()[:200]}")
+    return n
+
+
+def fill_profile(profile_slug: str, *, do_scrape: bool, dry: bool) -> dict:
+    cfg = PROFILE_CFG.get(profile_slug)
+    if not cfg:
+        print(f"  ! {profile_slug}: no PROFILE_CFG entry")
+        return {"profile": profile_slug, "skipped": "no_cfg"}
+
+    # Skip profiles deactivated in their profile JSON (e.g. subdomains
+    # reallocated to another profile). Reversible: set active=true to revive.
+    pf = REPO / "profiles" / f"{profile_slug}.json"
+    try:
+        if pf.exists() and json.loads(pf.read_text(encoding="utf-8")).get("active") is False:
+            print(f"\n=== {profile_slug} === (inactive — skipped)")
+            return {"profile": profile_slug, "skipped": "inactive"}
+    except Exception:
+        pass
+
+    print(f"\n=== {profile_slug} ===")
+    total_room, room_by_sub = cap_target_for_profile(profile_slug)
+    daily_need = daily_need_for_profile(profile_slug)
+    buffer_target = BUFFER_DAYS * daily_need
+    eligible_start = count_eligible_unenrolled(profile_slug, cfg["requires_city"], cfg.get("requires_first_name", True))
+    print(f"  today room across sds : {total_room}  ({room_by_sub})")
+    print(f"  daily need / buffer    : {daily_need} / {buffer_target}  ({BUFFER_DAYS}x)")
+    print(f"  eligible unenrolled   : {eligible_start}")
+    # Scrape to keep the pool stocked to BUFFER_DAYS x the daily need, so it
+    # never starves as the warmup ramp raises the daily cap. Enrollment below
+    # still only consumes today's room — the rest stays as a ready buffer.
+    needed = max(0, buffer_target - eligible_start)
+    print(f"  scrape target shortfall: {needed}  (to {buffer_target})")
+
+    if needed > 0 and do_scrape and not cfg.get("import_only"):
+        last_eligible = eligible_start
+        for pass_n in range(1, MAX_PASSES + 1):
+            print(f"  -- scrape pass {pass_n}/{MAX_PASSES}")
+            # Steps 1+2 are team-page sourcing and need a niche_slug; profiles
+            # whose sourcing is creator_scrapers-only (dorian) set niche_slug
+            # None and skip straight to step 3.
+            if cfg["niche_slug"]:
+                # 1. Seed-discovery first so lead_scrape sees fresh URLs this pass.
+                #    Uses ddgs multi-engine search + playwright_stealth fallback.
+                #    No-op if the niche has no search_queries block.
+                rc, _ = run_subprocess(
+                    "sequences/seed_discover.py",
+                    ["--niche", cfg["niche_slug"], "--max-per-query", "5"],
+                )
+                print(f"     seed_discover rc={rc}")
+                # 2. Team-page scrape over the (now possibly grown) seeds list.
+                rc, tail = run_subprocess(
+                    "sequences/lead_scrape.py", ["run", cfg["niche_slug"]]
+                )
+                print(f"     lead_scrape rc={rc}")
+            for s, args in cfg["creator_scrapers"]:
+                rc, _ = run_subprocess(s, args)
+                print(f"     {Path(s).name} rc={rc}")
+            if cfg["backfill_script"]:
+                rc, _ = run_subprocess(cfg["backfill_script"], cfg.get("backfill_args", []))
+                print(f"     {Path(cfg['backfill_script']).name} rc={rc}")
+            new_eligible = count_eligible_unenrolled(profile_slug, cfg["requires_city"], cfg.get("requires_first_name", True))
+            delta = new_eligible - last_eligible
+            print(f"     eligible now = {new_eligible}  (delta {delta:+d}, target {buffer_target})")
+            last_eligible = new_eligible
+            if new_eligible >= buffer_target: break
+            if delta <= 0:
+                print(f"     no progress, stopping early")
+                break
+
+    final_eligible = count_eligible_unenrolled(profile_slug, cfg["requires_city"], cfg.get("requires_first_name", True))
+    enrolled = 0
+    if not dry:
+        enrolled = enroll_up_to(profile_slug, total_room, cfg["requires_city"], cfg.get("requires_first_name", True))
+    print(f"  enrolled now           : {enrolled}")
+    return {
+        "profile": profile_slug,
+        "room_target":  total_room,
+        "eligible_start": eligible_start,
+        "eligible_final": final_eligible,
+        "enrolled":     enrolled,
+    }
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--profile", help="only run for one profile")
+    ap.add_argument("--no-scrape", action="store_true",
+                    help="skip scraping; only backfill+enroll")
+    ap.add_argument("--dry", action="store_true",
+                    help="plan only; do not enroll or tick")
+    args = ap.parse_args()
+
+    profiles = [args.profile] if args.profile else list(PROFILE_CFG.keys())
+
+    # Phase 1 — enroll from the already-eligible pool + tick FIRST, before any
+    # scraping. Root cause of past "0 enrolled" days: the slow scrape phase ate
+    # the scheduled task's 15-min budget and the task was killed (0x41306)
+    # before enroll/tick ever ran. Front-loading the fast, essential work
+    # guarantees the daily enrollment lands even if Phase 2 runs long or is
+    # killed. Skipped when --no-scrape (Phase 2 already does enroll-only then).
+    if not args.dry and not args.no_scrape:
+        print("=== phase 1: enroll from existing pool (no scrape) ===")
+        for p in profiles:
+            fill_profile(p, do_scrape=False, dry=False)
+        print("\n=== phase 1 tick ===")
+        rc, tail = run_subprocess("sequences/sequence-runner.py", ["tick"])
+        print(f"runner rc={rc}")
+
+    # Phase 2 — scrape to top the pool up for next time, enrolling new finds.
+    results = []
+    for p in profiles:
+        results.append(fill_profile(p, do_scrape=not args.no_scrape, dry=args.dry))
+
+    # Final tick so anything newly enrolled fires today
+    if not args.dry:
+        print("\n=== sequence-runner tick ===")
+        rc, tail = run_subprocess("sequences/sequence-runner.py", ["tick"])
+        print(tail)
+        print(f"runner rc={rc}")
+
+    print("\n=== SUMMARY ===")
+    for r in results:
+        print(f"  {r['profile']:18s} room={r.get('room_target','?'):3} "
+              f"eligible {r.get('eligible_start','?')} -> {r.get('eligible_final','?')}  "
+              f"enrolled={r.get('enrolled','?')}")
+
+    # Persist a one-line-per-profile audit trail so the user can review
+    # daily history without grepping the scheduled-task transcript.
+    log_dir = REPO / "warmup-state"
+    log_dir.mkdir(exist_ok=True)
+    log_file = log_dir / "daily-fill-and-enroll.jsonl"
+    stamp = dt.datetime.now(dt.timezone.utc).isoformat()
+    with log_file.open("a", encoding="utf-8") as f:
+        for r in results:
+            row = {"ts": stamp, **r}
+            f.write(json.dumps(row) + "\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

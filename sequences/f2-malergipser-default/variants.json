@@ -1,0 +1,61 @@
+{
+  "name": "F2 Maler & Gipser — 7-email Hormozi $100M Leads (DE-CH, Sind Sie offen + Sind Sie beschäftigt + Akte schliessen)",
+  "slug": "f2-malergipser-default",
+  "profile_slug": "f2-malergipser",
+  "created_at": "2026-05-18",
+  "target": "Liegenschaftsverwaltungen, Bewirtschafter in Bern, Burgdorf, Emmental, Oberaargau.",
+  "voice_notes": "Hormozi $100M Leads cold email template auf Schweizerdeutsch übersetzt. Schritt 1: Are you open Struktur (Hook Frage + Ich sehe + Wir helfen Avatar Y in Zeit ohne Pain Formel + Proof + Bestes ist + Soft CTA + Soft Unsubscribe). Schritt 4: Are you busy Problem/Lösung. KEINE Apostrophe, Gedankenstriche, einfachen Anführungszeichen, Word-internen Bindestriche. Required: {first_name}, {company}, {city}.",
+  "required_merges": ["first_name", "company", "city"],
+  "schedule_doc": "delay_days = Abstand zum vorigen Schritt. 0,2,2,3,4,7,10 = Tag 0,2,4,7,11,18,28.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "hormozi_sind_sie_offen_de",
+      "subject": "Sind Sie offen?",
+      "body": "Guten Tag {first_name},\n\nsind Sie gerade offen für etwas?\n\nIch sehe, was {company} bei Wohnungsabnahmen leisten muss.\n\nWir helfen Liegenschaftsverwaltungen wie Ihrer, Wohnungsabnahmen in 5 Werktagen statt 3 Wochen zu erledigen, mit Festpreis und ohne Nachträge.\n\n500 plus Wohnungen seit 2007. Letzte Wechsel Welle: 38 Wohnungen, alle in 5 Werktagen abgenommen.\n\nDas Beste ist, bei der ersten Wohnung 10 Prozent unter Ihrem aktuellen Anbieter. Stimmt die Qualität nicht, zahlen Sie nichts.\n\nBonus: 32 Punkte Checkliste als PDF, einfach antworten.\n\nMacht ein 15 Minuten Telefon Sinn?\n\nP.s. einfach mit nein antworten, falls kein Interesse."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "hormozi_was_checking_out_de",
+      "subject": "kurz nach {company} geschaut",
+      "body": "Guten Tag {first_name},\n\nhabe kurz nach {company} geschaut.\n\nKurzer Kontext: wir machen Wohnungsabnahmen für Verwaltungen wie {company}. 5 Werktage, Festpreis, eine Telefonnummer für alles.\n\n15 Minuten am Telefon?"
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "hormozi_data_point_wechsel_welle",
+      "subject": "38 Wohnungen, alle in 5 Tagen",
+      "body": "Guten Tag {first_name},\n\nnoch ein Datenpunkt.\n\nLetzte Wechsel Welle Ende März: drei Verwaltungen, 38 Wohnungen, alle in 5 Werktagen abgenommen. Festpreis bei 36 von 38, die zwei Differenzen haben wir selber bezahlt.\n\nGleiches Modell für {company} in {city}."
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "hormozi_sind_sie_beschäftigt_problem_loesung",
+      "subject": "viel zu tun..?",
+      "body": "Guten Tag {first_name},\n\nich nochmal, das ist die 4. Mail, ich nehme an Sie sind beschäftigt.\n\nProblem: wenn Sie die Wohnungsabnahmen für {company} dieses Jahr in alter Geschwindigkeit machen, kostet das TONNEN von Zeit und Nachträge fallen an.\n\nLösung: 15 Minuten am Telefon und ich erkläre, wie wir das in 5 Werktagen mit Festpreis erledigen.\n\nWann passt es?"
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "hormozi_forced_yes_or_no_de",
+      "subject": "{first_name}, ja oder nein",
+      "body": "Guten Tag {first_name},\n\nwenn wir Ihre Wohnungsabnahmen in {city} ab nächster Woche in 5 Werktagen mit Festpreis übernehmen und bei der ersten Wohnung 10 Prozent unter Ihrem aktuellen Anbieter liegen, würde {company} ja sagen?\n\nEin klares ja oder nein reichen beide."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "hormozi_pure_value_checkliste",
+      "subject": "32 Punkte Checkliste für {company}",
+      "body": "Guten Tag {first_name},\n\nob {company} mit F2 arbeitet oder nicht, die 32 Punkte Checkliste gehört Ihnen.\n\nAntworten Sie mit dem Wort Checkliste und ich schicke das PDF innert 24 Stunden. Kein Anruf, kein Verkaufsgespräch."
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "hormozi_breakup_de",
+      "subject": "schliesse Ihre Akte",
+      "body": "Guten Tag {first_name},\n\nschliesse Ihre Akte bei F2 heute, da die zwei Plätze für {city} diesen Monat vergeben werden.\n\nFalls der Zeitpunkt nicht passt, verstehe ich. Falls das Angebot nicht passt, sagen Sie es. Sonst melde ich mich nicht mehr."
+    }
+  ]
+}

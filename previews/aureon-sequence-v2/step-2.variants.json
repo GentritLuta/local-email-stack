@@ -1,0 +1,23 @@
+{
+  "name": "Aureon Global — 7-email Hormozi-rigorous sequence (named mechanism, no nag, forced-answer)",
+  "slug": "aureon-default",
+  "profile_slug": "aureon",
+  "created_at": "2026-05-18",
+  "target": "Real estate agents in DACH + NL closing 3+ deals/month OR brokerage teams of 2+ agents.",
+  "voice_notes": "Hormozi rigour applied. Named mechanism (The Aureon Listing Pipeline) appears 3 times. Each follow-up takes a different angle (story-objection, new case study, refund math, forced yes/no, pure value drop, sharp breakup). Subjects are human, lowercase where natural, specific numbers > vague claims. Step 1 has no CTA button (handled by template via step_n=1). Length tapers: 90 -> 50 -> 60 -> 70 -> 40 -> 55 -> 60 words. NO apostrophes, NO em-dashes, NO word-internal hyphens. NO single quotes ('). Reply-stop wired via imap-poll. Required: {first_name}, {company}, {city}.",
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
+  "schedule_doc": "delay_days = gap from PREVIOUS step's send. 0,3,4,5,6,8,9 = cumulative day 0,3,7,12,18,26,35.",
+  "variants": [
+    {
+      "n": 2,
+      "delay_days": 3,
+      "angle": "aureon_followup_objection_overcome_story",
+      "subject": "the Munich team almost said no",
+      "body": "Hi {first_name}.\n\nQuick story. The Munich team almost passed on the Aureon Listing Pipeline because they thought ad spend would eat the margin.\n\nWe carry the budget. They pay only on revenue we source. They went from 9 deals to 17 in 90 days.\n\nSame risk profile for {company}. Worth a reply with your monthly closings in {city}?\n\nAnna"
+    }
+  ]
+}

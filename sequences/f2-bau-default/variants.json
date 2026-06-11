@@ -1,0 +1,46 @@
+{
+  "name": "F2 Maler & Gipser — Bau/Architektur/GU Subunternehmer-Track",
+  "slug": "f2-bau-default",
+  "profile_slug": "f2-bau",
+  "target": "Architektur-, General-/Totalunternehmen und Bautraeger in der Deutschschweiz, die einen zuverlaessigen Maler-/Gipser-Subunternehmer fuer den Innenausbau/Endausbau von Neubau, Umbau und Sanierung brauchen.",
+  "voice_notes": "Schweizerdeutscher Geschaeftston, Absender Lukas Berger (GF F2). Hormozi-Struktur wie der Verwaltungs-Track, aber Avatar = Bau-Profis statt Liegenschaftsverwaltungen. Pain = Termin/Bauprogramm kippt + Nachtraege + Maengel bei der Abnahme, wenn der Maler-/Gipserpart nicht liefert. KEINE Apostrophe, kein scharfes s (ss statt ss), Gedankenstrich erlaubt, Umlaute ae/oe/ue ausgeschrieben fuer maximale Zustellbarkeit. Merges {first_name} {company} {city}.",
+  "required_merges": ["first_name", "company"],
+  "schedule_doc": "5-Schritt-Sequenz. Step 1 Tag 0, dann +3, +4, +5, +6 Werktage.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "hormozi_sind_sie_offen_bau_de",
+      "subject": "Sind Sie offen?",
+      "body": "Guten Tag {first_name},\n\nsind Sie gerade offen fuer etwas?\n\nIch sehe, wie schnell bei {company} ein Bauprogramm kippt, wenn der Maler- und Gipserpart am Schluss nicht termingerecht liefert.\n\nWir helfen Architektur-, General- und Bauunternehmen wie {company}, den Maler- und Gipserpart sauber und im Programm abzuschliessen, mit Festpreis und ohne Nachtraege.\n\nLetztes Jahr ueber 40 Projekte in der Deutschschweiz, keines wegen uns verspaetet.\n\nDas Beste ist, Sie haben eine Telefonnummer fuer den ganzen Maler- und Gipserumfang.\n\nWaeren 15 Minuten am Telefon einen Versuch wert?\n\nFalls das fuer Sie nicht passt, ein kurzes Wort und ich melde mich nicht mehr."
+    },
+    {
+      "n": 2,
+      "delay_days": 3,
+      "angle": "are_you_busy_bau_de",
+      "subject": "kurz nach {company} geschaut",
+      "body": "Guten Tag {first_name},\n\nhabe kurz nach {company} geschaut.\n\nKurzer Kontext, wir uebernehmen den Maler- und Gipserpart fuer Architektur- und Bauunternehmen. Im Bauprogramm, Festpreis, eine Ansprechperson fuer den ganzen Umfang.\n\n15 Minuten am Telefon, ob das fuer Ihr naechstes Projekt passt?"
+    },
+    {
+      "n": 3,
+      "delay_days": 4,
+      "angle": "datenpunkt_bau_de",
+      "subject": "noch ein Datenpunkt",
+      "body": "Guten Tag {first_name},\n\nnoch ein Datenpunkt.\n\nLetztes Quartal drei Umbauten begleitet, rund 1100 Quadratmeter Wand und Decke, alle Abnahmen termingerecht und mangelfrei. Festpreis gehalten, die zwei kleinen Differenzen haben wir selber getragen.\n\nDasselbe Modell waere fuer {company}{geo_clause} gut machbar."
+    },
+    {
+      "n": 4,
+      "delay_days": 5,
+      "angle": "are_you_busy_problem_bau_de",
+      "subject": "die 4. Mail",
+      "body": "Guten Tag {first_name},\n\nich nochmal, das ist die 4. Mail, ich nehme an Sie sind beschaeftigt.\n\nProblem, wenn der Maler- und Gipserpart bei {company} dieses Jahr weiter knapp eingeplant wird, kostet jeder verspaetete Endausbau Zeit, Nerven und im schlimmsten Fall Konventionalstrafen.\n\nLoesung, 15 Minuten am Telefon und ich zeige, wie wir diesen Part zuverlaessig im Programm halten.\n\nEin klares ja oder nein reichen beide."
+    },
+    {
+      "n": 5,
+      "delay_days": 6,
+      "angle": "checkliste_bau_de",
+      "subject": "Abnahme-Checkliste fuer {company}",
+      "body": "Guten Tag {first_name},\n\nob {company} mit F2 arbeitet oder nicht, unsere Abnahme-Checkliste fuer den Maler- und Gipserpart gehoert Ihnen.\n\nAntworten Sie mit dem Wort Checkliste und ich schicke das PDF innert 24 Stunden. Kein Anruf, kein Verkaufsgespraech.\n\nFalls der Zeitpunkt grundsaetzlich nicht passt, sagen Sie es und ich melde mich nicht mehr."
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+# -*- coding: utf-8 -*-
+"""Generate X (Twitter) ad creatives for AlgoAlpha's Atlas AI backtester.
+
+Produces PNG images at the two sizes X uses for image ads:
+  - 1.91:1 (1200x628)  single-image / website-card ad
+  - 1:1    (1080x1080) square feed ad
+
+Brand pulled from profiles/algoalpha.json (yellow #ffd400 + crimson #c9165b,
+dark UI, Inter). Multiple creative concepts so you can A/B in Ads Manager.
+
+    py scripts/_make-atlas-x-ads.py
+"""
+import asyncio
+from pathlib import Path
+from playwright.async_api import async_playwright
+
+REPO = Path(__file__).resolve().parent.parent
+OUT = REPO / "out" / "atlas-x-ads"
+OUT.mkdir(parents=True, exist_ok=True)
+
+YELLOW = "#ffd400"
+CRIMSON = "#c9165b"
+INK = "#0a0a0a"
+BG = "#0b0e14"
+CARD = "#121722"
+GREY = "#8b97a7"
+GREEN = "#16c784"
+
+FONT = ('<link href="https://fonts.googleapis.com/css2?'
+        'family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">')
+
+
+def chrome(w, h, inner):
+    return f"""<!doctype html><html><head><meta charset="utf-8">{FONT}
+<style>*{{box-sizing:border-box;margin:0}}body{{font-family:'Inter',sans-serif;-webkit-print-color-adjust:exact}}
+.ad{{width:{w}px;height:{h}px;background:{BG};color:#fff;overflow:hidden;position:relative}}
+.logo{{display:flex;align-items:center;gap:9px;font-weight:800;font-size:22px;letter-spacing:-0.3px}}
+.bolt{{width:26px;height:26px}}
+.tag{{color:{GREY};font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase}}
+.kpi{{background:{CARD};border:1px solid #1e2633;border-radius:12px;padding:14px 16px}}
+.kpi .n{{font-size:26px;font-weight:900}}
+.kpi .l{{font-size:12px;color:{GREY};margin-top:2px}}
+.cta{{display:inline-block;background:{YELLOW};color:{INK};font-weight:800;font-size:17px;
+     padding:13px 26px;border-radius:10px}}
+.pill{{display:inline-block;background:rgba(201,22,91,.15);color:{CRIMSON};border:1px solid {CRIMSON};
+      font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:.5px}}
+.glow{{position:absolute;border-radius:50%;filter:blur(80px);opacity:.45}}
+</style></head><body><div class="ad">{inner}</div></body></html>"""
+
+
+LOGO = (f'<div class="logo"><svg class="bolt" viewBox="0 0 22 22">'
+        f'<rect width="22" height="22" rx="6" fill="{YELLOW}"/>'
+        f'<path d="M12 3 L6 12 H10 L9 19 L16 9 H11.5 Z" fill="{INK}"/></svg>'
+        f'AlgoAlpha</div>')
+
+
+def concept_landscape_a():
+    """1200x628 — headline + KPI strip + CTA. 'Stop guessing' angle."""
+    inner = f"""
+      <div class="glow" style="width:380px;height:380px;background:{CRIMSON};top:-120px;right:-80px;"></div>
+      <div class="glow" style="width:320px;height:320px;background:{YELLOW};bottom:-140px;left:-90px;opacity:.25;"></div>
+      <div style="position:relative;padding:46px 54px;height:100%;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">{LOGO}
+          <span class="tag">Signal first. Then trade.</span></div>
+        <div style="margin-top:30px;">
+          <span class="pill">NEW · ATLAS AI</span>
+          <div style="font-size:46px;font-weight:900;line-height:1.05;margin-top:16px;letter-spacing:-1px;max-width:760px;">
+            Stop hunting for strategies.<br><span style="color:{YELLOW};">Let the AI find them.</span></div>
+          <div style="color:{GREY};font-size:18px;margin-top:14px;max-width:680px;">
+            Atlas backtests thousands of setups and surfaces the ones with real edge. No code. No all-nighters.</div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:14px;">
+          <span class="cta">Try Atlas free &rarr;</span>
+          <span style="color:{GREY};font-size:14px;">Join 79,000+ traders</span>
+        </div>
+      </div>"""
+    return chrome(1200, 628, inner)
+
+
+def concept_landscape_b():
+    """1200x628 — KPI/proof-led. 'Win rate / net profit / risk' angle."""
+    inner = f"""
+      <div class="glow" style="width:360px;height:360px;background:{GREEN};top:-130px;left:40%;opacity:.18;"></div>
+      <div style="position:relative;padding:46px 54px;height:100%;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">{LOGO}
+          <span class="tag">Atlas AI Backtester</span></div>
+        <div style="font-size:40px;font-weight:900;line-height:1.08;margin-top:26px;letter-spacing:-0.8px;max-width:720px;">
+          Find strategies optimized for<br><span style="color:{YELLOW};">win rate, profit and risk</span> in seconds.</div>
+        <div style="display:flex;gap:16px;margin-top:30px;">
+          <div class="kpi" style="flex:1;"><div class="n" style="color:{GREEN};">Win rate</div><div class="l">AI-optimized targets</div></div>
+          <div class="kpi" style="flex:1;"><div class="n" style="color:{YELLOW};">Net profit</div><div class="l">Ranked, backtested</div></div>
+          <div class="kpi" style="flex:1;"><div class="n">Risk ratio</div><div class="l">Filtered for edge</div></div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:14px;">
+          <span class="cta">Start free trial &rarr;</span>
+          <span style="color:{GREY};font-size:14px;">From $24.97/mo · cancel anytime</span>
+        </div>
+      </div>"""
+    return chrome(1200, 628, inner)
+
+
+def concept_square_a():
+    """1080x1080 — bold question hook for feed."""
+    inner = f"""
+      <div class="glow" style="width:420px;height:420px;background:{CRIMSON};top:-120px;right:-100px;"></div>
+      <div class="glow" style="width:360px;height:360px;background:{YELLOW};bottom:-150px;left:-120px;opacity:.22;"></div>
+      <div style="position:relative;padding:64px 60px;height:100%;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">{LOGO}
+          <span class="tag">Atlas AI</span></div>
+        <div style="margin-top:54px;">
+          <span class="pill">BACKTESTING ON AUTOPILOT</span>
+          <div style="font-size:62px;font-weight:900;line-height:1.04;margin-top:24px;letter-spacing:-1.5px;">
+            What if your<br>backtesting<br><span style="color:{YELLOW};">ran itself?</span></div>
+          <div style="color:{GREY};font-size:21px;margin-top:22px;max-width:560px;">
+            Atlas scans the market with AI and hands you strategies that actually show an edge. You just trade them.</div>
+        </div>
+        <div style="margin-top:auto;">
+          <span class="cta" style="font-size:19px;padding:15px 30px;">Try Atlas free &rarr;</span>
+          <div style="color:{GREY};font-size:15px;margin-top:16px;">Signal first. Then trade. · 79,000+ traders</div>
+        </div>
+      </div>"""
+    return chrome(1080, 1080, inner)
+
+
+def concept_square_b():
+    """1080x1080 — before/after contrast."""
+    inner = f"""
+      <div style="position:relative;padding:60px;height:100%;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">{LOGO}
+          <span class="tag">Atlas AI Backtester</span></div>
+        <div style="font-size:40px;font-weight:900;margin-top:40px;letter-spacing:-0.8px;">Manual backtesting vs <span style="color:{YELLOW};">Atlas</span></div>
+        <div style="display:flex;gap:18px;margin-top:34px;">
+          <div class="kpi" style="flex:1;padding:24px 24px 28px;">
+            <div style="color:{CRIMSON};font-weight:800;font-size:20px;">Doing it by hand</div>
+            <ul style="margin:18px 0 0 18px;color:{GREY};font-size:20px;line-height:2.1;">
+              <li>Hours per strategy</li><li>Easy to fool yourself</li><li>Slow iteration</li><li>Needs experience</li></ul></div>
+          <div class="kpi" style="flex:1;padding:24px 24px 28px;border-color:{YELLOW};">
+            <div style="color:{GREEN};font-weight:800;font-size:20px;">With Atlas</div>
+            <ul style="margin:18px 0 0 18px;color:#cfd6df;font-size:20px;line-height:2.1;">
+              <li>Seconds, not hours</li><li>Ranked by real metrics</li><li>AI-driven discovery</li><li>No code required</li></ul></div>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:16px;">
+          <span class="cta" style="font-size:19px;padding:15px 30px;">Get Atlas &rarr;</span>
+          <span style="color:{GREY};font-size:15px;">Bundled from $24.97/mo</span></div>
+      </div>"""
+    return chrome(1080, 1080, inner)
+
+
+CREATIVES = [
+    ("atlas-landscape-A_1200x628.png", 1200, 628, concept_landscape_a()),
+    ("atlas-landscape-B_1200x628.png", 1200, 628, concept_landscape_b()),
+    ("atlas-square-A_1080x1080.png", 1080, 1080, concept_square_a()),
+    ("atlas-square-B_1080x1080.png", 1080, 1080, concept_square_b()),
+]
+
+
+async def main():
+    async with async_playwright() as p:
+        b = await p.chromium.launch()
+        for name, w, h, html in CREATIVES:
+            pg = await b.new_page(viewport={"width": w, "height": h}, device_scale_factor=2)
+            await pg.set_content(html, wait_until="networkidle")
+            await pg.wait_for_timeout(800)
+            await pg.screenshot(path=str(OUT / name), clip={"x": 0, "y": 0, "width": w, "height": h})
+            await pg.close()
+            print("wrote", name)
+        await b.close()
+    print("dir:", OUT)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

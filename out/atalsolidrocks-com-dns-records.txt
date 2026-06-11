@@ -1,0 +1,151 @@
+# DNS records to publish on atalsolidrocks.com @ Hostinger
+# Generated 2026-05-28. 60 records across 12 subdomains.
+# Paste into https://hpanel.hostinger.com/domain/atalsolidrocks.com -> DNS Zone Editor
+# After propagation, verify each in Resend.
+#
+# Format: TYPE  NAME  CONTENT
+
+## anna.atalsolidrocks.com
+  TXT     resend._domainkey.anna                                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBdXoPtm+14E815N8fVKyMWTPZNLahyhlIUcL2G55ZF3vkBPOijram6ERLrM48TxzXu74+U2R04ZBva23ctVoN1aQdCZiP+r2H/uFEkN+E0o6yljEzAnAv1OvJ5KvIN+DVr9lFzC/6s3k1CXUTFO2UA3UygEih6fVNkaSnHTdMnQIDAQAB
+          # source: Resend DKIM
+  MX      send.anna                                                10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.anna                                                v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     anna                                                     v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.anna                                              v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## elias.atalsolidrocks.com
+  TXT     resend._domainkey.elias                                  p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDo+nUfaBiBGIt2q2p1TMcqRGK4LuYPsgSU2wJWqMufgtv2ZT0BYtH38Ob5RQtNFMEldEVXTZNPPyQEmVlgpRlxKJNwo6+4MiIrT1etso/10JJacK79NBBVQSnvT0YM2dPBgig1aqsQnw4EvrJO0rUG88Zg+l8/DmgtdFMGHFrZlQIDAQAB
+          # source: Resend DKIM
+  MX      send.elias                                               10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.elias                                               v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     elias                                                    v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.elias                                             v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## felix.atalsolidrocks.com
+  TXT     resend._domainkey.felix                                  p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2Wp5rVkeJiDs/5GFAeRUE0+xIvDRANggkTLpC66OJ8Tq0YDS0oS4SxDxolc488WisR+lQGiduK4WTUWsgfHgN+MzLQIkKba5sstrXOgeo9PIBDZ4jY1NTP8s0IrX5fjvdC0WNKpYEuSIp513LP3joe7saW1jPXDy/ym/fVjwbhwIDAQAB
+          # source: Resend DKIM
+  MX      send.felix                                               10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.felix                                               v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     felix                                                    v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.felix                                             v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## jonas.atalsolidrocks.com
+  TXT     resend._domainkey.jonas                                  p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBts1W1l/y3QWBYb2COsORdDAwaC/NVj1sldEyfS3FYaKOd+7Y2ERDkqxk90eP8u+Lc5fji/Ab7WKUIVQx+AUA/yO66SZc/pvfqLUOMfI/fmsEdk+ZX1sBOvCUMsO5LbPjREWGxj1ggyuzPUb/GUCyh353Aet6VxsRX8LX2LUemQIDAQAB
+          # source: Resend DKIM
+  MX      send.jonas                                               10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.jonas                                               v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     jonas                                                    v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.jonas                                             v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## lea.atalsolidrocks.com
+  TXT     resend._domainkey.lea                                    p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQChehv/5lot3bcsbo3HDHvRbdK7fZgBYhiR3TH2UXfZScnQBUC2Tmh7PquJrPg3zMq6vlFlWYtWKAjloZrLXDZlBqQK1XB4wubgyNL6tqYE9ojd9EZO8mBwwkcDS8MnuucXw3OtSsR7UlPBuGo9/QtH/ZPF90p3nsQLNLoMMrGA+QIDAQAB
+          # source: Resend DKIM
+  MX      send.lea                                                 10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.lea                                                 v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     lea                                                      v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.lea                                               v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## lena.atalsolidrocks.com
+  TXT     resend._domainkey.lena                                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDk7QBwTHt1qNO4lFCfCnZbt0M2Ke6EZnEH6qUTTJ2IELCLGHmnTOIVp62mf7jwrW0AuAqnormFUumPu+077HkMZMb7g3CBtbFOJOr8zIRgdQ9ErfbKIlm53ExP3nuc9PJvmpnjsgQUdPj2T1bLZHOkzdcNLg9r8eM4tIuGmLkOCwIDAQAB
+          # source: Resend DKIM
+  MX      send.lena                                                10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.lena                                                v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     lena                                                     v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.lena                                              v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## lukas.atalsolidrocks.com
+  TXT     resend._domainkey.lukas                                  p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2Zu2QYuLjeEhwdABM/hKFoOs7jxq4SmzWR6WM7jb2vUE2tnXhJE1EX2gavr0Bcf1PirMcqQiQw1TaFTle2ZDxUP5SmXdQ+qdwIbtnu7Tj2ODUz4K+SgNBiLb9T3SE2f88tnWQcjI7BmtIPN6AGlNQVtGzKld3TF0vx3s9VFpNrQIDAQAB
+          # source: Resend DKIM
+  MX      send.lukas                                               10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.lukas                                               v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     lukas                                                    v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.lukas                                             v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## mira.atalsolidrocks.com
+  TXT     resend._domainkey.mira                                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgVocsXMDx2mlLT1WcphFJRGkqgr4PEiwJHTWyV0ubeyqe9lttI1MSIIKGgTQVJ7VECSbLwZW2RvgektmXVBztdcRITwp8VSiV4nCBY3cn0gWnlTLDlJ1ZFr6tRaMFILEyVaVHMUWqGdoCf+/oA+G8OEz5FAa4ntmcyAKISxK6PwIDAQAB
+          # source: Resend DKIM
+  MX      send.mira                                                10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.mira                                                v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     mira                                                     v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.mira                                              v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## niklas.atalsolidrocks.com
+  TXT     resend._domainkey.niklas                                 p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCoCBrNekem2p1IY1Hkbquk/cAeXvIOvbLINU6ynKOaalOBP/wO+s7NuuwebHt/nYXlWhOQBbSleOfxfCs4fwtoPs/+XcpEc+bIh4dYRTb0eE0teR/A/W0lA0pbCp7mv6RPIs1qQDV8D3vAPXl41USvpB/pv4T+nhBScX2PxBglQIDAQAB
+          # source: Resend DKIM
+  MX      send.niklas                                              10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.niklas                                              v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     niklas                                                   v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.niklas                                            v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## nora.atalsolidrocks.com
+  TXT     resend._domainkey.nora                                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC4T+DbXY+sdgQfAFEQ8TfrNbIgSS/MWE4wDV/E46AJx0fBgKIC4/WtkNypa85BT7Vd6ITd4XKJ+L9Q+BbCCuBonevK7AbGDInCcBWZokRlLaHa74+eSitLjAukLKzhcFK4NtwV7F3EYPs7a91JHgFMmPNAlTCS8D6EEiA8qdBALwIDAQAB
+          # source: Resend DKIM
+  MX      send.nora                                                10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.nora                                                v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     nora                                                     v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.nora                                              v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## sara.atalsolidrocks.com
+  TXT     resend._domainkey.sara                                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCwp2DG1jUzNreqk+3NzGltcT9julPR9UrlIvjdfndjFX5VyYvrYS99+m7XdkTf46t041ingZpdArLVz6unnGyvDL9nQOcYKjx1hEDP5fUZFfq2qrjYJ+6KvKoJDtvXkgS/8xLGbPycdUtfyLkKqmhbAYLzF0MN7WNqe05Qeqe5GQIDAQAB
+          # source: Resend DKIM
+  MX      send.sara                                                10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.sara                                                v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     sara                                                     v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.sara                                              v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+
+## tobias.atalsolidrocks.com
+  TXT     resend._domainkey.tobias                                 p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCyfAbYfzw9+m7+a95mQgEtobrp3UZL33Amc7wDQtuE7ANrl4MoXcMEnPgzcauA88s9kpqg4ImMM74gs7oGUitBIMDO5e/xhmZPnhltDAY5fbKOAIrAlUDu0j1WqyiBssnS0T1ISMEfMDsiVEVofL5QUlqZLBammlX+s6xHz0XdQIDAQAB
+          # source: Resend DKIM
+  MX      send.tobias                                              10 feedback-smtp.eu-west-1.amazonses.com
+          # source: Resend SPF
+  TXT     send.tobias                                              v=spf1 include:amazonses.com ~all
+          # source: Resend SPF
+  TXT     tobias                                                   v=spf1 include:amazonses.com ~all
+          # source: deterministic SPF
+  TXT     _dmarc.tobias                                            v=DMARC1; p=none; rua=mailto:dmarc@atalsolidrocks.com; ruf=mailto:dmarc@atalsolidrocks.com; pct=100; adkim=s; aspf=s
+          # source: deterministic DMARC
+

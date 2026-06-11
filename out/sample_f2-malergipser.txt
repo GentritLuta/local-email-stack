@@ -1,0 +1,41 @@
+=== F2-MALERGIPSER step-1 sample ===
+From:    Lukas from F2 Maler & Gipser <lukas@news.aureonglobal.de>
+To:      maysa.younes@jordi-liegenschaften.ch
+Reply-To:info@aureonglobal.de
+Subject: Sind Sie offen?
+Headers: {
+  "Message-ID": "<937425e1d64b46a3b204d3332d3576c3.1779355462@news.aureonglobal.de>",
+  "List-Unsubscribe": "<https://gentritluta.github.io/local-email-stack/unsubscribe/f2-malergipser.html?t=dcaefc91-25ca-405d-b9e1-aa13a3829ee0>, <mailto:info@aureonglobal.de?subject=unsubscribe>",
+  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+}
+
+--- merge fields ---
+first_name = Maysa
+company    = Jordi Liegenschaften
+city       = Bern
+
+--- text body ---
+Guten Tag Maysa,
+
+sind Sie gerade offen für etwas?
+
+Ich sehe, was Jordi Liegenschaften bei Wohnungsabnahmen leisten muss.
+
+Wir helfen Liegenschaftsverwaltungen wie Ihrer, Wohnungsabnahmen in 5 Werktagen statt 3 Wochen zu erledigen, mit Festpreis und ohne Nachträge.
+
+500 plus Wohnungen seit 2007. Letzte Wechsel Welle: 38 Wohnungen, alle in 5 Werktagen abgenommen.
+
+Das Beste ist, bei der ersten Wohnung 10 Prozent unter Ihrem aktuellen Anbieter. Stimmt die Qualität nicht, zahlen Sie nichts.
+
+Bonus: 32 Punkte Checkliste als PDF, einfach antworten.
+
+Macht ein 15 Minuten Telefon Sinn?
+
+P.s. einfach mit nein antworten, falls kein Interesse.
+
+Lukas Berger
+Geschäftsführer, F2 Maler & Gipser
+F2 Maler & Gipser · f2-malergipser.ch
+
+---
+Don't want these emails? Unsubscribe: https://gentritluta.github.io/local-email-stack/unsubscribe/f2-malergipser.html?t=dcaefc91-25ca-405d-b9e1-aa13a3829ee0

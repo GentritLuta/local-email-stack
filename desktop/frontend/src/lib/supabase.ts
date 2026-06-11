@@ -145,15 +145,23 @@ export type DbProspect = {
   first_name: string | null; last_name: string | null; company: string | null;
   niche_slug: string | null; title: string | null; phone: string | null;
   city: string | null; state: string | null; website: string | null;
+  source_url: string | null;
   verified: boolean; verified_at: string | null; verification_method: string | null;
   unsubscribed: boolean; unsubscribed_at: string | null;
+  // categorization columns (populated by enrichment_worker)
+  source_platform: string | null;
+  audience_size:   number | null;
+  industry_tags:   string[] | null;
+  geo:             string | null;
+  quality_score:   number | null;
+  enriched_categorization_at: string | null;
   created_at: string;
 };
 
 export async function fetchProspects(profileSlug?: string, limit = 5000): Promise<DbProspect[]> {
   const s = getSupabase(); if (!s) return [];
   let q = s.from("prospects")
-    .select("id,profile_slug,email,first_name,last_name,company,niche_slug,title,phone,city,state,website,verified,verified_at,verification_method,unsubscribed,unsubscribed_at,created_at")
+    .select("id,profile_slug,email,first_name,last_name,company,niche_slug,title,phone,city,state,website,source_url,verified,verified_at,verification_method,unsubscribed,unsubscribed_at,source_platform,audience_size,industry_tags,geo,quality_score,enriched_categorization_at,created_at")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (profileSlug) q = q.eq("profile_slug", profileSlug);

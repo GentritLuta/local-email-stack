@@ -1,0 +1,99 @@
+{
+  "aureon": {
+    "url": "https://aureonglobal.de",
+    "ok": true,
+    "title": "Aureon Global - Real Estate Growth Partner",
+    "h1_text": null,
+    "body_color": "#ffffff",
+    "body_bg": "#050505",
+    "body_font": "Inter, ui-sans-serif, system-ui",
+    "h1_color": null,
+    "h1_font": "",
+    "primary_button_top": [
+      {
+        "hex": "#d4af37",
+        "count": 4
+      }
+    ],
+    "accent_candidates": [
+      {
+        "hex": "#d4af37",
+        "count": 12
+      },
+      {
+        "hex": "#4b5563",
+        "count": 4
+      }
+    ]
+  },
+  "algoalpha": {
+    "url": "https://algoalpha.io",
+    "ok": true,
+    "title": "AlgoAlpha — TradingView Indicators & Crypto Signals",
+    "h1_text": "AlgoAlpha — TradingView Indicators & Crypto Signals\nIndicators",
+    "body_color": "#f4f4f5",
+    "body_bg": "#08090d",
+    "body_font": "Inter, \"Inter Fallback\", ui-sans-serif, system-ui, sans-serif",
+    "h1_color": "#f4f4f5",
+    "h1_font": "Montserrat, \"Montserrat Fallback\"",
+    "primary_button_top": [],
+    "accent_candidates": [
+      {
+        "hex": "#ffd400",
+        "count": 5
+      },
+      {
+        "hex": "#c9165b",
+        "count": 1
+      },
+      {
+        "hex": "#ff7a00",
+        "count": 1
+      }
+    ]
+  },
+  "f2-malergipser": {
+    "url": "https://f2-malergipser.ch",
+    "ok": true,
+    "title": "F2 Maler Gipser GmbH - Bern und Burgdorf und Umgebung | F2 Maler Gipser GmbH",
+    "h1_text": "Maler und Gipser in Bern, Burgdorf und Umgebung",
+    "body_color": "#1a2332",
+    "body_bg": "#ffffff",
+    "body_font": "\"Plus Jakarta Sans\", sans-serif",
+    "h1_color": "#ffffff",
+    "h1_font": "\"Plus Jakarta Sans\", sans-serif",
+    "primary_button_top": [
+      {
+        "hex": "#6ba94c",
+        "count": 2
+      }
+    ],
+    "accent_candidates": [
+      {
+        "hex": "#6ba94c",
+        "count": 51
+      },
+      {
+        "hex": "#1a2332",
+        "count": 29
+      },
+      {
+        "hex": "#2b899c",
+        "count": 1
+      }
+    ]
+  },
+  "lk-advertising": {
+    "url": "https://lk-advertising.com",
+    "ok": true,
+    "title": "Website nicht gefunden",
+    "h1_text": "Website nicht gefunden",
+    "body_color": "#000000",
+    "body_bg": "#141414",
+    "body_font": "\"Times New Roman\"",
+    "h1_color": "#ffffff",
+    "h1_font": "Onest, -apple-system, system-ui, \"helvetica neue\", \"calibri light\", Roboto, sans-serif",
+    "primary_button_top": [],
+    "accent_candidates": []
+  }
+}

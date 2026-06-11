@@ -1,0 +1,83 @@
+slug: diraya_ai
+name: "Diraya official ICP — seed-to-Series-B AI-engineering buyers (SaaS / health tech / fintech)"
+profile_slug: diraya
+# CANONICAL ICP, set from Diraya Inc's Aureon onboarding (submitted 2026-05-24 by
+# Mohammed El Amine Amoura, amoura.ma@diraya.ca). This is the single source of truth
+# for who Diraya targets. The active sourcing paths (scripts/yc-guess-verify.py gate
+# + scripts/diraya-discover.py gate) are tuned to match it. Diraya is an IMPORT-ONLY
+# profile (founder emails are not cold-scrapeable), so this file documents and drives
+# the ICP rather than running lead_scrape directly.
+#
+# Company of record: Diraya Inc, reg. 1603166-8, Canada. Sending domain: diraya.ca.
+# Formal notices: info@diraya.ca. Positive replies route to a Calendly/inbox; intro
+# calls taken by Amoura and team (Algeria / Qatar / Canada, any time zone).
+
+icp:
+  who: "Startups and scaleups, roughly pre-seed to Series B, in SaaS / health tech /
+        fintech, that need AI engineering (shipping a production AI feature)."
+  stage: ["pre-seed", "seed", "series-a", "series-b"]
+  sectors: ["saas", "health tech", "fintech", "b2b software", "developer tools",
+            "data / analytics", "vertical software"]
+
+# Best-converting buyer titles (target these; founders cover most of them on YC data).
+buyer_titles:
+  - Owner
+  - Co-Owner
+  - Founder
+  - Co-Founder
+  - Founding Partner
+  - CEO
+  - Chief Executive Officer
+  - President
+  - Vice President
+  - Managing Director
+  - Manager
+  - Managing Partner
+  - Partner
+  - General Manager
+  - Proprietor
+  - Principal
+  - Chairman
+  - Chairperson
+  - Board Member
+  - Director
+  - Executive Director
+  - CTO
+  - Chief Technology Officer
+  - VP Engineering
+  - VP of Engineering
+  - Head of Engineering
+  - Engineering Manager
+  - Director of Engineering
+  - CPO
+  - Chief Product Officer
+  - VP Product
+  - Head of Product
+  - Director of Product
+  - COO
+  - Chief Operating Officer
+  - CIO
+  - Chief Information Officer
+  - Head of Technology
+  - Technical Lead
+  - Technical Director
+
+# Hard exclusions (competitors / non-buyers). Wired into the sourcing gates' EXCLUDE_RX.
+exclude_sectors:
+  - "AI engineering studios"
+  - "dev agencies / software development agencies"
+  - "large enterprise IT outsourcing firms"
+  - "staffing / recruiting agencies"
+
+# Buying signals that raise priority for a prospect (when detectable, free, no fabrication).
+buying_signals:
+  - "new funding round (pre-seed through Series B especially)"
+  - "new CTO, VP Engineering, or Head of Product joining"
+  - "engineering or AI/ML hiring spree"
+  - "public announcement of an AI product or AI roadmap"
+  - "recent product launch or pivot toward an AI-native feature"
+  - "open roles for 'AI engineer', 'ML engineer', or 'agentic systems'"
+  - "vendor migration (cloud, database, or AI provider switch)"
+  - "public mentions of struggling with RAG, agents, or LLM reliability"
+
+sequence_slug: diraya-default      # technical Hormozi 7-email sequence fits these buyers

@@ -1,0 +1,108 @@
+# ENER-G DNS records to publish. Add these in your DNS panel for each root domain.
+# Format: TYPE  NAME  CONTENT   (NAME is relative to the root domain / zone root)
+# After propagation (5-60 min): py scripts/provision-energ.py verify
+
+
+########## ener-g-beratung.com ##########
+
+## hello.ener-g-beratung.com
+  TXT    resend._domainkey.hello                       p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFDpYQm2sKvbrQAlcJNlNQ5k+Rb2ToL6DDAsLcmqNm9j4Mio001C/TTLnOjOzpB86odtpOrl2cu9ic+ZmNY8O602GLt3xn9s/J8CkjB1R/pa2jIMNMuJ82t/jKkY2TontGuCWGJJLtZPFt4TnGPwpk0nAKezyU2ItQi6bKMGK4kQIDAQAB
+         # Resend DKIM
+  MX     send.hello                                    10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.hello                                    v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    hello                                         v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.hello                                  v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.com; ruf=mailto:dmarc@ener-g-beratung.com; pct=100; adkim=s; aspf=s
+         # DMARC
+
+## team.ener-g-beratung.com
+  TXT    resend._domainkey.team                        p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrv5rtUBabi7FC3b8B5F5cLllCIlMZqLRku28CxC3jsN2zWVM6smWQzQ5TF+kEurzm+3IHlAEh0iLMUs2dCsaEkRE9IFrcsE5op8fuKtHlp5uzsxXAYU2W8rCNrsf4XbCsDofYJ/CqfIAchuTYwaXGMgaX3e5s3sHrUcoHD5Qb3wIDAQAB
+         # Resend DKIM
+  MX     send.team                                     10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.team                                     v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    team                                          v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.team                                   v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.com; ruf=mailto:dmarc@ener-g-beratung.com; pct=100; adkim=s; aspf=s
+         # DMARC
+
+########## ener-g-beratung.de ##########
+
+## hello.ener-g-beratung.de
+  TXT    resend._domainkey.hello                       p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDQKcwhwuzyDpvCdSpbtPIAq96176iAF9Ey0/tctK0xePwuknQEUltg/JQf2cwEilclBuYrRfdNz8f/TZwaBDQOvRiJXRUGZsUgmjptFHfigmkdw2SYzYL/0edMWgIiDL+osfx1SEPi6OXDF7I8y44GOz4TZX74RF+Av5CgGzbnrwIDAQAB
+         # Resend DKIM
+  MX     send.hello                                    10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.hello                                    v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    hello                                         v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.hello                                  v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.de; ruf=mailto:dmarc@ener-g-beratung.de; pct=100; adkim=s; aspf=s
+         # DMARC
+
+## team.ener-g-beratung.de
+  TXT    resend._domainkey.team                        p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD4/hyzMHmN0wVyGTCvCVOF120QsmAl4e6RszJ1IqOlE9U/AaM2xrFKYX1YcQ8a7XYlQPFv//Lp+2sw7vxETnXfbMYUo59WNHCserdad5ipNK8FtRKr+fMPbG7fgPNfThjswfdwM8FStqf5JuLSwF6NOc2O+Ue4ss1uRrEdn7bAkwIDAQAB
+         # Resend DKIM
+  MX     send.team                                     10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.team                                     v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    team                                          v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.team                                   v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.de; ruf=mailto:dmarc@ener-g-beratung.de; pct=100; adkim=s; aspf=s
+         # DMARC
+
+########## ener-g-beratung.org ##########
+
+## hello.ener-g-beratung.org
+  TXT    resend._domainkey.hello                       p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZKHP+U2a/M1NEhvwdFSOAY9a54lmbdj6dOxNTybt8PQxmV2KWQqHcqkul0+29hmgo8UdvPt4jIdlX1RGwfhN9jfLNdDXl8IEaoFeBX30dMz10OY8JABnEUZzCcY0+8X/i8Jqy/l6dd+c2gYjotSB2lf3JYz4i49PCVAyvF4GEVQIDAQAB
+         # Resend DKIM
+  MX     send.hello                                    10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.hello                                    v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    hello                                         v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.hello                                  v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.org; ruf=mailto:dmarc@ener-g-beratung.org; pct=100; adkim=s; aspf=s
+         # DMARC
+
+## team.ener-g-beratung.org
+  TXT    resend._domainkey.team                        p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCsNpb7G3zkYoSpqnDeYRdAcS8ggPuEg+oE9hhSOHX8coaUsPxB5EI+jFvwLLUuZEFlenc6Ou94PfkhzXxQbZfD13R82+yFOFMwZs5fwz0EafN4kY6GsUQtdEEmD6WnDApY2lGrlzv8mUjpOpdWRQ5Q639sAAmqPiSbymhLSazqwIDAQAB
+         # Resend DKIM
+  MX     send.team                                     10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.team                                     v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    team                                          v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.team                                   v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.org; ruf=mailto:dmarc@ener-g-beratung.org; pct=100; adkim=s; aspf=s
+         # DMARC
+
+########## ener-g-beratung.store ##########
+
+## hello.ener-g-beratung.store
+  TXT    resend._domainkey.hello                       p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9DbMDV70FIj5ELowd5RJslgXQpILfSdfL6o8IM07kFxWspUC9fBV8N2sDb0T+Eu5LDH9tGQfySBxD6p+/WhqTgJHIKzGBcrhbt71RsPt82pIw/76rc5o4iDdugxRhA+p3asxQLCU3Mh2H44a3PW4910iX5F5wh9595+RAbeDObwIDAQAB
+         # Resend DKIM
+  MX     send.hello                                    10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.hello                                    v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    hello                                         v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.hello                                  v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.store; ruf=mailto:dmarc@ener-g-beratung.store; pct=100; adkim=s; aspf=s
+         # DMARC
+
+## team.ener-g-beratung.store
+  TXT    resend._domainkey.team                        p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDTSWHxnlI6pDnN2GaCSbipkVDBMBN9qAyoQAEmKJG02wtyWi+P7nY/fsASRxOcR+RpjD0hoiopiGe9zQ8aRLz4GurZsuMgFZgbZzbmv1Ktb4uW9rUsGzmwUwMUESiiONPJ1SMr9CR1ipGlQfdshlhbBRj6vAiuXSF/6c5S1gkrsQIDAQAB
+         # Resend DKIM
+  MX     send.team                                     10 feedback-smtp.eu-west-1.amazonses.com
+         # Resend SPF
+  TXT    send.team                                     v=spf1 include:amazonses.com ~all
+         # Resend SPF
+  TXT    team                                          v=spf1 include:amazonses.com ~all
+         # SPF
+  TXT    _dmarc.team                                   v=DMARC1; p=none; rua=mailto:dmarc@ener-g-beratung.store; ruf=mailto:dmarc@ener-g-beratung.store; pct=100; adkim=s; aspf=s
+         # DMARC

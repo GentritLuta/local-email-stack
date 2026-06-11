@@ -1,0 +1,15 @@
+# LK Advertising — DNS records for lk-advertising.site (add in Hostinger hPanel via the collaboration).
+# NAME is relative to the lk-advertising.site zone root.
+
+########## outreach.lk-advertising.site (Resend) ##########
+TXT    resend._domainkey.outreach               p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC4Fjx3KXNUYKqxJv90N5exjMCP+bV3kOgyB2u7YeGbW8lHi6Y9OoEQAQ7hO+wDuDSZ6IGukcR6iY9y3zjbfgqntqH3g9GtTXReVtYW1ZD595qkx+sL/O7yJArUsDYMJm0ZaFAzdNf8ouidz37n+CoMJVJ5BribyUYlN1zvS70m1QIDAQAB
+MX     send.outreach                            feedback-smtp.eu-west-1.amazonses.com [priority 10]
+TXT    send.outreach                            v=spf1 include:amazonses.com ~all
+TXT    _dmarc.outreach                          v=DMARC1; p=none; rua=mailto:dmarc@lk-advertising.site; pct=100; adkim=s; aspf=s
+
+########## team.lk-advertising.site (Resend) ##########
+TXT    resend._domainkey.team                   p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDRykse96DDuOdNOtHVOGVAbkvu+r0VKvMogyr/UYmRCuMOtqntM6l9SI6kXH/GppT1n51E2NOA0Z4KI4Obpw9Px4SkMZNaIQFX5fJE+nGpKOGfl6nsN9ByPe2T2BLFdEWz6e8zrzmGRxQzCPPswhy5964GFZ23Dmwt/cQI8n/4RwIDAQAB
+MX     send.team                                feedback-smtp.eu-west-1.amazonses.com [priority 10]
+TXT    send.team                                v=spf1 include:amazonses.com ~all
+TXT    _dmarc.team                              v=DMARC1; p=none; rua=mailto:dmarc@lk-advertising.site; pct=100; adkim=s; aspf=s
+

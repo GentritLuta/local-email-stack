@@ -1,0 +1,216 @@
+{
+  "metro": "Bloomington",
+  "label": "Bloomington and South-Central Indiana",
+  "basename": "Attorney-Referral-List-Bloomington",
+  "match": {
+    "area_codes": [
+      "812",
+      "930"
+    ],
+    "states": [
+      "IN"
+    ],
+    "cities": [
+      "bloomington",
+      "ellettsville",
+      "spencer",
+      "bedford",
+      "gosport",
+      "bloomfield",
+      "ellettsville"
+    ],
+    "zip_prefixes": [
+      "474",
+      "472"
+    ]
+  },
+  "firms": [
+    {
+      "firm": "Clendening Johnson & Bohrer, P.C.",
+      "type": "Estate / Probate",
+      "lead_attorney": "James F. Bohrer",
+      "practice": "Probate and estate administration, board-certified trust & estate specialist",
+      "city": "Bloomington",
+      "phone": "812-382-9001",
+      "email": "",
+      "website": "https://www.lawcjb.com/",
+      "address": "409 W. Patterson Drive, Suite 205, Bloomington, IN 47403"
+    },
+    {
+      "firm": "Like Law Group LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Lance D. Like",
+      "practice": "Estate planning, elder law, Medicaid planning, probate & trust administration",
+      "city": "Bloomington",
+      "phone": "812-323-8300",
+      "email": "",
+      "website": "https://likelawgroup.com/",
+      "address": "1211 N. College Avenue, Bloomington, IN 47404"
+    },
+    {
+      "firm": "Freitag & Martoglio",
+      "type": "Estate / Probate",
+      "lead_attorney": "E. Paige Freitag",
+      "practice": "Estate planning, probate & trust administration, elder law",
+      "city": "Bloomington",
+      "phone": "812-676-6030",
+      "email": "",
+      "website": "https://www.bloominglaw.com/",
+      "address": "2907 E. Buick Cadillac Blvd., Bloomington, IN 47401"
+    },
+    {
+      "firm": "Bunger & Robertson",
+      "type": "Estate / Probate",
+      "lead_attorney": "Thomas Bunger",
+      "practice": "Estate planning, elder law and probate",
+      "city": "Bloomington",
+      "phone": "812-332-9295",
+      "email": "br@lawbr.com",
+      "website": "https://www.lawbr.com/",
+      "address": "211 South College Ave., Bloomington, IN 47404"
+    },
+    {
+      "firm": "Steele & Steele LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Brent E. Steele",
+      "practice": "Estate planning, wills & trusts, probate, real estate",
+      "city": "Bedford",
+      "phone": "812-279-3513",
+      "email": "",
+      "website": "https://www.steeleandsteelelaw.com/",
+      "address": "1602 I St, Suite 1, Bedford, IN 47421"
+    },
+    {
+      "firm": "Jewell, Crump, Angermeier & Prall",
+      "type": "Estate / Probate",
+      "lead_attorney": "Jerry E. Prall",
+      "practice": "Estate planning, wills, trusts and probate",
+      "city": "Columbus",
+      "phone": "812-376-9752",
+      "email": "",
+      "website": "https://www.jcaplaw.com/",
+      "address": "1325 Washington St., Columbus, IN 47201"
+    },
+    {
+      "firm": "Whitted Law LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Alan L. Whitted",
+      "practice": "Wills, estate planning, probate, guardianship, elder law",
+      "city": "Columbus",
+      "phone": "812-376-6676",
+      "email": "kim@whittedlaw.com",
+      "website": "https://www.whittedlaw.com/",
+      "address": "431 Washington St, Columbus, IN 47201"
+    },
+    {
+      "firm": "Beck Rocker, LLC",
+      "type": "Estate / Probate",
+      "lead_attorney": "Jeff Rocker",
+      "practice": "Estate planning, estate & trust administration, probate",
+      "city": "Columbus",
+      "phone": "812-372-8858",
+      "email": "",
+      "website": "https://www.beckrocker.com/",
+      "address": "432 Washington St, Columbus, IN 47201"
+    },
+    {
+      "firm": "McCrea & McCrea",
+      "type": "Divorce / Family",
+      "lead_attorney": "Aaron McCrea",
+      "practice": "Divorce, child custody, paternity, family law",
+      "city": "Bloomington",
+      "phone": "812-650-4425",
+      "email": "",
+      "website": "https://www.mccrea-mccrea.com/",
+      "address": "Bloomington, IN 47401"
+    },
+    {
+      "firm": "H. Michelle Gregory LLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "H. Michelle Gregory",
+      "practice": "Divorce, custody, child support, paternity, family law mediation",
+      "city": "Bloomington",
+      "phone": "812-322-0701",
+      "email": "",
+      "website": "https://hmichellegregoryllc.com/",
+      "address": "101 W. Kirkwood Ave. #006A, Bloomington, IN 47404"
+    },
+    {
+      "firm": "Carl Lamb and Associates, PC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Carl Lamb",
+      "practice": "Divorce, child custody, family law",
+      "city": "Bloomington",
+      "phone": "812-332-1420",
+      "email": "carl@carllamblaw.com",
+      "website": "https://attorneycarllamb.com/",
+      "address": "1101 West 2nd Street, Bloomington, IN 47403"
+    },
+    {
+      "firm": "Mallor Grodner Plummer Attorneys",
+      "type": "Divorce / Family",
+      "lead_attorney": "Andrew C. Mallor",
+      "practice": "Divorce, child custody, collaborative law, high-asset divorce",
+      "city": "Bloomington",
+      "phone": "812-332-5000",
+      "email": "",
+      "website": "https://lawmgp.com/",
+      "address": "511 S Woodscrest Drive, Bloomington, IN 47401"
+    },
+    {
+      "firm": "Schulz Reagan LLC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Kara Reagan",
+      "practice": "Family law, divorce, adoption",
+      "city": "Bloomington",
+      "phone": "812-339-6055",
+      "email": "info@schulzreagan.com",
+      "website": "https://www.schulzreagan.com/",
+      "address": "1114 N. College Ave., Bloomington, IN 47404"
+    },
+    {
+      "firm": "Slotegraaf Niehoff PC",
+      "type": "Divorce / Family",
+      "lead_attorney": "Eric Slotegraaf",
+      "practice": "Divorce, custody, collaborative & high-asset divorce",
+      "city": "Bloomington",
+      "phone": "812-332-6000",
+      "email": "",
+      "website": "https://www.snlawoffice.com/",
+      "address": "200 East Third St., Bloomington, IN 47401"
+    },
+    {
+      "firm": "Scott Callahan, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "J. Scott Callahan",
+      "practice": "Divorce and family law",
+      "city": "Bedford",
+      "phone": "812-277-1950",
+      "email": "",
+      "website": "https://www.scottcallahanattorney.com/",
+      "address": "1310 16th Street, Bedford, IN 47421"
+    },
+    {
+      "firm": "The McIntyre Law Office",
+      "type": "Divorce / Family",
+      "lead_attorney": "Meredith L. McIntyre",
+      "practice": "Divorce, child custody, paternity (certified family law specialist)",
+      "city": "Bedford",
+      "phone": "812-275-3306",
+      "email": "meredith@mcintyrelawoffice.com",
+      "website": "https://mcintyrelawoffice.com/",
+      "address": "1522 I Street, East Side Square, Bedford, IN 47421"
+    },
+    {
+      "firm": "Thomasson, Guthrie, Schuh-Ogle & Happel, P.C.",
+      "type": "Divorce / Family",
+      "lead_attorney": "Sean G. Thomasson",
+      "practice": "Divorce, custody, child support, family law",
+      "city": "Columbus",
+      "phone": "812-565-5041",
+      "email": "",
+      "website": "https://www.thomassonlaw.com/",
+      "address": "50 Washington Street, Suite 3A, Columbus, IN 47201"
+    }
+  ]
+}

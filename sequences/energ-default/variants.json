@@ -1,0 +1,143 @@
+{
+  "name": "ENER-G — 7-E-Mail Akquise-Sequenz (KMU/Gewerbe, unabhängige Energieberatung)",
+  "slug": "energ-default",
+  "profile_slug": "energ",
+  "created_at": "2026-06-07",
+  "finalized_at": "2026-06-07",
+  "target": "Founder, Prokurist, Geschäftsführer, Inhaber von KMU/Gewerbe in Deutschland ab 30.000 kWh Stromverbrauch, ohne Obergrenze (hunderttausende bis Millionen kWh), im Umkreis von ~100 km um Neuss/Düsseldorf. Ein Entscheider. Kaufsignale: Neugründung, neuer Gewerbemietvertrag/Bauantrag, Umzug, Eigentümerwechsel (Handelsregister), auslaufender Energievertrag (3-6 Monate vor Ende).",
+  "voice_notes": "Direkte B2B-Akquise auf Deutsch. Jede E-Mail: Wunschergebnis (niedrigere Energiekosten ohne Überraschungen) + wahrgenommene Wahrscheinlichkeit + geringer Aufwand + geringes Risiko. Philipp schreibt als Berater, nicht als Firma. Konkrete Zahlen. Benannte Lead-Magnete: CHECK (kostenloser Energiekosten-Check) und FALLEN (Liste der typischen Vertragsfallen). KEINE Gedankenstriche, KEINE typografischen Anführungszeichen, KEINE Auslassungspunkte, KEINE Ausrufezeichen, KEINE Emojis. P.S. auf jeder E-Mail mit einem zweiten konkreten Mehrwert. Pflicht-Merge: {company}. Anrede ohne Namen (Sie-Anrede, \"Guten Tag,\") da Impressum-Leads meist Rollenpostfaecher (info@/kontakt@) ohne Vornamen sind.",
+  "offer_facts": {
+    "value_prop": "Unabhängige Energieberatung für KMU und Gewerbe. Wir prüfen Ihre Strom- und Gasverträge, holen vergleichbare Angebote ein und sichern bessere Konditionen, bevor Ihr Vertrag oder Ihr neuer Standort zum Problem wird. 100 Prozent transparent, garantiert ohne Überraschungen.",
+    "proof_points": [
+      "kostenloser Energiekosten-Check in 15 Minuten, schriftliche Auswertung",
+      "unabhängig: wir vergleichen den Markt, statt einen einzigen Tarif zu verkaufen",
+      "spezialisiert ab 30.000 kWh Jahresverbrauch, ohne Obergrenze bis in den Millionenbereich",
+      "auch Stromsteuerrückerstattung und Solar-Contracting"
+    ],
+    "differentiators": [
+      "ein fester Ansprechpartner, kein Callcenter",
+      "transparente Beratung ohne versteckte Provisionen",
+      "schnell handlungsfähig bei Neugründung, Umzug oder Vertragsende",
+      "Fokus auf die Region um Neuss und Düsseldorf"
+    ],
+    "guarantee": "Der Energiekosten-Check ist kostenlos und unverbindlich. Wenn wir kein Einsparpotenzial finden, sagen wir Ihnen das ehrlich.",
+    "lead_magnet_primary": "Kostenloser Energiekosten-Check mit schriftlicher Auswertung. Antworten Sie mit CHECK.",
+    "lead_magnet_secondary": "Liste der typischen Vertragsfallen bei Strom- und Gasverträgen. Antworten Sie mit FALLEN."
+  },
+  "required_merges": [
+    "company"
+  ],
+  "schedule_doc": "delay_days = Abstand zum vorigen Schritt. 0,2,2,3,4,7,10 = kumuliert Tag 0,2,4,7,11,18,28.",
+  "performance": {
+    "title": "Leistungsprognose bei 600 E-Mails pro Tag",
+    "disclaimer": "Dies ist eine Schätzung, kein Versprechen und keine Garantie für Ergebnisse. Die tatsächlichen Resultate hängen von Listenqualität, Zustellbarkeit, Angebot, Marktzeitpunkt und Nachfassen ab. Die folgenden Zahlen sind aus üblichen B2B-Kaltakquise-Quoten auf Ihre eigene Angebotsökonomie modelliert, konservativ und optimistisch dargestellt, damit Sie die Bandbreite einschätzen können.",
+    "volume": {
+      "emails_per_day": 600,
+      "working_days_per_month": 22,
+      "sends_per_month": 13200
+    },
+    "funnel_label": "Akquise-Funnel (KMU/Gewerbe)",
+    "rows": [
+      {
+        "stage": "E-Mails versendet / Monat",
+        "cons_rate": "",
+        "cons": "13.200",
+        "opt_rate": "",
+        "opt": "13.200"
+      },
+      {
+        "stage": "Antworten",
+        "cons_rate": "2,5 %",
+        "cons": "330",
+        "opt_rate": "5 %",
+        "opt": "660"
+      },
+      {
+        "stage": "Interessenten (Check/Termin)",
+        "cons_rate": "20 % der Antworten",
+        "cons": "66",
+        "opt_rate": "30 % der Antworten",
+        "opt": "198"
+      },
+      {
+        "stage": "Vorgespräche",
+        "cons_rate": "40 % der Interessenten",
+        "cons": "26",
+        "opt_rate": "50 % der Interessenten",
+        "opt": "99"
+      },
+      {
+        "stage": "Mandate (Kunden gewonnen)",
+        "cons_rate": "15 % der Gespräche",
+        "cons": "4",
+        "opt_rate": "25 % der Gespräche",
+        "opt": "25"
+      }
+    ],
+    "value_note": "Wert pro gewonnenem Mandat: Schon ein Betrieb ab 30.000 kWh Jahresverbrauch lohnt sich; ein Betrieb mit hunderttausenden bis Millionen kWh zahlt grob 30.000 bis weit über 150.000 Euro Stromkosten pro Jahr. Bereits 10 bis 15 Prozent Einsparung sind realistisch, also mehrere tausend bis fünfstellig pro Jahr für den Kunden, bei sehr großen Verbräuchen deutlich mehr. Als konservative Planungsgröße für den Ertrag von ENER-G je Mandat (Provision/Honorar auf die Beschaffung) rechnen wir mit rund 1.500 Euro im ersten Jahr; bei größeren Verbräuchen und Folgejahren deutlich mehr.",
+    "value_per_unit": 1500,
+    "value_unit_label": "pro Mandat / Jahr (konservativ, ENER-G-Anteil)",
+    "revenue_rows": [
+      {
+        "label": "Konservativ: 4 Mandate/Monat x 12 = 48 Mandate/Jahr",
+        "value": "~72.000 Euro / Jahr"
+      },
+      {
+        "label": "Optimistisch: bis 25 Mandate/Monat (eingeschwungen)",
+        "value": "ein Vielfaches; durch Kapazität begrenzt, nicht durch Leads"
+      }
+    ],
+    "bottom_line": "Schon am konservativen Ende (4 neue Mandate pro Monat) deutet die Rechnung auf einen mittleren fünfstelligen bis sechsstelligen Jahresbeitrag aus einem einzigen 600/Tag-Kanal hin, noch ohne Folgejahre und Empfehlungen. Die eigentliche Grenze ist, wie viele Mandate ENER-G sauber betreuen kann, nicht wie viele Leads die Kampagne liefert."
+  },
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "seq_open_question_give",
+      "subject": "kurze Frage zu Ihren Energiekosten?",
+      "body": "Guten Tag,\n\nKurze Frage, kein Verkauf.\n\nIch bin von ENER-G, einer unabhängigen Energieberatung. Wir prüfen für Unternehmen wie {company} die Strom- und Gasverträge und holen bessere Konditionen, bevor der Vertrag oder ein neuer Standort zum Kostentreiber wird.\n\nBei einem Betrieb mit rund 250.000 kWh Jahresverbrauch haben wir zuletzt vierstellig pro Jahr eingespart, einfach weil der Altvertrag nie verglichen wurde. Wir verkaufen keinen einzelnen Tarif, wir vergleichen den Markt.\n\nWenn {company} ab etwa 30.000 kWh im Jahr verbraucht, ob hunderttausende oder Millionen kWh, wären 15 Minuten am Telefon hilfreich?\n\nFalls das Timing nicht passt, antworten Sie kurz mit Nein und ich melde mich nicht wieder.\n\nP.s. ob wir je zusammenarbeiten oder nicht: Antworten Sie mit dem Wort FALLEN und ich schicke Ihnen unsere Liste der typischen Vertragsfallen bei Strom und Gas. Kostenlos, ohne Telefonat."
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "seq_specificity_to_company",
+      "subject": "15 Minuten für {company}",
+      "body": "Guten Tag,\n\nKurze Nachfrage zum Thema Energiekosten.\n\nDer konkrete Ablauf, den ich für {company} im Kopf habe: In 15 Minuten klären wir Ihren aktuellen Verbrauch und Ihre Vertragslaufzeit. Danach holen wir vergleichbare Angebote ein und Sie bekommen eine schriftliche Auswertung mit dem realistischen Einsparpotenzial.\n\nKein Wechselstress, keine versteckten Provisionen. Sie entscheiden am Ende, ob sich etwas lohnt.\n\nGerade bei Neugründung, Umzug oder einem Vertrag, der zum Jahresende ausläuft, ist der richtige Zeitpunkt jetzt.\n\nPasst diese Woche ein 15-minütiges Vorgespräch?\n\nP.s. die Liste der Vertragsfallen gehört weiterhin Ihnen, wenn Sie möchten. Antworten Sie mit FALLEN."
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "seq_data_point_dream_outcome",
+      "subject": "ein Vertrag, nie verglichen",
+      "body": "Guten Tag,\n\nEine Zahl.\n\nDie meisten Gewerbebetriebe ab 30.000 kWh, egal ob hunderttausende oder Millionen kWh im Jahr, zahlen Jahr für Jahr zu viel, weil der Energievertrag nach Abschluss nie wieder geprüft wurde. Der Markt bewegt sich, der Altvertrag nicht.\n\nDer Hebel ist einfach: den aktuellen Verbrauch sauber erfassen, den Markt vergleichen, die Konditionen vor dem nächsten Stichtag sichern. Genau das machen wir, unabhängig und transparent.\n\nFür {company} würde derselbe Ansatz greifen. Der Energiekosten-Check zeigt schwarz auf weiß, ob etwas zu holen ist.\n\n15 Minuten, um zu sehen, was Ihr Check ergeben würde?\n\nP.s. gerne schicke ich Ihnen vorab die schriftliche Check-Vorlage. Antworten Sie mit CHECK und ich sende sie für {company} zu."
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "seq_busy_ack_reason_why",
+      "subject": "Sie haben wenig Zeit, hier die Rechnung",
+      "body": "Guten Tag,\n\nVierte E-Mail, Sie sind offensichtlich eingespannt. Letzte Nachricht von mir, bevor ich nur noch Mehrwert schicke.\n\nKurz, warum ich dranbleibe.\n\nWenn {company} einen auslaufenden Vertrag verstreichen lässt oder bei einem neuen Standort die Energieversorgung erst spät regelt, landet man oft in der Grundversorgung oder im teuersten Tarif. Das kostet ab 30.000 kWh schnell vierstellig pro Jahr, bei hunderttausenden bis Millionen kWh entsprechend mehr.\n\nWenn {company} rechtzeitig vergleicht, geht die Rechnung in die andere Richtung.\n\nDas Angebot: ein kostenloser Energiekosten-Check, schriftlich, unverbindlich. Finden wir nichts, sagen wir das ehrlich. Der Aufwand für Sie sind 15 Minuten.\n\nAntworten Sie mit einem Termin oder einem Nein. Beides ist für mich in Ordnung.\n\nP.s. die Liste der Vertragsfallen gibt es weiterhin ohne Telefonat. Antworten Sie mit FALLEN."
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "seq_forced_yes_no",
+      "subject": "{company}, ja oder nein",
+      "body": "Guten Tag,\n\nKlare Frage.\n\nWenn ENER-G für {company} die Strom- und Gasverträge prüft, den Markt vergleicht und Ihnen schriftlich zeigt, wie viel sich realistisch einsparen lässt, kostenlos und unverbindlich, würden Sie dann Ja zu einem 15-minütigen Vorgespräch sagen?\n\nEin klares Ja oder ein klares Nein. Beides ist die richtige Antwort für mich.\n\nP.s. falls es ein Nein zur Beratung ist: Der Energiekosten-Check und die Liste der Vertragsfallen stehen weiterhin bereit. Antworten Sie mit CHECK oder FALLEN."
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "seq_pure_value_double_give",
+      "subject": "zwei Dinge, die Sie so oder so nutzen können",
+      "body": "Guten Tag,\n\nWie versprochen jetzt nur noch Mehrwert.\n\nZwei Dinge, beide gehören Ihnen:\n\n1) Die Liste der typischen Vertragsfallen bei Strom- und Gasverträgen. Die Punkte, die ab 30.000 kWh und erst recht bei hunderttausenden bis Millionen kWh am meisten Geld kosten. Antworten Sie mit FALLEN.\n\n2) Ein kostenloser Energiekosten-Check für {company}. Ich schaue mir Ihren Verbrauch und Ihre Laufzeit an und sende Ihnen innerhalb von 48 Stunden eine schriftliche Auswertung: realistisches Einsparpotenzial, die wichtigsten Risiken, der nächste sinnvolle Schritt. Kein Verkaufsgespräch. Antworten Sie mit CHECK.\n\nKein Telefonat, keine Verpflichtung, keine weitere Sequenz danach. Nehmen Sie eines oder beides."
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "seq_breakup_value_open",
+      "subject": "ich schließe Ihren Vorgang bei ENER-G",
+      "body": "Guten Tag,\n\nIch schließe Ihren Vorgang bei ENER-G heute ab.\n\nDrei letzte Punkte.\n\nWenn das Timing falsch war, ist das in Ordnung. Sagen Sie mir, wann Ihr Vertrag ausläuft oder der Umzug ansteht, und ich melde mich genau dann wieder.\n\nWenn das Angebot nicht gepasst hat, sagen Sie mir, was gefehlt hat. Ich lese jede Antwort.\n\nWenn nichts gepasst hat, kein Problem. Der Energiekosten-Check und die Liste der Vertragsfallen stehen Ihnen weiterhin offen. Antworten Sie einfach mit CHECK oder FALLEN, ganz ohne Telefonat.\n\nViel Erfolg mit {company}."
+    }
+  ]
+}

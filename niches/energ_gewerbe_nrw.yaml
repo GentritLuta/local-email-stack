@@ -1,0 +1,281 @@
+slug: energ_gewerbe_nrw
+name: "ENER-G — energieintensives KMU/Gewerbe in NRW (~100 km um Neuss/Düsseldorf, ab 30.000 kWh)"
+profile_slug: energ
+engine: team_pages   # httpx + bs4, auto-upgrade to playwright on empty static HTML
+
+# Greeting falls back to "{company} team"/Sie-Anrede, but ENER-G copy hard-requires
+# {first_name} (Pflicht-Merge). German Impressum pages almost always name the GF, so
+# keep first-name extraction on; the backfill/synthesis fills {first_name} from the
+# Impressum "Geschäftsführer" line where the mailto context did not.
+require_first_name: false
+
+# WHAT THIS NICHE SCRAPES
+# Energy-intensive German commercial businesses (KMU/Gewerbe) whose annual
+# electricity use is >= 30.000 kWh (manufacturing, metal/plastics, food
+# production, cold storage, logistics, large bakeries/hotels/retail, print,
+# foundries), located within ~100 km of Neuss/Düsseldorf (NRW: Düsseldorf,
+# Neuss, Köln, Mönchengladbach, Krefeld, Duisburg, Essen, Wuppertal, Aachen,
+# Bonn, Leverkusen, Remscheid, Solingen). The decision-maker is the
+# Geschäftsführer / Inhaber / Prokurist — German Impressum + Kontakt pages
+# carry that person's name + email + city by law, so this is the reliable
+# extraction surface (same pattern that works for the Swiss/DE niches).
+#
+# DELIBERATELY OUT OF ICP (would need a different pitch first): energy vendors,
+# Stadtwerke/utilities, energy consultancies/competitors, pure offices/agencies
+# with tiny consumption, private households.
+#
+# RUN
+#   py sequences/lead_scrape.py run energ_gewerbe_nrw
+#
+# SCHEDULE (daily 08:30 local)
+#   schtasks /Create /TN "LES-lead-scrape-energ_gewerbe_nrw" /SC DAILY /ST 08:30 ^
+#     /TR "py C:\Users\bernh\local-email-stack\sequences\lead_scrape.py run energ_gewerbe_nrw"
+
+seeds:
+  # Hand-seeds get appended here by seed_discover.py. Start empty; the German
+  # queries below populate it on the first discovery pass, then lead_scrape
+  # walks the validated Impressum/Kontakt pages.
+
+# Auto-discovery: seed_discover.py runs these German queries, validates results
+# (HTTP 200 + has mailto: + page carries a Gewerbe/Produktion keyword), and
+# appends new seed URLs above. Queries aim at the energy-intensive NRW ICP and
+# at pages that actually expose a GF email (Impressum/Kontakt).
+
+  # auto-discovered 2026-06-09 17:38 via seed_discover.py
+  - https://oz24-kunststoffverarbeitung.de
+  - https://simfood.de/?srsltid=AfmBOorQ4sm7b1v33TBoEioH2QSla9TRmQJTSNzb-2b47DjI1c98ewTj
+  - https://hogri.de/news/galvanik-ganz-einfach-erklaert-galvanotechnik-fuer-anfaenger
+  - https://www.giesserei.eu/impressum
+  - https://www.eickhoff-bochum.de/de/node/87
+  - https://luettgen-druck.de/Impressum
+  - https://ps-mg.de/impressum
+  - https://www.hamburg.de/branchenbuch/hamburg/10238232/n0
+  - https://www.baeckerei-voigt.de/impressum
+  - https://www.baeckerei-buesch.de/impressum
+  - https://www.baeckerei-suckow.de/Impressum
+  - https://www.b-wmetallbaugmbh.de
+  - https://www.elspro.de/impressum
+  - http://www.tagungshotels-duesseldorf.com/kontakt-impressum.htm
+  - https://www.cvjm-duesseldorf.de/website/de/ov/duesseldorf/hotel
+
+  # auto-discovered 2026-06-09 18:47 via seed_discover.py
+  - https://indus.eu/de/impressum
+  - https://effekt.de/impressum
+  - https://xvoice-uc.de/impressum
+  - https://www.breffka-hehnke.de/impressum
+  - https://www.medl.de/impressum
+  - https://www.kunststoffland-nrw.de/impressum
+  - https://www.werkstoff.forum/impressum
+  - https://www.kompetenzzentrum-kunststoff.de/kontakt/impressum
+  - https://www.dornburger.de/de/Impressum
+  - https://simfood.de/?srsltid=AfmBOopWR0qI9J2pHByKzNTF_T21PumgvTU5ug4VMbYbMoEh4X1dF0rv
+  - https://b-fresh-bonn.de/kontakt
+  - https://kissling-galvanik.de
+  - https://www.parkhotel.nrw/impressum
+  - https://www.efa.nrw/aktuell/details/lienener-giesserei-schont-klima-und-ressourcen-mit-investition-in-moderne-anlagentechnik
+  - https://bothe-metallbau.de/KONTAKT
+
+  # auto-discovered 2026-06-09 19:00 via seed_discover.py
+  - https://companyinfo.de/impressum
+  - https://indus.eu/de/beteiligungen/vulkan-inox-gmbh
+  - https://simfood.de/?srsltid=AfmBOopBfS0DfP9bcvjJeykuZEbAW8J_RIUXbY7Dvu4MPi2wo1KcbS_I
+  - https://www.intocast.de/unternehmen
+  - https://karkor-metallbau.de
+  - https://did-group.de/impressum
+  - https://stb-industrie.com/impressum
+  - https://www.emka-aluminium.de/de_de/service/impressum
+  - https://www.mib-industriebeteiligungen.de/impressum
+  - https://stadthotel-duesseldorf.de/kontakt
+  - https://www.cvjm-duesseldorf.de/website/de/ov/duesseldorf/hotel/tagung
+  - https://www.kessen-maschinenbau.de/de/impressum.html
+  - https://www.wegener-maschinenbau.de/impressum
+  - https://www.grote-maschinenbau.de/impressum
+  - https://www.alwid.de/v3/impressum
+
+  # auto-discovered 2026-06-09 19:13 via seed_discover.py
+  - https://www.industrieservice-europa.de/impressum
+  - https://kunststoff-luettringhaus.de/impressum
+  - https://simfood.de/?srsltid=AfmBOorGIpVanzfxDwHXo6EPedRGRJ7Ph-Wr0Kz1Ay91iuK5HjkjRsLE
+  - https://www.meierguss.de/impressum
+  - https://www.metallbau-draeger.de
+  - https://www.durit.com/de/impressum
+  - https://www.maschinenbau-schadowski.com/impressum
+  - https://ohe.de/impressum
+  - http://www.bbs.com/de/home
+  - https://www.bbs.com/en/news/2023/ci-r-unlimited-vw-id-buzz
+
+  # auto-discovered 2026-06-10 08:03 via seed_discover.py
+  - https://www.tecpro-metall.de/rechtliches/impressum
+  - https://www.metallbearbeitung-strauss.de
+  - https://kunststoff-institut.de/impressum
+  - https://www.kunststoffland-nrw.de/kontakt
+  - https://www.doellken-profiles.com/de/meta-navigation/impressum
+  - https://simfood.de/?srsltid=AfmBOoqhz4EYa4i-5_AwRWxl3fWFctN03wv0FOawEwhrd32XxwkCDX93
+  - https://www.mue-fahrenbach.de/metallveredelung-heilbronn
+  - https://www.sachsenguss.de/impressum
+  - https://www.jachmann-druck.de/impressum
+  - https://www.hoelter-brot.de/impressum
+  - https://www.baecker.eu/de/impressum
+  - https://www.cvjm-gastfreunde.de/cvjm-gastfreunde-haeuser/deutschland/nordrhein-westfalen/cvjm-duesseldorf-hotel-tagung
+  - https://ds-maschinenbau.de
+
+
+
+
+
+search_queries:
+  - "produzierendes Unternehmen Düsseldorf Impressum Geschäftsführer"
+  - "Metallverarbeitung Neuss Kontakt Impressum"
+  - "Kunststoffverarbeitung NRW Impressum Geschäftsführer"
+  - "Lebensmittelproduktion Köln Impressum Kontakt"
+  - "Galvanik Oberflächentechnik NRW Impressum"
+  - "Gießerei NRW Impressum Geschäftsführer"
+  - "Druckerei Mönchengladbach Impressum Kontakt"
+  - "Kühlhaus Logistik Duisburg Impressum"
+  - "Großbäckerei NRW Impressum Geschäftsführer"
+  - "metallverarbeitender Betrieb Krefeld Kontakt"
+  - "Industriebetrieb Wuppertal Impressum Geschäftsführer"
+  - "Hotel Tagungshaus Düsseldorf Impressum Kontakt"
+  - "Maschinenbau Essen Impressum Geschäftsführer"
+  - "Lackiererei Beschichtung Neuss Impressum"
+  - "Lebensmittelhersteller Mönchengladbach Kontakt Impressum"
+  - "energieintensiver Betrieb NRW Impressum"
+
+# scrape-time ICP gate (lead_scrape.py): EVERY seed page must contain one of
+# these terms or the seed is skipped before any lead is extracted. These signal
+# a real producing/energy-using Gewerbe (not an agency, shop-only, or utility).
+seed_require_keywords:
+  - "Produktion"
+  - "Fertigung"
+  - "Herstellung"
+  - "Werk"
+  - "Industrie"
+  - "Maschinen"
+  - "Metall"
+  - "Kunststoff"
+  - "Lebensmittel"
+  - "Logistik"
+  - "Kühl"
+  - "Gießerei"
+  - "Galvanik"
+  - "Druckerei"
+  - "Bäckerei"
+  - "Hotel"
+  - "Produktions"
+  - "Geschäftsführer"
+
+discovery:
+  max_seeds_per_run: 15
+  search_country:    de          # German results
+  require_mailto:    true
+  require_keywords:
+    - "Produktion"
+    - "Fertigung"
+    - "Herstellung"
+    - "Industrie"
+    - "Metall"
+    - "Kunststoff"
+    - "Lebensmittel"
+    - "Logistik"
+    - "Maschinen"
+    - "Gießerei"
+    - "Galvanik"
+    - "Druckerei"
+    - "Geschäftsführer"
+    - "Impressum"
+  exclude_domains:
+    - facebook.com
+    - linkedin.com
+    - xing.com
+    - youtube.com
+    - twitter.com
+    - x.com
+    - instagram.com
+    - tiktok.com
+    - reddit.com
+    - yelp.com
+    - wikipedia.org
+    - gelbeseiten.de
+    - dasoertliche.de
+    - wlw.de
+    - europages.de
+    - 11880.com
+    - meinestadt.de
+    - kununu.com
+    - indeed.com
+    - stepstone.de
+    # Energy vendors / utilities / competitors — off-ICP (we are the independent
+    # consultant; do not pitch other consultants or the utilities themselves).
+    - eon.de
+    - eon.com
+    - rwe.com
+    - rwe.de
+    - vattenfall.de
+    - enbw.com
+    - stadtwerke
+    - swd-ag.de
+    - check24.de
+    - verivox.de
+    # Directory / aggregator (wrong-region noise — hamburg.de branchenbuch).
+    - hamburg.de
+    # Impressum legal-boilerplate sources: German Impressum pages link out to a
+    # privacy lawyer, the chamber of crafts, the state data-protection authority,
+    # arbitration boards and trade media. The scraper grabs those addresses as if
+    # they were the company. Block them at discovery so they never seed.
+    - datenschutz-neuss.de
+    - ldi.nrw.de
+    - hwk-koeln.de
+    - hwk-duesseldorf.de
+    - verbraucher-schlichter.de
+    - dvs-media.info
+    - marketingflotte.ai
+
+filter:
+  # Skip generic role mailboxes where possible — ENER-G copy hard-requires a
+  # {first_name}. Note: German Impressum often only exposes info@/kontakt@ even
+  # when it names the GF in text; the backfill step pairs the named GF with the
+  # address. Keep this list short so we don't drop the only address a small
+  # Betrieb publishes.
+  exclude_local_parts:
+    - newsletter
+    - presse
+    - jobs
+    - bewerbung
+    - karriere
+    - datenschutz
+    - webmaster
+    - marketing
+    - support
+  exclude_domains:
+    # Utilities / energy vendors / competitors that slip past the page gate.
+    - eon.de
+    - rwe.de
+    - vattenfall.de
+    - enbw.com
+    - check24.de
+    - verivox.de
+    # Impressum legal-boilerplate + directory + off-ICP caught in the 2026-06-09
+    # first scrape (privacy lawyer, chamber of crafts, NRW data authority,
+    # arbitration board, trade media, AI marketing vendor, Hamburg directory,
+    # low-consumption hotels / YMCA). Never email these.
+    - datenschutz-neuss.de
+    - ldi.nrw.de
+    - hwk-koeln.de
+    - verbraucher-schlichter.de
+    - dvs-media.info
+    - marketingflotte.ai
+    - team.hamburg.de
+    - hamburg.de
+    - city-hotels.co
+    - cvjm-duesseldorf.de
+    - hogri.de
+    # 2nd-pass contaminants (2026-06-09 eve): associations/institutes/authorities/
+    # arbitration/utilities/agencies + a UC vendor. Not energy-buying Betriebe.
+    - kunststoffland-nrw.de
+    - kunststoff-institut.de
+    - schlichtungsstelle-energie.de
+    - bnetza.de
+    - medl.de
+    - qmarketing.de
+    - xvoice-uc.de
+    - kuehlhaus-zentrum.de

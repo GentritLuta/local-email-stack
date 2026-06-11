@@ -1,0 +1,13 @@
+# Don't pull these into the Docker image
+.git
+.gitignore
+node_modules
+desktop/
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+out/
+warmup-state/
+deploy/secrets/
+*.private.json
+.env

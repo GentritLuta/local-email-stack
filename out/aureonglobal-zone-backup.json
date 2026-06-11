@@ -1,0 +1,523 @@
+[
+  {
+    "name": "hostingermail-c._domainkey",
+    "records": [
+      {
+        "content": "hostingermail-c.dkim.mail.hostinger.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "CNAME"
+  },
+  {
+    "name": "hostingermail-b._domainkey",
+    "records": [
+      {
+        "content": "hostingermail-b.dkim.mail.hostinger.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "CNAME"
+  },
+  {
+    "name": "hostingermail-a._domainkey",
+    "records": [
+      {
+        "content": "hostingermail-a.dkim.mail.hostinger.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "CNAME"
+  },
+  {
+    "name": "www",
+    "records": [
+      {
+        "content": "www.aureonglobal.de.cdn.hstgr.net.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "CNAME"
+  },
+  {
+    "name": "resend._domainkey.connect",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCkp8XHpX38aDyydc1MJE6mW2X2A7Pqdd3km96yfFzHzgnShaRBlq+nLYT3l5wP3z2wh1T3hmxc0yhBe989iRXFbcxXfIZnxHF3VwGEWW2icQEBf9CUPf465xp1L5X1+Ad7X373KMXTYzK7ScIPSHuNjk0mUMBhm6bR2VKpBKtDDwIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.connect",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.connect",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.news",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNVG96gCg7zQli3++K/mfZH1iz2DbmIDXDnp7quYB+hKMGBLcYAecft9kbvkl9AtlWLzMrd6UvWAZg3tO909coHbw63Egumgnv/FhkznVZmo70EuaYoTXgJfnILhiOpUCTPOQ8ekpR6heS6Bugq1pxCc/yZAA187RxVPD+MRYqEwIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.news",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.news",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.partners",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEESe3AWcz+nDjWK/Wx0wjMHK/vL9ruYQwiyHo8HX+s1HUFw8EZvYfVVLc8ocHUor38lXn7mE7qKMi4SVRgC17fTwNjjBYgvgnvylYWtV/woWSItmBSq+aHaRAQsUG+BZ6ktN7nZ2MSZ00G7uyexgI+MPhSHTzY2FDTfyLjlyhXwIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.partners",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.partners",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "autodiscover",
+    "records": [
+      {
+        "content": "autodiscover.mail.hostinger.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "CNAME"
+  },
+  {
+    "name": "ftp",
+    "records": [
+      {
+        "content": "88.223.85.46",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 1800,
+    "type": "A"
+  },
+  {
+    "name": "resend._domainkey.hello",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDPa4DycXGB6fpYoooO9pABWZi2H/x9FYCqMocu3VPvUzKa8oDuioH4P5cU+pAiNBCWhW15LBkgJgOvJ+YsaECdAjWS3e8s20cq0Xt7CqeK+Apg5PBzgEnh+FkaR6lHrkSz8KwGRCTwh2zSM7ToStcI5KUyhFLJuqdhBXsBKyWLswIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.hello",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.hello",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.team",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD021ed7PqwZUOYPzPDClWysqJyOwQT4BiBkzu8erHg+s3ELI1Xzkhn0HqS+gE5Ks2K/riTb0v89msTdFk5UnviCyX1rCJTR4rdUqeChr9sTb2a+lQgbA3rLThtZpcxdPzRypUH6pJbwIpxYrcXHfNFoQbhPSqH/jWk0alxNquRfwIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.team",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.team",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.mail",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDxkJVORBesYLcXqlGvC33U/WrSjoRWgeNqNTvD/9ajShruQ8+0ljiDLu+mbLIUlngxW1u4nL3n/IXcTv9rXHadK4JAvyerc9zUk2GbXH9x/k9H25Did3Bj9R+aFp78Rhsu6PHomoE7wK5TrrHspkRbuWmWTSJ7NS89AglTdvlAYwIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.mail",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.mail",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.desk",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6AETZQA0mLlJ55CZV7W+nYRh2Yajdu6N2OLda9JvQ0u0dYw7S2lQQYVpSup86DbPDITE4ojB5ph7jYZDFOvc72eXuhO6vItJwKyKwusy1apu4Zr/anb6Rqqv8jZexIgj1TU7iu/MzWLyJZMRVjJvvZZ06mjgeQfk76+975syzWQIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.desk",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.desk",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.hi",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDMSsll9ywEfdOHotsuKlNm/G8lI5dTwaQ24Xn4AyXWeapMeleeorMX8oUkdIZvxqLAtwLWxBdlKfsZ9spo5Ah3euTeRM8Wc3Ol7bU1B6svU9kUpxeey+tm7Nzddu+IOEHMx0shU9iBFGo3v26BNnPDYyGGXzDDGr+3KfJQLFF/gQIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.hi",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.hi",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.outreach",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHlBgmeYN2OmDOkeDAe1nNZ71uWaxXGZ3Wzjs6VMz48ntiRieAgco87sUmgauKY7m21FMPPXDGIqz+LV7NwHbOHAVl731n4TBSC1JN4vgH98PQb0fzvHpBsLqUw+lHiXgfRz6GbhLlERABLOrRvf+rKZvaHtldkFqBTzo49KukOQIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.outreach",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.outreach",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "resend._domainkey.reach",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC79BUNY6u6GTpETCAc88GCx4C8znP4mlOd7cc4xkyjjTQPVk+ln90sAqAelO9uMgpzVbyaNfbYcfCZBZEWQqFHws310Y8z5Oz6O66NQSuX81CPRKGBaEk9HzJNFy9bqPX5+5szdsOoipGUwapz4XiukDEXH+DF2QGbZ1vpQDjw3QIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.reach",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.reach",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "autoconfig",
+    "records": [
+      {
+        "content": "autoconfig.mail.hostinger.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "CNAME"
+  },
+  {
+    "name": "resend._domainkey.send",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6KCldNAT/VD9srs1RF94bQ94nSgOa57awo/PZiPaQwK94+r0uMlZ6pROlsXErNN6eoJC9FZtrSWtLSLzxJTz1cWuD5t/1MPvpO60XXBXGvDHRFLRmuvq0q6VYDEaRgccenBw2BdHR0mHpAza+nA6WzzgVRT6+JUlaYHMe0NOMKwIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.send",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.send",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "_dmarc",
+    "records": [
+      {
+        "content": "\"v=DMARC1; p=none; rua=mailto:dmarc@aureonglobal.de; ruf=mailto:dmarc@aureonglobal.de; pct=100; adkim=s; aspf=s; fo=1\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "resend._domainkey.hub",
+    "records": [
+      {
+        "content": "\"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZtmlqRMcni7H4fV9czGwr+T5/QQTIHbPFn+V7U3KT7B7zMrHhD7hEKGrSNWugE16Qv4BpkIrlgBaUdfsZMR6Ox26ezcEsTypLcnDOxMpjQaHIEqXcmC4A0LJXR0H//wpyTlTB5sqyl25XOuecp5keYDh+2Pwja5myxrD8hMvI9wIDAQAB\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.hub",
+    "records": [
+      {
+        "content": "\"v=spf1 include:amazonses.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "send.hub",
+    "records": [
+      {
+        "content": "10 feedback-smtp.eu-west-1.amazonses.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "MX"
+  },
+  {
+    "name": "@",
+    "records": [
+      {
+        "content": "aureonglobal.de.cdn.hstgr.net.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 300,
+    "type": "ALIAS"
+  },
+  {
+    "name": "@",
+    "records": [
+      {
+        "content": "\"v=spf1 include:_spf.mail.hostinger.com ~all\"",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 3600,
+    "type": "TXT"
+  },
+  {
+    "name": "@",
+    "records": [
+      {
+        "content": "5 mx1.hostinger.com.",
+        "is_disabled": false
+      },
+      {
+        "content": "10 mx2.hostinger.com.",
+        "is_disabled": false
+      }
+    ],
+    "ttl": 14400,
+    "type": "MX"
+  }
+]
