@@ -100,51 +100,30 @@ function showError(msg) {
 }
 
 async function loadProspect() {
-  if (!token) { showError("Der Link ist unvollständig. Bitte verwenden Sie den Link aus der E-Mail."); if (btn) btn.disabled = true; return; }
-  try {
-    const r = await fetch(
-      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email,unsubscribed`,
-      { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
-    );
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    const rows = await r.json();
-    if (!rows.length) { showError("Wir konnten diesen Link nicht finden. Möglicherweise wurde er bereits verwendet."); if (btn) btn.disabled = true; return; }
-    if (rows[0].unsubscribed) {
-      showSuccess(rows[0].email);
-      if (status) status.textContent = "Sie sind bereits abgemeldet.";
-    }
-  } catch (err) { showError("Etwas ist schiefgelaufen: " + err.message); }
+  if (!token) { showError("This link is incomplete. Please use the link from the email."); if (btn) btn.disabled = true; return; }
+  // Under RLS (PII lockdown 2026-06-12) anon cannot read prospects. We skip the
+  // pre-read entirely; the Unsubscribe button calls a SECURITY DEFINER RPC.
 }
 
 async function doUnsubscribe() {
   if (btn) btn.disabled = true;
   try {
-    const find = await fetch(
-      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email`,
-      { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
-    );
-    if (!find.ok) throw new Error("HTTP " + find.status);
-    const rows = await find.json();
-    if (!rows.length) { showError("Wir konnten diesen Link nicht finden. Möglicherweise wurde er bereits verwendet."); return; }
-    const email = rows[0].email;
-    const patch = await fetch(
-      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}`,
+    const rpc = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`,
       {
-        method: "PATCH",
+        method: "POST",
         headers: {
           apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON,
-          "Content-Type": "application/json", Prefer: "return=minimal"
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ unsubscribed: true, unsubscribed_at: new Date().toISOString() })
+        body: JSON.stringify({ p_token: token })
       }
     );
-    if (!patch.ok && patch.status !== 204) throw new Error("HTTP " + patch.status);
-    showSuccess(email);
-  } catch (err) { showError("Etwas ist schiefgelaufen: " + err.message); }
+    if (!rpc.ok) throw new Error("HTTP " + rpc.status);
+    showSuccess("");
+  } catch (err) { showError("Something went wrong: " + err.message); }
 }
 
 if (btn) btn.addEventListener("click", doUnsubscribe);
 loadProspect();
 </script>
-
-</body></html>

@@ -99,73 +99,38 @@
       }
     }
 
-    async function loadBrandAndProspect() {
-      // PostgREST FK embed: prospects has FK profile_slug → profiles.slug, so we can
-      // pull the profile's config (which contains brand) in one round trip.
-      const r = await fetch(
-        `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email,unsubscribed,profiles(config)`,
-        { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
-      );
-      if (!r.ok) throw new Error("Lookup failed: HTTP " + r.status);
-      const rows = await r.json();
-      if (!rows.length) return null;
-      const row = rows[0];
-      const cfg = row.profiles && row.profiles.config;
-      applyBrand(cfg && cfg.brand);
-      return row;
-    }
-
     if (!token) {
       btn.disabled = true;
       show("err", "Missing token — this link is incomplete. Please use the link from the email.");
-    } else {
-      // Eagerly load brand + prospect so the page paints in the client's colors.
-      loadBrandAndProspect().then(row => {
-        if (!row) {
-          show("err", "We couldn't find that link in our system. It may have already been used.");
-          btn.disabled = true;
-        } else if (row.unsubscribed) {
-          lead.innerHTML = `<span class="email">${escapeHtml(row.email)}</span> is already unsubscribed. You will not receive any more emails from us.`;
-          btn.style.display = "none";
-          show("ok", "Already unsubscribed.");
-        }
-      }).catch(err => {
-        show("err", "Could not load: " + err.message);
-      });
     }
+    // No pre-read: under RLS (PII lockdown 2026-06-12) anon cannot SELECT prospects.
+    // The Unsubscribe button calls the SECURITY DEFINER rpc/unsubscribe_by_token,
+    // which is the only access anon has. Brand colors fall back to the default.
 
     async function confirmUnsubscribe() {
       btn.disabled = true;
       show("busy", "Processing…");
       try {
-        const findRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email`,
-          { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
-        );
-        if (!findRes.ok) throw new Error("Lookup failed: HTTP " + findRes.status);
-        const found = await findRes.json();
-        if (!found.length) {
-          show("err", "We couldn't find that link in our system. It may have already been used.");
-          return;
-        }
-        const target = found[0];
-        const patchRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}`,
+        // Call the SECURITY DEFINER RPC. Under RLS (PII lockdown 2026-06-12) anon
+        // has NO read/write on prospects at all, only EXECUTE on this function.
+        // The function flips unsubscribed=true for the matching token and returns
+        // a boolean (no PII). This is the only way anon can unsubscribe now.
+        const rpcRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`,
           {
-            method: "PATCH",
+            method: "POST",
             headers: {
               apikey: SUPABASE_ANON,
               Authorization: "Bearer " + SUPABASE_ANON,
-              "Content-Type": "application/json",
-              Prefer: "return=minimal"
+              "Content-Type": "application/json"
             },
-            body: JSON.stringify({ unsubscribed: true, unsubscribed_at: new Date().toISOString() })
+            body: JSON.stringify({ p_token: token })
           }
         );
-        if (!patchRes.ok && patchRes.status !== 204) {
-          throw new Error("Update failed: HTTP " + patchRes.status);
+        if (!rpcRes.ok) {
+          throw new Error("Unsubscribe failed: HTTP " + rpcRes.status);
         }
-        lead.innerHTML = `<span class="email">${escapeHtml(target.email)}</span> has been unsubscribed. You will not receive any more emails from us.`;
+        lead.innerHTML = `You have been unsubscribed. You will not receive any more emails from us.`;
         btn.style.display = "none";
         show("ok", "Done.");
       } catch (err) {
