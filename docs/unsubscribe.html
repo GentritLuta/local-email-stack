@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Unsubscribe</title>
+  <style>
+    :root { color-scheme: light; --accent:#1f2937; --text:#0a0a0a; --text-2:#4b5563; --muted:#9ca3af; --bg:#fafafa; --card:#ffffff; --rule:#ececec; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: grid; place-items: center; padding: 24px;
+    }
+    .card {
+      background: var(--card); max-width: 480px; width: 100%;
+      padding: 36px; border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+    }
+    .brand-bar { height: 2px; background: var(--accent); opacity:.6; margin: -36px -36px 24px; border-radius: 8px 8px 0 0; }
+    .wordmark { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .wordmark span { color: var(--accent); }
+    .tagline { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+    h1 { font-size: 22px; font-weight: 600; margin: 0 0 8px; color: var(--text); }
+    p { font-size: 15px; line-height: 1.6; margin: 0 0 12px; color: var(--text-2); }
+    .email { font-weight: 600; color: var(--text); }
+    .footer { font-size: 12px; color: var(--muted); margin-top: 28px; border-top:1px solid var(--rule); padding-top:14px; }
+    .footer a { color: var(--text-2); text-decoration:none; }
+    .status { padding: 14px 16px; border-radius: 6px; margin-top: 16px; font-size: 14px; display:none; }
+    .status.ok   { background: #f0fdf4; color: #065f46; border: 1px solid #a7f3d0; }
+    .status.err  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .status.busy { background: #f9fafb; color: #374151; border: 1px solid #e5e7eb; }
+    button {
+      margin-top: 16px; padding: 11px 18px; font-size: 14px; font-weight: 500;
+      border: 1px solid var(--accent); background: var(--accent); color: #ffffff;
+      border-radius: 6px; cursor: pointer;
+    }
+    button:hover  { opacity: .9; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand-bar"></div>
+    <div class="wordmark" id="wordmark"><span>Unsubscribe</span></div>
+    <div class="tagline" id="tagline"></div>
+    <h1>Stop receiving emails</h1>
+    <p id="lead">Click the button below to stop receiving emails from us. We won't contact you again.</p>
+    <button id="btn" type="button">Confirm unsubscribe</button>
+    <div id="status" class="status busy">Processing…</div>
+    <div class="footer" id="footer"></div>
+  </div>
+
+  <script>
+    // Public read/update — the unsubscribe token in the URL IS the auth.
+    const SUPABASE_URL  = "https://ccmqkljsjiuavpydbkva.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
+
+    const params = new URLSearchParams(location.search);
+    const token  = params.get("t") || "";
+    const btn    = document.getElementById("btn");
+    const lead   = document.getElementById("lead");
+    const status = document.getElementById("status");
+    const wordmarkEl = document.getElementById("wordmark");
+    const taglineEl  = document.getElementById("tagline");
+    const footerEl   = document.getElementById("footer");
+
+    function show(kind, text) {
+      status.className = "status " + kind;
+      status.textContent = text;
+      status.style.display = "block";
+    }
+
+    function applyBrand(brand) {
+      if (!brand) return;
+      const c = brand.colors || {};
+      const r = document.documentElement.style;
+      if (c.accent)   r.setProperty("--accent",  c.accent);
+      if (c.text)     r.setProperty("--text",    c.text);
+      if (c.text_2)   r.setProperty("--text-2",  c.text_2);
+      if (c.muted)    r.setProperty("--muted",   c.muted);
+      if (c.bg_page)  r.setProperty("--bg",      c.bg_page);
+      if (c.bg_card)  r.setProperty("--card",    c.bg_card);
+      if (c.rule)     r.setProperty("--rule",    c.rule);
+      if (brand.font_stack) document.body.style.fontFamily = brand.font_stack;
+      if (brand.font_url) {
+        const l = document.createElement("link");
+        l.rel = "stylesheet"; l.href = brand.font_url; document.head.appendChild(l);
+      }
+      if (brand.wordmark) {
+        wordmarkEl.innerHTML = `<span>${escapeHtml(brand.wordmark)}</span>`;
+        document.title = "Unsubscribe — " + brand.wordmark;
+      }
+      if (brand.tagline) taglineEl.textContent = brand.tagline;
+      if (brand.site) {
+        footerEl.innerHTML = `${escapeHtml(brand.wordmark || '')} · <a href="https://${escapeHtml(brand.site)}">${escapeHtml(brand.site)}</a>`;
+      }
+    }
+
+    if (!token) {
+      btn.disabled = true;
+      show("err", "Missing token — this link is incomplete. Please use the link from the email.");
+    }
+    // No pre-read: under RLS (PII lockdown 2026-06-12) anon cannot SELECT prospects.
+    // The Unsubscribe button calls the SECURITY DEFINER rpc/unsubscribe_by_token,
+    // which is the only access anon has. Brand colors fall back to the default.
+
+    async function confirmUnsubscribe() {
+      btn.disabled = true;
+      show("busy", "Processing…");
+      try {
+        // Call the SECURITY DEFINER RPC. Under RLS (PII lockdown 2026-06-12) anon
+        // has NO read/write on prospects at all, only EXECUTE on this function.
+        // The function flips unsubscribed=true for the matching token and returns
+        // a boolean (no PII). This is the only way anon can unsubscribe now.
+        const rpcRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`,
+          {
+            method: "POST",
+            headers: {
+              apikey: SUPABASE_ANON,
+              Authorization: "Bearer " + SUPABASE_ANON,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ p_token: token })
+          }
+        );
+        if (!rpcRes.ok) {
+          throw new Error("Unsubscribe failed: HTTP " + rpcRes.status);
+        }
+        lead.innerHTML = `You have been unsubscribed. You will not receive any more emails from us.`;
+        btn.style.display = "none";
+        show("ok", "Done.");
+      } catch (err) {
+        show("err", "Something went wrong: " + err.message + ". Reply with the word unsubscribe to info@aureonglobal.de and we will remove you manually.");
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    }
+
+    btn.addEventListener("click", confirmUnsubscribe);
+  </script>
+</body>
+</html>

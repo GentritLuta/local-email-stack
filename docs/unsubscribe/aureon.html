@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Unsubscribe · Aureon Global</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #050505; min-height: 100vh; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         color: #ffffff; padding: 32px 16px; display: grid; place-items: center; }
+  .card { width: 100%; max-width: 560px; background: #0e0e0e; border: 1px solid #1a1a1a;
+          border-radius: 8px; overflow: hidden; }
+  .accent-rule { height: 3px; background: #d4af37; }
+  .body { padding: 40px 36px 28px; }
+  .wordmark { font-size: 20px; font-weight: 700; color: #d4af37; letter-spacing: .5px; }
+  .tagline { font-size: 12px; color: #888888; margin-top: 6px;
+             text-transform: uppercase; letter-spacing: 1.4px; }
+  h1 { font-size: 24px; font-weight: 700; margin: 28px 0 12px; color: #ffffff; }
+  p { font-size: 15px; line-height: 1.65; margin: 0 0 14px; color: #cbd5e1; }
+  p .email { color: #d4af37; font-weight: 600; }
+  .btn { display: inline-block; margin-top: 14px; padding: 13px 26px;
+         background: #d4af37; color: #050505; font-size: 14px; font-weight: 700;
+         border: none; border-radius: 4px; cursor: pointer; letter-spacing: .3px; }
+  .btn:hover { background: #b8941f; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .success { display: none; margin-top: 16px; padding: 14px 16px;
+             background: rgba(212,175,55,.08); border-left: 3px solid #d4af37;
+             font-size: 14px; line-height: 1.5; color: #d4af37; border-radius: 4px; }
+  .err { display: none; margin-top: 16px; padding: 14px 16px;
+         background: rgba(220,38,38,.1); border-left: 3px solid #dc2626;
+         font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 4px; }
+  .footer { padding: 22px 36px 28px; border-top: 1px solid #1a1a1a;
+            font-size: 12px; color: #555555; }
+  .footer a { color: #d4af37; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="accent-rule"></div>
+    <div class="body">
+      <div class="wordmark">Aureon Global</div>
+      <div class="tagline">Real Estate Growth Partner</div>
+
+      <h1>Stop receiving Aureon emails</h1>
+      <p id="lead">Click below and we will remove your address from every Aureon
+        campaign. No follow-up, no second attempt. If you change your mind later,
+        the door is always open at <a href="https://aureonglobal.de" style="color:#d4af37">aureonglobal.de</a>.</p>
+      <button class="btn" id="btn" type="button">Confirm unsubscribe</button>
+
+      <div class="success" id="success-state">
+        <b><span id="email">Your address</span></b> has been unsubscribed.
+        You will not hear from us again.
+      </div>
+
+      <div class="err" id="error-state"></div>
+      <div id="status" style="display:none"></div>
+    </div>
+
+    <div class="footer">
+      Aureon Global L.L.C. · Kacanik, Republic of Kosovo<br>
+      <a href="mailto:info@aureonglobal.de">info@aureonglobal.de</a>
+      &nbsp;·&nbsp;
+      <a href="https://aureonglobal.de">aureonglobal.de</a><br>
+      © 2026 Aureon Global L.L.C.
+    </div>
+  </div>
+
+<script>
+const SUPABASE_URL  = "https://ccmqkljsjiuavpydbkva.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
+
+const params = new URLSearchParams(location.search);
+const token  = params.get("t") || "";
+const btn    = document.getElementById("btn");
+const lead   = document.getElementById("lead");
+const status = document.getElementById("status");
+const successWrap = document.getElementById("success-state");
+const errorWrap   = document.getElementById("error-state");
+const emailEl     = document.getElementById("email");
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
+
+function showSuccess(email) {
+  if (emailEl) emailEl.textContent = email || "Ihre Adresse";
+  if (successWrap) successWrap.style.display = "block";
+  if (btn) btn.style.display = "none";
+  if (lead) lead.style.display = "none";
+}
+
+function showError(msg) {
+  if (errorWrap) {
+    errorWrap.textContent = msg;
+    errorWrap.style.display = "block";
+  }
+  if (btn) btn.disabled = false;
+}
+
+async function loadProspect() {
+  if (!token) { showError("This link is incomplete. Please use the link from the email."); if (btn) btn.disabled = true; return; }
+  // Under RLS (PII lockdown 2026-06-12) anon cannot read prospects. We skip the
+  // pre-read entirely; the Unsubscribe button calls a SECURITY DEFINER RPC.
+}
+
+async function doUnsubscribe() {
+  if (btn) btn.disabled = true;
+  try {
+    const rpc = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`,
+      {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ p_token: token })
+      }
+    );
+    if (!rpc.ok) throw new Error("HTTP " + rpc.status);
+    showSuccess("");
+  } catch (err) { showError("Something went wrong: " + err.message); }
+}
+
+if (btn) btn.addEventListener("click", doUnsubscribe);
+loadProspect();
+</script>
