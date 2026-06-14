@@ -5,152 +5,77 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Unsubscribe · AlgoAlpha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #08090d; min-height: 100vh; }
-  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-         color: #f4f4f5; padding: 32px 16px; display: grid; place-items: center; }
-  .card { width: 100%; max-width: 560px; background: #0f1117; border: 1px solid #1f2230;
-          border-radius: 12px; overflow: hidden; }
-  .accent-rule { height: 4px;
-                  background: linear-gradient(90deg,#ffd400 0%,#c9165b 100%); }
-  .body { padding: 38px 32px 28px; }
-  .wordmark { font-size: 22px; font-weight: 800; color: #ffd400; letter-spacing: -.3px; }
-  .tagline { font-size: 12.5px; color: #94a3b8; margin-top: 6px; }
-  h1 { font-size: 23px; font-weight: 700; margin: 26px 0 12px; color: #ffffff; }
-  p { font-size: 15px; line-height: 1.65; margin: 0 0 14px; color: #cbd5e1; }
-  p .email { color: #ffd400; font-weight: 600; }
-  .btn { display: inline-block; margin-top: 14px; padding: 13px 28px;
-         background: #ffd400; color: #08090d; font-size: 14px; font-weight: 800;
-         border: none; border-radius: 8px; cursor: pointer; letter-spacing: .3px; }
-  .btn:hover { background: #e6c000; }
+  body { font-family: Inter, "Inter Fallback", ui-sans-serif, system-ui, sans-serif; color: #ffd400; padding: 32px 16px; display: grid; place-items: center; }
+  .card { width: 100%; max-width: 560px; background: #16171b; border: 1px solid #25262a;
+          border-radius: 8px; overflow: hidden; }
+  .accent-rule { height: 3px; background: #ffd400; }
+  .body { padding: 40px 36px 28px; }
+  .logo { max-width: 160px; height: auto; }
+  .wordmark { font-size: 20px; font-weight: 700; color: #ffd400; letter-spacing: .5px; }
+  .tagline { font-size: 12px; color: #8f7805; margin-top: 6px; text-transform: uppercase; letter-spacing: 1.4px; }
+  h1 { font-size: 24px; font-weight: 700; margin: 28px 0 12px; color: #ffd400; }
+  p { font-size: 15px; line-height: 1.65; margin: 0 0 14px; color: #d2af02; }
+  .btn { display: inline-block; margin-top: 14px; padding: 13px 26px; background: #ffd400;
+         color: #0a0a0a; font-size: 14px; font-weight: 700; border: none; border-radius: 4px;
+         cursor: pointer; letter-spacing: .3px; }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .success { display: none; margin-top: 16px; padding: 14px 16px;
-             background: rgba(255,212,0,.06); border-left: 3px solid #ffd400;
-             font-size: 14px; line-height: 1.5; color: #ffd400; border-radius: 6px; }
-  .err { display: none; margin-top: 16px; padding: 14px 16px;
-         background: rgba(220,38,38,.1); border-left: 3px solid #dc2626;
-         font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 6px; }
-  .footer { padding: 20px 32px 26px; border-top: 1px solid #1f2230;
-            font-size: 12px; color: #64748b; }
-  .footer a { color: #c9165b; text-decoration: none; font-weight: 600; }
+  .success { display: none; margin-top: 16px; padding: 14px 16px; background: rgba(127,127,127,.1);
+             border-left: 3px solid #ffd400; font-size: 14px; line-height: 1.5; color: #ffd400; border-radius: 4px; }
+  .err { display: none; margin-top: 16px; padding: 14px 16px; background: rgba(220,38,38,.1);
+         border-left: 3px solid #dc2626; font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 4px; }
+  .footer { padding: 22px 36px 28px; border-top: 1px solid #25262a; font-size: 12px; color: #8f7805; }
+  .footer a { color: #ffd400; text-decoration: none; }
 </style>
 </head>
 <body>
   <div class="card">
     <div class="accent-rule"></div>
     <div class="body">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:4px;">
-        <img src="https://algoalpha.io/file.svg" alt="AlgoAlpha" width="44" height="44"
-             style="display:block;border:0;">
-        <div>
-          <div class="wordmark">AlgoAlpha</div>
-          <div class="tagline">TradingView indicators &amp; live crypto signals · 75k+ traders</div>
-        </div>
-      </div>
-
+      <img class="logo" src="https://algoalpha.io/brand/og-image-2026-05-09.png" alt="AlgoAlpha" style="max-width:80px;height:auto;display:block;margin-bottom:4px;">
+      <div class="tagline">TradingView indicators &amp; live crypto signals for 75k+ active traders</div>
       <h1>Unsubscribe from AlgoAlpha</h1>
-      <p id="lead">One click and we are out of your inbox. Our creator partnership
-        emails will stop coming. The free indicators on TradingView keep working
-        either way at <a href="https://algoalpha.io" style="color:#ffd400">algoalpha.io</a>.</p>
+      <p id="lead">Click below and we will remove your address from every AlgoAlpha
+        campaign. No follow-up, no second attempt.</p>
       <button class="btn" id="btn" type="button">Confirm unsubscribe</button>
-
       <div class="success" id="success-state">
-        <b><span id="email">Your address</span></b> has been unsubscribed.
-        We will not contact you again.
+        <b><span id="email">Your address</span></b> has been unsubscribed. You will not hear from us again.
       </div>
-
       <div class="err" id="error-state"></div>
-      <div id="status" style="display:none"></div>
     </div>
-
     <div class="footer">
       AlgoAlpha · Lisbon, Portugal<br>
-      <a href="mailto:support@algoalpha.io">support@algoalpha.io</a>
-      &nbsp;·&nbsp;
-      <a href="https://algoalpha.io">algoalpha.io</a><br>
+      <a href="mailto:support@algoalpha.io">support@algoalpha.io</a> &nbsp;·&nbsp; <a href="https://algoalpha.io">algoalpha.io</a><br>
       © 2026 AlgoAlpha
     </div>
   </div>
-
 <script>
 const SUPABASE_URL  = "https://ccmqkljsjiuavpydbkva.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
-
-const params = new URLSearchParams(location.search);
-const token  = params.get("t") || "";
-const btn    = document.getElementById("btn");
-const lead   = document.getElementById("lead");
-const status = document.getElementById("status");
+const token = new URLSearchParams(location.search).get("t") || "";
+const btn = document.getElementById("btn");
+const lead = document.getElementById("lead");
 const successWrap = document.getElementById("success-state");
-const errorWrap   = document.getElementById("error-state");
-const emailEl     = document.getElementById("email");
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-}
-
-function showSuccess(email) {
-  if (emailEl) emailEl.textContent = email || "Ihre Adresse";
-  if (successWrap) successWrap.style.display = "block";
-  if (btn) btn.style.display = "none";
-  if (lead) lead.style.display = "none";
-}
-
-function showError(msg) {
-  if (errorWrap) {
-    errorWrap.textContent = msg;
-    errorWrap.style.display = "block";
-  }
-  if (btn) btn.disabled = false;
-}
-
-async function loadProspect() {
-  if (!token) { showError("This link is incomplete. Please use the link from the email."); if (btn) btn.disabled = true; return; }
+const errorWrap = document.getElementById("error-state");
+function showSuccess() { successWrap.style.display="block"; btn.style.display="none"; lead.style.display="none"; }
+function showError(m) { errorWrap.textContent=m; errorWrap.style.display="block"; btn.disabled=false; }
+async function doUnsub() {
+  btn.disabled = true;
   try {
-    const r = await fetch(
-      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email,unsubscribed`,
-      { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
-    );
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    const rows = await r.json();
-    if (!rows.length) { showError("We could not find this link. It may have already been used."); if (btn) btn.disabled = true; return; }
-    if (rows[0].unsubscribed) {
-      showSuccess(rows[0].email);
-      if (status) status.textContent = "You are already unsubscribed.";
-    }
-  } catch (err) { showError("Something went wrong: " + err.message); }
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`, {
+      method:"POST",
+      headers:{ apikey:SUPABASE_ANON, Authorization:"Bearer "+SUPABASE_ANON, "Content-Type":"application/json" },
+      body: JSON.stringify({ p_token: token })
+    });
+    if (!r.ok) throw new Error("HTTP "+r.status);
+    showSuccess();
+  } catch (e) { showError("Something went wrong: "+e.message); }
 }
-
-async function doUnsubscribe() {
-  if (btn) btn.disabled = true;
-  try {
-    const find = await fetch(
-      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}&select=email`,
-      { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } }
-    );
-    if (!find.ok) throw new Error("HTTP " + find.status);
-    const rows = await find.json();
-    if (!rows.length) { showError("We could not find this link. It may have already been used."); return; }
-    const email = rows[0].email;
-    const patch = await fetch(
-      `${SUPABASE_URL}/rest/v1/prospects?unsubscribe_token=eq.${encodeURIComponent(token)}`,
-      {
-        method: "PATCH",
-        headers: {
-          apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON,
-          "Content-Type": "application/json", Prefer: "return=minimal"
-        },
-        body: JSON.stringify({ unsubscribed: true, unsubscribed_at: new Date().toISOString() })
-      }
-    );
-    if (!patch.ok && patch.status !== 204) throw new Error("HTTP " + patch.status);
-    showSuccess(email);
-  } catch (err) { showError("Something went wrong: " + err.message); }
-}
-
-if (btn) btn.addEventListener("click", doUnsubscribe);
-loadProspect();
+if (!token) { showError("This link is incomplete. Please use the link from the email."); btn.disabled = true; }
+btn.addEventListener("click", doUnsub);
 </script>
-
-</body></html>
+</body>
+</html>
