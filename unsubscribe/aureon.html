@@ -9,25 +9,29 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #0b0b0b; min-height: 100vh; }
-  body { font-family: Inter, ui-sans-serif, system-ui; color: #ffffff; padding: 32px 16px; display: grid; place-items: center; }
-  .card { width: 100%; max-width: 560px; background: #191919; border: 1px solid #282828;
-          border-radius: 8px; overflow: hidden; }
-  .accent-rule { height: 3px; background: #d4af37; }
-  .body { padding: 40px 36px 28px; }
-  .logo { max-width: 160px; height: auto; }
-  .wordmark { font-size: 20px; font-weight: 700; color: #d4af37; letter-spacing: .5px; }
-  .tagline { font-size: 12px; color: #919191; margin-top: 6px; text-transform: uppercase; letter-spacing: 1.4px; }
-  h1 { font-size: 24px; font-weight: 700; margin: 28px 0 12px; color: #ffffff; }
-  p { font-size: 15px; line-height: 1.65; margin: 0 0 14px; color: #d3d3d3; }
-  .btn { display: inline-block; margin-top: 14px; padding: 13px 26px; background: #d4af37;
-         color: #0a0a0a; font-size: 14px; font-weight: 700; border: none; border-radius: 4px;
-         cursor: pointer; letter-spacing: .3px; }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .success { display: none; margin-top: 16px; padding: 14px 16px; background: rgba(127,127,127,.1);
-             border-left: 3px solid #d4af37; font-size: 14px; line-height: 1.5; color: #d4af37; border-radius: 4px; }
-  .err { display: none; margin-top: 16px; padding: 14px 16px; background: rgba(220,38,38,.1);
-         border-left: 3px solid #dc2626; font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 4px; }
-  .footer { padding: 22px 36px 28px; border-top: 1px solid #282828; font-size: 12px; color: #919191; }
+  body { font-family: Inter, ui-sans-serif, system-ui; color: #ffffff; padding: 40px 18px;
+         display: grid; place-items: center; background: radial-gradient(1100px 620px at 50% -8%, rgba(212,175,55,0.16) 0%, rgba(212,175,55,0.0) 60%), #0b0b0b; background-attachment: fixed; }
+  .card { position: relative; width: 100%; max-width: 540px; background: #22201a;
+          border: 1px solid #46402a; border-radius: 22px; overflow: hidden;
+          box-shadow: 0 24px 70px rgba(212,175,55,0.22), 0 2px 8px rgba(0,0,0,.18); }
+  .accent-rule { height: 4px; background: linear-gradient(90deg, #d4af37, rgba(212,175,55,0.35)); }
+  .body { padding: 40px 38px 30px; }
+  .logo { max-width: 170px; height: auto; border-radius: 10px; }
+  .wordmark { font-size: 21px; font-weight: 700; color: #d4af37; letter-spacing: .3px; }
+  .tagline { font-size: 12px; color: #919191; margin-top: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
+  h1 { font-size: 25px; font-weight: 700; margin: 28px 0 12px; color: #ffffff; letter-spacing: -.2px; }
+  p { font-size: 15px; line-height: 1.7; margin: 0 0 14px; color: #d3d3d3; }
+  .btn { display: inline-block; margin-top: 16px; padding: 15px 30px; background: #d4af37;
+         color: #0a0a0a; font-size: 14.5px; font-weight: 700; border: none; border-radius: 14px;
+         cursor: pointer; letter-spacing: .3px; transition: background .15s ease, transform .1s ease;
+         box-shadow: 0 8px 22px rgba(212,175,55,0.3); }
+  .btn:hover { background: #d9b84f; transform: translateY(-1px); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+  .success { display: none; margin-top: 18px; padding: 15px 18px; background: rgba(212,175,55,0.1);
+             border: 1px solid rgba(212,175,55,0.4); font-size: 14px; line-height: 1.5; color: #d4af37; border-radius: 14px; }
+  .err { display: none; margin-top: 18px; padding: 15px 18px; background: rgba(220,38,38,.1);
+         border: 1px solid rgba(220,38,38,.4); font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 14px; }
+  .footer { padding: 22px 38px 30px; border-top: 1px solid #46402a; font-size: 12px; color: #919191; line-height: 1.7; }
   .footer a { color: #d4af37; text-decoration: none; }
 </style>
 </head>
@@ -35,7 +39,7 @@
   <div class="card">
     <div class="accent-rule"></div>
     <div class="body">
-      <div class="wordmark">Aureon Global</div>
+      <img class="logo" src="https://aureonglobal.de/logo.png" alt="Aureon Global" style="max-width:50px;height:auto;display:block;margin-bottom:4px;">
       <div class="tagline">Performance Partner for Real Estate Agents &amp; Brokerages</div>
       <h1>Unsubscribe from Aureon Global</h1>
       <p id="lead">Click below and we will remove your address from every Aureon Global
