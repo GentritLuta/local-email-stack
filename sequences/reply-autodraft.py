@@ -60,7 +60,12 @@ OPERATOR_ADDR = "info@aureonglobal.de"
 ALERT_FROM = "Reply Draft <drafts@hi.aureonglobal.de>"
 # The Claude CLI lives in the user's npm-global on Windows. `claude` is not on the
 # bash PATH but the .cmd is directly invokable.
-CLAUDE_CMD = os.environ.get("CLAUDE_CLI", r"D:\npm-global\claude.cmd")
+# The npm .cmd shim cannot be launched via subprocess under pythonw (it hangs /
+# WinError 2), so the AI draft silently fell back to the generic template. Point at
+# the real claude.exe the .cmd wraps; fall back to the .cmd only if the exe is gone.
+# (See memory: claude-cli-exe-fix — same fix the other tools already got.)
+_CLAUDE_EXE = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.exe"
+CLAUDE_CMD = os.environ.get("CLAUDE_CLI") or (_CLAUDE_EXE if os.path.exists(_CLAUDE_EXE) else r"D:\npm-global\claude.cmd")
 
 
 # ─── env / supabase ──────────────────────────────────────────────────────────
@@ -496,7 +501,8 @@ def resolve_brand_persona(reply: dict) -> tuple[dict | None, dict | None]:
 
 def claude_draft(profile: dict, persona: dict, prospect_email: str,
                  subject: str, prospect_msg: str,
-                 offer_context: str = "") -> str | None:
+                 offer_context: str = "", offer_brief: str = "",
+                 signup_url: str = "") -> str | None:
     """Drive the local Claude CLI to write a reply. Returns the draft text, or
     None on failure (caller falls back to a template).
 
@@ -576,6 +582,30 @@ def claude_draft(profile: dict, persona: dict, prospect_email: str,
             f"- {voice.get('register', 'direct and confident')}; {quirks}.\n"
             "- Under 120 words; use the extra room only to answer questions they asked, otherwise stay tight."
         )
+
+    # Detail mode: a warm prospect asking for the specifics gets the FULL structured
+    # explanation (what we do, how it works, the terms) from the brand's offer brief,
+    # then a clear bridge to a call or the website, instead of a short closer. This is
+    # the reply -> call bridge: explain first, then make the next step obvious.
+    if offer_brief and re.search(
+            r"\b(the specifics|specifics|more detail|more info|more information|how it works|"
+            r"how (?:do|does) (?:it|you|this) work|tell me more|what exactly|break it down|"
+            r"walk me through|send (?:me )?(?:the )?(?:info|information|details|specifics)|"
+            r"learn more|more about)\b", prospect_msg or "", re.I):
+        style_intro = "They asked for the specifics, so give the full, clear explanation:"
+        style_lines = (
+            "- Explain what we do, how it works in concrete steps, and the terms, drawn ONLY from "
+            "the brief below. Never invent numbers, steps, or claims.\n"
+            "- Make it easy to read: a one line intro, then the numbered steps, then the terms.\n"
+            "- End by bridging to the next step: offer a short call with the link AND tell them they "
+            "can start on the website. Make the path obvious and low pressure.\n"
+            f"- {voice.get('register', 'clear, confident, human')}; {quirks}. Up to 250 words. No hype."
+        )
+        cta_line = ((f"\n- Call link to offer: {cta}" if cta else "")
+                    + (f"\n- Website to start: {signup_url}" if signup_url else ""))
+        offer_line = ("\n\nWhat we do, how it works, and the terms (your only source of truth, do not "
+                      f"go beyond this):\n{offer_brief}")
+
     prompt = f"""Draft my reply to the email below.
 
 I run {company} and sign as "{from_name}". {style_intro}
@@ -970,8 +1000,11 @@ def one_pass(limit: int, dry: bool) -> dict:
                            f"lifetime commission on every signup.")
         draft = None
         if profile and persona:
+            _brand = (profile or {}).get("brand", {})
             draft = claude_draft(profile, persona, prospect, subject, msg,
-                                 offer_context=offer_ctx)
+                                 offer_context=offer_ctx,
+                                 offer_brief=_brand.get("offer_brief", ""),
+                                 signup_url=_brand.get("signup_url", ""))
         if not draft:
             draft = template_draft(persona or {}, msg, offer_recap=offer_recap)
             print("    (used template fallback)")

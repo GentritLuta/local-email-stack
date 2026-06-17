@@ -1,6 +1,6 @@
 {
   "slug": "aureon",
-  "name": "Aureon Global — Real estate growth partner (DACH + NL)",
+  "name": "Aureon Global - Real estate growth partner (DACH + NL)",
   "created_at": "2026-05-17",
   "active": true,
   "company": {
@@ -38,14 +38,16 @@
       "vat_number": "330681892",
       "registration_number": "812368240",
       "copyright_year": 2026,
-      "logo_url": "",
+      "logo_url": "https://aureonglobal.de/logo.png",
       "logo_width": 50,
       "privacy_policy_url": "https://aureonglobal.de/privacy.html",
       "terms_of_service_url": "https://aureonglobal.de/terms.html",
       "legal_disclaimer": "The information transmitted is intended only for the person or entity to which it is addressed and may contain confidential and/or privileged material. Any review re-transmission, dissemination or other use of or taking any action in reliance upon this information by persons or entities other than the intended recipient is prohibited. If you received this in error, please contact the sender immediately by return electronic transmission and then immediately delete this transmission including all attachments without copying, distributing or disclosing the same.",
       "partner_notice": "You are receiving this email because you are a registered partner or have requested information from Aureon Global."
     },
-    "template": "aureon-custom"
+    "template": "aureon-custom",
+    "signup_url": "https://portal.aureonglobal.de",
+    "offer_brief": "Aureon Global is a performance partner for real estate agents. We run seller outreach in the agent's own zip code and hand them booked listing appointments; the agent takes the appointments, we do the finding. How it works: (1) we set up a branded Home Value page for the agent, their name and brand, that homeowners in their zip use to get a quick value estimate, which captures real sellers who raise their hand; (2) we seed it with for-sale-by-owner and expired-listing owners already in that zip, plus estate and probate referral sources nearby, people who have shown they want to sell; (3) we reach out to those sellers on the agent's behalf, qualify them, and book the listing appointment straight onto the agent's calendar. No cold-calling strangers, only people showing real intent. Terms: we run it as a 3 month test. The agent gets the leads and booked appointments the whole time, and in return gives an honest review at the end so Aureon has a real result to show the next agent. No big upfront commitment."
   },
   "_architecture_note": [
     "Per-persona reputation isolation: each persona sends from a unique address on a",
@@ -67,7 +69,7 @@
         "verified_at": "2026-05-17T15:18:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -85,7 +87,7 @@
         "verified_at": "2026-05-17T18:27:06.010129Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -103,7 +105,7 @@
         "verified_at": "2026-05-17T18:27:08.767781Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -122,7 +124,7 @@
         "warmup": {
           "enabled": true,
           "started_at": "2026-05-29",
-          "current_day": 13,
+          "current_day": 20,
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -140,7 +142,7 @@
         "warmup": {
           "enabled": true,
           "started_at": "2026-05-29",
-          "current_day": 13,
+          "current_day": 20,
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -157,7 +159,7 @@
         "verified_at": "2026-05-26T09:13:43.464870Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -175,7 +177,7 @@
         "verified_at": "2026-05-26T09:14:20.309123Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -193,7 +195,7 @@
         "verified_at": "2026-05-17T18:24:59.263184Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -211,7 +213,7 @@
         "verified_at": "2026-05-17T18:27:15.000000Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -229,7 +231,7 @@
         "verified_at": "2026-05-17T18:27:07.322179Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -247,7 +249,7 @@
         "verified_at": "2026-05-17T18:27:10.164646Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -265,7 +267,7 @@
         "verified_at": "2026-05-17T18:24:16.965265Z",
         "warmup": {
           "enabled": true,
-          "current_day": 13,
+          "current_day": 20,
           "started_at": "2026-05-29",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -277,7 +279,8 @@
           }
         }
       }
-    ]
+    ],
+    "report_to": "info@aureonglobal.de"
   },
   "personas": [
     {
@@ -530,10 +533,10 @@
       }
     ],
     "reputation": {
-      "bounce_rate_7d": 0.0,
+      "bounce_rate_7d": 0.0145,
       "complaint_rate_7d": 0.0,
-      "delivered_7d": 0,
-      "last_check": null
+      "delivered_7d": 340,
+      "last_check": "2026-06-17T23:07:36.549049+00:00"
     },
     "auto_pause_thresholds": {
       "bounce_rate": 0.05,
