@@ -44,17 +44,31 @@ HENV = _load_env(REPO / "sequences" / "hostinger.env")
 U = SENV["SUPABASE_URL"].rstrip("/") + "/rest/v1"
 K = SENV["SUPABASE_ANON_KEY"]
 H = {"apikey": K, "Authorization": "Bearer " + K, "Content-Type": "application/json"}
-CLAUDE_CMD = os.environ.get("CLAUDE_CLI", r"D:\npm-global\claude.cmd")
+_CLAUDE_EXE = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.exe"
+CLAUDE_CMD = os.environ.get("CLAUDE_CLI") or (_CLAUDE_EXE if os.path.exists(_CLAUDE_EXE) else r"D:\npm-global\claude.cmd")
 
 cli = httpx.Client(base_url=U, headers=H, timeout=40)
 
 
 # ─── Supabase helpers ───────────────────────────────────────────────────────
 def fetch_pending(one_id: str | None):
-    q = {"status": "eq.pending", "select": "*", "order": "created_at.asc"}
+    # Process submissions that are pending OR were waiting on signature: once the
+    # client signs and the contract is sealed, the gate in process() lets them
+    # through. status=in.(pending,awaiting_signature) re-admits sealed ones.
+    q = {"status": "in.(pending,awaiting_signature)", "select": "*", "order": "created_at.asc"}
     if one_id:
         q = {"id": f"eq.{one_id}", "select": "*"}
     return cli.get("/onboarding_submissions", params=q).json()
+
+
+def sealed_contract(sub_id: str) -> dict | None:
+    """Return the sealed contract for this submission, or None. Provisioning is
+    gated on this: no profile, copy, domains, leads, or sends happen until the
+    client has digitally signed and the contract is sealed."""
+    rows = cli.get("/contracts",
+                   params={"select": "id,status,contract_ref,signed_at",
+                           "submission_id": f"eq.{sub_id}", "status": "eq.sealed"}).json()
+    return rows[0] if rows else None
 
 
 def set_submission(sub_id: str, **fields):
@@ -70,6 +84,25 @@ def step(sub_id: str, step: str, state: str, detail: str = "", payload=None):
     cli.post("/provisioning_status?on_conflict=submission_id,step", json=row,
              headers={**H, "Prefer": "resolution=merge-duplicates,return=minimal"})
     print(f"    [{step}] {state}: {detail}")
+
+
+def run_step_script(sid: str, step_name: str, label: str, script_rel: str, *script_args) -> bool:
+    """Run a repo script as a provisioning step, recording running/done/error.
+    Reuses the same per-client builders the operator runs by hand."""
+    step(sid, step_name, "running", label)
+    script = REPO / script_rel
+    try:
+        r = subprocess.run([sys.executable, str(script), *script_args],
+                           cwd=str(REPO), capture_output=True, text=True, timeout=900)
+        if r.returncode == 0:
+            step(sid, step_name, "done", label + " — done")
+            return True
+        msg = (r.stderr or r.stdout or "failed").strip().splitlines()[-1:] or ["failed"]
+        step(sid, step_name, "error", msg[0][:200])
+        return False
+    except Exception as e:
+        step(sid, step_name, "error", str(e)[:200])
+        return False
 
 
 # ─── Slug ───────────────────────────────────────────────────────────────────
@@ -120,8 +153,13 @@ Emails 2-6 escalate value + the offer. Email 7 = a breakup with a final give.
             [CLAUDE_CMD, "-p", "--system-prompt", system,
              "--disallowedTools", "Bash,Read,Glob,Grep,Edit,Write,WebFetch,WebSearch",
              "--setting-sources", "user"],
-            input=prompt, capture_output=True, text=True, timeout=180,
+            input=prompt, capture_output=True, text=True, timeout=240,
             encoding="utf-8", errors="replace", cwd=workdir,
+            # claude.cmd runs via cmd.exe; under the windowless pythonw scheduled
+            # task (LES-onboard-pipeline) the missing CREATE_NO_WINDOW made the
+            # subprocess fail every run ("copy drafting failed"). reply-autodraft
+            # already sets this — matching it fixes the recurring copy error.
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
     except Exception as e:
         print(f"  ! claude CLI error: {e}")
@@ -228,20 +266,60 @@ def push_sequence_and_variants(slug: str, variants: list[dict]) -> str:
     return seq_id
 
 
+def write_variants_file(slug: str, variants: list[dict]) -> None:
+    """Persist the drafted sequence to sequences/<slug>-default/variants.json so the
+    per-client builders that read from disk (the PDF deck) can pick it up — the same
+    file shape the hand-built clients use."""
+    delays = [0, 2, 2, 3, 4, 7, 10]
+    out = {
+        "name": f"{slug} — 7-email cold sequence",
+        "slug": f"{slug}-default",
+        "profile_slug": slug,
+        "variants": [
+            {"n": v["n"],
+             "delay_days": delays[v["n"] - 1] if 0 <= v["n"] - 1 < len(delays) else 3,
+             "angle": v.get("angle", ""), "subject": v.get("subject", ""),
+             "body": v.get("body", "")}
+            for v in variants
+        ],
+    }
+    d = REPO / "sequences" / f"{slug}-default"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "variants.json").write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
 # ─── Domain provisioning router ─────────────────────────────────────────────
+def _client_dns_token(slug: str, host: str):
+    """Return (env_key, token) for THIS client's zone if we hold one, else (None, None).
+    Mirrors credentials-sync.py key naming. push-client-dns.py auto-publishes to
+    Hostinger; Cloudflare / other still hand the records back to paste."""
+    env = _load_env(REPO / "sequences" / "hostinger.env")   # fresh: credentials-sync may have just written it
+    tok = slug.upper().replace("-", "_")
+    if "hostinger" in host:
+        key = f"HOSTINGER_API_TOKEN_{tok}"
+        val = env.get(key)
+        return (key, val) if val else (None, None)
+    return (None, None)
+
+
 def provision_domains(slug: str, a: dict, sub_id: str) -> str:
-    """Returns state: 'done' | 'needs_input' | 'error'. Routes by dns_host."""
+    """Create the client's Resend sending domains, collect their DNS records, and
+    AUTO-PUBLISH them to the client's zone when we hold their DNS token (Hostinger,
+    handed over in the post-sign access step). Otherwise hand the records back to
+    paste. Returns 'done' | 'needs_input' | 'error'."""
     host = (a.get("dns_host") or "other").lower()
-    # We can only auto-push DNS where we hold a token for THIS client's zone. For
-    # v1 the operator's own zones are covered; arbitrary client zones are not, so
-    # default to guided-manual: create Resend domains, hand back records to paste.
+    root = (a.get("sending_root") or "").strip()
     profile = load_profile(slug)
     resend_key = HENV.get("RESEND_FULL_ACCESS_API_KEY")
     if not resend_key:
         return "error"
     RH = {"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"}
     region = profile["relay"].get("resend_region", "us-east-1")
+    dmarc = f"v=DMARC1; p=none; rua=mailto:dmarc@{root}; pct=100; adkim=s; aspf=s"
     records_out = []
+    file_lines = [f"# {slug} — DNS records for {root}. NAME relative to the zone root.",
+                  f"# Push: py scripts/push-client-dns.py hostinger {root} <token> out/{slug}-dns-records.txt",
+                  ""]
     with httpx.Client(timeout=25) as rc:
         existing = {d["name"]: d for d in rc.get("https://api.resend.com/domains", headers=RH).json().get("data", [])}
         for entry in profile["relay"]["from_domains"]:
@@ -254,15 +332,52 @@ def provision_domains(slug: str, a: dict, sub_id: str) -> str:
                 dom = r.json()
             entry["resend_domain_id"] = dom["id"]
             full = rc.get(f"https://api.resend.com/domains/{dom['id']}", headers=RH).json()
+            sub = name.replace(f".{root}", "") if root else name
+            file_lines.append(f"# --- {name} ---")
             for rec in full.get("records", []):
-                records_out.append({"type": rec.get("type"),
-                                    "name": rec.get("name"), "value": rec.get("value")})
+                rtype, rname, rval = rec.get("type"), (rec.get("name") or ""), rec.get("value")
+                records_out.append({"type": rtype, "name": rname, "value": rval})
+                if rtype == "MX":
+                    file_lines.append(f"MX     {rname:40s} {rval} [priority {rec.get('priority', 10)}]")
+                else:
+                    file_lines.append(f"{rtype:6s} {rname:40s} {rval}")
+            file_lines.append(f"TXT    {'_dmarc.' + sub:40s} {dmarc}")   # Resend omits DMARC
+            file_lines.append("")
     save_profile(profile)
-    # For v1: we have created Resend domains + collected records. Auto-push only if
-    # the client's DNS is on a host we have a token for AND it is our own zone.
-    # Otherwise hand the records to the client to paste (needs_input).
+
+    # Always write the records file so a manual push is one command if ever needed.
+    recfile = REPO / "out" / f"{slug}-dns-records.txt"
+    recfile.parent.mkdir(parents=True, exist_ok=True)
+    recfile.write_text("\n".join(file_lines), encoding="utf-8")
+
+    # Auto-publish when we hold this client's DNS token (Hostinger handover).
+    env_key, token = _client_dns_token(slug, host)
+    if token and root:
+        step(sub_id, "domains", "running",
+             f"Publishing {len(records_out)} DNS records to {root} via your {host} token")
+        try:
+            r = subprocess.run([sys.executable, str(REPO / "scripts" / "push-client-dns.py"),
+                                "hostinger", root, token, str(recfile)],
+                               cwd=str(REPO), capture_output=True, text=True, timeout=120)
+            if r.returncode == 0:
+                step(sub_id, "domains", "done",
+                     f"Published {len(records_out)} DNS records to {root}. Resend will verify shortly.")
+                return "done"
+            tail = (r.stderr or r.stdout or "push failed").strip().splitlines()
+            step(sub_id, "domains", "needs_input",
+                 f"Auto-publish to {root} failed ({(tail[-1] if tail else 'error')[:120]}). "
+                 f"Add the {len(records_out)} records manually; then we verify.",
+                 payload={"records": records_out, "host": host})
+            return "needs_input"
+        except Exception as e:
+            step(sub_id, "domains", "needs_input",
+                 f"Auto-publish error ({str(e)[:120]}). Add the {len(records_out)} records manually; then we verify.",
+                 payload={"records": records_out, "host": host})
+            return "needs_input"
+
+    # No token (or non-Hostinger host): hand the records to paste.
     step(sub_id, "domains", "needs_input",
-         f"Add {len(records_out)} DNS records at your {host} DNS for {a.get('sending_root')}, then we verify automatically.",
+         f"Add {len(records_out)} DNS records at your {host} DNS for {root}, then we verify automatically.",
          payload={"records": records_out, "host": host})
     return "needs_input"
 
@@ -282,6 +397,23 @@ def process(sub: dict):
     sid = sub["id"]
     a = sub.get("raw_answers") or {}
     print(f"\n=== submission {sid[:8]} — {a.get('company')}")
+
+    # ─── CONTRACT GATE ───────────────────────────────────────────────────────
+    # No provisioning — no profile, copy, domains, leads, or sends — until the
+    # client has digitally signed the pilot agreement and contract-sign.py has
+    # sealed it. The contract is auto-prepared on submit (contract-sign prepare),
+    # the client signs it in the SaaS app, then it is sealed. Only then does the
+    # rest of this run proceed.
+    contract = sealed_contract(sid)
+    if not contract:
+        set_submission(sid, status="awaiting_signature")
+        step(sid, "contract", "needs_input",
+             "Sign your service agreement to begin setup.")
+        print(f"  gated: submission {sid[:8]} awaiting signed contract")
+        return
+    step(sid, "contract", "done",
+         f"Agreement signed and sealed ({contract['contract_ref']}).")
+
     set_submission(sid, status="provisioning")
 
     # 1. profile
@@ -308,9 +440,18 @@ def process(sub: dict):
         v["subject"] = (v.get("subject") or "").replace("—", ",").replace("–", ",")
         v["body"] = (v.get("body") or "").replace("—", ",").replace("–", ",")
     push_sequence_and_variants(slug, variants[:7])
+    write_variants_file(slug, variants[:7])   # so the PDF deck builder finds the sequence
     step(sid, "copy", "done", f"{len(variants[:7])}-email sequence drafted and saved")
 
-    # 3. domains
+    # 2b. sequence presentation PDF (the branded deck we hand every client)
+    run_step_script(sid, "pdf", "Building your sequence presentation PDF",
+                    "scripts/build-client-sequence-pdf.py", "--profile", slug)
+
+    # 2c. unsubscribe page (so every email footer's one-click unsub resolves)
+    run_step_script(sid, "unsub", "Publishing your unsubscribe page",
+                    "scripts/build-unsub-pages.py", slug)
+
+    # 3. domains (Resend connection: create sending domains + collect DNS)
     step(sid, "domains", "running", "Provisioning sending domains")
     dom_state = provision_domains(slug, a, sid)
 

@@ -48,12 +48,16 @@ import json
 import os
 import re
 import shutil
+import smtplib
+import ssl
 import subprocess
 import sys
 import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from pathlib import Path
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -73,7 +77,8 @@ except Exception:
 UA = "local-email-stack seller-outreach/1.0"
 OPERATOR_ADDR = "info@aureonglobal.de"
 ALERT_FROM = "Seller Outreach <drafts@hi.aureonglobal.de>"
-CLAUDE_CMD = os.environ.get("CLAUDE_CLI", r"D:\npm-global\claude.cmd")
+_CLAUDE_EXE = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.exe"
+CLAUDE_CMD = os.environ.get("CLAUDE_CLI") or (_CLAUDE_EXE if os.path.exists(_CLAUDE_EXE) else r"D:\npm-global\claude.cmd")
 CALENDLY_PLACEHOLDER = "<<SET CALENDLY LINK: SELLER_OUTREACH_CALENDLY in hostinger.env>>"
 
 
@@ -378,6 +383,9 @@ Output the email body wrapped in ===EMAIL=== / ===END=== markers. No subject lin
              "--setting-sources", "user"],
             input=prompt, capture_output=True, text=True, timeout=180,
             encoding="utf-8", errors="replace", cwd=workdir,
+            # claude.cmd runs via cmd.exe (console); under the pyw task it
+            # would flash a console window per draft without this.
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
     except Exception as e:
         print(f"  ! claude CLI error: {e}")
@@ -440,6 +448,108 @@ def set_status(prospect: dict, **fields) -> None:
 
 # ─── operator digest email ───────────────────────────────────────────────────
 
+def _original_from_addr(reply: dict) -> str:
+    """The exact subdomain address that first emailed this prospect, so the
+    auto-sent follow-up threads in their inbox. Looked up from the run's first
+    send_log row; falls back to '' if unknown."""
+    rid = reply.get("run_id")
+    if not rid:
+        return ""
+    rows = supa_get(f"send_log?run_id=eq.{rid}&select=from_addr&order=step_n.asc&limit=1")
+    if rows and rows[0].get("from_addr"):
+        return rows[0]["from_addr"]
+    return ""
+
+
+def auto_send_followup(*, prospect: dict, profile: dict, persona: dict,
+                       subject: str, draft: str, reply: dict, dry: bool) -> bool:
+    """Send the seller-outreach follow-up STRAIGHT to the prospect, always with a
+    copy to info@aureonglobal.de (Bcc) so the operator sees every reply that goes
+    out. Routing mirrors reply-autodraft: aureon sends FROM info@aureonglobal.de
+    via Hostinger SMTP; every other brand sends via its own Resend relay from the
+    exact address that first emailed the prospect (so it threads + stays on-brand).
+    Returns True if the prospect send fired."""
+    prospect_email = prospect.get("email") or ""
+    persona_name = (persona or {}).get("from_name") or "there"
+    slug = profile.get("slug")
+    reply_subject = subject if (subject or "").lower().startswith("re:") else f"Re: {subject}"
+
+    if slug == "aureon":
+        user = HOST.get("SMTP_USER") or OPERATOR_ADDR
+        pw = HOST.get("SMTP_PASS")
+        if dry:
+            print(f"  [DRY] would AUTO-SEND follow-up to {prospect_email} from info@ (Bcc info@)")
+            return True
+        if not pw:
+            print("  ! no SMTP_PASS in hostinger.env — cannot auto-send follow-up")
+            return False
+        m = MIMEText(draft, "plain", "utf-8")
+        m["Subject"] = reply_subject[:200]
+        # persona_name already carries the brand ("Anna from Aureon Global"); use
+        # it as-is so the From header doesn't double to "... from Aureon Global
+        # from Aureon Global".
+        m["From"] = f"{persona_name} <{user}>"
+        m["To"] = prospect_email
+        m["Reply-To"] = user
+        try:
+            with smtplib.SMTP_SSL("smtp.hostinger.com", 465,
+                                  context=ssl.create_default_context()) as s:
+                s.login(user, pw)
+                # info@ Bcc'd: the copy lands in the operator's webmail.
+                s.sendmail(user, [prospect_email, OPERATOR_ADDR], m.as_string())
+            print(f"  ✓ AUTO-SENT follow-up to {prospect_email} (copy to info@)")
+            return True
+        except Exception as e:
+            print(f"  ! auto-send follow-up failed: {e}")
+            return False
+
+    # Non-aureon: send via the brand's own Resend relay from the original sender.
+    if dry:
+        print(f"  [DRY] would AUTO-SEND follow-up to {prospect_email} via Resend (Bcc info@)")
+        return True
+    from_addr = _original_from_addr(reply)
+    key = _brand_resend_key(slug)
+    if not from_addr or not key:
+        print(f"  ! cannot auto-send ({slug}): from_addr={from_addr or 'MISSING'} "
+              f"key={'yes' if key else 'MISSING'}")
+        return False
+    payload = {
+        "from": f"{persona_name} <{from_addr}>",
+        "to": [prospect_email],
+        "bcc": [OPERATOR_ADDR],
+        "reply_to": from_addr,
+        "subject": reply_subject[:200],
+        "text": draft,
+        "tags": [{"name": "kind", "value": "seller_outreach_autosend"}],
+    }
+    req = urllib.request.Request(
+        "https://api.resend.com/emails", data=json.dumps(payload).encode(),
+        method="POST", headers={"Authorization": f"Bearer {key}",
+                                "Content-Type": "application/json", "User-Agent": UA})
+    try:
+        urllib.request.urlopen(req, timeout=20)
+        print(f"  ✓ AUTO-SENT follow-up to {prospect_email} via Resend (copy to info@)")
+        return True
+    except Exception as e:
+        print(f"  ! auto-send follow-up failed ({slug}): {e}")
+        return False
+
+
+def _brand_resend_key(slug: str) -> str:
+    """Per-brand Resend key from profiles/<slug>.private.json (relay.resend_api_key),
+    falling back to the shared RESEND_KEY."""
+    try:
+        priv = REPO / "profiles" / f"{slug}.private.json"
+        if priv.exists():
+            p = json.loads(priv.read_text(encoding="utf-8"))
+            k = (p.get("relay") or {}).get("resend_api_key")
+            if k:
+                return k
+    except Exception:
+        pass
+    return RESEND_KEY
+
+
 def send_digest(*, prospect: dict, profile: dict, persona: dict, subject: str,
                 prospect_msg: str, draft: str, site_summary: str,
                 thread: str, dry: bool) -> bool:
@@ -456,11 +566,11 @@ def send_digest(*, prospect: dict, profile: dict, persona: dict, subject: str,
 
     body_html = f"""\
 <div style="font-family:system-ui,-apple-system,sans-serif;color:#1e293b;max-width:640px">
-  <h2 style="margin:0 0 4px 0;color:#16a34a">&#129534; Seller-outreach lead &mdash; follow-up ready</h2>
+  <h2 style="margin:0 0 4px 0;color:#16a34a">&#129534; Seller-outreach lead &mdash; follow-up SENT</h2>
   <p style="margin:0 0 12px 0;color:#64748b;font-size:13px">
-    {esc(profile_name)} &middot; persona <b>{esc(persona_name)}</b> &middot; reply to
-    <b>{esc(prospect.get('email',''))}</b>. Edit if needed, then hit Reply to send
-    (Reply-To is the prospect).</p>
+    {esc(profile_name)} &middot; persona <b>{esc(persona_name)}</b> &middot; auto-sent to
+    <b>{esc(prospect.get('email',''))}</b>. This is your copy for the record. To add
+    anything, just Reply (Reply-To is the prospect).</p>
 
   <table style="font-size:13px;border-collapse:collapse;margin:0 0 14px 0">
     <tr><td style="color:#64748b;padding:2px 10px 2px 0">Company</td><td><b>{esc(company)}</b></td></tr>
@@ -487,8 +597,8 @@ def send_digest(*, prospect: dict, profile: dict, persona: dict, subject: str,
               font-family:ui-monospace,monospace;font-size:11px;color:#475569">{esc((site_summary or '(none)')[:900])}</pre>
 
   <p style="margin:14px 0 0 0;color:#94a3b8;font-size:11px">
-    Drafted by seller-outreach.py via the local Claude CLI. Nothing was sent to the
-    prospect. Approve by hitting Reply. After you close it, run
+    Drafted by seller-outreach.py via the local Claude CLI and auto-sent to the
+    prospect (you were Bcc'd). After you close it, run
     <code>py seller-outreach.py return {esc(prospect.get('email',''))}</code> to hand the lead back to the client.</p>
 </div>"""
 
@@ -754,14 +864,20 @@ def one_pass(limit: int, dry: bool) -> dict:
             draft = template_followup(persona, is_german)
         thread = prior_thread(r.get("run_id"), prospect_email)
 
-        ok = send_digest(prospect=prospect, profile=profile, persona=persona,
-                         subject=subject, prospect_msg=msg, draft=draft,
-                         site_summary=site, thread=thread, dry=dry)
-        if ok:
-            stats["drafted"] += 1
+        # AUTO-SEND the follow-up straight to the prospect (with info@ copied),
+        # then always email the operator a record digest so the full context
+        # (thread, site notes, what they wrote) lands in info@ too.
+        sent = auto_send_followup(prospect=prospect, profile=profile, persona=persona,
+                                  subject=subject, draft=draft, reply=r, dry=dry)
+        send_digest(prospect=prospect, profile=profile, persona=persona,
+                    subject=subject, prospect_msg=msg, draft=draft,
+                    site_summary=site, thread=thread, dry=dry)
+        if sent:
+            stats["sent"] = stats.get("sent", 0) + 1
             if not dry:
-                set_status(prospect, status="drafted", site_summary=site[:300],
-                           drafted_at=dt.datetime.now(dt.timezone.utc).isoformat())
+                set_status(prospect, status="sent", site_summary=site[:300],
+                           drafted_at=dt.datetime.now(dt.timezone.utc).isoformat(),
+                           sent_at=dt.datetime.now(dt.timezone.utc).isoformat())
                 mark_seen(r)
         else:
             stats["errors"] += 1
