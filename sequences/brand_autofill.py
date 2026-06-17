@@ -77,6 +77,13 @@ def autofill_once(slug_filter: str | None = None, force: bool = False) -> int:
                 print(f"  - {prof['slug']:20} skip: no company.site")
                 skipped += 1; continue
 
+            # Skip placeholder/draft URLs (reserved TLDs never resolve, so a
+            # fetch always fails and would trip the task's non-zero exit).
+            host = site.split("://", 1)[-1].split("/", 1)[0].lower()
+            if host.rsplit(".", 1)[-1] in ("example", "invalid", "test", "localhost"):
+                print(f"  - {prof['slug']:20} skip: placeholder site {site}")
+                skipped += 1; continue
+
             existing_brand = cfg.get("brand")
             if existing_brand and not force:
                 ef = (existing_brand or {}).get("extracted_from", "")
@@ -89,7 +96,23 @@ def autofill_once(slug_filter: str | None = None, force: bool = False) -> int:
             if brand is None:
                 print(f"    ! extract failed (fetch error)")
                 failed += 1; continue
-            cfg["brand"] = asdict(brand)
+            # MERGE the auto-extracted brand INTO the existing brand instead of
+            # replacing it. A bare replace silently dropped manually-set fields,
+            # most critically `template` (the custom-HTML dispatcher key) and any
+            # hand-tuned colors/legal/tagline. That clobbered aureon + algoalpha's
+            # custom templates back to "default" every 15 min (2026-06-12 fix).
+            # Never overwrite these operator-owned keys from a site scrape:
+            PRESERVE = ("template", "legal", "tagline", "reply_tone",
+                        "unsubscribe_url_template", "cta_url")
+            merged = dict(existing_brand or {})
+            for k, v in asdict(brand).items():
+                if k in PRESERVE and merged.get(k) not in (None, "", {}, []):
+                    continue  # keep the operator's value
+                merged[k] = v
+            for k in PRESERVE:
+                if existing_brand and existing_brand.get(k) not in (None, "", {}, []):
+                    merged[k] = existing_brand[k]
+            cfg["brand"] = merged
 
             up = c.patch(f"/profiles?slug=eq.{prof['slug']}", json={"config": cfg})
             if up.status_code not in (200, 204):
