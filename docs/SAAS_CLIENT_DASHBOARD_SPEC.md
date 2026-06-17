@@ -1,6 +1,14 @@
 # SaaS Client Dashboard — Architecture & Spec (v1)
 
-Status: SPEC for review. No code written yet. Build target: next session.
+Status: **BUILT + LIVE (as of 2026-06-17).** Implemented as the client portal at
+portal.aureonglobal.de — the `saas/` Vite+React app (GitHub Pages repo aureon-portal),
+Supabase Auth + RLS, the `LES-onboard-pipeline` task running `onboard-pipeline.py` against
+`onboarding_submissions`, and the `clients` / `onboarding_submissions` / `provisioning_status`
+tables. All 5 screens below exist (Login, Onboard, Status, Dashboard, go-live) plus more that
+postdate this spec: contract e-sign (Sign), billing-on-file (Billing), credential handover
+(Access), continuation. This doc is kept as the original design record; the open questions in
+§7 were all resolved during build (password+invite auth, billing built, guided-manual DNS
+fallback, GitHub Pages hosting).
 Decisions locked 2026-06-08: (1) new public web app, Supabase-backed; (2) full auto
 including DNS, with fallback to manual when the DNS host is not API-reachable;
 (3) spec first, build next.
@@ -61,7 +69,10 @@ The pipeline a submission must trigger, in order:
   does the privileged work.
 
 ## 4. New data model (Supabase tables to add)
-- `clients` (id, auth_user_id, profile_slug, company, status, created_at)
+- `clients` (id, auth_user_id, profile_slug, company, contact_name, contact_position, contact_email, status, created_at)
+  - `contact_position` and `contact_email` are always captured from the onboarding form's
+    required first question (see screen 5.2); kept as first-class columns so every invited
+    client has them queryable, not only inside `onboarding_submissions.raw_answers`.
 - `onboarding_submissions` (id, client_id, raw_answers jsonb, status[pending|provisioning|
   needs_dns|ready|live|error], created_at) - the pipeline's work queue.
 - `provisioning_status` (client_id, step, state, detail, updated_at) - per-step progress for
@@ -70,9 +81,12 @@ The pipeline a submission must trigger, in order:
 
 ## 5. Client dashboard screens (v1)
 1. **Sign up / log in** (Supabase Auth).
-2. **Onboarding form** - the questions from aureon-onboarding-form.gs, restructured: company,
-   offer, ICP, sending-domain (+ where its DNS is hosted), lead source (CSV upload or ICP pick),
-   reply-to mailbox. Submitting writes `onboarding_submissions`.
+2. **Onboarding form** - the questions from aureon-onboarding-form.gs, restructured: primary
+   contact (name, **position/role**, and **work email**) - REQUIRED and always asked, the first
+   question after invite, since it identifies who we're dealing with and where replies go;
+   company, offer, ICP, sending-domain (+ where its DNS is hosted), lead source (CSV upload or
+   ICP pick), reply-to mailbox. Submitting writes `onboarding_submissions` and back-fills the
+   `clients` contact fields below.
 3. **Provisioning status** - live view of the pipeline (profile created, copy drafted, domains
    verifying X/N, leads loaded). If a domain needs manual DNS, show the exact records + a
    "re-check" button.
