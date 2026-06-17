@@ -10,13 +10,17 @@ class='reply' and pauses the sequence), THIS script:
      reply's run_id -> send_log.persona_slug, falling back to the matched profile).
   3. Asks the local Claude CLI (`claude -p`, authed via the user's Max plan — NO
      API key) to draft a short, on-voice reply in that persona's voice.
-  4. Emails the DRAFT to the operator (info@aureonglobal.de) via Resend, with the
-     prospect's message quoted and the proposed reply ready to copy/edit/send.
-     reply_to is set to the prospect so the operator can just hit Reply.
-  5. Marks the reply row raw_headers.autodraft_sent=true so it is never re-drafted.
+  4. AUTO-SENDS that draft straight to the prospect, from the exact address that
+     originally emailed them (so it threads + stays on-brand), with info@aureonglobal.de
+     BCC'd for the paper trail. If auto-send cannot fire (no sender/key resolved),
+     it falls back to emailing the draft to the operator for manual sending.
+  5. Marks the reply row raw_headers.autosent=true / autodraft_sent=true.
 
-DRAFT + QUEUE FOR APPROVAL ONLY. This script never emails a prospect directly.
-The operator reviews every draft and sends it by hand.
+AUTO-SEND MODE (set 2026-06-11 at user request). Genuine campaign replies are
+answered automatically: the suppression list (laso.finance etc.) + the active-
+prospect gate mean only real enrolled prospects ever reach the auto-send, so
+general mail to our inboxes is never auto-answered. Positive call-intent still
+gets the brand booking link; everything else gets the AI draft auto-sent.
 
 Usage:
     py reply-autodraft.py once          # one pass over undrafted replies
@@ -39,6 +43,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -158,20 +163,30 @@ def is_list_request(subject: str | None, body: str | None) -> bool:
 BOOKING_LINKS = {
     "aureon": "https://calendly.com/aureonglobal-info/30min",
     "diraya": "https://calendly.com/amoura-ma-diraya/30min",
+    "lk-advertising": "https://cal.com/lkadvertising/15min",  # LK books to its own cal.com (per its sequence copy)
 }
 _BOOKING_HOSTS = ("calendly.com", "cal.com", "savvycal", "meetings.hubspot",
-                  "zcal.co", "tidycal", "koalendar", "youcanbook")
+                  "zcal.co", "tidycal", "koalendar", "youcanbook",
+                  "calendar.app.google", "calendar.google.com")
+
+# Universal fallback booking link (the operator's own). Every reply must carry a
+# CTA: a brand's own scheduling link if it has one, otherwise THIS. So a brand
+# that has not set its own link still books onto the operator's calendar rather
+# than going out with no call-to-action. Override with OPERATOR_BOOKING_URL.
+OPERATOR_BOOKING_URL = (os.environ.get("OPERATOR_BOOKING_URL")
+                        or "https://calendly.com/aureonglobal-info/30min")
 
 
 def booking_link_for(slug: str, profile: dict | None) -> str:
-    """The booking URL for a brand: explicit map first, then the profile's
-    brand.cta_url if it is a real scheduling link. '' = no auto-booking."""
+    """The booking URL for a reply: explicit per-brand map first, then the
+    profile's brand.cta_url if it is a real scheduling link, then the operator's
+    own link as a universal fallback. Never empty — every reply gets a CTA."""
     link = BOOKING_LINKS.get(slug, "")
     if not link:
         cta = (((profile or {}).get("brand") or {}).get("cta_url") or "").strip()
         if cta.startswith("http") and any(h in cta for h in _BOOKING_HOSTS):
             link = cta
-    return link
+    return link or OPERATOR_BOOKING_URL
 
 
 def already_autoreplied(addr: str) -> bool:
@@ -209,30 +224,94 @@ def _brand_resend_key(slug: str) -> str:
 
 
 def _autoreply_body(first_name: str, persona_name: str, brand_name: str,
-                    booking_url: str, signoff_email: str) -> str:
+                    booking_url: str, signoff_email: str,
+                    with_signoff: bool = True) -> str:
     fn = (first_name or "").strip() or "there"
     lines = [
         f"Hi {fn},", "",
         "Great to hear from you, glad this is a fit.", "",
         "Grab whatever time works best for you here and it lands straight on my calendar:",
         booking_url, "",
+        "So the time is useful and not wasted, two quick things when you book: "
+        "where your numbers are right now, and what a good outcome from 15 minutes "
+        "would look like for you.", "",
         "If none of those slots fit, just reply with a couple of windows that suit "
         "you and I will set one up.", "",
-        "Looking forward to it.", "",
-        persona_name, brand_name,
+        "Looking forward to it.",
     ]
-    if signoff_email:
-        lines.append(signoff_email)
+    # When the email is rendered through the branded template, the template adds
+    # the persona signature block, so omit the inline signoff to avoid doubling.
+    # persona_name already carries the brand ("Anna from Aureon Global"); only add
+    # the bare brand_name as a second line if persona_name does not already end
+    # with it, so the signoff never reads "... from Aureon Global / Aureon Global".
+    if with_signoff:
+        sig = ["", persona_name]
+        if brand_name and brand_name.lower() not in (persona_name or "").lower():
+            sig.append(brand_name)
+        lines += sig
+        if signoff_email:
+            lines.append(signoff_email)
     return "\n".join(lines)
+
+
+def _strip_trailing_sig(body: str, persona: dict | None) -> str:
+    """Remove a trailing signoff (persona signature / from_name lines) from a
+    reply body, so the branded template's own signature block is the only one."""
+    sig = ((persona or {}).get("signature") or "").strip()
+    b = (body or "").rstrip()
+    if sig and b.endswith(sig):
+        return b[: -len(sig)].rstrip()
+    name = ((persona or {}).get("from_name") or "").strip()
+    tokens = {s.strip().lower() for s in (sig.split("\n") + [name]) if s.strip()}
+    lines = b.split("\n")
+    while lines and (not lines[-1].strip() or lines[-1].strip().lower() in tokens):
+        lines.pop()
+    return "\n".join(lines).rstrip()
+
+
+def _linkify(html: str, accent: str) -> str:
+    """Make bare http(s) URLs in the rendered body clickable (so a booking link
+    in a reply is an actual link, not plain text). Skips URLs already inside an
+    href/attribute (preceded by =, ", ')."""
+    def repl(m: "re.Match") -> str:
+        url = m.group(0)
+        tail = ""
+        while url and url[-1] in ".,;:)]}>":
+            tail = url[-1] + tail
+            url = url[:-1]
+        return (f'<a href="{url}" style="color:{accent};text-decoration:underline;">'
+                f'{url}</a>{tail}')
+    return re.sub(r'(?<![="\'])\bhttps?://[^\s<>"\']+', repl, html)
+
+
+def _render_reply_html(body: str, persona: dict | None, profile: dict | None,
+                       unsub_token: str | None = None) -> str | None:
+    """Wrap a reply body in the SAME branded template the sequence emails use, so
+    replies look identical in the inbox. step_n=1 -> the per-brand template omits
+    the CTA button (the booking link is already in the reply body), and we linkify
+    that booking URL so it is clickable."""
+    try:
+        import email_render
+        brand = (profile or {}).get("brand") or {}
+        clean = _strip_trailing_sig(body, persona)
+        html = email_render.render_html(body=clean, persona=persona or {},
+                                        unsubscribe_token=unsub_token,
+                                        brand=brand, step_n=1)
+        accent = ((brand.get("colors") or {}).get("accent")) or "#1a56db"
+        return _linkify(html, accent)
+    except Exception as e:
+        print(f"  ! reply HTML render failed ({e}); falling back to plain text")
+        return None
 
 
 def send_autoreply(*, slug: str, prospect_email: str, first_name: str, subject: str,
                    persona: dict | None, profile: dict | None, booking_url: str,
-                   reply: dict, dry: bool) -> bool:
+                   reply: dict, dry: bool, unsub_token: str | None = None) -> bool:
     """Send the warm-lead booking reply. aureon goes FROM info@aureonglobal.de via
     Hostinger SMTP (the user's chosen inbox); every other brand goes via its own
     Resend relay from the exact address that emailed the prospect, so it stays
-    on-brand and threads. Plain text, signed as the persona."""
+    on-brand and threads. Rendered in the SAME branded template as the sequence
+    emails (HTML), with a plain-text alternative, signed as the persona."""
     persona_name = (persona or {}).get("from_name") or "there"
     brand_name = (profile or {}).get("name") or "our team"
     reply_subject = subject if (subject or "").lower().startswith("re:") else f"Re: {subject}"
@@ -242,14 +321,25 @@ def send_autoreply(*, slug: str, prospect_email: str, first_name: str, subject: 
         pw = HOST.get("SMTP_PASS")
         body = _autoreply_body(first_name, persona_name, "Aureon Global", booking_url, user)
         if dry:
-            print(f"  [DRY] would AUTO-REPLY to {prospect_email} as {persona_name} via Hostinger info@")
+            print(f"  [DRY] would AUTO-REPLY to {prospect_email} as {persona_name} via Hostinger info@ (branded HTML)")
             return True
         if not pw:
             print("  ! no SMTP_PASS in hostinger.env — cannot auto-reply")
             return False
-        m = MIMEText(body, "plain", "utf-8")
+        # HTML source omits the inline signoff — the branded template signs.
+        html = _render_reply_html(
+            _autoreply_body(first_name, persona_name, "Aureon Global", booking_url, user, with_signoff=False),
+            persona, profile, unsub_token)
+        if html:
+            m = MIMEMultipart("alternative")
+            m.attach(MIMEText(body, "plain", "utf-8"))
+            m.attach(MIMEText(html, "html", "utf-8"))
+        else:
+            m = MIMEText(body, "plain", "utf-8")
         m["Subject"] = reply_subject[:200]
-        m["From"] = f"{persona_name} from Aureon Global <{user}>"
+        # persona_name already carries the brand ("Anna from Aureon Global"); use
+        # it as-is so the From header doesn't double the brand suffix.
+        m["From"] = f"{persona_name} <{user}>"
         m["To"] = prospect_email
         m["Reply-To"] = user
         try:
@@ -267,11 +357,15 @@ def send_autoreply(*, slug: str, prospect_email: str, first_name: str, subject: 
     body = _autoreply_body(first_name, persona_name, brand_name, booking_url, from_addr)
     if dry:
         print(f"  [DRY] would AUTO-REPLY to {prospect_email} as {persona_name} via {slug} "
-              f"Resend from {from_addr or '(unknown sender)'} (key={'yes' if key else 'MISSING'})")
+              f"Resend from {from_addr or '(unknown sender)'} (key={'yes' if key else 'MISSING'}, branded HTML)")
         return bool(from_addr and key)
     if not from_addr or not key:
         print(f"  ! {slug}: missing sender/resend key — cannot auto-reply (will draft)")
         return False
+    # HTML source omits the inline signoff — the branded template signs.
+    html = _render_reply_html(
+        _autoreply_body(first_name, persona_name, brand_name, booking_url, from_addr, with_signoff=False),
+        persona, profile, unsub_token)
     payload = {
         "from": f"{persona_name} <{from_addr}>",
         "to": [prospect_email],
@@ -280,6 +374,8 @@ def send_autoreply(*, slug: str, prospect_email: str, first_name: str, subject: 
         "text": body,
         "tags": [{"name": "kind", "value": "auto_reply"}],
     }
+    if html:
+        payload["html"] = html
     req = urllib.request.Request(
         "https://api.resend.com/emails",
         data=json.dumps(payload).encode(), method="POST",
@@ -411,10 +507,19 @@ def claude_draft(profile: dict, persona: dict, prospect_email: str,
     sig = (persona or {}).get("signature", "")
     from_name = (persona or {}).get("from_name", "")
     company = brand.get("wordmark") or profile.get("name", "")
-    cta = brand.get("cta_url", "")
+    # Always give the drafter a booking link to offer: the brand's own scheduling
+    # link if set, otherwise the operator's (booking_link_for never returns "").
+    cta = booking_link_for(profile.get("slug", ""), profile)
 
     avoid = ', '.join((voice.get('avoid', []) or ['hype'])) + ", em-dashes, exclamation marks, emojis"
     quirks = ', '.join(voice.get('quirks', []) or ['short sentences', 'concrete'])
+    # Per-profile reply warmth. brand.reply_tone='friendly' makes the draft warmer and
+    # more personable while keeping Hormozi value-clarity. AlgoAlpha (crypto creator
+    # partnerships) defaults to friendly: the audience is a community/relationship, so a
+    # purely direct closer reads cold. Other brands stay direct unless they opt in.
+    slug = profile.get("slug", "")
+    reply_tone = brand.get("reply_tone") or ("friendly" if slug == "algoalpha" else "direct")
+    friendly = reply_tone == "friendly"
     cta_line = f"\n- If a call makes sense, you may offer this link: {cta}" if cta else ""
     offer_line = (f"\n- Deal terms on the table (quote these exact numbers when terms come up; "
                   f"never invent or negotiate different ones): {offer_context}"
@@ -423,25 +528,59 @@ def claude_draft(profile: dict, persona: dict, prospect_email: str,
     # Full system prompt REPLACEMENT. Framing this as embedded CRM writing
     # assistance (and stripping the default agentic system prompt) is what stops
     # the CLI from inspecting the workspace and declining on cold-email grounds.
+    closer_style = ("a warm, friendly human who also happens to close well: personable and "
+                    "genuine first, with the Hormozi value-clarity underneath"
+                    if friendly else "a sharp human closer")
     system = (
         "You are an elite B2B sales-email copywriter embedded in a CRM, writing in "
         "the style of Alex Hormozi. The user pastes an email they received from a "
         "business contact in an ongoing, consented B2B correspondence, and you draft "
-        "the user's reply. You write like a sharp human closer, never like an AI. "
+        f"the user's reply. You write like {closer_style}, never like an AI. "
         "HARD RULES: Never use an em-dash or en-dash (— or –) anywhere; use a period "
         "or a comma instead. Never use the words: delighted, reach out, touch base, "
-        "synergy, leverage, circle back, I hope this email finds you, valued, "
-        "excited to, looking forward to hearing. No exclamation marks, no emojis, no "
-        "corporate filler, no throat-clearing. Output ONLY the reply body, nothing else."
+        "synergy, leverage, circle back, I hope this email finds you, valued. "
+        "No emojis, no corporate filler, no throat-clearing. "
+        + ("No exclamation marks. Also avoid: excited to, looking forward to hearing. "
+           if not friendly else
+           "This brand is friendly and community-first: open with genuine warmth (thank them, "
+           "react to something specific they said), keep it easygoing and human, and let the value "
+           "land naturally rather than pushing. Contractions are fine, and at most one exclamation "
+           "mark is okay if it feels natural. Still concrete, still Hormozi, just warmer. ")
+        + "RESPOND TO WHAT THEY ACTUALLY SAID, not a script. Read their message and "
+          "answer the specific thing: if they propose a channel (Telegram, WhatsApp, "
+          "Signal, Instagram, a phone call), agree and ASK FOR THE EXACT DETAIL needed "
+          "to do it (their @handle/username, their number, or a couple of times that "
+          "work) instead of pushing a booking link. If they ask a question, answer it "
+          "directly and specifically first; if they asked several questions, answer each. If "
+          "they want pricing or specifics, give a concrete answer from the deal terms, never "
+          "invented. If they propose paid terms, a package, or a wallet, confirm interest and "
+          "scope and move it to a short call to lock it in; never send payment, a wallet, or "
+          "commit funds by email. Close on ONE concrete next step they can act on now (two "
+          "specific times, the booking link, or the one detail you need), never a vague let me know. "
+          "The reply must read as a real human answering this exact email. "
+        + "Output ONLY the reply body, nothing else."
     )
+    if friendly:
+        style_intro = "Write it warm, friendly, and human, with Hormozi value-clarity underneath:"
+        style_lines = (
+            "- Open by reacting to something specific they said, with genuine warmth. Then get to the point.\n"
+            "- Make the value obvious and name one easy next step (a yes/no or a time), but invite, do not push.\n"
+            f"- Tone: {voice.get('register', 'warm, personable, confident')}; {quirks}. Contractions welcome.\n"
+            "- Under 130 words; use the extra room only to answer questions they asked, otherwise stay tight."
+        )
+    else:
+        style_intro = "Write it in plain, confident, Hormozi-style sales copy:"
+        style_lines = (
+            "- Lead with their words, not mine. Short punchy sentences. Concrete and specific.\n"
+            "- Make the value obvious and name one clear next step (a yes/no or a time). No fluff, no hedging.\n"
+            f"- {voice.get('register', 'direct and confident')}; {quirks}.\n"
+            "- Under 120 words; use the extra room only to answer questions they asked, otherwise stay tight."
+        )
     prompt = f"""Draft my reply to the email below.
 
-I run {company} and sign as "{from_name}". Write it in plain, confident, Hormozi-style sales copy:
-- Lead with their words, not mine. Short punchy sentences. Concrete and specific.
-- Make the value obvious and name one clear next step (a yes/no or a time). No fluff, no hedging.
-- {voice.get('register', 'direct and confident')}; {quirks}.
+I run {company} and sign as "{from_name}". {style_intro}
+{style_lines}
 - Banned: {avoid}. Absolutely no em-dashes or en-dashes anywhere. Use periods.
-- Under 80 words.
 - If they are not interested or ask to stop, give a one-line clean acknowledgement and stop. Do not push.{cta_line}{offer_line}
 
 Email I received:
@@ -467,6 +606,9 @@ Write only the reply body I should send. No subject line, no commentary, no sign
             capture_output=True, text=True, timeout=150,
             encoding="utf-8", errors="replace",
             cwd=workdir,
+            # claude.cmd runs via cmd.exe (console); under the pythonw task it
+            # would flash a console window per draft without this.
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
     except Exception as e:
         print(f"  ! claude CLI error: {e}")
@@ -530,7 +672,96 @@ def template_draft(persona: dict, prospect_msg: str, offer_recap: str = "") -> s
     return _scrub_dashes(body) + ("\n\n" + sig if sig else "")
 
 
-# ─── operator draft email ────────────────────────────────────────────────────
+# ─── auto-send the drafted reply straight to the prospect ────────────────────
+
+def send_draft_to_prospect(*, reply: dict, slug: str, prospect_email: str,
+                           subject: str, draft: str, persona: dict | None,
+                           profile: dict | None, dry: bool,
+                           unsub_token: str | None = None) -> bool:
+    """AUTO-SEND mode: send the AI-drafted reply directly to the prospect,
+    from the exact address that originally emailed them (so it threads + stays
+    on-brand), with info@aureonglobal.de BCC'd for the paper trail.
+
+    Aureon goes via Hostinger SMTP from info@; every other brand goes via its
+    own Resend relay from the original sender. Caller has already passed the
+    suppression list AND the active-prospect gate, so only genuine campaign
+    replies reach here. Returns True on a successful send."""
+    persona_name = (persona or {}).get("from_name") or "there"
+    brand_name = (profile or {}).get("name") or "our team"
+    reply_subject = subject if (subject or "").lower().startswith("re:") else f"Re: {subject}"
+
+    if slug == "aureon":
+        user = HOST.get("SMTP_USER") or OPERATOR_ADDR
+        pw = HOST.get("SMTP_PASS")
+        if dry:
+            print(f"  [DRY] would AUTO-SEND reply to {prospect_email} as {persona_name} "
+                  f"via Hostinger info@ (bcc {OPERATOR_ADDR})")
+            return True
+        if not pw:
+            print("  ! no SMTP_PASS in hostinger.env, cannot auto-send")
+            return False
+        html = _render_reply_html(draft, persona, profile, unsub_token)
+        if html:
+            m = MIMEMultipart("alternative")
+            m.attach(MIMEText(draft, "plain", "utf-8"))
+            m.attach(MIMEText(html, "html", "utf-8"))
+        else:
+            m = MIMEText(draft, "plain", "utf-8")
+        m["Subject"] = reply_subject[:200]
+        # persona_name already carries the brand ("Anna from Aureon Global"); use
+        # it as-is so the From header doesn't double the brand suffix.
+        m["From"] = f"{persona_name} <{user}>"
+        m["To"] = prospect_email
+        m["Reply-To"] = user
+        try:
+            with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
+                s.login(user, pw)
+                s.sendmail(user, [prospect_email, OPERATOR_ADDR], m.as_string())
+            return True
+        except Exception as e:
+            print(f"  ! auto-send failed: {e}")
+            return False
+
+    # Non-Aureon: send via the brand's own Resend relay, from the original sender.
+    from_addr = _original_from_addr(reply)
+    key = _brand_resend_key(slug)
+    if dry:
+        print(f"  [DRY] would AUTO-SEND reply to {prospect_email} as {persona_name} via {slug} "
+              f"Resend from {from_addr or '(unknown sender)'} bcc {OPERATOR_ADDR} "
+              f"(key={'yes' if key else 'MISSING'})")
+        return bool(from_addr and key)
+    if not from_addr or not key:
+        print(f"  ! {slug}: missing sender/resend key, cannot auto-send (will draft to operator)")
+        return False
+    html = _render_reply_html(draft, persona, profile, unsub_token)
+    payload = {
+        "from": f"{persona_name} <{from_addr}>",
+        "to": [prospect_email],
+        "bcc": [OPERATOR_ADDR],
+        "reply_to": from_addr,
+        "subject": reply_subject[:200],
+        "text": draft,
+        "tags": [{"name": "kind", "value": "auto_reply_drafted"}],
+    }
+    if html:
+        payload["html"] = html
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=json.dumps(payload).encode(), method="POST",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json", "User-Agent": UA})
+    try:
+        urllib.request.urlopen(req, timeout=20)
+        return True
+    except urllib.error.HTTPError as e:
+        print(f"  ! {slug} auto-send failed: HTTP {e.code} {e.read().decode()[:160]}")
+        return False
+    except Exception as e:
+        print(f"  ! {slug} auto-send failed: {e}")
+        return False
+
+
+# ─── operator draft email (fallback when auto-send can't fire) ────────────────
 
 def send_draft_to_operator(*, prospect_email: str, subject: str,
                            prospect_msg: str, draft: str, profile_name: str,
@@ -694,7 +925,8 @@ def one_pass(limit: int, dry: bool) -> dict:
                     if send_autoreply(slug=slug, prospect_email=prospect,
                                       first_name=(prow or {}).get("first_name") or "",
                                       subject=subject, persona=persona, profile=profile,
-                                      booking_url=booking, reply=r, dry=dry):
+                                      booking_url=booking, reply=r, dry=dry,
+                                      unsub_token=(prow or {}).get("unsubscribe_token")):
                         stats["autoreplied"] += 1
                         if not dry:
                             rh = dict(r.get("raw_headers") or {})
@@ -743,6 +975,31 @@ def one_pass(limit: int, dry: bool) -> dict:
         if not draft:
             draft = template_draft(persona or {}, msg, offer_recap=offer_recap)
             print("    (used template fallback)")
+        # AUTO-SEND: deliver the drafted reply straight to the prospect (bcc info@).
+        # Only genuine campaign replies reach here (suppression + active-prospect
+        # gates already passed). If auto-send cannot fire (no sender/key resolved),
+        # fall back to queuing the draft to the operator so nothing is lost.
+        slug = (prow or {}).get("profile_slug") or ""
+        sent = send_draft_to_prospect(
+            reply=r, slug=slug, prospect_email=prospect, subject=subject,
+            draft=draft, persona=persona, profile=profile, dry=dry,
+            unsub_token=(prow or {}).get("unsubscribe_token"))
+        if sent:
+            print(f"    -> AUTO-SENT reply to {prospect} (bcc {OPERATOR_ADDR})")
+            stats["autosent"] = stats.get("autosent", 0) + 1
+            if not dry:
+                rh = dict(r.get("raw_headers") or {})
+                rh["autosent"] = True
+                rh["autosent_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                rh["autodraft_sent"] = True
+                # Store the answer we sent so forward-replies-to-client can show the
+                # client BOTH the prospect's reply AND our response (they act on the
+                # sale). Capped to keep the row small. 2026-06-16.
+                rh["answer_text"] = (draft or "")[:4000]
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": rh})
+            continue
+        # Fallback: auto-send could not fire, queue the draft for manual sending.
+        print("    (auto-send unavailable, queuing draft to operator)")
         ok = send_draft_to_operator(
             prospect_email=prospect, subject=subject, prospect_msg=msg,
             draft=draft, profile_name=pname, persona_name=perq, dry=dry)
