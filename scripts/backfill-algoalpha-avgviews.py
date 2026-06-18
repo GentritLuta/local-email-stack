@@ -1,23 +1,27 @@
 #!/usr/bin/env python
-"""One-off (re-runnable) backfill: populate enriched_context.avg_views_10 for
-existing AlgoAlpha prospects that were scraped BEFORE the offer formula started
-capturing last-10-video average views at scrape time.
+"""Re-runnable backfill: populate enriched_context.avg_views_10 for existing
+prospects of a profile that were scraped BEFORE the scraper started capturing
+last-10-video average views.
 
 Why: the AlgoAlpha offer (10 USD per 1,000 of the last-10-video average, +30%
 commission) personalises the per-video number off enriched_context.avg_views_10.
 Prospects scraped before 2026-06-18 have no avg_views_10, so their replies fall
 back to a generic offer. This walks their YouTube channels once and fills it in,
-instead of waiting for the next full re-scrape.
+instead of waiting for the next full re-scrape. NOTE: only the AlgoAlpha offer
+logic currently consumes avg_views_10 (reply-autodraft is gated to
+profile_slug=='algoalpha'); for any other profile this just stores the channel-
+size metadata for future use, it does not change that profile's emails today.
 
 Reuses the proven youtube_worker functions (KeyPool, resolve_channel_async,
 avg_views_last_10) so the resolution / quota-rotation logic is identical to the
 live scraper. Resolves off enriched_context.channel_handle (the full 24-char UC
 id), NOT source_url/website (those are truncated by a column limit).
 
-  py scripts/backfill-algoalpha-avgviews.py            # run for real
-  py scripts/backfill-algoalpha-avgviews.py --dry      # resolve only, no DB write
+  py scripts/backfill-algoalpha-avgviews.py                       # algoalpha, real
+  py scripts/backfill-algoalpha-avgviews.py --dry                 # resolve only
+  py scripts/backfill-algoalpha-avgviews.py --profile dorian      # another profile
 """
-import asyncio, json, sys, urllib.request
+import argparse, asyncio, json, sys, urllib.request
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -29,7 +33,12 @@ import httpx  # noqa: E402
 from youtube_worker import KeyPool, resolve_channel_async, avg_views_last_10  # noqa: E402
 from youtube_scraper import load_api_keys  # noqa: E402
 
-DRY = "--dry" in sys.argv
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--profile", default="algoalpha")
+_ap.add_argument("--dry", action="store_true")
+ARGS = _ap.parse_args()
+DRY = ARGS.dry
+PROFILE = ARGS.profile
 PROJECT = "ccmqkljsjiuavpydbkva"
 
 
@@ -57,10 +66,10 @@ def mq(sql: str):
 
 
 def fetch_targets() -> list[dict]:
-    """AlgoAlpha prospects with a YouTube channel handle but no avg_views_10 yet."""
-    rows = mq("""select id, enriched_context->>'channel_handle' handle
+    """Prospects of PROFILE with a YouTube channel handle but no avg_views_10 yet."""
+    rows = mq(f"""select id, enriched_context->>'channel_handle' handle
       from prospects
-      where profile_slug='algoalpha'
+      where profile_slug='{PROFILE}'
         and (enriched_context->>'channel_handle') is not null
         and (enriched_context->>'avg_views_10') is null""")
     return [r for r in rows if (r.get("handle") or "").strip()]
@@ -112,9 +121,9 @@ def write_batch(pairs: list[tuple[str, int]]):
 async def main():
     targets = fetch_targets()
     keys = load_api_keys()
-    print(f"targets={len(targets)}  api_keys={len(keys)}  dry={DRY}")
+    print(f"profile={PROFILE}  targets={len(targets)}  api_keys={len(keys)}  dry={DRY}")
     if not targets:
-        print("nothing to backfill — all AlgoAlpha YT prospects already have avg_views_10")
+        print(f"nothing to backfill — all {PROFILE} YT prospects already have avg_views_10")
         return
     pool = KeyPool(keys)
     queue = asyncio.Queue()
@@ -139,9 +148,9 @@ async def main():
         write_batch(pairs[i:i + 50])
         print(f"  wrote {min(i + 50, len(pairs))}/{len(pairs)}")
     # verify
-    have = mq("""select count(*) c from prospects
-      where profile_slug='algoalpha' and (enriched_context->>'avg_views_10') is not null""")[0]["c"]
-    print(f"DONE — AlgoAlpha prospects now carrying avg_views_10: {have}")
+    have = mq(f"""select count(*) c from prospects
+      where profile_slug='{PROFILE}' and (enriched_context->>'avg_views_10') is not null""")[0]["c"]
+    print(f"DONE — {PROFILE} prospects now carrying avg_views_10: {have}")
 
 
 if __name__ == "__main__":
