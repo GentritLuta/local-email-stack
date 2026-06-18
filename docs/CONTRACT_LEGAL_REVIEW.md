@@ -47,14 +47,19 @@ arbitration and the arbitration-only sub-clauses 20.4/20.5/20.6 are dropped). Ap
 bases at generation time. Falls back to "the jurisdiction in which the Client is incorporated" if
 the answer is blank. This also resolves the review's disproportionate-forum finding (#31).
 
-## One item left for your decision (NOT auto-applied)
+## both-base Schedule 2 social processing stream — RESOLVED
 
-1. **both-base Schedule 2 social processing stream.** The combined agreement's Article 28
-   schedule still describes only the email processing. A "both" client's social processing
-   (comments, DMs, automated responses) needs its own Schedule 2 particulars block mirroring the
-   corrected social-base. The social-base standalone is fully re-mapped; the combined file's
-   schedule needs this block authored (deferred because it is a substantial schedule addition,
-   not a one-line redline).
+Added paragraph **2.11 Social Media Processing Stream** to the both-base Schedule 2: subject
+matter/purpose, data subjects (followers + commenters/DM senders, likely consumers), personal
+data categories (handles, comment/DM content that may incidentally include special-category or
+children's data, engagement metadata), incidental special-category/children's handling, the
+automated AI processing on the Client's documented instruction with no Article 22 decisions
+without human review, platform sub-processors (Meta/TikTok/YouTube) + US transfers, retention,
+and the consumer legitimate-interest lawful basis. Verified: the combined contract generates
+clean (verify_clean CLEAN) with the block present.
+
+**All review items are now applied or resolved.** A final human-lawyer read before the first
+real signature remains good practice, but no defect is outstanding.
 
 ## Regeneration note
 
