@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "purpose": "Per-client inputs that fill the placeholder fields in each pilot agreement. Edit a value here, then run scripts/fill-contract-placeholders.py to apply it. Empty string = leave the visible placeholder in the contract (value genuinely not yet known). Keys starting with _ are ignored by the filler.",
+    "fields": {
+      "registered_office": "Client cell -> 'Registered office:'",
+      "registration_number": "Client cell -> 'Company registration number' / '(KvK)' / 'Employer Identification Number (EIN)'",
+      "notices_email": "Client cell -> 'Email for notices:'",
+      "authorised_contact_email": "Schedule 3.2 Client Authorised Contact -> 'Email:'",
+      "reply_endpoint": "Schedule 3.3 Positive Reply Routing Endpoint -> 'Endpoint:'"
+    },
+    "applied_by": "scripts/fill-contract-placeholders.py"
+  },
+  "atal": {
+    "authorised_contact_email": "info@atalsolidrocks.com",
+    "reply_endpoint": "info@atalsolidrocks.com",
+    "_missing": []
+  },
+  "diraya": {
+    "registered_office": "500 Sedgebrook Way, Canada",
+    "registration_number": "1603166-8",
+    "authorised_contact_email": "amoura.ma@diraya.ca",
+    "reply_endpoint": "amoura.ma@diraya.ca",
+    "_missing": []
+  },
+  "dorian": {
+    "authorised_contact_email": "skiljodorian@gmail.com",
+    "reply_endpoint": "skiljodorian@gmail.com",
+    "_missing": []
+  },
+  "energ": {
+    "registration_number": "",
+    "authorised_contact_email": "info@ener-g-beratung.de",
+    "reply_endpoint": "info@ener-g-beratung.de",
+    "_missing": [
+      "registration_number"
+    ]
+  },
+  "lk-advertising": {
+    "registration_number": "",
+    "authorised_contact_email": "info@lk-advertising.site",
+    "reply_endpoint": "info@lk-advertising.site",
+    "_missing": [
+      "registration_number"
+    ]
+  },
+  "mark-eting": {
+    "company": "Mark-eting B.V.",
+    "registered_office": "Burgemeester Falkenaweg 36, 8442 LD Heerenveen, Netherlands",
+    "registration_number": "91237963",
+    "authorised_contact_email": "mark@mark-eting.co",
+    "reply_endpoint": "mark@mark-eting.co (inbox) and https://calendar.app.google/oh6EboZpqnM9uKx19 (booking calendar)",
+    "_missing": []
+  },
+  "otai": {
+    "registration_number": "",
+    "authorised_contact_email": "owner@otaisystems.com",
+    "reply_endpoint": "owner@otaisystems.com",
+    "_missing": [
+      "registration_number (EIN)"
+    ]
+  },
+  "smh": {
+    "registered_office": "",
+    "registration_number": "",
+    "notices_email": "",
+    "authorised_contact_email": "",
+    "reply_endpoint": "",
+    "_missing": [
+      "notices_email",
+      "authorised_contact_email",
+      "reply_endpoint"
+    ]
+  }
+}
