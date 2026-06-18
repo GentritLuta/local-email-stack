@@ -391,10 +391,13 @@ Deno.serve(async (req) => {
       const authText = String(cr.authorization_text ?? "").trim();
       const nowIso = new Date().toISOString();
 
-      // Audit hash over the authorization text + identity + token + ts.
+      // Audit hash over the authorization text + identity + access handed over + ts.
+      // Covers both the email-infra token and the social-account access so the
+      // hash attests to whatever the client actually authorized.
       const hashInput = [
         authText, cr.registrar ?? "", cr.dns_host ?? "", cr.api_token ?? "",
-        ip ?? "", nowIso,
+        cr.social_handles ?? "", cr.asset_link ?? "",
+        String(cr.social_access_confirmed ?? ""), ip ?? "", nowIso,
       ].join("|");
       const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(hashInput));
       const sha = Array.from(new Uint8Array(digest)).map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -406,6 +409,12 @@ Deno.serve(async (req) => {
         dns_host: cr.dns_host ?? (sub.raw_answers?.dns_host ?? null),
         api_token: cr.api_token ?? null,
         other_access: cr.other_access ?? null,
+        // Social-media account access (social / both clients).
+        social_handles: cr.social_handles ?? null,
+        social_access_confirmed: cr.social_access_confirmed ?? null,
+        social_business_id: cr.social_business_id ?? null,
+        asset_link: cr.asset_link ?? null,
+        content_approver: cr.content_approver ?? null,
         notes: cr.notes ?? null,
         authorized: true,
         authorization_text: authText,

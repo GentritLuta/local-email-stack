@@ -531,10 +531,17 @@ export async function adminListBillingProfiles() {
 // DNS / domain host so the pipeline can auto-provision sending infrastructure.
 // We deliberately ask for a token, not an account password.
 export type CredentialsInput = {
+  // Email-infrastructure access (collected for email / both clients).
   registrar: string;        // "Hostinger", "Cloudflare", "GoDaddy"…
   dns_host: string;         // cloudflare | hostinger | other
   api_token: string;        // the scoped, revocable token
   other_access: string;     // any additional access notes
+  // Social-media account access (collected for social / both clients).
+  social_handles: string;        // the accounts to manage, e.g. "Instagram @x, TikTok @y"
+  social_access_confirmed: boolean; // they granted partner/member access via the platforms' business tools
+  social_business_id: string;    // Meta Business / TikTok Business Center id or the partner email invited (optional)
+  asset_link: string;            // link to logo, brand guidelines, product photos, video footage
+  content_approver: string;      // name + email of who approves the content calendar
   notes: string;
   authorized: boolean;
   authorization_text: string;
