@@ -161,6 +161,44 @@ def is_list_request(subject: str | None, body: str | None) -> bool:
     return False
 
 
+# Automated replies (out-of-office, ticket/case acknowledgements, "we will
+# respond within 24 hours") are not a human reply and must never get a drafted
+# sales response. We can't rely on RFC 3834 headers (Auto-Submitted / Precedence)
+# because imap-poll does not store them, so this matches the subject + body
+# boilerplate instead. Built deliberately tight so a real reply that merely says
+# "thanks for your email" is NOT flagged (it must also promise a later response).
+_AUTORESP_SUBJ = re.compile("|".join([
+    r"out of (?:the )?office", r"automatic reply", r"auto[\s-]?reply",
+    r"automated (?:response|reply)", r"ticket (?:received|created|opened|#|number)",
+    r"case (?:number|#|opened|received)", r"undeliverable",
+    r"delivery status notification", r"mail delivery (?:failed|subsystem)",
+    r"read receipt", r"on (?:vacation|holiday|annual leave|parental leave|maternity leave)",
+    r"away from (?:the |my )?(?:office|desk)",
+]), re.I)
+_AUTORESP_BODY = re.compile("|".join([
+    r"thank you for (?:your (?:e-?mail|message|enquiry|inquiry)|contacting|reaching out)"
+    r".{0,80}(?:we|i)\s*(?:'ll|will|aim to|try to)?\s*(?:respond|reply|get back|be in touch)",
+    r"this is an automat(?:ed|ic)",
+    r"(?:we|i)\s*(?:'ll|will|aim to)\s*(?:respond|reply|get back).{0,40}(?:24 hours|48 hours|business day|shortly|as soon as)",
+    r"out of (?:the )?office",
+    r"currently (?:away|out of (?:the )?office|on (?:leave|vacation|holiday)|unavailable)",
+    r"do not reply to this", r"automated (?:message|response|e-?mail)",
+    r"your (?:support )?ticket (?:has|number|#|is)",
+    r"received your (?:message|e-?mail|request|ticket)",
+    r"i am (?:currently )?(?:out of (?:the )?office|away|on (?:leave|vacation|holiday))",
+]), re.I)
+
+
+def is_autoresponder(reply: dict) -> str | None:
+    """Return a short reason if the reply is an automated acknowledgement (out of
+    office, ticket/case bot, "we will respond within 24 hours"), else None."""
+    if _AUTORESP_SUBJ.search(reply.get("subject") or ""):
+        return "subject"
+    if _AUTORESP_BODY.search((reply.get("body_snippet") or "")[:600]):
+        return "body"
+    return None
+
+
 # Per-brand booking links for the auto-reply. aureon's lives in the email
 # template (not the profile JSON) so it is pinned here; diraya's matches its
 # profile. Add a slug here, or set a brand's brand.cta_url to a scheduling URL,
@@ -934,6 +972,21 @@ def one_pass(limit: int, dry: bool) -> dict:
                 rh = dict(r.get("raw_headers") or {})
                 rh["autodraft_sent"] = True
                 rh["autodraft_skipped"] = "not_active_prospect"
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": rh})
+            continue
+
+        # GATE 2.2 — automated acknowledgements (out-of-office, ticket/case bots,
+        # "we will respond within 24 hours") are not a human reply. Never draft a
+        # sales response to a bot inbox (we drafted one to a zeiierman ticket bot
+        # before this gate). Mark handled; the prospect's own sequence continues.
+        ar = is_autoresponder(r)
+        if ar:
+            print(f"  · {prospect}: autoresponder ({ar}) — no draft")
+            stats["skipped"] += 1
+            if not dry:
+                rh = dict(r.get("raw_headers") or {})
+                rh["autodraft_sent"] = True
+                rh["autodraft_skipped"] = "autoresponder"
                 supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": rh})
             continue
 
