@@ -249,6 +249,10 @@ def generate_contract(a: dict, ref: str) -> str:
     s = s.replace("a day other than a Saturday, Sunday, or public holiday in England and Wales",
                   f"a day other than a Saturday, Sunday, or public holiday in {je}")
     s = s.replace("clause 8 (Data, Intellectual Property, Domain, and Reputation)", "clause 8")
+    # No arbitration anywhere now, so drop the stray "any arbitration" in the
+    # service-of-process limb of the notices clause.
+    s = s.replace("any legal action or, where applicable, any arbitration or other method of dispute resolution",
+                  "any legal action or other method of dispute resolution")
     s = _re.sub(
         r'<li><span class="num">20\.2</span>.*?</li>',
         ('<li><span class="num">20.2</span> <em class="term">Jurisdiction.</em> The courts of '
