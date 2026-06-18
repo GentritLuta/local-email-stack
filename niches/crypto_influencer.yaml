@@ -81,6 +81,16 @@ seeds:
   - { url: "https://www.ethcc.io/speakers",           engine: playwright }
   - { url: "https://www.permissionless.io/speakers",  engine: playwright }
 
+  # ── L4: TRADING media / education (not just crypto). AlgoAlpha's TradingView
+  # indicators work on any market, so general trading influencers (forex, stocks,
+  # futures, TA) are in the ICP. Widened 2026-06-18. Primary trading-influencer
+  # source is the YouTube discovery (niches/crypto_yt_search_terms.txt, Tier G).
+  - { url: "https://www.benzinga.com/about-us",        engine: playwright }
+  - { url: "https://www.tradingview.com/about/",        engine: playwright }
+  - { url: "https://www.babypips.com/about",            engine: playwright }
+  - { url: "https://www.tradingsetupsreview.com/about", engine: playwright }
+  - { url: "https://www.warriortrading.com/about-us",   engine: playwright }
+
 filter:
   # Skip role mailboxes — campaigns target individuals, not info@/contact@.
   exclude_local_parts:

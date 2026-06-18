@@ -54,6 +54,7 @@ from profile_lib import (
 )
 from email_render import build_payload
 import algoalpha_offer
+import send_throttle
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE  = REPO_ROOT / "sequences" / "supabase.env"
@@ -172,6 +173,13 @@ def pick_persona_and_domain(profile_config: dict, send_log_rows: list[dict]) -> 
     today_start = dt.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
 
     pair_usage: dict[tuple[str, str], dict] = {}
+    # The send_ramp curve's per_persona quota means sends PER PERSONA PER DAY in
+    # TOTAL, across every domain that persona sends from, NOT per (persona, domain)
+    # pair. Counting per-pair let one persona send `quota` times on each of N
+    # domains (quota x N), blowing past the ramp (algoalpha sent 157/day vs a 36
+    # target on day 4, 2026-06-11 audit). Track per-persona totals for the quota
+    # check; keep per-pair last_ts only for the min-gap throttle.
+    persona_total_today: dict[str, int] = {}
     domain_total_today: dict[str, int] = {d["domain"]: 0 for d in domains}
     for row in send_log_rows:
         slug   = row.get("persona_slug") or ""
@@ -184,13 +192,29 @@ def pick_persona_and_domain(profile_config: dict, send_log_rows: list[dict]) -> 
         u = pair_usage.setdefault(key, {"count_today": 0, "last_ts": 0.0})
         if ts >= today_start:
             u["count_today"] += 1
+            persona_total_today[slug] = persona_total_today.get(slug, 0) + 1
             if domain in domain_total_today: domain_total_today[domain] += 1
         u["last_ts"] = max(u["last_ts"], ts)
+
+    # STANDARD (hardcoded for every client): each subdomain has ONE dedicated
+    # persona — the persona whose declared from_addr domain IS that subdomain.
+    # We pair persona<->domain 1:1 (never rebind a persona to a foreign sub),
+    # so e.g. alex only ever sends from alex@outreach.<root>. Build the binding
+    # from the persona from_addr domains.
+    persona_for_domain: dict[str, dict] = {}
+    for p in personas:
+        psub = _domain_of(p.get("from_addr", ""))
+        if psub:
+            persona_for_domain.setdefault(psub, p)
 
     eligible = []
     for d in domains:
         blocked, _ = reputation_exceeded_for_domain(profile_config, d)
         if blocked: continue
+        # Skip a subdomain that has no dedicated persona — sending from it would
+        # force a foreign-persona rebind, which is exactly what we're forbidding.
+        if d["domain"] not in persona_for_domain:
+            continue
         ceiling = daily_target_for_domain(profile_config, d) or quota
         room = max(0, ceiling - domain_total_today.get(d["domain"], 0))
         if room <= 0: continue
@@ -199,15 +223,12 @@ def pick_persona_and_domain(profile_config: dict, send_log_rows: list[dict]) -> 
     eligible.sort(key=lambda t: -t[0])
 
     for _, d in eligible:
-        cands = []
-        for p in personas:
-            u = pair_usage.get((p["slug"], d["domain"]), {"count_today": 0, "last_ts": 0.0})
-            if u["count_today"] >= quota: continue
-            if (now_ts - u["last_ts"]) < min_gap: continue
-            cands.append((u["count_today"], u["last_ts"], p))
-        if cands:
-            cands.sort(key=lambda x: (x[0], x[1]))
-            return cands[0][2], d
+        p = persona_for_domain[d["domain"]]  # the ONE persona bound to this sub
+        # Quota is per-persona-per-day TOTAL (per persona == per sub now).
+        if persona_total_today.get(p["slug"], 0) >= quota: continue
+        u = pair_usage.get((p["slug"], d["domain"]), {"count_today": 0, "last_ts": 0.0})
+        if (now_ts - u["last_ts"]) < min_gap: continue
+        return p, d
     return None, None
 
 
@@ -219,12 +240,50 @@ def pick_persona(profile_config: dict, send_log_rows: list[dict]) -> dict | None
 
 # ─── Step lookup ───────────────────────────────────────────────────────────
 
-def fetch_due_runs(c: httpx.Client) -> list[dict]:
-    """Pull runs where status='queued' and (next_send_at <= now OR next_send_at IS NULL)."""
+FETCH_PER_BRAND_LIMIT = 250  # see fetch_due_runs
+
+
+def fetch_due_runs(c: httpx.Client, only_profiles: set[str] | None = None) -> list[dict]:
+    """Pull runs where status='queued' and (next_send_at <= now OR next_send_at IS NULL),
+    fetched PER BRAND so no brand's backlog can crowd another out of the result page.
+    Pass only_profiles={slug,...} to scope to specific brands (per-brand runner).
+
+    A single unbounded `/runs?...&select=*` is silently capped at PostgREST's
+    db-max-rows (1000 on this project). Once total due runs exceed 1000 (live: 1806
+    across 6 brands), whichever brand's rows sorted first filled the page and the
+    rest got ZERO rows fetched — so the runner never saw them and they sent nothing,
+    independent of caps/windows. That is fetch-layer starvation: a brand with full
+    headroom + open window + due runs (e.g. diraya: 0 of 93 due rows fetched) sent
+    nothing because aureon/lk's backlog ate the page. _interleave_by_profile only
+    reorders what was fetched, so it cannot fix a brand that got nothing here.
+
+    Fix: one bounded query per brand (oldest-due first), so every active brand is
+    always represented every tick. FETCH_PER_BRAND_LIMIT (250) is far above any one
+    brand's per-tick send rate (the per-persona/subdomain min-gap throttle caps a
+    brand at ~one send per persona per tick), so a brand never under-fetches; the
+    send guards (per-subdomain cap, per-persona quota, window, global cap) are
+    unchanged and still bind, so this CANNOT over-send. 2026-06-16."""
     now_iso = dt.datetime.utcnow().isoformat() + "Z"
-    r = c.get(f"/runs?status=eq.queued&or=(next_send_at.lte.{now_iso},next_send_at.is.null)&select=*")
-    r.raise_for_status()
-    return r.json()
+    # profile_slug -> its sequence ids (runs carry sequence_id, not profile_slug)
+    by_profile: dict[str, list[str]] = {}
+    for s in c.get("/sequences?select=id,profile_slug").json():
+        by_profile.setdefault(s.get("profile_slug") or "_unknown", []).append(s["id"])
+    out: list[dict] = []
+    for slug, sids in by_profile.items():
+        # Optional per-brand scoping (e.g. `tick --profile energ`). When set, only
+        # that brand's runs are fetched/processed — the basis for running one runner
+        # per brand if ever desired. Default (None) = all brands, as today.
+        if only_profiles is not None and slug not in only_profiles:
+            continue
+        if not sids:
+            continue
+        idlist = "(" + ",".join(sids) + ")"
+        r = c.get(f"/runs?status=eq.queued&sequence_id=in.{idlist}"
+                  f"&or=(next_send_at.lte.{now_iso},next_send_at.is.null)"
+                  f"&order=next_send_at.asc.nullsfirst&select=*&limit={FETCH_PER_BRAND_LIMIT}")
+        r.raise_for_status()
+        out.extend(r.json())
+    return out
 
 
 def fetch_sequence_step(c: httpx.Client, sequence_id: str, step_n: int) -> dict | None:
@@ -254,17 +313,31 @@ def fetch_profile_config(c: httpx.Client, profile_slug: str) -> dict:
     return r.json()[0]["config"]
 
 
-def fetch_today_log(c: httpx.Client, profile_slug: str) -> list[dict]:
-    """Today's send_log rows for this profile (for rotation quota). Now also
-    pulls from_addr so the rotation can attribute each send to its sending
-    subdomain when picking the next (persona, domain) pair."""
+def fetch_today_log(c: httpx.Client, profile_slug: str, profile_config: dict | None = None) -> list[dict]:
+    """Today's send_log rows for this profile (for rotation quota). Pulls
+    from_addr so the rotation can attribute each send to its sending subdomain
+    when picking the next (persona, domain) pair.
+
+    send_log has no profile_slug column, so we attribute rows to a profile by
+    matching from_addr's domain against the profile's own sending subdomains.
+    This MUST be filtered per-profile: persona slugs (alex, casey, sam, ...)
+    are generic and collide across clients, so an unfiltered global log made
+    the picker count OTHER clients' sends against this profile's per-persona
+    quota — silently zeroing out new clients (lk-advertising: 0 sends despite
+    70/day of verified capacity, because every persona looked "at cap" from
+    other profiles' identically-named personas). 2026-06-12.
+    """
     today = dt.date.today().isoformat()
     r = c.get(f"/send_log?sent_at=gte.{today}T00:00:00&select=persona_slug,from_addr,sent_at"
-              f"&order=sent_at.desc&limit=500")
+              f"&order=sent_at.desc&limit=2000")
     r.raise_for_status()
-    # Filter to this profile's personas (we don't have a profile_slug column on send_log;
-    # this can be improved later. For now, all sends from same Supabase = same operator.)
-    return r.json()
+    rows = r.json()
+    if profile_config is not None:
+        own = {(d.get("domain") or "").lower()
+               for d in (profile_config.get("relay") or {}).get("from_domains", [])}
+        rows = [row for row in rows
+                if _domain_of(row.get("from_addr", "")).lower() in own]
+    return rows
 
 
 def get_api_key(profile_slug: str) -> str:
@@ -372,11 +445,13 @@ def synthesize_optional_merges(prospect: dict, team_size_lookup: dict | None = N
     #   syn["proof_line"] = "Our first beta brokerage booked 14 listing appointments in 30 days."
     # Leaving it empty renders cleanly (the surrounding copy reads fine without it).
     syn["proof_line"] = ""
-    # AlgoAlpha creator-offer merges: per-video retainer personalized from the
-    # prospect's scraped audience_size, generic range fallback when unknown.
-    # Always non-empty; only algoalpha copy references them.
-    syn["retainer_quote"] = algoalpha_offer.retainer_quote(prospect.get("audience_size"))
-    syn["retainer_math"]  = algoalpha_offer.retainer_math(prospect.get("audience_size"))
+    # AlgoAlpha creator-offer merges: per-video retainer = 10 USD per 1,000 of the
+    # creator's last-10-video AVERAGE VIEWS (captured at scrape time into
+    # enriched_context.avg_views_10), generic fallback when unknown. Always
+    # non-empty; only algoalpha copy references them.
+    _avg_views = (prospect.get("enriched_context") or {}).get("avg_views_10")
+    syn["retainer_quote"] = algoalpha_offer.retainer_quote(_avg_views)
+    syn["retainer_math"]  = algoalpha_offer.retainer_math(_avg_views)
     return syn
 
 
@@ -473,29 +548,124 @@ def advance_run(c: httpx.Client, run: dict, step_completed: int,
 
 # ─── tick / enqueue / status ───────────────────────────────────────────────
 
-def tick() -> None:
+def _interleave_by_profile(runs: list[dict], seq_by_id: dict) -> list[dict]:
+    """Round-robin the due runs across profiles so a large brand cannot eat the
+    per-tick time budget and starve smaller ones. Plain random.shuffle only
+    spread sends PROPORTIONALLY to backlog, so the biggest pool (aureon, 1700+
+    prospects) still dominated and mark-eting/energ were starved despite having
+    capacity and due runs. Interleaving gives every active brand a fair turn each
+    pass. Order within and across brands is still randomized per tick. 2026-06-16."""
+    groups: dict[str, list] = {}
+    for r in runs:
+        seq = seq_by_id.get(r.get("sequence_id")) or {}
+        slug = seq.get("profile_slug") or "_unknown"
+        groups.setdefault(slug, []).append(r)
+    for g in groups.values():
+        random.shuffle(g)
+    order = list(groups.keys())
+    random.shuffle(order)
+    out: list[dict] = []
+    i = 0
+    while True:
+        added = False
+        for slug in order:
+            g = groups[slug]
+            if i < len(g):
+                out.append(g[i]); added = True
+        if not added:
+            break
+        i += 1
+    return out
+
+
+def tick(only_profiles: set[str] | None = None) -> None:
+    # Soft per-tick time budget. The scheduled task has a hard PT15M execution
+    # limit; when a tick iterates a large due-runs batch (most of which are
+    # out-of-window and get skipped) it can blow past that limit and be
+    # force-terminated (LastTaskResult 0x800710E0). That dropped no sends — the
+    # remaining runs were out-of-window anyway — but it left the task looking
+    # failed. Exit cleanly at 13 min having done every send we could; the next
+    # 5-min tick picks up where we left off. 2026-06-15.
+    _budget_s = 13 * 60
+    _t_start = time.monotonic()
     url, key = load_supabase()
     with supa(url, key) as c:
-        runs = fetch_due_runs(c)
+        runs = fetch_due_runs(c, only_profiles=only_profiles)
         if not runs:
             print("no due runs")
             return
-        # Cache per-profile config + today's send log to avoid re-fetching per run
+        # Fair per-brand ordering happens AFTER seq_by_id is built (below), via
+        # _interleave_by_profile: round-robin so a large brand can't eat the
+        # per-tick budget and starve smaller ones. Plain random.shuffle only
+        # spread sends proportionally to backlog, so aureon (1700+ prospects)
+        # still dominated and mark-eting/energ were starved. 2026-06-16.
+        # ── Batch-prefetch the few shared lookups ONCE per tick ───────────────
+        # The hot path used to do 2 HTTP calls PER RUN (sequence + step), so a
+        # 1000-run batch spent ~2000 round-trips just learning profile/step before
+        # any send work — that's what blew the 15-min limit and starved smaller
+        # brands (lk sent ~25/day vs a 180 cap). Sequences (~8) and sequence_steps
+        # (a few dozen) are tiny and fixed within a tick, so pull them all up front
+        # and serve from a dict. 2026-06-15.
+        seq_by_id: dict[str, dict] = {
+            s["id"]: s for s in c.get("/sequences?select=id,profile_slug,name").json()}
+        steps_all = c.get("/sequence_steps?select=*,variants(subject,body)").json()
+        steps_by_seq_step: dict[tuple, dict] = {}
+        max_step_by_seq: dict[str, int] = {}
+        for st in steps_all:
+            sid = st.get("sequence_id"); sn = st.get("step_n")
+            steps_by_seq_step[(sid, sn)] = st
+            if sid is not None and sn is not None:
+                max_step_by_seq[sid] = max(max_step_by_seq.get(sid, 0), sn)
+
+        # Fair-share ordering: round-robin across brands now that each run's
+        # profile is known, so smaller brands get equal turns within the budget.
+        runs = _interleave_by_profile(runs, seq_by_id)
+
+        # Batch-prefetch every prospect for the due runs (one call per ~150 ids)
+        # instead of one GET per run.
+        prospect_by_id: dict[str, dict] = {}
+        _pids = sorted({r["prospect_id"] for r in runs if r.get("prospect_id")})
+        for i in range(0, len(_pids), 150):
+            chunk = _pids[i:i + 150]
+            idlist = "(" + ",".join(chunk) + ")"
+            for pr in c.get(f"/prospects?id=in.{idlist}&select=*").json():
+                prospect_by_id[pr["id"]] = pr
+
+        # Batch-prefetch the first send_log row per run (for sticky sender on
+        # step 2+) in one shot, keyed by run_id, instead of one GET per step-2 run.
+        first_send_by_run: dict[str, dict] = {}
+        _step2_run_ids = sorted({r["id"] for r in runs if (r.get("current_step") or 1) > 1})
+        for i in range(0, len(_step2_run_ids), 150):
+            chunk = _step2_run_ids[i:i + 150]
+            idlist = "(" + ",".join(chunk) + ")"
+            for sl in c.get(f"/send_log?run_id=in.{idlist}"
+                            f"&order=step_n.asc&select=run_id,persona_slug,from_addr").json():
+                # keep the earliest (lowest step) per run
+                first_send_by_run.setdefault(sl["run_id"], sl)
+
+        # Cache per-profile config + today's send log to avoid re-fetching per run.
+        # The send-log cache is keyed BY PROFILE — a single global log let one
+        # client's sends count against another's per-persona quota (see
+        # fetch_today_log docstring). 2026-06-12.
         profile_cache: dict[str, dict] = {}
-        today_log_cache: list[dict] | None = None
+        today_log_by_profile: dict[str, list[dict]] = {}
         for run in runs:
-            # Pull the sequence (to learn the profile + step structure)
+            if time.monotonic() - _t_start > _budget_s:
+                print(f"tick time budget ({_budget_s}s) reached — exiting cleanly; "
+                      f"next tick continues")
+                break
+            # Sequence (profile + step structure) — from the prefetch cache.
             seq_id = run["sequence_id"]
-            seq_resp = c.get(f"/sequences?id=eq.{seq_id}&select=profile_slug,name").json()
-            if not seq_resp:
+            seq_row = seq_by_id.get(seq_id)
+            if not seq_row:
                 continue
-            profile_slug = seq_resp[0]["profile_slug"]
+            profile_slug = seq_row["profile_slug"]
             if profile_slug not in profile_cache:
                 profile_cache[profile_slug] = fetch_profile_config(c, profile_slug)
             profile_config = profile_cache[profile_slug]
 
             step_n = run["current_step"]
-            step = fetch_sequence_step(c, seq_id, step_n)
+            step = steps_by_seq_step.get((seq_id, step_n))
             if not step:
                 # No step at this n → done
                 c.patch(f"/runs?id=eq.{run['id']}", json={"status": "completed"})
@@ -519,8 +689,10 @@ def tick() -> None:
                 print(f"  ! run {run['id']} step {step_n}: no subject/body")
                 continue
 
-            if today_log_cache is None:
-                today_log_cache = fetch_today_log(c, profile_slug)
+            if profile_slug not in today_log_by_profile:
+                today_log_by_profile[profile_slug] = fetch_today_log(
+                    c, profile_slug, profile_config)
+            today_log_cache = today_log_by_profile[profile_slug]
 
             # ── Sender stickiness ────────────────────────────────────────
             # A lead must be worked end-to-end by the SAME (persona,
@@ -533,9 +705,8 @@ def tick() -> None:
             # in the recipient's inbox). The run retries next tick.
             sticky_persona, sticky_domain = None, None
             if step_n > 1:
-                prior = c.get(
-                    f"/send_log?run_id=eq.{run['id']}&order=step_n.asc&select=persona_slug,from_addr&limit=1"
-                ).json()
+                _prior = first_send_by_run.get(run["id"])
+                prior = [_prior] if _prior else []
                 if prior:
                     prior_persona_slug = prior[0].get("persona_slug")
                     prior_from = (prior[0].get("from_addr") or "").lower()
@@ -585,7 +756,32 @@ def tick() -> None:
                 continue
             persona = materialize_persona(persona, domain)
 
-            prospect = fetch_prospect(c, run["prospect_id"])
+            # Per-subdomain daily-cap BACKSTOP (path-independent). pick/sticky check
+            # the cap on the domain THEY chose, but materialize_persona rebinds the
+            # send to the persona's OWN declared subdomain (each persona is 1:1 with a
+            # sub). If those disagree — or a future forced-persona path routes a persona
+            # bound to a busy sub — the cap is checked on the WRONG subdomain and the
+            # real one can blow past its ceiling. Live: anna@mail.aureonglobal.de sent
+            # 347 in one burst vs a 35/day cap (all step 2+, one persona). There is no
+            # per-subdomain daily-cap guard in safeguards either, so enforce the ceiling
+            # on the ACTUAL sending subdomain here — no sub can exceed it, on any path.
+            # Uses today_log_cache (tick-start fetch + within-tick appends) so it binds
+            # within and across ticks. 2026-06-16.
+            _send_sub = _domain_of(persona.get("from_addr", ""))
+            _send_entry = next((d for d in (profile_config.get("relay") or {}).get("from_domains", [])
+                                if (d.get("domain") or "").lower() == _send_sub), None)
+            if _send_entry:
+                _sub_cap = daily_target_for_domain(profile_config, _send_entry) or 0
+                _sub_used = sum(1 for row in today_log_cache
+                                if _domain_of(row.get("from_addr", "")) == _send_sub)
+                if _sub_used >= _sub_cap:
+                    print(f"  ~ run {run['id'][:8]} step {step_n}: sending subdomain "
+                          f"{_send_sub} at daily cap ({_sub_used}/{_sub_cap}) - skipping tick")
+                    continue
+
+            prospect = prospect_by_id.get(run["prospect_id"])
+            if not prospect:
+                continue
             # Enrich the prospect with synthesized optional merge fields
             # (geo_clause, team_phrase, etc) so personalization tags in the
             # variant body always have a value, even when underlying data
@@ -670,6 +866,12 @@ def tick() -> None:
             # template was logged, breaking analytics + reply matching).
             rendered_subject = _render_merge(subject, prospect)
             rendered_body    = _render_merge(body,    prospect)
+            # Global cross-process Resend rate limit. All brands share ONE Resend
+            # account key, so once we run one runner PER BRAND these processes send
+            # concurrently against the same account; this paces the COMBINED send
+            # rate under the per-account cap (~2 req/s) so no process gets 429'd and
+            # drops a send. No-op-ish for a single process. 2026-06-16.
+            send_throttle.acquire()
             outcome = send_via_resend(api_key, persona, prospect,
                                       rendered_subject, rendered_body,
                                       brand=profile_config.get("brand"),
@@ -687,12 +889,13 @@ def tick() -> None:
                                     "sent_at":     dt.datetime.utcnow().isoformat() + "Z"})
 
             if outcome["ok"]:
-                max_step = fetch_max_step(c, seq_id)
+                # max step + next step both come from the per-tick prefetch caches.
+                max_step = max_step_by_seq.get(seq_id, step_n)
                 if step_n >= max_step:
                     advance_run(c, run, step_n, None)
                 else:
                     # Next step's delay
-                    next_step = fetch_sequence_step(c, seq_id, step_n + 1)
+                    next_step = steps_by_seq_step.get((seq_id, step_n + 1))
                     delay = next_step.get("delay_days", 3) if next_step else 3
                     advance_run(c, run, step_n, delay)
 
@@ -770,7 +973,10 @@ def status_cmd() -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("tick")
+    p_tick = sub.add_parser("tick")
+    p_tick.add_argument("--profile", default=None,
+                        help="comma-separated brand slug(s) to scope this tick to "
+                             "(e.g. --profile energ). Default: all brands.")
     p_eq = sub.add_parser("enqueue"); p_eq.add_argument("sequence_slug"); p_eq.add_argument("prospect_email")
     p_en = sub.add_parser("enqueue-niche")
     p_en.add_argument("sequence_slug")
@@ -778,7 +984,7 @@ def main() -> int:
     p_en.add_argument("--limit", type=int, default=None)
     sub.add_parser("status")
     args = ap.parse_args()
-    if args.cmd == "tick":              tick()
+    if args.cmd == "tick":              tick(only_profiles={s.strip() for s in args.profile.split(",")} if args.profile else None)
     elif args.cmd == "enqueue":         enqueue(args.sequence_slug, args.prospect_email)
     elif args.cmd == "enqueue-niche":   enqueue_niche(args.sequence_slug, args.niche_slug, args.limit)
     elif args.cmd == "status":          status_cmd()

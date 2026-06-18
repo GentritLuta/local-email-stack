@@ -617,8 +617,14 @@ def claude_draft(profile: dict, persona: dict, prospect_email: str,
           "they want pricing or specifics, give a concrete answer from the deal terms, never "
           "invented. If they propose paid terms, a package, or a wallet, confirm interest and "
           "scope and move it to a short call to lock it in; never send payment, a wallet, or "
-          "commit funds by email. Close on ONE concrete next step they can act on now (two "
-          "specific times, the booking link, or the one detail you need), never a vague let me know. "
+          "commit funds by email. "
+          "YOUR JOB IS THE UPFRONT WORK, THEN A CLEAN HANDOFF TO A HUMAN: do as much as "
+          "possible in this reply (answer every question, confirm interest and scope, restate "
+          "the terms, remove friction) so the lead is fully warmed, then hand it to a person to "
+          "negotiate and close. Do NOT negotiate, discount, finalise pricing, or agree contract "
+          "terms yourself; that is the human closer's job. Close on ONE concrete next step that "
+          "moves it to the human: two specific times for a short call, the booking link, or the "
+          "single detail needed to set that up, never a vague let me know. "
           "The reply must read as a real human answering this exact email. "
         + "Output ONLY the reply body, nothing else."
     )
@@ -797,12 +803,15 @@ def send_draft_to_prospect(*, reply: dict, slug: str, prospect_email: str,
             print("  ! no SMTP_PASS in hostinger.env, cannot auto-send")
             return False
         html = _render_reply_html(draft, persona, profile, unsub_token)
-        if html:
-            m = MIMEMultipart("alternative")
-            m.attach(MIMEText(draft, "plain", "utf-8"))
-            m.attach(MIMEText(html, "html", "utf-8"))
-        else:
-            m = MIMEText(draft, "plain", "utf-8")
+        if not html:
+            # Never auto-send a plain/blank reply. If the client's branded HTML
+            # cannot render, hand it to the operator instead of sending bare text.
+            print("  ! reply HTML render failed; refusing to auto-send a plain reply, "
+                  "queueing to operator instead")
+            return False
+        m = MIMEMultipart("alternative")
+        m.attach(MIMEText(draft, "plain", "utf-8"))
+        m.attach(MIMEText(html, "html", "utf-8"))
         m["Subject"] = reply_subject[:200]
         # persona_name already carries the brand ("Anna from Aureon Global"); use
         # it as-is so the From header doesn't double the brand suffix.
@@ -830,6 +839,11 @@ def send_draft_to_prospect(*, reply: dict, slug: str, prospect_email: str,
         print(f"  ! {slug}: missing sender/resend key, cannot auto-send (will draft to operator)")
         return False
     html = _render_reply_html(draft, persona, profile, unsub_token)
+    if not html:
+        # Never auto-send a plain/blank reply on a client's brand. Queue to operator.
+        print(f"  ! {slug}: reply HTML render failed; refusing to auto-send a plain reply, "
+              f"queueing to operator instead")
+        return False
     payload = {
         "from": f"{persona_name} <{from_addr}>",
         "to": [prospect_email],
@@ -837,10 +851,9 @@ def send_draft_to_prospect(*, reply: dict, slug: str, prospect_email: str,
         "reply_to": from_addr,
         "subject": reply_subject[:200],
         "text": draft,
+        "html": html,
         "tags": [{"name": "kind", "value": "auto_reply_drafted"}],
     }
-    if html:
-        payload["html"] = html
     req = urllib.request.Request(
         "https://api.resend.com/emails",
         data=json.dumps(payload).encode(), method="POST",
@@ -1075,14 +1088,16 @@ def one_pass(limit: int, dry: bool) -> dict:
         perq = (persona or {}).get("from_name", "default persona")
         print(f"  · drafting reply to {prospect}  [{pname} / {perq}]")
         # AlgoAlpha: hand the drafter the prospect's exact deal terms (per-video
-        # retainer from audience_size + 30 percent lifetime commission) so the
-        # response quotes the same numbers the outreach promised.
+        # retainer = 10 USD per 1,000 of the creator's last-10-video AVERAGE
+        # VIEWS (captured at scrape time into enriched_context.avg_views_10) +
+        # 30 percent lifetime commission, so the response quotes the same numbers
+        # the outreach promised.
         offer_ctx = ""
         offer_recap = ""
         if (prow or {}).get("profile_slug") == "algoalpha":
-            aud = (prow or {}).get("audience_size")
-            offer_ctx = algoalpha_offer.offer_context(aud)
-            offer_recap = (f"Quick recap of the deal: {algoalpha_offer.retainer_quote(aud)}, "
+            avg_views = ((prow or {}).get("enriched_context") or {}).get("avg_views_10")
+            offer_ctx = algoalpha_offer.offer_context(avg_views)
+            offer_recap = (f"Quick recap of the deal: {algoalpha_offer.retainer_quote(avg_views)}, "
                            f"up to four paid videos a month, paid win or lose, plus 30 percent "
                            f"lifetime commission on every signup.")
         draft = None

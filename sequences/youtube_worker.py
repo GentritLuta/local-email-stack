@@ -103,7 +103,7 @@ async def resolve_channel_async(client: httpx.AsyncClient, pool: KeyPool,
         key = await pool.get()
         if key is None:
             raise RuntimeError("quota: all keys exhausted")
-        params = {"part": "snippet,brandingSettings", "key": key}
+        params = {"part": "snippet,brandingSettings,contentDetails,statistics", "key": key}
         if is_id:
             params["id"] = handle_or_id
         else:
@@ -121,6 +121,62 @@ async def resolve_channel_async(client: httpx.AsyncClient, pool: KeyPool,
             continue
         # Other errors are not quota — surface them
         raise RuntimeError(f"channels.list {r.status_code}: {r.text[:160]}")
+
+
+async def avg_views_last_10(client: httpx.AsyncClient, pool: KeyPool,
+                            ch: dict) -> Optional[int]:
+    """Average views of the channel's last 10 uploads, or None. Used to size
+    the AlgoAlpha offer (10 USD per 1,000 of this average). Two API calls:
+    playlistItems (the uploads playlist) then videos.list (view counts).
+    Rotates keys on quota like resolve_channel_async."""
+    uploads = (((ch.get("contentDetails") or {}).get("relatedPlaylists") or {})
+               .get("uploads"))
+    if not uploads:
+        return None
+    vids: list[str] = []
+    while True:
+        key = await pool.get()
+        if key is None:
+            return None
+        try:
+            r = await client.get(f"{API_BASE}/playlistItems",
+                                  params={"part": "contentDetails", "playlistId": uploads,
+                                          "maxResults": 10, "key": key}, timeout=15)
+        except Exception:
+            return None
+        if r.status_code == 403 and "quota" in r.text.lower():
+            await pool.mark_exhausted(key); continue
+        if r.status_code != 200:
+            return None
+        vids = [(it.get("contentDetails") or {}).get("videoId")
+                for it in (r.json().get("items") or [])]
+        vids = [v for v in vids if v]
+        break
+    if not vids:
+        return None
+    while True:
+        key = await pool.get()
+        if key is None:
+            return None
+        try:
+            r = await client.get(f"{API_BASE}/videos",
+                                  params={"part": "statistics", "id": ",".join(vids),
+                                          "key": key}, timeout=15)
+        except Exception:
+            return None
+        if r.status_code == 403 and "quota" in r.text.lower():
+            await pool.mark_exhausted(key); continue
+        if r.status_code != 200:
+            return None
+        views = []
+        for it in (r.json().get("items") or []):
+            vc = (it.get("statistics") or {}).get("viewCount")
+            try:
+                if vc is not None:
+                    views.append(int(vc))
+            except (TypeError, ValueError):
+                pass
+        return int(round(sum(views) / len(views))) if views else None
 
 
 # ─── Worker ───────────────────────────────────────────────────────────────
@@ -169,6 +225,15 @@ async def worker_loop(worker_idx: int, sem: asyncio.Semaphore,
                 continue
             summary["resolved"] += 1
 
+            # Last-10-video average views: sizes the AlgoAlpha offer
+            # (10 USD per 1,000 of this average). Best-effort; None if blocked.
+            try:
+                avg10 = await avg_views_last_10(client, pool, ch)
+            except Exception:
+                avg10 = None
+            if avg10 is not None:
+                summary["avg_views_captured"] = summary.get("avg_views_captured", 0) + 1
+
             # Fan out cross-platform handles into other source queues
             for plat, handles_set in extract_social_handles(ch).items():
                 if not handles_set:
@@ -211,7 +276,8 @@ async def worker_loop(worker_idx: int, sem: asyncio.Semaphore,
                     website=channel_url,
                     source_url=channel_url,
                     context={"channel_handle": handle,
-                              "about_snippet": ctx[:200]},
+                              "about_snippet": ctx[:200],
+                              **({"avg_views_10": avg10} if avg10 is not None else {})},
                 )
                 if dry:
                     continue

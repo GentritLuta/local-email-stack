@@ -1,142 +1,130 @@
 """algoalpha_offer.py — the AlgoAlpha creator-proposal formula, one place.
 
-Per-influencer proposal = FIXED per-video retainer (scales with audience)
-+ 30 percent lifetime commission on top. Imported by sequence-runner.py
-(outbound merge fields) and reply-autodraft.py (response drafting) so the
-emails and the replies always quote the same numbers.
+THE FORMULA (hard-coded, do not deviate):
+    retainer_per_video = round_to_10( 10 USD x AVG_VIEWS / 1000 )
+    AVG_VIEWS = the average views of the creator's LAST 10 videos
+    plus 30 percent lifetime commission on every paid signup.
 
-The formula
-    retainer_per_video(S) = clamp( round50( 4 USD x S/1000 ), 200, 5000 )
-    paid videos capped at 4 per month
-    S = audience_size (subscribers/followers, scraped per prospect)
+So a creator whose last 10 videos average 50,000 views is paid 500 USD per
+video (10 USD per 1,000 views), win or lose, plus 30 percent lifetime
+commission. The per-video number scales directly with real, recent reach
+(views), not subscriber count, because views are what a sponsored slot
+actually delivers.
 
-Why 4 USD per 1,000 subscribers: a featured integration averages ~10 percent
-of subscribers in views, so 4/1k subs is ~40 USD CPM on expected views —
-solid market rate for finance/crypto integrations, deliberately NOT top of
-market. The math favors AlgoAlpha: break-even on the retainer is a constant
-~0.023 percent of expected views converting (avg paid signup = 247 USD year
-one, creator keeps 30 percent lifetime = ~74 USD per signup per year,
-AlgoAlpha nets ~173 USD year one), and the commission only ever pays on
-revenue that actually arrived, so it is self-funding by construction. The
-deal stays strong for the creator because the upside is the commission: a
-converting channel out-earns any flat sponsorship within months, and the
-copy stacks the monthly retainer potential (rate x 4 videos) so the offer
-still reads big.
+AVG_VIEWS is captured at scrape time (the YouTube scraper stores each
+prospect's last-10-video average in custom_fields.avg_views_10) and is
+re-figured whenever the channel is re-scraped, so the average used for an
+offer is the freshest one we have for that creator. A personalized number
+is quoted only when avg_views_10 is known and >= MIN_QUOTE_VIEWS; otherwise
+the copy asks for the channel link and says we confirm the exact number on
+our end.
 
-Floor 200 USD keeps micro-channel quotes credible; cap 5,000 USD bounds
-mega-channel risk (cap reached at ~1.25M); the 4-paid-videos-per-month cap
-bounds total monthly exposure (worst case 20,000 USD/month at the cap) and
-is framed in copy as opportunity ("up to four paid videos a month").
-Reference points: 50k -> 200, 100k -> 400, 250k -> 1,000, 500k -> 2,000,
-1M -> 4,000. The legacy copy's case study (4 videos, 14,000 USD retainer =
-3,500/video) maps to a ~875k channel, inside its stated 250k-1M band, so
-that claim stays true.
-
-A personalized number is quoted only when audience_size is known and
->= MIN_QUOTE_AUDIENCE; otherwise the copy falls back to the generic range
-and asks for the channel link.
-
-IMPORTANT: the formula is INTERNAL ONLY. Prospect-facing strings state the
-offer (the number / the range) and never the rate, the per-subscriber math,
-or their audience figure next to the quote — we calculate on our end. The
-reply-draft context carries an explicit do-not-explain guardrail.
+INTERNAL ONLY: prospect-facing strings state the per-video number and the 30
+percent commission, and NEVER the 10-per-1000-views rate, the view math, or
+the creator's average-views figure next to the number. We calculate on our
+end. The reply-draft context carries an explicit do-not-explain guardrail.
 
 Copy style contract (matches algoalpha variants voice): no apostrophes, no
 em-dashes, no typographic quotes, no exclamation marks, no emojis.
 """
 from __future__ import annotations
 
-RATE_PER_1K_USD = 4
-FLOOR_USD = 200
-CAP_USD = 5000
-COMMISSION_PCT = 30
-MIN_QUOTE_AUDIENCE = 10_000
-MAX_PAID_VIDEOS_PER_MONTH = 4
+RATE_PER_1K_VIEWS_USD = 10          # 10 USD per 1,000 average views. Do not change.
+COMMISSION_PCT = 30                 # 30 percent lifetime commission. Do not change.
+MIN_QUOTE_VIEWS = 2_000             # below this avg, quote the generic offer instead
+MAX_PAID_VIDEOS_PER_MONTH = 4       # operational cap on paid slots (framed as opportunity)
 
-# Prose form of the monthly cap, so copy reads "four" while the math uses 4.
 _NUM_WORDS = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
 _CAP_WORD = _NUM_WORDS.get(MAX_PAID_VIDEOS_PER_MONTH, str(MAX_PAID_VIDEOS_PER_MONTH))
 
 
-def retainer_usd(audience_size) -> int | None:
-    """Per-video retainer in USD, or None when the audience is unknown or
-    below the quote threshold (the copy then uses the generic range)."""
+def retainer_usd(avg_views) -> int | None:
+    """Per-video retainer in USD = 10 USD per 1,000 of the last-10-video
+    average views, rounded to the nearest 10. None when avg_views is unknown
+    or below the quote threshold (the copy then uses the generic offer)."""
     try:
-        s = int(audience_size or 0)
+        v = int(avg_views or 0)
     except (TypeError, ValueError):
         return None
-    if s < MIN_QUOTE_AUDIENCE:
+    if v < MIN_QUOTE_VIEWS:
         return None
-    raw = RATE_PER_1K_USD * s / 1000
-    return int(min(max(round(raw / 50) * 50, FLOOR_USD), CAP_USD))
+    raw = RATE_PER_1K_VIEWS_USD * v / 1000
+    return int(round(raw / 10) * 10)
 
 
 def _usd(n: int) -> str:
     return f"{n:,}"
 
 
-def audience_approx(audience_size) -> str:
-    """Human-rounded audience for copy: 45k, 270k, 1.3M. Never falsely
-    precise — scraped counts drift."""
-    s = int(audience_size or 0)
-    if s >= 1_000_000:
-        return f"{s / 1_000_000:.1f}".rstrip("0").rstrip(".") + "M"
-    if s >= 100_000:
-        return f"{round(s / 10_000) * 10}k"
-    return f"{max(round(s / 5_000) * 5, 5)}k"
+def avg_views_approx(avg_views) -> str:
+    """Human-rounded average views for INTERNAL notes only: 45k, 270k, 1.3M."""
+    try:
+        v = int(avg_views or 0)
+    except (TypeError, ValueError):
+        return "an unknown number of"
+    if v >= 1_000_000:
+        return f"{v / 1_000_000:.1f}".rstrip("0").rstrip(".") + "M"
+    if v >= 1_000:
+        return f"{round(v / 1000)}k"
+    return str(v)
 
 
-def retainer_quote(audience_size) -> str:
+def retainer_quote(avg_views) -> str:
     """Inline clause for the offer sentence. Always non-empty. States the
-    offer only — never the rate behind it."""
-    r = retainer_usd(audience_size)
+    offer number only, never the rate behind it."""
+    r = retainer_usd(avg_views)
     if r is not None:
         return f"a flat {_usd(r)} USD per video"
-    return (f"a flat per video retainer, {_usd(FLOOR_USD)} USD up to "
-            f"{_usd(CAP_USD)} USD, sized to your channel")
+    return "a flat per video retainer sized to your channel"
 
 
-def retainer_math(audience_size) -> str:
-    """The offer paragraph (step 3). States the locked number when the
-    audience is known, otherwise the range + an ask for the channel link.
-    Never shows the calculation — that stays on our end."""
-    r = retainer_usd(audience_size)
+def retainer_math(avg_views) -> str:
+    """The offer paragraph (step 3). States the locked number when the average
+    views are known, otherwise asks for the channel link. Never shows the
+    calculation or the views figure."""
+    r = retainer_usd(avg_views)
     if r is not None:
         monthly = r * MAX_PAID_VIDEOS_PER_MONTH
         return (f"Your rate is locked on our end: we pay you {_usd(r)} USD per video, "
                 f"flat, up to {_CAP_WORD} paid videos a month. That is up to "
                 f"{_usd(monthly)} USD a month in retainer, paid up front, win or lose, "
                 f"before a single viewer signs up.")
-    return (f"Your rate gets locked before you post anything: we pay you a flat "
-            f"retainer between {_usd(FLOOR_USD)} USD and {_usd(CAP_USD)} USD per video, "
-            f"sized to your channel, up to {_CAP_WORD} paid videos a month. "
-            f"Paid up front, win or lose.\n\n"
-            f"Reply with your channel link and I send your exact number.")
+    return ("Your rate gets locked before you post anything: we pay you a flat per video "
+            f"retainer sized to your channel, up to {_CAP_WORD} paid videos a month, paid "
+            "up front, win or lose.\n\n"
+            "Reply with your channel link and I send your exact number.")
 
 
-def offer_context(audience_size) -> str:
+def offer_context(avg_views) -> str:
     """Plain-text terms summary injected into reply drafting, so responses
     quote the same numbers the outreach promised. Carries the guardrail that
     the calculation behind the number is never explained to the prospect."""
-    r = retainer_usd(audience_size)
+    r = retainer_usd(avg_views)
     if r is not None:
         retainer_line = (f"flat retainer of {_usd(r)} USD per video featuring AlgoAlpha, "
                          f"already locked for this creator, covering up to "
                          f"{_CAP_WORD} paid videos a month (up to "
                          f"{_usd(r * MAX_PAID_VIDEOS_PER_MONTH)} USD a month)")
     else:
-        retainer_line = (f"flat retainer per video between {_usd(FLOOR_USD)} USD and "
-                         f"{_usd(CAP_USD)} USD, sized to their channel, covering up to "
-                         f"{_CAP_WORD} paid videos a month; their exact number "
-                         f"is not locked yet, so ask for the channel link and say we will "
-                         f"confirm it on our end")
+        retainer_line = (f"flat retainer per video sized to their channel, covering up to "
+                         f"{_CAP_WORD} paid videos a month; their exact number is not locked "
+                         f"yet, so ask for the channel link and say we will confirm it on our end")
     return (f"AlgoAlpha creator offer terms for this prospect: {retainer_line}, paid "
             f"whether or not anyone signs up. On top, {COMMISSION_PCT} percent lifetime "
             f"commission on every paid signup, recurring every month they stay (average "
             f"signup spends 247 USD in year one, about 74 USD per signup per year to the "
             f"creator). Free lifetime VIP access and one custom branded indicator included. "
-            f"Five partner slots per quarter. The retainer is calculated on our end: never "
-            f"explain or reveal how the number is set, never state a per subscriber rate or "
-            f"mention their audience size next to the number. If they ask how it was "
+            f"Five partner slots per quarter. The retainer is calculated on our end as a fixed "
+            f"rate per thousand of recent average views: never explain or reveal how the number "
+            f"is set, never state the per view or per thousand rate, and never mention their "
+            f"view counts or average views next to the number. If they ask how it was "
             f"calculated or push to negotiate, say rates are set internally for channel fit "
             f"and steer to the call.")
+
+
+# ── Backward-compatibility shim ──────────────────────────────────────────────
+# Old call sites passed audience_size (subscribers). The offer is now based on
+# the last-10-video average VIEWS; callers should pass avg_views. This alias
+# keeps older imports working but expects views, not subscribers.
+def audience_approx(avg_views) -> str:  # legacy alias
+    return avg_views_approx(avg_views)

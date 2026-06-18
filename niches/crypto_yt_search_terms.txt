@@ -63,3 +63,31 @@ bitcoin podcast
 crypto interview
 crypto roundtable
 crypto AMA
+
+# ── Tier G: GENERAL TRADING influencers (not just crypto). AlgoAlpha's
+# TradingView indicators work on any market, so day/swing/forex/stock/futures
+# traders are in the ICP too. Widened 2026-06-18.
+day trading
+swing trading
+technical analysis
+price action trading
+TradingView
+TradingView indicators
+TradingView strategy
+forex trading
+forex signals
+stock trading
+stock market analysis
+futures trading
+options trading
+trading strategy
+trading psychology
+chart patterns
+candlestick patterns
+scalping strategy
+trading for beginners
+fintwit
+trading mentor
+quant trading
+algorithmic trading
+trade ideas
