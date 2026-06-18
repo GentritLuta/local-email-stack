@@ -58,6 +58,24 @@ def _esc(s: str) -> str:
     return _html.escape((s or "").strip())
 
 
+def _short_business(offer: str | None) -> str:
+    """A concise 'principal business' descriptor from the onboarding 'offer'
+    field, which is usually a multi-sentence sales pitch. Take the first
+    sentence, and if it is still long, the first clause before a comma. This
+    keeps the contract's company block to the business TYPE, not the marketing
+    copy (e.g. 'SEO and online visibility', not the whole funnel description)."""
+    o = (offer or "").strip().rstrip(".")
+    if not o:
+        return "its services"
+    p = o.find(". ")
+    sent = o[:p].strip() if p != -1 else o
+    if len(sent.split()) > 14:
+        cpos = sent.find(",")
+        if cpos != -1:
+            sent = sent[:cpos].strip()
+    return sent or "its services"
+
+
 # ─── Per-client placeholder fill ────────────────────────────────────────────
 # Label-anchored, idempotent fill for the fields the onboarding form does not
 # capture (registration number / registered office / schedule contact email +
@@ -120,7 +138,6 @@ def derive_contract_fields(a: dict) -> dict:
     company = (a.get("company") or "Client").strip()
     website = (a.get("website") or "").strip()
     email = (a.get("contact_email") or a.get("reply_to") or "").strip()
-    offer = (a.get("offer") or "").strip().rstrip(".")
     icp = (a.get("icp") or "").strip().rstrip(".")
     rep = (a.get("rep") or a.get("signer_name") or "").strip()
     title = (a.get("rep_title") or a.get("signer_title") or "Founder").strip()
@@ -130,7 +147,7 @@ def derive_contract_fields(a: dict) -> dict:
     place = (a.get("place") or jurisdiction).strip()
     domains = (a.get("sending_root") or "").strip()
 
-    business = offer or "its services"
+    business = _short_business(a.get("offer"))
     recital = (f"The Client operates {company}, a provider of {business}"
                + (f" to {icp}" if icp else "")
                + ", and is presently developing its client base"
