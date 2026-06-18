@@ -236,6 +236,33 @@ def generate_contract(a: dict, ref: str) -> str:
                       ("Mohammed El Amine Amoura", c["sig"]), ("Mohammed", c["sig"]),
                       ("amoura.ma@diraya.ca", c["email"]), ("diraya.ca", c["entity"])]:
         s = s.replace(tok, _esc(repl))
+    # 7. Governing law, forum, and Business Day follow the CLIENT's own jurisdiction
+    #    (firm policy: contract jurisdiction is always where the Client's company is
+    #    situated). Taken from the onboarding "jurisdiction" answer. The LCIA London
+    #    arbitration is replaced with the exclusive jurisdiction of the Client's courts,
+    #    and the arbitration-only sub-clauses (20.4 costs, 20.5 proceedings
+    #    confidentiality, 20.6 New York Convention) are dropped.
+    import re as _re
+    juris = (a.get("jurisdiction") or "").strip() or "the jurisdiction in which the Client is incorporated"
+    je = _esc(juris)
+    s = s.replace("the laws of <strong>England and Wales</strong>", f"the laws of <strong>{je}</strong>")
+    s = s.replace("a day other than a Saturday, Sunday, or public holiday in England and Wales",
+                  f"a day other than a Saturday, Sunday, or public holiday in {je}")
+    s = s.replace("clause 8 (Data, Intellectual Property, Domain, and Reputation)", "clause 8")
+    s = _re.sub(
+        r'<li><span class="num">20\.2</span>.*?</li>',
+        ('<li><span class="num">20.2</span> <em class="term">Jurisdiction.</em> The courts of '
+         f'<strong>{je}</strong> shall have exclusive jurisdiction to settle any dispute or claim '
+         '(including non contractual disputes or claims) arising out of or in connection with this '
+         'Agreement, its subject matter, or its formation, and each party irrevocably submits to the '
+         'exclusive jurisdiction of those courts.</li>'),
+        s, count=1, flags=_re.S)
+    s = s.replace(
+        "without thereby waiving the obligation to arbitrate any underlying dispute, and without "
+        "prejudice to the powers of the arbitrator under the LCIA Rules.",
+        "without prejudice to any other remedy available to it.")
+    for _n in ("20.4", "20.5", "20.6"):
+        s = _re.sub(r'\s*<li><span class="num">' + _n + r'</span>.*?</li>', '', s, count=1, flags=_re.S)
     # 6b. Fill per-client placeholder inputs (registration number / registered
     # office / schedule contact email + reply endpoint) from
     # contracts/client-contract-inputs.json, matched by company name. This makes a

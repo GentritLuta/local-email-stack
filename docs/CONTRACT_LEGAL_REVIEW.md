@@ -37,16 +37,19 @@ review caught and the redlines fixed:
   indemnity cap set at EUR 50,000 vs the EUR 5,000 general cap (12.2).
 - **Moral rights** waiver and **user-generated-content** reposting clauses added.
 
-## Two items left for your decision (NOT auto-applied)
+## Governing law and forum — RESOLVED (firm policy)
 
-1. **Governing law and forum (clause 20).** The review flagged London-seated LCIA arbitration
-   under England & Wales law as disproportionate for a no-fee EUR-5,000-capped pilot between a
-   Kosovo provider and a non-UK client. I did **not** unilaterally rewrite the dispute
-   architecture (law + seat + Business Day + enforcement recital) from an advisory note; that is
-   a strategic choice. The clause is left as-is (England & Wales / LCIA, internally consistent).
-   Decide with the user whether to move to a proportionate Kosovo-seated forum.
+Per instruction, **contract jurisdiction is always the Client's own jurisdiction** (where the
+Client's company is situated). Implemented in `contract_lib.generate_contract`: clause 20.1
+governing law and the Business Day definition take the Client's `jurisdiction` onboarding answer,
+and clause 20.2 is now the **exclusive jurisdiction of the Client's courts** (the LCIA London
+arbitration and the arbitration-only sub-clauses 20.4/20.5/20.6 are dropped). Applies to all three
+bases at generation time. Falls back to "the jurisdiction in which the Client is incorporated" if
+the answer is blank. This also resolves the review's disproportionate-forum finding (#31).
 
-2. **both-base Schedule 2 social processing stream.** The combined agreement's Article 28
+## One item left for your decision (NOT auto-applied)
+
+1. **both-base Schedule 2 social processing stream.** The combined agreement's Article 28
    schedule still describes only the email processing. A "both" client's social processing
    (comments, DMs, automated responses) needs its own Schedule 2 particulars block mirroring the
    corrected social-base. The social-base standalone is fully re-mapped; the combined file's
