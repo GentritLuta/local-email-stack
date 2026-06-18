@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join the AlgoAlpha Creator Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+ :root{--accent:#ffd400;--accent2:#c9165b}
+ *{box-sizing:border-box}
+ html,body{margin:0;padding:0;background:#08090d;min-height:100vh}
+ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+   color:#f4f4f5;line-height:1.55;padding:32px 16px;display:grid;place-items:center}
+ .card{width:100%;max-width:580px;background:#0f1117;border:1px solid #1f2230;border-radius:16px;overflow:hidden}
+ .accent-rule{height:4px;background:linear-gradient(90deg,#ffd400 0%,#c9165b 100%)}
+ .inner{padding:30px 32px 34px}
+ .brandbar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+ .brandbar img{display:block;border-radius:8px}
+ .wordmark{font-size:22px;font-weight:800;color:#ffd400;letter-spacing:-.3px;line-height:1}
+ .tagline{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#94a3b8;margin-top:5px;font-weight:600}
+ h1{font-size:25px;font-weight:700;margin:6px 0 10px;color:#fff}
+ .sub{color:#cbd5e1;font-size:15px;margin:0 0 20px}
+ ul.stack{list-style:none;padding:0;margin:0 0 22px}
+ ul.stack li{display:flex;gap:11px;align-items:flex-start;padding:9px 0;font-size:14.5px;color:#e5e5e5;border-bottom:1px solid #1a1d27}
+ ul.stack li:last-child{border-bottom:0}
+ ul.stack .ck{flex:0 0 20px;height:20px;border-radius:50%;background:var(--accent);color:#08090d;font-weight:800;
+   font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+ ul.stack b{color:#fff}
+ .sec{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;
+   margin:22px 0 2px;padding-bottom:6px;border-bottom:1px solid #1f2230}
+ label{display:block;font-size:13px;color:#cbd5e1;margin:14px 0 6px}
+ input,select,textarea{width:100%;padding:12px 13px;border-radius:9px;border:1px solid #2a2e3d;background:#161922;
+   color:#fff;font-size:15px;font-family:inherit}
+ textarea{resize:vertical;min-height:64px}
+ select{appearance:none;cursor:pointer}
+ .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ .row2 label{margin-top:14px}
+ .hint{font-size:12px;color:#64748b;margin:4px 0 0}
+ button{width:100%;margin-top:24px;padding:14px;border:0;border-radius:9px;background:var(--accent);
+   color:#08090d;font-weight:800;font-size:16px;cursor:pointer;transition:background .15s}
+ button:hover{background:#e6c000} button:disabled{opacity:.5;cursor:default}
+ .foot{color:#64748b;font-size:12px;margin-top:18px;text-align:center}
+ .ok{display:none;text-align:center;padding:18px 0}
+ .ok h2{color:var(--accent);font-size:24px;margin:0 0 10px}
+ .ok p{color:#cbd5e1;font-size:15px}
+ .ok .book{margin-top:18px;display:inline-block;background:var(--accent);color:#08090d;font-weight:800;
+   padding:12px 22px;border-radius:9px;text-decoration:none}
+ .err{display:none;color:#fca5a5;font-size:13.5px;margin-top:12px;background:rgba(220,38,38,.1);
+   border-left:3px solid #dc2626;padding:10px 12px;border-radius:6px}
+ .badges{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 2px}
+ .badge{font-size:11px;color:#94a3b8;background:#161922;border:1px solid #1f2230;border-radius:999px;padding:5px 11px}
+</style></head>
+<body><div class="card">
+ <div class="accent-rule"></div>
+ <div class="inner">
+   <div class="brandbar">
+     <img src="https://algoalpha.io/file.svg" alt="AlgoAlpha" width="44" height="44"
+          onerror="this.style.display='none'">
+     <div><div class="wordmark">AlgoAlpha</div><div class="tagline">Creator Program</div></div>
+   </div>
+   <h1>Get paid to feature AlgoAlpha</h1>
+   <p class="sub">A flat fee per video sized to your audience, plus 30% lifetime commission on every
+      paid signup you send, recurring every month they stay. Tell us about your channel and we will
+      come back with your exact per-video number.</p>
+   <ul class="stack">
+     <li><span class="ck">&check;</span><div>A <b>flat fee per video</b> set from your real audience, paid per spot</div></li>
+     <li><span class="ck">&check;</span><div><b>30% lifetime commission</b> on every paid signup, every month they stay</div></li>
+     <li><span class="ck">&check;</span><div>Works for <b>crypto and general trading</b> creators (forex, stocks, futures, TA)</div></li>
+     <li><span class="ck">&check;</span><div>You keep creative control, we send the brief and the assets</div></li>
+   </ul>
+   <div class="badges"><span class="badge">No exclusivity</span><span class="badge">Paid per video</span><span class="badge">Recurring commission</span><span class="badge">Takes 60 seconds</span></div>
+
+   <form id="f">
+     <div class="sec">Your channel</div>
+     <label>Channel / creator name *</label>
+     <input id="cname" required placeholder="e.g. Crypto Power">
+     <label>Channel link *</label>
+     <input id="curl" required placeholder="https://youtube.com/@yourchannel" type="url">
+     <div class="row2">
+       <div><label>Main platform</label>
+         <select id="platform"><option value="">Select…</option>
+           <option>YouTube</option><option>X / Twitter</option><option>TikTok</option>
+           <option>Twitch</option><option>Instagram</option><option>Other</option></select></div>
+       <div><label>Audience size / avg views</label><input id="audience" placeholder="e.g. 50k avg views"></div>
+     </div>
+     <label>Niche</label>
+     <select id="niche"><option value="">Select…</option>
+       <option>Crypto</option><option>Trading (general)</option><option>Forex</option>
+       <option>Stocks</option><option>Futures / options</option><option>Technical analysis</option>
+       <option>Other</option></select>
+
+     <div class="sec">How to reach you</div>
+     <label>Email *</label>
+     <input id="email" type="email" required placeholder="you@email.com">
+     <div class="row2">
+       <div><label>Telegram (optional)</label><input id="telegram" placeholder="@yourhandle"></div>
+       <div><label>Preferred payout</label>
+         <select id="payout"><option value="">Select…</option>
+           <option>PayPal</option><option>Bank transfer</option><option>Crypto wallet</option>
+           <option>Wise</option><option>Other</option></select></div>
+     </div>
+     <label>Anything else we should know? (optional)</label>
+     <textarea id="notes" placeholder="Rates, posting cadence, what you cover, past sponsorships…"></textarea>
+     <p class="hint">We use this only to prepare your offer. We never sell your data.</p>
+     <button id="btn" type="submit">Send me my per-video number &rarr;</button>
+     <div class="err" id="err"></div>
+   </form>
+
+   <div class="ok" id="ok">
+     <h2>You are in.</h2>
+     <p>Thanks. The AlgoAlpha team will come back to you with your exact per-video number and walk
+        you through getting set up. Want to talk it through live?</p>
+     <a class="book" href="https://calendly.com/aureonglobal-info/30min">Book a quick call</a>
+   </div>
+   <p class="foot">AlgoAlpha Creator Program. Your information is used only to prepare your offer and is never sold.</p>
+ </div>
+</div>
+<script>
+const SUPABASE_URL="https://ccmqkljsjiuavpydbkva.supabase.co";
+const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
+const f=document.getElementById('f'),btn=document.getElementById('btn'),err=document.getElementById('err');
+const val=id=>{const e=document.getElementById(id);return e?e.value.trim():"";};
+f.addEventListener('submit',async(e)=>{
+  e.preventDefault(); btn.disabled=true; err.style.display='none';
+  const row={
+    profile_slug:"algoalpha",
+    channel_name:val('cname'), channel_url:val('curl'), platform:val('platform'),
+    email:val('email'), audience:val('audience'), niche:val('niche'),
+    payout_method:val('payout'), telegram:val('telegram'), notes:val('notes'),
+    raw:{submitted_at:new Date().toISOString(), ua:navigator.userAgent}
+  };
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/creator_signups",{
+      method:"POST",
+      headers:{apikey:SUPABASE_ANON,Authorization:"Bearer "+SUPABASE_ANON,
+        "Content-Type":"application/json",Prefer:"return=minimal"},
+      body:JSON.stringify(row)
+    });
+    if(!r.ok && r.status!==201 && r.status!==204) throw new Error("HTTP "+r.status);
+    f.style.display='none'; document.getElementById('ok').style.display='block';
+  }catch(ex){ err.textContent="Something went wrong. Please try again, or email us directly."; err.style.display='block'; btn.disabled=false; }
+});
+</script></body></html>
