@@ -4,6 +4,12 @@ Reads `niches/<slug>.yaml`, iterates each seed team-page URL, extracts every
 mailto: link with its surrounding context (name, role, phone, page section),
 verifies each email through lead_verify, and upserts to Supabase prospects.
 
+Seed progress persists across runs in `niches/<slug>.seeds.done` (one URL per
+walked seed): each run skips already-done seeds, resumes at the first pending
+one, and clears the file to wrap around once every seed has been walked. The
+time budget (--max-seconds) therefore covers NEW ground every run instead of
+re-walking the same head of the list.
+
 This is the thing that runs without a human in the chat. Schedule it:
 
     schtasks /Create /TN "LES-lead-scrape-real_estate_us" ^
@@ -35,6 +41,7 @@ from bs4 import BeautifulSoup, Tag
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lead_verify import verify, VerificationResult, JUNK_LOCAL_PARTS  # noqa: E402
 from name_derive import derive_first_name, derive_company, is_free_or_isp_domain  # noqa: E402
+from email_clean import clean_email  # noqa: E402
 
 REPO_ROOT  = Path(__file__).resolve().parent.parent
 NICHES_DIR = REPO_ROOT / "niches"
@@ -368,7 +375,7 @@ def _merge(into: ScrapedLead, other: ScrapedLead) -> ScrapedLead:
 
 def _absorb_json_pair(by_email: dict, url: str, email: str, name: str, html: str) -> None:
     """Insert/merge a JSON-blob-derived lead with proper name + optional bio."""
-    email = email.strip().lower()
+    email = clean_email(email)
     name  = name.strip()
     if not email or not _HUMAN_NAME_RX.match(name): return
     first, last = _split_name(name)
@@ -400,6 +407,18 @@ def extract_leads_from_page(url: str, html: str) -> list[ScrapedLead]:
       3. Plain-text email occurrences in rendered HTML — fallback for sites
          that print emails in copy without a mailto link.
     """
+    # Compliance gate: if the page declares it does not accept unsolicited
+    # marketing / outreach email (EN notices or the German Impressum anti-Werbung
+    # clause), harvest NOTHING from it. Never cold-email a site that said no.
+    try:
+        from compliance import forbids_outreach
+        _forbid, _label = forbids_outreach(html)
+        if _forbid:
+            print(f"   skip (no-solicitation [{_label}]): {url}")
+            return []
+    except Exception:
+        pass
+
     soup = BeautifulSoup(html, "lxml")
     by_email: dict[str, ScrapedLead] = {}
 
@@ -411,6 +430,7 @@ def extract_leads_from_page(url: str, html: str) -> list[ScrapedLead]:
         _absorb_json_pair(by_email, url, m.group(2), m.group(1), html)
 
     def absorb_dom(node: Tag, email: str) -> None:
+        email = clean_email(email)  # decode escapes/entities, drop labels + obfuscated/invalid
         if not email: return
         candidate = _build_lead(node, email, url)
         existing = by_email.get(email)
@@ -445,6 +465,23 @@ def load_niche(slug: str) -> dict:
     return data
 
 
+def _seeds_done_path(slug: str) -> Path:
+    return NICHES_DIR / f"{slug}.seeds.done"
+
+
+def _load_seeds_done(slug: str) -> set[str]:
+    path = _seeds_done_path(slug)
+    if not path.exists():
+        return set()
+    return {ln.strip() for ln in path.read_text(encoding="utf-8").splitlines()
+            if ln.strip()}
+
+
+def _mark_seed_done(slug: str, seed_url: str) -> None:
+    with _seeds_done_path(slug).open("a", encoding="utf-8") as f:
+        f.write(seed_url + "\n")
+
+
 def list_niches() -> None:
     if not NICHES_DIR.exists():
         print("(no niches/ directory)")
@@ -461,9 +498,10 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
         force_engine: Optional[str] = None, max_seconds: int = 500) -> int:
     # Internal time budget. The orchestrator kills this subprocess at 600s
     # (SUBPROCESS_TIMEOUT) with rc=-1, losing the clean exit. We stop the seed
-    # loop at `max_seconds` (default 540, 60s under the kill) and return 0 —
+    # loop at `max_seconds` (default 500, 100s under the kill) and return 0 —
     # leads found so far are already upserted incrementally, so a partial pass
-    # is real progress, not a failure. Next pass continues from fresh seeds.
+    # is real progress, not a failure. The seed cursor below makes the next
+    # pass resume at the first seed this pass didn't reach.
     import time as _time
     deadline = _time.monotonic() + max_seconds
     niche = load_niche(niche_slug)
@@ -488,6 +526,31 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
             seeds.append((s["url"], (s.get("engine") or niche_engine).lower(), meta))
     if not seeds:
         sys.exit(f"niche {niche_slug} has no seeds")
+    # ── SEED CURSOR ──────────────────────────────────────────────────────
+    # The time budget means one pass rarely covers every seed; without a
+    # cursor each scheduled run re-walks the same head of the list and the
+    # tail is never reached. niches/<slug>.seeds.done holds one URL per
+    # fully-walked seed: this run skips those and walks the remaining seeds
+    # in original file order (deterministic resume). Once every current seed
+    # is done the cycle is complete — clear the file and wrap to the top.
+    # Keyed on URL, not index, so seed_discover appending new seeds mid-cycle
+    # just queues them; a seed interrupted mid-walk by the budget is NOT
+    # marked done and is re-walked next run (upserts are idempotent).
+    # Dry runs read the cursor but never write it.
+    done = _load_seeds_done(niche_slug)
+    pending = [t for t in seeds if t[0] not in done]
+    if not pending:
+        print(f"  seed cursor: all {len(seeds)} seeds walked — cycle complete, "
+              f"wrapping to start")
+        done = set()
+        if not dry:
+            _seeds_done_path(niche_slug).unlink(missing_ok=True)
+        pending = list(seeds)
+
+    def seed_done(url: str) -> None:
+        if not dry:
+            _mark_seed_done(niche_slug, url)
+
     exclude_locals = set(niche.get("filter", {}).get("exclude_local_parts", [])) | JUNK_LOCAL_PARTS
     exclude_domains = set(niche.get("filter", {}).get("exclude_domains", []))
     # Seed-level ICP gate: a seed page must carry at least one of these keywords
@@ -505,7 +568,10 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
     print(f"  profile_slug = {profile_slug}")
     print(f"  default eng  = {niche_engine}")
     print(f"  smtp probe   = {smtp}")
-    print(f"  dry          = {dry}\n")
+    print(f"  dry          = {dry}")
+    print(f"  seed cursor  = {len(seeds) - len(pending)}/{len(seeds)} done this "
+          f"cycle, {len(pending)} pending"
+          + ("  (dry: progress not persisted)" if dry else "") + "\n")
 
     if not dry:
         url, key = load_supabase()
@@ -514,10 +580,11 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
                "rejected": 0, "skipped_generic": 0, "skipped_domain": 0,
                "skipped_low_quality": 0, "upserted": 0}
 
-    for seed_i, (seed, eng, seed_meta) in enumerate(seeds):
+    for seed_i, (seed, eng, seed_meta) in enumerate(pending):
         if _time.monotonic() > deadline:
-            print(f"  TIME BUDGET {max_seconds}s reached after {seed_i}/{len(seeds)} "
-                  f"seeds — stopping cleanly (leads found are already saved).")
+            print(f"  TIME BUDGET {max_seconds}s reached after {seed_i}/{len(pending)} "
+                  f"pending seeds — stopping cleanly (leads found are already "
+                  f"saved; next run resumes at the first unwalked seed).")
             break
         print(f"-- seed [{eng}]: {seed}"
               + (f"  (defaults: {seed_meta})" if seed_meta else ""))
@@ -534,28 +601,48 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
                 print(f"   (no email markers in static HTML, retrying via playwright)")
                 html = fetch_html_playwright(seed) or html
         if not html:
+            # Fetch failed but the seed had its attempt — mark it done so a
+            # dead site can't eat budget at the head of every run; it gets
+            # retried next cycle after the wrap.
+            seed_done(seed)
             continue
         # ── SEED-LEVEL ICP GATE ──────────────────────────────────────────
         if seed_require_kw and not any(k in html.lower() for k in seed_require_kw):
             print(f"   [SKIP SEED] no real-estate signal on page — non-ICP, skipping")
             summary["skipped_seed_non_icp"] = summary.get("skipped_seed_non_icp", 0) + 1
+            seed_done(seed)
             continue
         summary["seeds_fetched"] += 1
         leads = extract_leads_from_page(seed, html)
         print(f"   extracted {len(leads)} candidate emails")
         summary["candidates"] += len(leads)
 
+        budget_hit_mid_seed = False
         for lead in leads:
             # Mid-seed budget check: a single page can yield many leads, each
             # costing a DNS/MX verify. Bail here too so a lead-heavy seed can't
             # overshoot the budget by minutes (the outer check is per-seed only).
             if _time.monotonic() > deadline:
-                print(f"   TIME BUDGET reached mid-seed — saved {summary['upserted']} so far, stopping.")
+                print(f"   TIME BUDGET reached mid-seed — saved {summary['upserted']} "
+                      f"so far, stopping (this seed stays pending and is "
+                      f"re-walked next run).")
+                budget_hit_mid_seed = True
                 break
             local, _, domain = lead.email.partition("@")
             if local in exclude_locals:
                 summary["skipped_generic"] += 1; continue
             if domain in exclude_domains:
+                summary["skipped_domain"] += 1; continue
+            # Structural false-match guard: JS bundles embed Sentry DSNs and
+            # package version strings that the email regex mis-reads as addresses
+            # (e.g. rspack@1.6.8, intl-segmenter@11.7.10, <hex>@sentry.wixpress.com).
+            # Reject them so the pool stays clean for every client. 2026-06-14.
+            _tld = domain.rsplit(".", 1)[-1] if "." in domain else ""
+            if (re.fullmatch(r"\d+(\.\d+)+", domain)
+                    or "sentry.wixpress" in domain or "ingest.sentry" in domain
+                    or domain.endswith("sentry.io")
+                    or re.fullmatch(r"[0-9a-f]{32}", local or "")
+                    or not re.fullmatch(r"[a-z]{2,24}", _tld)):   # real TLDs are alphabetic
                 summary["skipped_domain"] += 1; continue
 
             # Inherit seed-level metadata (company / city / state) as fallback.
@@ -605,6 +692,10 @@ def run(niche_slug: str, *, dry: bool = False, smtp: bool = True,
             except Exception as e:
                 print(f"     ! upsert failed: {e}")
 
+        if budget_hit_mid_seed:
+            break  # seed NOT marked done — next run resumes at this seed
+        seed_done(seed)
+
     print(f"\n=== summary ===")
     for k, v in summary.items():
         print(f"  {k:18} {v}")
@@ -624,7 +715,7 @@ def main() -> int:
                        help="force fetch engine for all seeds")
     p_run.add_argument("--max-seconds", type=int, default=500,
                        help="internal time budget; stop the seed loop cleanly "
-                            "before the orchestrator's 600s kill (default 540)")
+                            "before the orchestrator's 600s kill (default 500)")
     args = ap.parse_args()
 
     if args.cmd == "list":

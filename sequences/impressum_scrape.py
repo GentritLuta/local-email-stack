@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse, re, sys, uuid, urllib.parse
 from pathlib import Path
 import httpx
+from email_clean import clean_email
 
 REPO = Path(__file__).resolve().parent.parent
 if hasattr(sys.stdout, "reconfigure"):
@@ -100,9 +101,25 @@ def visible_text(html: str) -> str:
 
 def extract(html: str, domain: str) -> dict | None:
     text = visible_text(html)
-    # email — prefer one on the company's own domain
-    emails = [e for e in EMAIL_RX.findall(text)
-              if not any(b in e.lower() for b in BAD_EMAIL_DOMAINS)]
+    # Compliance gate: German Impressum pages very often carry the anti-advertising
+    # objection ("nicht ausdrücklich angeforderter Werbung ... wird widersprochen").
+    # Emailing those addresses is a UWG violation, so skip the prospect entirely.
+    try:
+        from compliance import forbids_outreach
+        _forbid, _label = forbids_outreach(text)
+        if _forbid:
+            print(f"   skip (no-solicitation [{_label}]): {domain}")
+            return None
+    except Exception:
+        pass
+    # email — prefer one on the company's own domain. clean_email decodes the
+    # escape/entity artefacts (u003e from an undecoded >) and label prefixes
+    # the raw regex would otherwise glue onto the address, and drops invalid ones.
+    emails = []
+    for raw in EMAIL_RX.findall(text):
+        e = clean_email(raw)
+        if e and not any(b in e for b in BAD_EMAIL_DOMAINS):
+            emails.append(e)
     root = domain.replace("https://", "").replace("http://", "").split("/")[0].lstrip("www.")
     on_domain = [e for e in emails if root.split(".")[0] in e.lower()]
     email = (on_domain or emails or [None])[0]
