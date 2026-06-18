@@ -500,11 +500,19 @@ def all_profiles() -> list[dict]:
 
 
 def resolve_brand_persona(reply: dict) -> tuple[dict | None, dict | None]:
-    """Return (profile, persona) that originally mailed this prospect.
+    """Return (profile, persona) to brand this reply.
 
-    Primary path: reply.run_id -> send_log row -> persona_slug + from_addr domain,
-    then find the profile whose pool contains that domain. Fallback: match the
-    sending subdomain of the reply's to_addr (our address) to a profile."""
+    PRIMARY key is the prospect's CURRENT brand: reply.profile_slug (set when the
+    inbound was matched to its prospect) is authoritative. A lead is always branded
+    as its current brand even if an earlier send went out on a legacy or migrated
+    domain. AlgoAlpha was first mailed from *.aureonglobal.de, then moved to its own
+    *.tryalgoalpha.com; replies on the old Aureon-domain threads must still resolve
+    to AlgoAlpha, not Aureon. It also fixes replies that arrive on a non-sending
+    address (a Calendly thread to info@) which match no sending domain at all.
+    The persona is the one that actually sent (persona_slug from send_log) looked up
+    within that brand, else the brand's first persona. FALLBACK, only when the reply
+    has no usable profile_slug: match the run's from_addr (or the reply's To:)
+    sending subdomain to a profile's pool."""
     persona_slug = None
     from_dom = None
     run_id = reply.get("run_id")
@@ -516,40 +524,32 @@ def resolve_brand_persona(reply: dict) -> tuple[dict | None, dict | None]:
             fa = (rows[0].get("from_addr") or "").lower()
             from_dom = fa.split("@", 1)[1] if "@" in fa else None
 
-    # Fallback: the reply's To: is our sending address; use its domain.
-    if not from_dom:
-        to = (reply.get("to_addr") or "").lower()
-        from_dom = to.split("@", 1)[1] if "@" in to else None
+    def _with_persona(prof):
+        persona = None
+        if persona_slug:
+            persona = next((p for p in prof.get("personas", [])
+                            if p.get("slug") == persona_slug), None)
+        if not persona and prof.get("personas"):
+            persona = prof["personas"][0]
+        return prof, persona
 
-    for prof in all_profiles():
-        doms = {d["domain"].lower()
-                for d in prof.get("relay", {}).get("from_domains", [])}
-        if from_dom and from_dom in doms:
-            persona = None
-            if persona_slug:
-                persona = next((p for p in prof.get("personas", [])
-                                if p.get("slug") == persona_slug), None)
-            if not persona and prof.get("personas"):
-                persona = prof["personas"][0]
-            return prof, persona
-
-    # Final fallback: the reply row usually already carries the resolved
-    # profile_slug (set when the inbound was matched to its prospect). Use it so
-    # a reply that arrived on a non-sending address (e.g. a Calendly thread to
-    # info@, or a forwarded meeting note) still resolves to its brand instead of
-    # dropping to a brand-less template. andrew@atpropertiesind.com hit this:
-    # he replied on the meeting thread, no domain matched, so no draft. 2026-06-18.
+    # PRIMARY: the prospect's current brand is authoritative.
     slug = (reply.get("profile_slug") or "").strip()
     if slug:
         prof = next((p for p in all_profiles() if p.get("slug") == slug), None)
         if prof:
-            persona = None
-            if persona_slug:
-                persona = next((p for p in prof.get("personas", [])
-                                if p.get("slug") == persona_slug), None)
-            if not persona and prof.get("personas"):
-                persona = prof["personas"][0]
-            return prof, persona
+            return _with_persona(prof)
+
+    # FALLBACK (reply carries no resolvable profile_slug): match the sending
+    # subdomain, from the run's send_log from_addr, else the reply's To: address.
+    if not from_dom:
+        to = (reply.get("to_addr") or "").lower()
+        from_dom = to.split("@", 1)[1] if "@" in to else None
+    for prof in all_profiles():
+        doms = {d["domain"].lower()
+                for d in prof.get("relay", {}).get("from_domains", [])}
+        if from_dom and from_dom in doms:
+            return _with_persona(prof)
     return None, None
 
 
