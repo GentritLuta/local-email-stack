@@ -972,7 +972,13 @@ def one_pass(limit: int, dry: bool) -> dict:
         # bodies) give the model nothing to work with and produce confused drafts.
         # Route them to manual review instead of auto-drafting noise.
         alnum = re.sub(r"[^a-zA-ZäöüÄÖÜ]", "", msg)
-        if not msg or len(alnum) < 12:
+        # A short reply that IS the CTA response (a list/report keyword, a bare ZIP
+        # for the seller test, or a positive intent like "yes"/"interested") is a
+        # WARM lead doing exactly what we asked. Never skip those as too terse, or
+        # they get silently ignored and unsubscribe (jake@cbstiles.com replied
+        # "List" and was skipped, then unsubscribed). Only true noise/empties skip.
+        meaningful_short = is_list_request(r.get("subject"), msg) or bool(_AR_POS.search(msg or ""))
+        if (not msg or len(alnum) < 12) and not meaningful_short:
             print(f"  - skip {prospect}: too terse for a draft "
                   f"({msg[:40]!r}) -> manual review")
             stats["skipped"] += 1
