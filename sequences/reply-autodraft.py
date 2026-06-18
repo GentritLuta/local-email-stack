@@ -494,6 +494,24 @@ def resolve_brand_persona(reply: dict) -> tuple[dict | None, dict | None]:
             if not persona and prof.get("personas"):
                 persona = prof["personas"][0]
             return prof, persona
+
+    # Final fallback: the reply row usually already carries the resolved
+    # profile_slug (set when the inbound was matched to its prospect). Use it so
+    # a reply that arrived on a non-sending address (e.g. a Calendly thread to
+    # info@, or a forwarded meeting note) still resolves to its brand instead of
+    # dropping to a brand-less template. andrew@atpropertiesind.com hit this:
+    # he replied on the meeting thread, no domain matched, so no draft. 2026-06-18.
+    slug = (reply.get("profile_slug") or "").strip()
+    if slug:
+        prof = next((p for p in all_profiles() if p.get("slug") == slug), None)
+        if prof:
+            persona = None
+            if persona_slug:
+                persona = next((p for p in prof.get("personas", [])
+                                if p.get("slug") == persona_slug), None)
+            if not persona and prof.get("personas"):
+                persona = prof["personas"][0]
+            return prof, persona
     return None, None
 
 
@@ -874,7 +892,7 @@ def one_pass(limit: int, dry: bool) -> dict:
     stats = {"candidates": 0, "drafted": 0, "autoreplied": 0, "skipped": 0,
              "suppressed": 0, "not_prospect": 0, "errors": 0}
     rows = supa_get("replies?class=eq.reply&select=id,from_addr,to_addr,subject,"
-                    "body_snippet,run_id,raw_headers,received_at"
+                    "body_snippet,run_id,raw_headers,received_at,profile_slug"
                     "&order=received_at.desc&limit=200")
     # Only the prospect's own replies, not our own alert/self rows or operator self-replies.
     todo = []
