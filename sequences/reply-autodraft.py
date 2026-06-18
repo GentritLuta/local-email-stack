@@ -625,44 +625,54 @@ Write only the reply body I should send. No subject line, no commentary, no sign
     # replaced system prompt, all tools disabled, user settings only (skip the
     # repo's project/local CLAUDE.md + settings), prompt via stdin.
     import tempfile, shutil
-    workdir = tempfile.mkdtemp(prefix="les_draft_")
-    try:
-        proc = subprocess.run(
-            [CLAUDE_CMD, "-p",
-             "--system-prompt", system,
-             "--disallowedTools", "Bash,Read,Glob,Grep,Edit,Write,WebFetch,WebSearch",
-             "--setting-sources", "user"],
-            input=prompt,
-            capture_output=True, text=True, timeout=150,
-            encoding="utf-8", errors="replace",
-            cwd=workdir,
-            # claude.cmd runs via cmd.exe (console); under the pythonw task it
-            # would flash a console window per draft without this.
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-        )
-    except Exception as e:
-        print(f"  ! claude CLI error: {e}")
-        return None
-    finally:
+    # One retry. The CLI fails transiently now and then (timeout, empty output),
+    # and a single failure used to drop the reply to the generic template
+    # fallback (which ignores what the prospect actually said). A second attempt
+    # almost always succeeds, keeping the draft on the real model. 2026-06-18.
+    last_err = ""
+    attempt = 0
+    for attempt in range(2):
+        workdir = tempfile.mkdtemp(prefix="les_draft_")
+        try:
+            proc = subprocess.run(
+                [CLAUDE_CMD, "-p",
+                 "--system-prompt", system,
+                 "--disallowedTools", "Bash,Read,Glob,Grep,Edit,Write,WebFetch,WebSearch",
+                 "--setting-sources", "user"],
+                input=prompt,
+                capture_output=True, text=True, timeout=150,
+                encoding="utf-8", errors="replace",
+                cwd=workdir,
+                # claude.cmd runs via cmd.exe (console); under the pythonw task it
+                # would flash a console window per draft without this.
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            )
+        except Exception as e:
+            last_err = str(e)
+            shutil.rmtree(workdir, ignore_errors=True)
+            continue
         shutil.rmtree(workdir, ignore_errors=True)
-    if proc.returncode != 0:
-        print(f"  ! claude CLI exit {proc.returncode}: {proc.stderr[:200]}")
-        return None
-    text = (proc.stdout or "").strip()
-    # Strip the known stdin warning if it leaks into stdout.
-    text = re.sub(r"^Warning: no stdin data received.*?\n", "", text, flags=re.I).strip()
-    if not text:
-        return None
-    text = _scrub_dashes(text)
-    text = _strip_preamble(text, from_name)
-    if sig and sig.split("\n")[0].lower() not in text.lower():
-        text = f"{text}\n\n{sig}"
-    return text
+        if proc.returncode != 0:
+            last_err = f"exit {proc.returncode}: {(proc.stderr or '')[:200]}"
+            continue
+        text = (proc.stdout or "").strip()
+        # Strip the known stdin warning if it leaks into stdout.
+        text = re.sub(r"^Warning: no stdin data received.*?\n", "", text, flags=re.I).strip()
+        if not text:
+            last_err = "empty output"
+            continue
+        text = _scrub_dashes(text)
+        text = _strip_preamble(text, from_name)
+        if sig and sig.split("\n")[0].lower() not in text.lower():
+            text = f"{text}\n\n{sig}"
+        return text
+    print(f"  ! claude CLI failed after {attempt + 1} attempts: {last_err[:200]}")
+    return None
 
 
 _PREAMBLE_RX = re.compile(
-    r"^(here'?s?(\s+(a|the|my))?\s+(clean\s+)?(reply|draft|response)\b.*|"
-    r"sure[,.!]?|okay[,.!]?|got it[,.!]?)\s*$", re.I)
+    r"^(here(?:'?s|\s+is)?(\s+(a|the|my|your))?\s+(clean\s+)?(reply|draft|response|email)\b.*|"
+    r"sure[,.!:]?|okay[,.!:]?|got it[,.!:]?)\s*$", re.I)
 
 
 def _strip_preamble(text: str, from_name: str) -> str:
