@@ -478,6 +478,29 @@ def aggregate(data: dict) -> dict:
 # every genuine reply into a spelled-out action (e.g. "Message @handle on
 # Telegram", "Send the seller list to X", "Book the call with Y"), so the daily
 # report tells the operator/client exactly what to do to convert each reply.
+_OPERATOR_ADDR = "info@aureonglobal.de"
+_REPORT_TO_CACHE: dict[str, str | None] = {}
+
+
+def _report_to_for(slug: str) -> str | None:
+    """Client inbox for this profile (relay.report_to) — the same address the
+    forward-replies script hands the lead to. report_to == the operator means we
+    own the close; anything else means the CLIENT is the closer."""
+    if slug in _REPORT_TO_CACHE:
+        return _REPORT_TO_CACHE[slug]
+    pf = REPO / "profiles" / f"{slug}.json"
+    rt = None
+    if pf.exists():
+        try:
+            p = json.loads(pf.read_text(encoding="utf-8"))
+            rt = ((p.get("relay") or {}).get("report_to") or p.get("report_to")
+                  or ((p.get("brand") or {}).get("legal") or {}).get("contact_email"))
+        except Exception:
+            rt = None
+    _REPORT_TO_CACHE[slug] = rt
+    return rt
+
+
 def build_action_items(replies: list[dict]) -> list[dict]:
     # Only genuine prospect replies, and NOT autoresponders (out-of-office, ticket
     # bots). The AI has already replied to most of these (reply-autodraft auto-sends
@@ -502,19 +525,33 @@ def build_action_items(replies: list[dict]) -> list[dict]:
             status = "WE ALREADY REPLIED" + (f' (our reply: "{ans[:150]}")' if ans else "")
         else:
             status = "NOT yet answered by us"
+        slug = r.get("profile_slug") or ""
+        rt = _report_to_for(slug)
+        if rt and rt.lower() != _OPERATOR_ADDR.lower():
+            owner = (f"CLIENT LEAD ({slug}) — the closer is the client at {rt}. This reply was "
+                     f"forwarded to them; they close it by replying to the forwarded email, which "
+                     f"goes straight to the prospect. You only oversee, never reply yourself.")
+        else:
+            owner = "OUR LEAD (aureon) — you are the closer."
         lines.append(f'{i+1}. From {r.get("from_addr","?")} | Subject: {r.get("subject","")[:70]} | '
-                     f'They wrote: "{body}" | {status}')
+                     f'They wrote: "{body}" | {status} | {owner}')
     block = "\n".join(lines)
     system = (
         "You are a sales assistant producing a HANDOFF to-do list for the human closer. Our AI "
         "has already replied to most prospects and done the upfront work (answered questions, "
-        "restated the offer, removed friction). Your job is the SINGLE next step the human should "
-        "take TODAY to negotiate and CLOSE, never to send another first reply. "
-        "For a reply marked WE ALREADY REPLIED: the action is to take the warmed lead and close it, "
-        "for example 'Jump on the call with X to lock the deal', 'Confirm the package and terms with "
-        "X and get them to sign', or 'Hand X to the closer to negotiate', referencing what they want. "
-        "For a reply marked NOT yet answered: the action is the direct follow-up needed (answer them, "
-        "send what they asked for, or get the handle/number/time). Be specific to what THEY said. "
+        "restated the offer, removed friction). Your job is the SINGLE next step to take TODAY to "
+        "move each lead toward CLOSE, never to send another first reply. "
+        "OWNERSHIP MATTERS: every lead is tagged OUR LEAD or CLIENT LEAD. "
+        "For a CLIENT LEAD: the CLIENT is the closer and the reply is already forwarded to them, so "
+        "they close it by replying to the forwarded email (which reaches the prospect directly). Your "
+        "action is OVERSIGHT only, addressed to the operator about the client, for example 'Check the "
+        "client closed X; nudge them if it stalls'. NEVER tell anyone to reply to the prospect on a "
+        "CLIENT LEAD. "
+        "For an OUR LEAD marked WE ALREADY REPLIED: the action is to take the warmed lead and close it, "
+        "for example 'Jump on the call with X to lock the deal' or 'Confirm the package and terms with "
+        "X and get them to sign', referencing what they want. "
+        "For an OUR LEAD marked NOT yet answered: the action is the direct follow-up needed (answer "
+        "them, send what they asked for, or get the handle/number/time). Be specific to what THEY said. "
         "No em-dashes. Return a JSON array of {\"who\":\"<email>\",\"action\":\"<imperative instruction>\"} "
         "and nothing else."
     )
