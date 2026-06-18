@@ -112,11 +112,12 @@ def supa_get_all(path: str, page: int = 1000, max_pages: int = 60) -> list:
 # Production-only filter. Anything outside these sets is pre-system test
 # data left in Supabase (legacy personas, business-correspondence replies
 # to info@aureonglobal.de, etc.) and gets excluded from the report.
-PRODUCTION_PERSONAS = {"anna", "tomas", "lukas",
-                       # Atal SolidRocks personas (12 — one per subdomain)
-                       "tobias", "lea", "felix", "sara", "jonas",
-                       "mira", "niklas", "lena", "elias", "nora"}
-ACTIVE_PROFILES     = {"aureon", "algoalpha", "f2-malergipser", "atalsolidrocks"}
+# ACTIVE_PROFILES is now derived from the DB `active` flag at fetch time (see
+# fetch_all_data), NOT hardcoded — a hardcoded list went stale and silently
+# zeroed every newer client's report (energ/diraya/dorian/lk/mark-eting were
+# missing). The persona allowlist is also gone: a send is attributed purely by
+# its SENDING SUBDOMAIN, which is collision-free and authoritative (every active
+# subdomain belongs to exactly one profile). 2026-06-15.
 
 
 def _is_production_send(row: dict, active_subdomains: set[str]) -> bool:
@@ -124,9 +125,7 @@ def _is_production_send(row: dict, active_subdomains: set[str]) -> bool:
     subdomain both belong to the live campaigns. Filters out legacy daniel/
     marco/olivia/rachel test sends and pre-system mail.aureonglobal.de
     traffic from setup-period scripts."""
-    persona = row.get("persona_slug") or ""
     from_addr = (row.get("from_addr") or "").lower()
-    if persona not in PRODUCTION_PERSONAS: return False
     domain = from_addr.split("@", 1)[1] if "@" in from_addr else ""
     return domain in active_subdomains
 
@@ -150,13 +149,16 @@ def fetch_all_data() -> dict:
     server-side to bound query size, then production-filtered client-side."""
     since30 = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).isoformat()
     s30 = urllib.parse.quote(since30)
-    profiles = supa_get("profiles?select=slug,name,config&limit=20")
+    profiles = supa_get("profiles?select=slug,name,active,config&limit=20")
 
     # Build the set of active SENDER subdomains from active-profile relay pools.
+    # "Active" = the profile's DB `active` flag is true AND it has sending
+    # subdomains. Derived live so a new client is never silently excluded.
     active_subdomains: set[str] = set()
     for p in profiles:
-        if p["slug"] not in ACTIVE_PROFILES: continue
-        for fd in (p.get("config", {}).get("relay", {}).get("from_domains") or []):
+        cfg = p.get("config") or {}
+        if not p.get("active"): continue
+        for fd in (cfg.get("relay", {}).get("from_domains") or []):
             if fd.get("domain"): active_subdomains.add(fd["domain"])
 
     sends_raw = supa_get_all(
@@ -450,6 +452,8 @@ def aggregate(data: dict) -> dict:
         "by_metro": dict(sorted(geo_metro.items(), key=lambda kv: -kv[1]["leads"])),
     }
 
+    action_items = build_action_items(recent_replies[:12])
+
     return {
         "today":      today,
         "last_7":     last_7,
@@ -464,9 +468,77 @@ def aggregate(data: dict) -> dict:
         "todays_bounces":   todays_bounces,
         "new_suppressions": new_suppressions,
         "recent_replies":   recent_replies,
+        "action_items":     action_items,
         "inbox_24h":        inbox_24h,
         "geography":        geography,
     }
+
+
+# Concrete next-step to-do list built from the recent replies. One CLI call turns
+# every genuine reply into a spelled-out action (e.g. "Message @handle on
+# Telegram", "Send the seller list to X", "Book the call with Y"), so the daily
+# report tells the operator/client exactly what to do to convert each reply.
+def build_action_items(replies: list[dict]) -> list[dict]:
+    # Only genuine prospect replies, and NOT autoresponders (out-of-office, ticket
+    # bots). The AI has already replied to most of these (reply-autodraft auto-sends
+    # and stamps raw_headers.answer_text), so the to-do is the HUMAN HANDOFF to close,
+    # not another first reply.
+    genuine = [r for r in replies
+               if r.get("class") == "reply"
+               and not AUTO_RX.search(f"{r.get('subject','')}\n{r.get('body_snippet','')}")]
+    if not genuine:
+        return []
+    import os, subprocess, tempfile, shutil
+    # Prefer the real claude.exe (the .cmd shim fails to launch via subprocess on
+    # Windows); fall back to the configured CLI path.
+    _exe = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.exe"
+    CLAUDE = _exe if os.path.exists(_exe) else os.environ.get("CLAUDE_CLI", r"D:\npm-global\claude.cmd")
+    lines = []
+    for i, r in enumerate(genuine):
+        body = (r.get("body_snippet") or "").replace("\n", " ")[:300]
+        rh = r.get("raw_headers") or {}
+        ans = (rh.get("answer_text") or "")
+        if rh.get("autosent") or rh.get("autoreply_sent") or ans:
+            status = "WE ALREADY REPLIED" + (f' (our reply: "{ans[:150]}")' if ans else "")
+        else:
+            status = "NOT yet answered by us"
+        lines.append(f'{i+1}. From {r.get("from_addr","?")} | Subject: {r.get("subject","")[:70]} | '
+                     f'They wrote: "{body}" | {status}')
+    block = "\n".join(lines)
+    system = (
+        "You are a sales assistant producing a HANDOFF to-do list for the human closer. Our AI "
+        "has already replied to most prospects and done the upfront work (answered questions, "
+        "restated the offer, removed friction). Your job is the SINGLE next step the human should "
+        "take TODAY to negotiate and CLOSE, never to send another first reply. "
+        "For a reply marked WE ALREADY REPLIED: the action is to take the warmed lead and close it, "
+        "for example 'Jump on the call with X to lock the deal', 'Confirm the package and terms with "
+        "X and get them to sign', or 'Hand X to the closer to negotiate', referencing what they want. "
+        "For a reply marked NOT yet answered: the action is the direct follow-up needed (answer them, "
+        "send what they asked for, or get the handle/number/time). Be specific to what THEY said. "
+        "No em-dashes. Return a JSON array of {\"who\":\"<email>\",\"action\":\"<imperative instruction>\"} "
+        "and nothing else."
+    )
+    prompt = f"Turn these replies into a CLOSER handoff to-do list:\n\n{block}\n\nReturn only the JSON array."
+    workdir = tempfile.mkdtemp(prefix="les_todo_")
+    try:
+        proc = subprocess.run(
+            [CLAUDE, "-p", "--system-prompt", system,
+             "--disallowedTools", "Bash,Read,Glob,Grep,Edit,Write,WebFetch,WebSearch",
+             "--setting-sources", "user"],
+            input=prompt, capture_output=True, text=True, timeout=120,
+            encoding="utf-8", errors="replace", cwd=workdir,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        out = (proc.stdout or "").strip()
+        m = re.search(r"\[.*\]", out, re.S)
+        if m:
+            items = json.loads(m.group(0))
+            return [{"who": it.get("who", ""), "action": it.get("action", "")} for it in items if it.get("action")]
+    except Exception as e:
+        print(f"  (action items skipped: {str(e)[:80]})")
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+    return []
 
 
 # ─── HTML render ──────────────────────────────────────────────────────────
@@ -850,6 +922,25 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
         geo_inner,
     )
 
+    # ── Your action items (to-do list from today's replies) ──
+    items = a.get("action_items") or []
+    if items:
+        li = "".join(
+            f'<li style="margin:0 0 10px;padding:0 0 0 4px;line-height:1.5;">'
+            f'<span style="font-weight:600;">{escape(it.get("action",""))}</span>'
+            + (f'<br><span style="color:#777;font-size:12px;">Reply from {escape(it.get("who",""))}</span>' if it.get("who") else "")
+            + '</li>'
+            for it in items)
+        todo_inner = f'<ol style="margin:0;padding:0 0 0 20px;">{li}</ol>'
+    else:
+        todo_inner = '<div style="color:#666;padding:8px;">No leads ready to hand off right now.</div>'
+    todo_block = section(
+        "Leads to close today",
+        ("We have already replied and warmed these leads. Each item is the next step for you "
+         "(the closer) to negotiate and close, so you just pick up where the reply left off."),
+        todo_inner,
+    )
+
     # ── Recent replies (full content) ──
     rr = a["recent_replies"]
     if rr:
@@ -953,9 +1044,10 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
         cname = escape(client_mode.get("name") or "Your")
         c_accent = client_mode.get("accent") or GOLD
         c_dark = client_mode.get("dark") or DARK
-        header_title = f"{cname} — Campaign Report"
+        header_title = f"{cname} Campaign Report"
         sections = f"""
     {headline_block}
+    {todo_block}
     {window_block}
     {intent_block}
     {step_block}
@@ -964,10 +1056,26 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
     {reply_block}"""
         footer = "Prepared for you by Aureon Global."
         accent, dark = c_accent, c_dark
+        _logo = client_mode.get("logo")
+        logo_html = (f'<img src="{escape(_logo)}" alt="{cname}" '
+                     f'style="max-height:34px;width:auto;margin-bottom:10px;display:block;">'
+                     if _logo else "")
     else:
         header_title = "Outreach Stack — Daily Report"
+        # Consolidated system events: drain the ops_digest buffer (watchdog
+        # remedies + safeguard trips that USED to email per-event) and show them as
+        # ONE section. Drained only here (operator report) so each event shows once.
+        try:
+            sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "sequences"))
+            import ops_digest
+            ops_block = ('<div style="padding:0 28px;">'
+                         + ops_digest.render_html(ops_digest.drain()) + "</div>")
+        except Exception:
+            ops_block = ""
         sections = f"""
     {headline_block}
+    {todo_block}
+    {ops_block}
     {window_block}
     {intent_block}
     {step_block}
@@ -982,6 +1090,7 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
         footer = (f'Generated by daily-report.py at {dt.datetime.now().strftime("%H:%M %Z")}. '
                   f'Live data: <a href="http://localhost:5173" style="color:{GOLD};text-decoration:none;">dashboard</a>.')
         accent, dark = GOLD, DARK
+        logo_html = ""
 
     return f"""<!doctype html>
 <html><head><meta charset="utf-8"></head>
@@ -991,6 +1100,7 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
 <table role="presentation" width="800" cellspacing="0" cellpadding="0" border="0" style="max-width:800px;width:100%;">
 
   <tr><td style="background:{dark};padding:24px 28px;border-radius:6px 6px 0 0;border-top:3px solid {accent};">
+    {logo_html}
     <div style="font-size:18px;font-weight:700;color:{accent};letter-spacing:.4px;">{header_title}</div>
     <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1.4px;margin-top:6px;">
       {dt.datetime.now().strftime("%A, %B %d %Y")}
@@ -1012,12 +1122,15 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
 # ─── Send ──────────────────────────────────────────────────────────────────
 
 def send_via_resend(*, to_addr: str, subject: str, html: str, dry: bool) -> None:
+    # --to accepts a comma-separated list so a client report can reach BOTH the
+    # client and the operator (e.g. "mark@mark-eting.co,info@aureonglobal.de").
+    recipients = [a.strip() for a in str(to_addr).split(",") if a.strip()]
     if dry:
-        print(f"[dry] would send to {to_addr}, subject={subject!r}, html_len={len(html)}")
+        print(f"[dry] would send to {recipients}, subject={subject!r}, html_len={len(html)}")
         return
     payload = {
         "from":    "Outreach Stack <reports@hi.aureonglobal.de>",
-        "to":      [to_addr],
+        "to":      recipients,
         "subject": subject,
         "html":    html,
         "tags":    [{"name": "kind", "value": "daily_report"}],
@@ -1056,13 +1169,22 @@ def scope_to_profile(data: dict, profile_slug: str) -> dict:
                if fd.get("domain")}
     personas = {p["slug"] for p in (prof.get("config", {}).get("personas") or [])}
 
+    # The persona fallback is ONLY safe for profiles that own NO sending domains
+    # of their own (a pure shared-pool rider). For a profile WITH its own domains,
+    # domain matching is authoritative and the persona fallback mis-attributes
+    # other brands' sends whose generic first-name persona slugs collide (e.g.
+    # 'lukas'/'anna' shared across atalsolidrocks/lk/aureon). Confirmed by the
+    # 2026-06-11 audit: it inflated atalsolidrocks to 1810 phantom sends.
+    use_persona_fallback = not domains
+
     def belongs(s: dict) -> bool:
         fa = (s.get("from_addr") or "").lower()
         dom = fa.split("@", 1)[1] if "@" in fa else ""
         if dom in domains:
             return True
-        # fallback for shared-pool senders (LK rides aureonglobal.de subs): persona match.
-        return (s.get("persona_slug") or "") in personas
+        if use_persona_fallback:
+            return (s.get("persona_slug") or "") in personas
+        return False
 
     prospect_emails = {(p.get("email") or "").lower()
                        for p in data["prospects"] if p.get("profile_slug") == profile_slug}
@@ -1112,9 +1234,11 @@ def main() -> int:
         subject = args.subject
     elif args.profile:
         pname = (data["profiles"][0]["name"] if data["profiles"] else args.profile)
-        subject = f"{pname} — campaign report — {dt.datetime.now().strftime('%a %b %d')} — {agg['today']['sent']} sent, {agg['today']['real_replies']} replied"
+        # Hard no-em-dash rule: strip any em/en dash that slips in via the profile name.
+        pname = pname.replace(" — ", " - ").replace("—", "-").replace("–", "-")
+        subject = f"{pname} - campaign report - {dt.datetime.now().strftime('%a %b %d')} - {agg['today']['sent']} sent, {agg['today']['real_replies']} replied"
     else:
-        subject = f"Outreach Daily Report — {dt.datetime.now().strftime('%a %b %d')} — {agg['today']['sent']} sent, {agg['today']['real_replies']} replied"
+        subject = f"Outreach Daily Report - {dt.datetime.now().strftime('%a %b %d')} - {agg['today']['sent']} sent, {agg['today']['real_replies']} replied"
     print(f"sending to {args.to} (dry={args.dry})...")
     send_via_resend(to_addr=args.to, subject=subject, html=html, dry=args.dry)
     return 0
