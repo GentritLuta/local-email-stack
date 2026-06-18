@@ -29,6 +29,8 @@ except ImportError:
 
 REPO = Path(__file__).resolve().parent.parent
 BASE = REPO / "docs" / "aureon-pilot-agreement-diraya-print.html"
+SOCIAL_BASE = REPO / "docs" / "aureon-pilot-agreement-social-base.html"
+BOTH_BASE = REPO / "docs" / "aureon-pilot-agreement-both-base.html"
 INPUTS_JSON = REPO / "contracts" / "client-contract-inputs.json"
 
 # ─── The Diraya base strings we swap out (mirror _gen-contracts.py) ──────────
@@ -176,10 +178,19 @@ def _build_cell(c: dict) -> str:
 
 def generate_contract(a: dict, ref: str) -> str:
     """Build the DRAFT agreement HTML for these onboarding answers."""
-    if not BASE.exists():
-        raise FileNotFoundError(f"base contract template missing: {BASE}")
+    # Route to the agreement matching the service: social-only -> social base;
+    # both -> combined email + social base; email (or unset) -> email base.
+    _st = a.get("service_type")
+    if _st == "social" and SOCIAL_BASE.exists():
+        base_path = SOCIAL_BASE
+    elif _st == "both" and BOTH_BASE.exists():
+        base_path = BOTH_BASE
+    else:
+        base_path = BASE
+    if not base_path.exists():
+        raise FileNotFoundError(f"base contract template missing: {base_path}")
     c = derive_contract_fields(a)
-    s = BASE.read_text(encoding="utf-8")
+    s = base_path.read_text(encoding="utf-8")
 
     # 0. Holding-structure variant: when the Client brings/owns the sending domain
     # (the portal model — client provides a domain + delegated DNS access), the
