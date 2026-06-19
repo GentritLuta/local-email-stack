@@ -12,7 +12,7 @@
     "root_domain": "diraya.ca",
     "office_address": "500 Sedgebrook Way, Canada",
     "signer": "Mohammed El Amine Amoura, Director (and incorporator)",
-    "notices_email": "info@diraya.ca",
+    "notices_email": "amoura.ma@diraya.ca",
     "target_market": "Seed to Series B SaaS / health tech / fintech startups and scaleups needing AI engineering"
   },
   "_note": "Private overrides for Diraya. Gitignored. Populate resend_api_key + verified resend_domain_ids here once domains are provisioned in Resend. Reuse the shared Aureon Resend Pro API key — same account as aureon / algoalpha / f2 / atalsolidrocks.",
@@ -613,7 +613,7 @@
         "Diraya Inc",
         "500 Sedgebrook Way, Canada"
       ],
-      "contact_email": "info@diraya.ca",
+      "contact_email": "amoura.ma@diraya.ca",
       "copyright_year": 2026,
       "logo_url": "https://diraya.ca/wp-content/uploads/2024/06/Diraya-Logo.png",
       "logo_width": 140,
