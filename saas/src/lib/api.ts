@@ -9,6 +9,7 @@ export type OnboardingAnswers = {
   offer: string;            // what they sell / the core offer / their brand
   icp: string;              // who they target (email ICP) / audience (social)
   proof: string;            // social proof / numbers (email)
+  give_first: string;       // the give-first free-value offer / lead magnet (email) — the hook that drives replies
   cta: string;              // desired call to action (email)
   sending_root: string;     // e.g. tryacme.com — the domain to send from (email)
   dns_host: string;         // cloudflare | hostinger | other (email)

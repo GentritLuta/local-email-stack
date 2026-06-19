@@ -132,7 +132,11 @@ def draft_sequence(a: dict) -> list[dict] | None:
         "low-friction one-question ask that only the prospect can answer about their own business "
         "(this outperforms generic 'are you open?' openers 10x). No em dashes, no exclamation marks, "
         "no emojis, no typographic quotes. Short sentences, concrete numbers, one clear CTA. Use "
-        "{first_name} and {company} merge tags. Each email needs a P.S. with a second concrete give."
+        "{first_name} and {company} merge tags. Each email needs a P.S. with a second concrete give. "
+        "The client has a GIVE-FIRST OFFER: a genuinely valuable free resource (an audit, list, teardown, "
+        "checklist or sample) the prospect gets just by replying a keyword. Make that offer the SPINE of the "
+        "sequence: lead with it, name a one-word reply trigger for it, and restate it as the main give. It is "
+        "the single biggest lever on reply rate, so it should appear in almost every email."
     )
     prompt = f"""Write a 7-email cold sequence for this client.
 
@@ -141,11 +145,14 @@ Website: {a.get('website')}
 Offer: {a.get('offer')}
 Ideal customer (ICP): {a.get('icp')}
 Proof / numbers: {a.get('proof')}
+Give-first free offer (the lead magnet, the MAIN hook that makes them reply): {a.get('give_first')}
 Desired CTA: {a.get('cta')}
 Notes: {a.get('notes')}
 
-Email 1 = the low-friction one-question hook (ask for one specific thing only they know).
-Emails 2-6 escalate value + the offer. Email 7 = a breakup with a final give.
+Email 1 = the low-friction one-question hook (ask for one specific thing only they know), and offer the
+give-first resource for a one-word reply. Emails 2-6 escalate value and keep re-offering the give-first
+resource (it is the primary hook, the paid CTA is the optional second step). Email 7 = a breakup that leaves
+the give-first resource on the table, no call attached.
 {SEQ_SCHEMA_HINT}"""
     workdir = tempfile.mkdtemp(prefix="les_onboard_")
     try:

@@ -7,7 +7,7 @@ import LegalConsent, { LegalAcceptance, allAccepted } from "../components/LegalC
 const EMPTY: OnboardingAnswers = {
   service_type: "",
   company: "", website: "", contact_email: "", offer: "", icp: "", proof: "",
-  cta: "", sending_root: "", dns_host: "cloudflare", reply_to: "",
+  give_first: "", cta: "", sending_root: "", dns_host: "cloudflare", reply_to: "",
   lead_source: "icp_sourcing",
   platforms: "", handles: "", posting_cadence: "",
   notes: "",
@@ -45,7 +45,7 @@ export default function Onboard() {
 
   const required: (keyof OnboardingAnswers)[] = [
     "company", "contact_email", "offer", "icp", "rep", "rep_title",
-    ...(isEmail ? (["sending_root"] as (keyof OnboardingAnswers)[]) : []),
+    ...(isEmail ? (["give_first", "sending_root"] as (keyof OnboardingAnswers)[]) : []),
     ...(isSocial ? (["platforms"] as (keyof OnboardingAnswers)[]) : []),
   ];
   const valid = picked && required.every((k) => String(a[k]).trim().length > 0) && allAccepted(legal);
@@ -141,6 +141,34 @@ export default function Onboard() {
             {isEmail && (
               <>
                 <h3 style={{ marginTop: 24, marginBottom: 4 }}>Email marketing</h3>
+
+                <label>Your give-first offer: the free value that makes people reply *</label>
+                <div className="hint" style={{ marginTop: 0, marginBottom: 6 }}>
+                  The single biggest lever on whether the campaign works. A brilliant email with a weak give-first
+                  offer still gets ignored; a plain email with an irresistible one gets replies. Spend real thought here.
+                </div>
+                <div style={{ background: "rgba(212,175,55,0.07)", border: "1px solid rgba(212,175,55,0.28)", borderRadius: 12, padding: "13px 15px", color: "var(--text2)", fontSize: 13, lineHeight: 1.55, marginBottom: 8 }}>
+                  <div style={{ fontWeight: 700, color: "var(--accent)", marginBottom: 4 }}>A strong give-first offer meets all four</div>
+                  <ol style={{ margin: "0 0 10px 18px", padding: 0 }}>
+                    <li>Valuable enough that you would normally <b style={{ color: "var(--text)" }}>charge</b> for it (a real gift, not a brochure).</li>
+                    <li><b style={{ color: "var(--text)" }}>Near-zero effort</b> for you to make, so we can templatise it and automate the delivery.</li>
+                    <li>Delivered <b style={{ color: "var(--text)" }}>instantly</b> when they reply one word. No call, no form, no waiting.</li>
+                    <li>Hits your prospect's <b style={{ color: "var(--text)" }}>number-one</b> nagging problem, or the question they always ask.</li>
+                  </ol>
+                  <div style={{ fontWeight: 700, color: "var(--accent)", marginBottom: 4 }}>Formats that work (pick the closest, make it specific to your world)</div>
+                  <ul style={{ margin: "0 0 10px 18px", padding: 0 }}>
+                    <li><b style={{ color: "var(--text)" }}>Audit / teardown</b> &mdash; a written breakdown of where their result is leaking (SEO, ads, funnels, ops, hiring).</li>
+                    <li><b style={{ color: "var(--text)" }}>Curated list</b> &mdash; a hand-built list of vetted people, tools, or vendors for their exact situation.</li>
+                    <li><b style={{ color: "var(--text)" }}>Checklist / template</b> &mdash; the step-by-step checklist or ready-to-use template you use for the job.</li>
+                    <li><b style={{ color: "var(--text)" }}>Sample / done-for-you</b> &mdash; one finished piece made for them, free, so they see your quality first.</li>
+                    <li><b style={{ color: "var(--text)" }}>Report / number</b> &mdash; their key figure worked out for them (what their X is worth, or what it is costing).</li>
+                  </ul>
+                  <div style={{ marginBottom: 8 }}><b style={{ color: "var(--text)" }}>Avoid:</b> a free consultation, a discovery call, a demo, or a generic ebook. Those make the prospect do the work or read like a pitch.</div>
+                  <div><b style={{ color: "var(--text)" }}>Stuck?</b> Answer one of these in the box: what do your best clients always ask for before they buy, or what do you already have that a stranger would pay for and you could send in a single email? Or just write <i>"help me design one"</i> and we will propose it with you.</div>
+                </div>
+                <textarea value={a.give_first} onChange={(e) => set("give_first", e.target.value)} rows={3}
+                  placeholder="Describe your give-first offer. e.g. A free written teardown of where a roofer's Google Business Profile is losing them calls, sent as a branded PDF the moment they reply AUDIT." />
+
                 <label>Proof / numbers you can cite</label>
                 <textarea value={a.proof} onChange={(e) => set("proof", e.target.value)}
                   placeholder="e.g. 47 clients, 14.1M chart adds, 22% less downtime in 90 days." />
