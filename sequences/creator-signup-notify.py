@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""creator-signup-notify.py — route new creator-program signups to the client.
+"""creator-signup-notify.py, route new creator-program signups to the client.
 
 A creator fills the AlgoAlpha signup capture page (docs/algoalpha-signup.html ->
 gentritluta.github.io/local-email-stack/signup/algoalpha.html). The page writes a
@@ -114,13 +114,13 @@ def once(limit: int, dry: bool, to_override: str | None) -> dict:
     user = HENV.get("SMTP_USER") or OPERATOR_ADDR
     pw = HENV.get("SMTP_PASS")
     if not pw and not dry:
-        print("  ! no SMTP_PASS — cannot send"); stats["errors"] = len(rows); return stats
+        print("  ! no SMTP_PASS, cannot send"); stats["errors"] = len(rows); return stats
 
     for s in rows:
         slug = s.get("profile_slug") or "algoalpha"
         client_email = to_override or client_email_for(slug)
         if not client_email:
-            print(f"  ! no client inbox for profile {slug} — skipping {s.get('channel_name')}")
+            print(f"  ! no client inbox for profile {slug}, skipping {s.get('channel_name')}")
             stats["skipped_no_client"] += 1
             continue
         if dry:

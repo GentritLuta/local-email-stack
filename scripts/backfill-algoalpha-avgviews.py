@@ -123,7 +123,7 @@ async def main():
     keys = load_api_keys()
     print(f"profile={PROFILE}  targets={len(targets)}  api_keys={len(keys)}  dry={DRY}")
     if not targets:
-        print(f"nothing to backfill — all {PROFILE} YT prospects already have avg_views_10")
+        print(f"nothing to backfill, all {PROFILE} YT prospects already have avg_views_10")
         return
     pool = KeyPool(keys)
     queue = asyncio.Queue()
@@ -141,7 +141,7 @@ async def main():
         sample = sorted(results.values())
         print(f"  avg range: min={sample[0]:,}  median={sample[len(sample)//2]:,}  max={sample[-1]:,}")
     if DRY:
-        print("DRY run — no DB writes")
+        print("DRY run, no DB writes")
         return
     pairs = list(results.items())
     for i in range(0, len(pairs), 50):
@@ -150,7 +150,7 @@ async def main():
     # verify
     have = mq(f"""select count(*) c from prospects
       where profile_slug='{PROFILE}' and (enriched_context->>'avg_views_10') is not null""")[0]["c"]
-    print(f"DONE — {PROFILE} prospects now carrying avg_views_10: {have}")
+    print(f"DONE: {PROFILE} prospects now carrying avg_views_10: {have}")
 
 
 if __name__ == "__main__":
