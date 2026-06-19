@@ -144,12 +144,34 @@ Deno.serve(async (req) => {
       const user = await ensureUser(email);
       const clientId = await upsertClient(email, answers.company ?? null, user.id);
 
-      const { data: sub, error: subErr } = await admin
+      // One in-flight submission per client: a resubmit on the same email reuses
+      // the open submission (refreshing the answers) instead of stacking a new
+      // row that would later spawn a duplicate profile. A partial unique index
+      // (uq_one_open_submission_per_client) enforces this at the DB level too.
+      const OPEN_STATUSES = ["pending", "provisioning", "needs_dns", "ready", "awaiting_signature"];
+      const { data: openSub } = await admin
         .from("onboarding_submissions")
-        .insert({ client_id: clientId, raw_answers: answers, status: "pending" })
         .select("id")
-        .single();
-      if (subErr) throw subErr;
+        .eq("client_id", clientId)
+        .in("status", OPEN_STATUSES)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let sub: { id: string };
+      if (openSub) {
+        await admin.from("onboarding_submissions")
+          .update({ raw_answers: answers }).eq("id", openSub.id);
+        sub = openSub as { id: string };
+      } else {
+        const { data: ins, error: subErr } = await admin
+          .from("onboarding_submissions")
+          .insert({ client_id: clientId, raw_answers: answers, status: "pending" })
+          .select("id")
+          .single();
+        if (subErr) throw subErr;
+        sub = ins as { id: string };
+      }
 
       // Set-password email: invite if the user has never confirmed, else recovery.
       const isNew = !user.email_confirmed_at;

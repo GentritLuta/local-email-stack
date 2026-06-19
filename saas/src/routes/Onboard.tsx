@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { createSubmission, OnboardingAnswers } from "../lib/api";
 import { HAS_CONFIG } from "../lib/supabase";
 import LegalConsent, { LegalAcceptance, allAccepted } from "../components/LegalConsent";
@@ -24,7 +24,11 @@ const PLATFORMS = ["Instagram", "TikTok", "Facebook", "YouTube", "X (Twitter)", 
 
 export default function Onboard() {
   const nav = useNavigate();
-  const [a, setA] = useState<OnboardingAnswers>(EMPTY);
+  const [params] = useSearchParams();
+  const [a, setA] = useState<OnboardingAnswers>(() => {
+    const svc = params.get("svc");
+    return { ...EMPTY, service_type: (svc === "email" || svc === "social" || svc === "both") ? svc : "" };
+  });
   const [legal, setLegal] = useState<LegalAcceptance>({ terms: false, privacy: false, agb: false });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -88,20 +92,17 @@ export default function Onboard() {
         <label>What do you want us to run? *</label>
         <div className="svc-pick">
           {SERVICES.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => set("service_type", s.id)}
-              className={"svc-card" + (a.service_type === s.id ? " sel" : "")}
-              style={{
-                textAlign: "left", padding: "14px 16px", borderRadius: 10, cursor: "pointer",
-                border: a.service_type === s.id ? "2px solid var(--accent, #2563eb)" : "1px solid #d8dbe0",
-                background: a.service_type === s.id ? "rgba(37,99,235,0.06)" : "#fff", flex: 1,
-              }}
-            >
-              <b style={{ display: "block", marginBottom: 4 }}>{s.title}</b>
-              <span style={{ fontSize: 13, color: "#6b7280" }}>{s.desc}</span>
-            </button>
+            <div key={s.id} className="svc-card-wrap">
+              <button
+                type="button"
+                onClick={() => set("service_type", s.id)}
+                className={"svc-card" + (a.service_type === s.id ? " sel" : "")}
+              >
+                <b>{s.title}</b>
+                <span className="desc">{s.desc}</span>
+              </button>
+              <Link to={"/learn/" + s.id} className="learn">How it works, results &amp; examples &rarr;</Link>
+            </div>
           ))}
         </div>
 
@@ -211,16 +212,12 @@ export default function Onboard() {
               <>
                 <h3 style={{ marginTop: 24, marginBottom: 4 }}>Social media management</h3>
                 <label>Which platforms? *</label>
-                <div className="svc-platforms" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 4 }}>
+                <div className="svc-platforms">
                   {PLATFORMS.map((p) => {
                     const on = a.platforms.split(", ").filter(Boolean).includes(p);
                     return (
                       <button key={p} type="button" onClick={() => togglePlatform(p)}
-                        style={{
-                          padding: "6px 12px", borderRadius: 20, cursor: "pointer", fontSize: 13,
-                          border: on ? "2px solid var(--accent, #2563eb)" : "1px solid #d8dbe0",
-                          background: on ? "rgba(37,99,235,0.08)" : "#fff",
-                        }}>
+                        className={"svc-pill" + (on ? " on" : "")}>
                         {on ? "✓ " : ""}{p}
                       </button>
                     );

@@ -423,16 +423,26 @@ def process(sub: dict):
 
     set_submission(sid, status="provisioning")
 
-    # 1. profile
+    # 1. profile — ONE per client, never one per submission. If this client
+    #    already has a profile_slug, reuse it instead of minting company-2/-3
+    #    (the bug that gave mark-eting three submissions all pointing at new slugs).
     step(sid, "profile", "running", "Creating your profile")
-    slug = unique_slug(slugify(a.get("company", "client")))
-    profile = build_profile(slug, a)
-    save_profile(profile)
-    push_profile_db(profile)
+    existing_slug = None
     if sub.get("client_id"):
-        cli.patch(f"/clients?id=eq.{sub['client_id']}", json={"profile_slug": slug, "status": "provisioning"},
-                  headers={**H, "Prefer": "return=minimal"})
-    step(sid, "profile", "done", f"Profile created: {slug}", payload={"profile_slug": slug})
+        rows = cli.get("/clients", params={"id": f"eq.{sub['client_id']}", "select": "profile_slug"}).json()
+        existing_slug = rows[0]["profile_slug"] if rows else None
+    if existing_slug:
+        slug = existing_slug
+        step(sid, "profile", "done", f"Using existing profile: {slug}", payload={"profile_slug": slug})
+    else:
+        slug = unique_slug(slugify(a.get("company", "client")))
+        profile = build_profile(slug, a)
+        save_profile(profile)
+        push_profile_db(profile)
+        if sub.get("client_id"):
+            cli.patch(f"/clients?id=eq.{sub['client_id']}", json={"profile_slug": slug, "status": "provisioning"},
+                      headers={**H, "Prefer": "return=minimal"})
+        step(sid, "profile", "done", f"Profile created: {slug}", payload={"profile_slug": slug})
 
     # 2. copy
     step(sid, "copy", "running", "Drafting your 7-email sequence (AI)")

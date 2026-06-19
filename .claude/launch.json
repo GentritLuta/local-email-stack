@@ -2,6 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "saasdist",
+      "runtimeExecutable": "py",
+      "runtimeArgs": ["-m", "http.server", "5280", "--directory", "C:/Users/bernh/local-email-stack/saas/dist"],
+      "port": 5280,
+      "openUrl": "http://localhost:5280/"
+    },
+    {
       "name": "reports",
       "runtimeExecutable": "py",
       "runtimeArgs": ["-m", "http.server", "8766", "--directory", "out"],
