@@ -109,12 +109,21 @@ _CLI_TIMEOUT_S = 25
 _cli_calls_this_run = 0
 # Reject steps that look like injected payloads rather than close advice: a URL, the
 # UPPERCASE banking acronyms, or a long account/phone-style digit run (>=10 digits,
-# solid or space-separated). The prospect's raw reply is fed to the CLI, so a hostile
-# prospect could try to steer attacker-chosen "steps" into the client's inbox; failing
-# closed to FALLBACK_ACTIONS neutralises that. Date/price separators (. / - ,) are kept
-# OUT of the digit class so legit close steps with dates ("2026-06-30") or prices
-# ("$1,200") survive, and the acronyms are case-sensitive so the word "swift" is fine.
-_RISKY_RX = re.compile(r"(?i:https?://|www\.)|\b(?:IBAN|BIC|SWIFT)\b|\b\d[\d ]{8,}\d\b")
+# The prospect's raw reply is fed to the CLI, so a hostile prospect could try to steer
+# attacker-chosen "steps" into the client's inbox; a step that looks like a payment/
+# contact destination fails closed to FALLBACK_ACTIONS. This is a best-effort backstop,
+# NOT a complete filter (the primary defence is the data-not-instructions fencing and the
+# fact the recipient is a seller closing their own deal). Covers URLs, the banking
+# acronyms (uppercase so the word "swift" is fine), and email addresses.
+_RISKY_RX = re.compile(r"(?i:https?://|www\.)|\b(?:IBAN|BIC|SWIFT)\b|[\w.+-]+@[\w-]+\.[A-Za-z]{2,}")
+# Any number carrying 10+ digits once its inline separators (space . , - / parens) are
+# removed = a phone / account / card / IBAN body. Counting DIGITS (not characters) keeps
+# legit dates (8 digits: 2026-06-30), prices ($1,200) and times under the bar.
+_LONGNUM_RX = re.compile(r"\d[\d .,()/\-]*\d")
+
+
+def _looks_like_account(s: str) -> bool:
+    return any(len(re.sub(r"\D", "", m.group())) >= 10 for m in _LONGNUM_RX.finditer(s))
 
 
 def _claude_cli() -> str:
@@ -135,14 +144,17 @@ def _scrub_dashes(text: str) -> str:
 
 def _valid_step(x) -> str | None:
     """A returned array element is only usable as a close step if it is genuinely a
-    string (not a nested list/number stringified into junk), a real sentence,
-    dash-scrubbed, and free of injected URLs/account numbers."""
+    string (not a nested list/number stringified into junk), a real one-line sentence,
+    dash-scrubbed, and free of injected URLs / accounts / emails."""
     if not isinstance(x, str):
         return None
-    s = _scrub_dashes(x.strip())
+    # Collapse ALL whitespace (incl. newlines/control chars) to single spaces so a step
+    # is always one clean line: an embedded \n cannot render a phantom unnumbered line
+    # inside the trusted ACTION LIST block.
+    s = " ".join(_scrub_dashes(x).split())
     if not (10 <= len(s) <= 300):
         return None
-    if _RISKY_RX.search(s):
+    if _RISKY_RX.search(s) or _looks_like_account(s):
         return None
     return s
 
@@ -305,7 +317,7 @@ def once(limit: int, dry: bool) -> dict:
         f"&select=id,profile_slug,from_addr,to_addr,subject,body_snippet,raw_headers,received_at"
         f"&order=received_at.desc&limit={limit}")
     stats = {"candidates": 0, "forwarded": 0, "skipped_no_client": 0,
-             "already": 0, "errors": 0, "waiting_answer": 0}
+             "already": 0, "errors": 0, "waiting_answer": 0, "mark_failed": 0}
     client_cache: dict[str, str | None] = {}
     for r in rows:
         rh = r.get("raw_headers") or {}
@@ -354,11 +366,14 @@ def once(limit: int, dry: bool) -> dict:
         if ok:
             stats["forwarded"] += 1
             if not dry:
-                mark_with_retry(f"replies?id=eq.{r['id']}", {"raw_headers": {
-                    **rh, "client_forwarded": True,
-                    "client_forwarded_to": client_email,
-                    "client_forwarded_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-                    "client_forwarded_with_answer": bool(answer)}})
+                # A failed mark leaves the row re-sendable (intended at-least-once), but
+                # count it so a run that sent-but-could-not-mark is visible, not silent.
+                if not mark_with_retry(f"replies?id=eq.{r['id']}", {"raw_headers": {
+                        **rh, "client_forwarded": True,
+                        "client_forwarded_to": client_email,
+                        "client_forwarded_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+                        "client_forwarded_with_answer": bool(answer)}}):
+                    stats["mark_failed"] += 1
         else:
             stats["errors"] += 1
     print(f"=== forward-replies-to-client === {json.dumps(stats)}")
