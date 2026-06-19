@@ -254,6 +254,10 @@ def forward(reply: dict, client_email: str, dry: bool, answer: str | None = None
     body = reply.get("body_snippet") or "(no body captured)"
     answer = (answer or "").strip()
     fwd_subject = subject if subject.lower().startswith(("re:", "fwd:")) else f"Re: {subject}"
+    # Deterministic per-thread token so a CLIENT reply that comes back to info@
+    # (clients often reply to the From, not the Reply-To) can be matched to this
+    # exact prospect thread and relayed onward. See sequences/relay-client-replies.py.
+    relay_tok = (str(reply.get("id") or "")).replace("-", "")[:10]
 
     intro = (f"A prospect replied in your AUREON campaign"
              + (", and we already did the groundwork and answered on your behalf (below)." if answer
@@ -282,7 +286,8 @@ def forward(reply: dict, client_email: str, dry: bool, answer: str | None = None
         print("        action list: " + " | ".join(actions))
         return True
     m = MIMEMultipart("alternative")
-    m["Subject"] = f"[Campaign reply] {fwd_subject}"[:200]
+    m["Subject"] = (f"[Campaign reply #{relay_tok}] {fwd_subject}" if relay_tok
+                    else f"[Campaign reply] {fwd_subject}")[:200]
     m["From"] = f"AUREON Campaign <{user}>"
     m["To"] = client_email
     m["Reply-To"] = prospect      # client hits Reply -> goes straight to the prospect
