@@ -155,14 +155,6 @@ def rebrand_algoalpha(p: dict) -> dict:
     return p
 
 
-def rebrand_f2(p: dict) -> dict:
-    p["name"] = "F2 Maler & Gipser — Maler- und Gipserarbeiten Bern / Emmental"
-    existing_slugs = {x["slug"] for x in p.get("personas", [])}
-    if "reto" not in existing_slugs:
-        p["personas"].append(F2_NEW_PERSONA)
-    return p
-
-
 def rebrand_lk(p: dict) -> dict:
     p["name"] = "LK Advertising — Performance media for DTC + B2B brands"
     existing_slugs = {x["slug"] for x in p.get("personas", [])}
@@ -174,7 +166,6 @@ def rebrand_lk(p: dict) -> dict:
 REBRANDERS = {
     "aureon":         rebrand_aureon,
     "algoalpha":      rebrand_algoalpha,
-    "f2-malergipser": rebrand_f2,
     "lk-advertising": rebrand_lk,
 }
 

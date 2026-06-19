@@ -53,7 +53,6 @@ def first_enrollable(profile_slug: str, requires_city: bool) -> dict | None:
 PROFILES = [
     {"slug": "aureon",         "variants_dir": "aureon-default",         "requires_city": False},
     {"slug": "algoalpha",      "variants_dir": "algoalpha-default",      "requires_city": False},
-    {"slug": "f2-malergipser", "variants_dir": "f2-malergipser-default", "requires_city": True},
 ]
 
 OUT = REPO / "out"

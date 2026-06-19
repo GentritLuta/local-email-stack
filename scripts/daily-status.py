@@ -36,7 +36,6 @@ H = {"apikey": KEY, "Authorization": f"Bearer {KEY}"}
 PROFILES = [
     ("aureon",          "real_estate_us",            False),
     ("algoalpha",       "crypto_influencer",         False),
-    ("f2-malergipser",  "liegenschaftsverwalter_be", True),
 ]
 
 

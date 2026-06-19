@@ -41,6 +41,22 @@ DEFAULT_BRAND = {
 
 FALLBACK_UNSUB_MAILTO = "info@aureonglobal.de?subject=unsubscribe"
 
+# STANDARD (all clients): the agency inbox is always a Reply-To so replies reach
+# Aureon AND the client. Prospect replies go to BOTH the client's mailbox and here.
+AGENCY_INBOX = "info@aureonglobal.de"
+
+
+def _reply_to_list(persona: dict) -> list[str]:
+    """Reply-To = [client's reply mailbox, agency inbox], deduped, order-preserved.
+    Every cold send routes replies to both the client and Aureon."""
+    client = persona.get("reply_to") or persona.get("from_addr")
+    out = []
+    for addr in (client, AGENCY_INBOX):
+        a = (addr or "").strip()
+        if a and a.lower() not in [x.lower() for x in out]:
+            out.append(a)
+    return out
+
 
 def unsubscribe_url(token: Optional[str], brand: dict | None = None) -> str:
     """Build the per-prospect unsubscribe URL. Always returns a URL (not a
@@ -88,11 +104,6 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
     # with a non-"default" template gets its own HTML structure entirely;
     # the generic template below only runs when no custom is declared.
     template = (brand or {}).get("template", "default")
-    if template == "f2-custom":
-        from email_template_f2 import render_html_f2
-        return render_html_f2(body=body, persona=persona,
-                               unsubscribe_token=unsubscribe_token, brand=brand,
-                               step_n=step_n)
     if template == "aureon-custom":
         from email_template_aureon import render_html_aureon
         return render_html_aureon(body=body, persona=persona,
@@ -123,11 +134,11 @@ def render_html(*, body: str, persona: dict, unsubscribe_token: Optional[str] = 
         return render_html_energ(body=body, persona=persona,
                                  unsubscribe_token=unsubscribe_token, brand=brand,
                                  step_n=step_n)
-    if template == "teamminik-custom":
-        from email_template_teamminik import render_html_teamminik
-        return render_html_teamminik(body=body, persona=persona,
-                                     unsubscribe_token=unsubscribe_token, brand=brand,
-                                     step_n=step_n)
+    if template == "mark-eting-custom":
+        from email_template_mark_eting import render_html_mark_eting
+        return render_html_mark_eting(body=body, persona=persona,
+                                      unsubscribe_token=unsubscribe_token, brand=brand,
+                                      step_n=step_n)
 
     b = {**DEFAULT_BRAND, **(brand or {})}
     # Deep-merge colors so a profile can override one color without losing the rest.
@@ -484,7 +495,7 @@ def build_payload(*, persona: dict, to_addr: str, subject: str, body: str,
     payload = {
         "from":     formataddr((persona["from_name"], persona["from_addr"])),
         "to":       [to_addr],
-        "reply_to": persona.get("reply_to", persona["from_addr"]),
+        "reply_to": _reply_to_list(persona),
         "subject":  subject,
         "text":     text,
         "html":     html,

@@ -377,7 +377,7 @@ def aggregate(data: dict) -> dict:
             enrolled_ids = {r["prospect_id"] for r in runs if r["sequence_id"] == seq["id"]}
         verified = [x for x in prof_prospects if x.get("verified") and not x.get("unsubscribed")]
         # Determine required merges from variants file (cheap heuristic)
-        requires_city = p["slug"] == "f2-malergipser"
+        requires_city = False
         eligible = [x for x in verified
                     if x["id"] not in enrolled_ids
                     and x.get("first_name") and x.get("company")

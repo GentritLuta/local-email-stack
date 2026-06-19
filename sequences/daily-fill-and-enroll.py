@@ -91,51 +91,29 @@ PROFILE_CFG = {
         # company but no parseable first name are still enrollable.
         "requires_first_name": False,
     },
-    "f2-malergipser": {
-        "niche_slug":      "liegenschaftsverwalter_be",
-        # Per-seed company/city flow in via YAML for hand-curated seeds.
-        # For auto-discovered seeds we also need to (a) quarantine the
-        # Sentry/version-string false-match emails and (b) derive
-        # first_name from the local-part. clean-f2-prospects.py does both.
-        "backfill_script": "scripts/clean-f2-prospects.py",
-        "creator_scrapers": [],
-        "requires_city":   True,
-    },
     "atalsolidrocks": {
         "niche_slug":      "atal_dach_b2b",
-        # Reuse f2's clean-* shape pattern adapted for DACH first_name +
-        # company derivation. For now uses the aureon-style backfill which
-        # handles email-local-part name parsing + free-mail filtering.
-        # Until atal-specific backfill is written, the aureon one is the
-        # closest match (English/DACH name patterns are similar enough).
+        # Uses the aureon-style backfill which handles email-local-part name
+        # parsing + free-mail filtering (English/DACH name patterns are similar
+        # enough until an atal-specific backfill is written).
         "backfill_script": "scripts/backfill-aureon-prospects.py",
         "creator_scrapers": [],
         "requires_city":   True,
     },
-    "f2-bau": {
-        # Architect / GU / developer Subunternehmer track — shares F2's senders
-        # but its own copy (f2-bau-default). Same Swiss-firm backfill as f2,
-        # called with the f2-bau slug. City optional (only step 3 uses {city};
-        # variant required_merges = first_name + company).
-        "niche_slug":      "bau_dach_ch",
-        "backfill_script": "scripts/clean-f2-prospects.py",
-        "backfill_args":   ["f2-bau"],
-        "creator_scrapers": [],
-        "requires_city":   False,
-    },
     "diraya": {
-        # IMPORT-ONLY profile: leads are not cold-scrapeable (proven dead 3x).
-        # They come from yc-guess-verify.py / the YC site-email scrape via
-        # import-prospects-csv.py. So we skip the scrape/backfill phase entirely
-        # (import_only) and just enroll the verified imported pool into
-        # diraya-default. Sends from the separate "Pro" Resend account (the key
-        # lives in profiles/diraya.private.json -> relay.resend_api_key).
-        "niche_slug":      None,
+        # WIDENED 2026-06-14: ICP broadened from seed-Series-B AI founders (YC
+        # published-email ceiling ~100) to ALL B2B SaaS/tech/software companies via
+        # the diraya_b2b_saas team_pages niche, so the pool can feed real volume.
+        # Copy is now name-optional ({greeting}), so role inboxes (info@/contact@)
+        # enroll. The YC published-email harvest (diraya-nightly-grow) still runs as
+        # a second, higher-quality named-founder source. Sends on the Pro Resend
+        # account (key in profiles/diraya.private.json).
+        "niche_slug":      "diraya_b2b_saas",
         "backfill_script": None,
         "creator_scrapers": [],
         "requires_city":   False,
-        "requires_first_name": True,   # diraya copy personalizes by {first_name}
-        "import_only":     True,       # skip scrape/backfill; enroll-only
+        "requires_first_name": False,  # name-optional ({greeting}); role inboxes OK
+        "import_only":     False,      # scrape the broad B2B-SaaS niche
     },
     "energ": {
         # Energy-intensive German KMU/Gewerbe in NRW. Leads come from German
@@ -162,6 +140,25 @@ PROFILE_CFG = {
         # Hostinger (collaboration invite -> publish records via hPanel); the
         # aureonglobal.de connect./partners. subs are the fallback meanwhile.
         "niche_slug":      "real_estate_us_lk",
+        "backfill_script": None,
+        "creator_scrapers": [],
+        "requires_city":   False,
+        "requires_first_name": False,
+        # OWN-LANE (2026-06-13): LK shares aureon's real-estate source, so 61-86%
+        # of its leads were ALREADY emailed by aureon. The send-time anti-double-
+        # email guard correctly blocked them, leaving 287 runs stuck queued and
+        # ~0 sends. dedupe_cross_brand makes LK enroll ONLY leads no other brand
+        # has emailed (checked against send_log), so it stops colliding with aureon
+        # and only works fresh prospects. Flag is read by count_eligible_unenrolled
+        # + enroll_up_to; absent/false for every other brand so they are unchanged.
+        "dedupe_cross_brand": True,
+    },
+    "mark-eting": {
+        # Mark-eting B.V. (Mark Eizema) — SEO / online visibility for US service
+        # businesses (trades + professional services). team_pages scrape of US
+        # service-business sites; name-optional ({greeting}). Compliance no-solicitation
+        # gate + SMTP/MX verify apply automatically. Sends once getmark-eting.com DNS verifies.
+        "niche_slug":      "mark_eting_us_service",
         "backfill_script": None,
         "creator_scrapers": [],
         "requires_city":   False,
@@ -201,7 +198,10 @@ PROFILE_CFG = {
                                               "--no-smtp", "--limit", "50"]),
         ],
         "requires_city":   False,
-        "requires_first_name": True,
+        # Name-optional 2026-06-11: Dorian copy now greets "{greeting}" (first_name
+        # when known, else a neutral fallback), so role-mailbox founder leads
+        # (info@, hello@) enroll. Matches energ/lk/algoalpha.
+        "requires_first_name": False,
         "import_only":     False,
     },
 }
@@ -234,6 +234,9 @@ def run_subprocess(script: str, args: list[str]) -> tuple[int, str]:
         p = subprocess.run(
             cmd, cwd=str(REPO), capture_output=True, text=True,
             timeout=SUBPROCESS_TIMEOUT, encoding="utf-8", errors="replace",
+            # Parent runs under pythonw (no console); a py.exe child would
+            # allocate and FLASH a new console window per step without this.
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
         out = (p.stdout or "") + (p.stderr or "")
         tail = "\n".join(out.splitlines()[-30:])
@@ -324,6 +327,36 @@ def daily_need_for_profile(profile_slug: str) -> int:
     return total
 
 
+def _emails_touched_by_other_brands(profile_slug: str) -> set[str]:
+    """Recipient emails that SOME OTHER profile has already emailed (matched via
+    send_log.from_addr domain not in this profile's own sending domains).
+
+    Used only by dedupe_cross_brand profiles (lk-advertising): LK shares aureon's
+    real-estate source, so most of its leads were already emailed by aureon and the
+    send-time anti-double-email guard blocked them. Excluding them at ENROLL time
+    gives LK its own lane (only fresh, never-contacted prospects)."""
+    try:
+        d = json.loads((REPO / "profiles" / f"{profile_slug}.json").read_text(encoding="utf-8"))
+        own = {fd["domain"].lower() for fd in d.get("relay", {}).get("from_domains", [])}
+    except Exception:
+        own = set()
+    touched: set[str] = set()
+    step, off = 1000, 0
+    while True:
+        rows = http_get(f"send_log?select=to_addr,from_addr&limit={step}&offset={off}")
+        for r in rows:
+            fa = (r.get("from_addr") or "").lower()
+            dom = fa.split("@")[-1] if "@" in fa else ""
+            if dom and dom not in own:
+                ta = (r.get("to_addr") or "").lower()
+                if ta:
+                    touched.add(ta)
+        if len(rows) < step:
+            break
+        off += step
+    return touched
+
+
 def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
                               requires_first_name: bool = True) -> int:
     SID = get_sequence_id(profile_slug)
@@ -334,14 +367,17 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
                 http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
     rows = http_get(
         f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
-        f"&select=id,first_name,company,city&limit=2000"
+        f"&select=id,email,first_name,company,city&limit=2000"
     )
+    cross = (_emails_touched_by_other_brands(profile_slug)
+             if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
     n = 0
     for p in rows:
         if p["id"] in enrolled: continue
         if not p.get("company"): continue
         if requires_first_name and not p.get("first_name"): continue
         if requires_city and not p.get("city"): continue
+        if cross is not None and (p.get("email") or "").lower() in cross: continue
         n += 1
     return n
 
@@ -361,16 +397,38 @@ def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
         f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
         f"&select=id,email,first_name,company,city&limit=2000"
     )
+    cross = (_emails_touched_by_other_brands(profile_slug)
+             if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
     eligible = [p for p in rows
                 if p["id"] not in enrolled
                 and p.get("company")
                 and (p.get("first_name") or not requires_first_name)
-                and (not requires_city or p.get("city"))]
+                and (not requires_city or p.get("city"))
+                and (cross is None or (p.get("email") or "").lower() not in cross)]
     # Prefer leads we can personalize by NAME — send to the best prospects first,
     # leaving company-only / front-desk (info@) leads as overflow. Stable sort
     # keeps prior ordering within each tier.
     eligible.sort(key=lambda p: 0 if (p.get("first_name") or "").strip() else 1)
-    eligible = eligible[:target]
+    # Per-domain cap: don't let one recipient domain dominate a day's enrollment.
+    # A single brokerage/firm team page can list 100s of agents; hammering one
+    # domain looks like spam and lets one bad domain (a server that rejects us)
+    # tank the pool's bounce rate. Spread across domains, named-first preserved.
+    # Free/shared providers (gmail etc.) are exempt — they are not a single org.
+    _FREE = {"gmail.com", "googlemail.com", "yahoo.com", "ymail.com", "hotmail.com",
+             "outlook.com", "live.com", "msn.com", "aol.com", "icloud.com", "me.com",
+             "gmx.com", "gmx.net", "gmx.de", "web.de", "t-online.de", "mail.com",
+             "protonmail.com", "proton.me", "comcast.net", "verizon.net", "att.net"}
+    MAX_PER_DOMAIN = 5
+    picked, per_dom = [], {}
+    for p in eligible:
+        d = (p.get("email") or "").split("@")[-1].lower()
+        if d not in _FREE and per_dom.get(d, 0) >= MAX_PER_DOMAIN:
+            continue
+        picked.append(p)
+        per_dom[d] = per_dom.get(d, 0) + 1
+        if len(picked) >= target:
+            break
+    eligible = picked
     # Find any prior cancelled runs for these prospects — we'll PATCH those
     # back to queued instead of INSERTing (the runs table has a unique key
     # on (sequence_id, prospect_id) that doesn't care about status).
@@ -521,6 +579,52 @@ def fill_profile(profile_slug: str, *, do_scrape: bool, dry: bool) -> dict:
     }
 
 
+def _per_brand_sender_tasks() -> list[str]:
+    """Names of the per-brand sender tasks (LES-sequence-runner-<brand>).
+    Empty pre-cutover / non-Windows."""
+    if not sys.platform.startswith("win"):
+        return []
+    try:
+        out = subprocess.check_output(
+            ["powershell.exe", "-NoProfile", "-Command",
+             "(Get-ScheduledTask -TaskName 'LES-sequence-runner-*' "
+             "-ErrorAction SilentlyContinue).TaskName"],
+            text=True, stderr=subprocess.DEVNULL, timeout=15,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        return [ln.strip() for ln in out.splitlines() if ln.strip()]
+    except Exception:
+        return []
+
+
+def trigger_senders(profiles: list[str]) -> None:
+    """Fire the sender(s) so newly-enrolled runs go out promptly.
+
+    Per-brand cutover (2026-06-16): each active brand runs its OWN always-on
+    LES-sequence-runner-<brand> task. We must NOT run a bare global
+    `sequence-runner.py tick` here — that would double-process the same due runs
+    alongside those tasks and DOUBLE-SEND. Instead Start each brand's own task
+    (Start-ScheduledTask respects MultipleInstances=IgnoreNew, so a brand already
+    mid-tick is not double-started). Falls back to ONE global tick only when no
+    per-brand tasks exist (pre-cutover / non-Windows / VPS)."""
+    tasks = set(_per_brand_sender_tasks())
+    if tasks:
+        for slug in profiles:
+            tn = f"LES-sequence-runner-{slug}"
+            if tn in tasks:
+                try:
+                    subprocess.run(
+                        ["powershell.exe", "-NoProfile", "-Command",
+                         f"Start-ScheduledTask -TaskName '{tn}'"],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        timeout=20, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+                    print(f"  triggered {tn}")
+                except Exception as e:
+                    print(f"  ! trigger {tn} failed: {e}")
+    else:
+        rc, _ = run_subprocess("sequences/sequence-runner.py", ["tick"])
+        print(f"  global runner rc={rc}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--profile", help="only run for one profile")
@@ -542,21 +646,19 @@ def main() -> int:
         print("=== phase 1: enroll from existing pool (no scrape) ===")
         for p in profiles:
             fill_profile(p, do_scrape=False, dry=False)
-        print("\n=== phase 1 tick ===")
-        rc, tail = run_subprocess("sequences/sequence-runner.py", ["tick"])
-        print(f"runner rc={rc}")
+        print("\n=== phase 1: fire per-brand senders ===")
+        trigger_senders(profiles)
 
     # Phase 2 — scrape to top the pool up for next time, enrolling new finds.
     results = []
     for p in profiles:
         results.append(fill_profile(p, do_scrape=not args.no_scrape, dry=args.dry))
 
-    # Final tick so anything newly enrolled fires today
+    # Fire senders so anything newly enrolled goes out promptly (per-brand tasks,
+    # IgnoreNew-safe; NOT a global tick that would double-process post-cutover).
     if not args.dry:
-        print("\n=== sequence-runner tick ===")
-        rc, tail = run_subprocess("sequences/sequence-runner.py", ["tick"])
-        print(tail)
-        print(f"runner rc={rc}")
+        print("\n=== fire per-brand senders ===")
+        trigger_senders(profiles)
 
     print("\n=== SUMMARY ===")
     for r in results:

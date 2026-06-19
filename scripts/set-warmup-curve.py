@@ -10,7 +10,7 @@ Also stamps warmup.started_at = today on the profile AND on every
 from_domain so the ramp begins from now.
 
 Usage:
-    py scripts/set-warmup-curve.py aureon algoalpha f2-malergipser
+    py scripts/set-warmup-curve.py aureon algoalpha lk-advertising
 """
 from __future__ import annotations
 import datetime as dt

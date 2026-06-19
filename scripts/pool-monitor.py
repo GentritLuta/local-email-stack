@@ -34,6 +34,14 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 REPO = Path(__file__).resolve().parent.parent
+
+# Spawn scrapers WINDOWLESS so they never pop a console window on the user's
+# desktop. pythonw.exe + CREATE_NO_WINDOW = fully silent background work.
+import sys as _sys
+PYW = str(Path(_sys.executable).with_name("pythonw.exe"))
+if not Path(PYW).exists():
+    PYW = "pythonw"
+_NOWINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 env = {}
 for line in (REPO / "sequences" / "supabase.env").read_text().splitlines():
     if "=" in line and not line.strip().startswith("#"):
@@ -47,7 +55,11 @@ H = {"apikey": KEY, "Authorization": f"Bearer {KEY}"}
 # template requires {city}, so a prospect missing city is unsendable there.
 PROFILES = [
     {"slug": "aureon",         "niche": "real_estate_us",            "json": "aureon.json",         "requires_city": False,
-     "extra_scrapers": []},
+     # Google Places: brokerages live on Maps, not "team pages" — far higher yield
+     # for this local ICP, and returns company + city for free.
+     "extra_scrapers": [
+         ("sequences/places_scrape.py", ["run", "real_estate_us"]),
+     ]},
     {"slug": "algoalpha",      "niche": "crypto_influencer",         "json": "algoalpha.json",      "requires_city": False,
      # AlgoAlpha-specific: crypto-creator scrapers find emails the generic
      # lead_scrape can't reach. Runs sequentially so we don't blow YT quota.
@@ -57,10 +69,40 @@ PROFILES = [
          ("sequences/tradingview_scrape.py", ["run", "crypto_influencer",
                                               "niches/tv_handles.txt", "--no-smtp", "--limit", "50"]),
      ]},
-    {"slug": "f2-malergipser", "niche": "liegenschaftsverwalter_be", "json": "f2-malergipser.json", "requires_city": True,
-     "extra_scrapers": []},
     {"slug": "atalsolidrocks", "niche": "atal_dach_b2b", "json": "atalsolidrocks.json", "requires_city": True,
-     "extra_scrapers": []},
+     "extra_scrapers": [
+         ("sequences/places_scrape.py", ["run", "atal_dach_b2b"]),
+     ]},
+    # diraya/energ/lk are name-optional ({greeting}) — their variant templates do
+    # NOT require first_name, so the pool count must not require it either, or it
+    # under-reads the pool and scrapes forever. requires_first_name=False mirrors
+    # daily-fill-and-enroll.PROFILE_CFG.
+    {"slug": "diraya",         "niche": "diraya_b2b_saas",           "json": "diraya.json",         "requires_city": False,
+     # Places is supplementary for diraya (B2B SaaS is not Maps-native); the
+     # team-page scrape stays primary and a paid bulk source is the real volume
+     # lever. Places still adds real tech/agency companies at no extra spend.
+     "requires_first_name": False, "extra_scrapers": [
+         ("sequences/places_scrape.py", ["run", "diraya_b2b_saas"]),
+     ]},
+    {"slug": "energ",          "niche": "energ_gewerbe_nrw",         "json": "energ.json",          "requires_city": False,
+     "requires_first_name": False, "extra_scrapers": [
+         ("sequences/places_scrape.py", ["run", "energ_gewerbe_nrw"]),
+     ]},
+    {"slug": "lk-advertising", "niche": "real_estate_us_lk",         "json": "lk-advertising.json", "requires_city": False,
+     "requires_first_name": False, "extra_scrapers": [
+         ("sequences/places_scrape.py", ["run", "real_estate_us_lk"]),
+     ]},
+    # dorian sources purely via creator scrapers (B2B founders on YouTube/social),
+    # so niche is None — pool-monitor skips the team-page scrape and just runs the
+    # creator scrapers when the pool is below buffer. Mirrors daily-fill PROFILE_CFG.
+    {"slug": "dorian",         "niche": None,                        "json": "dorian.json",         "requires_city": False,
+     "requires_first_name": False, "extra_scrapers": [
+         ("sequences/youtube_scraper.py", ["discover", "niches/dorian_social_yt_search_terms.txt",
+                                           "--out", "niches/dorian_yt_channels.txt", "--pages", "1"]),
+         ("sequences/youtube_scraper.py", ["run", "dorian_social", "niches/dorian_yt_channels.txt", "--no-smtp"]),
+         ("sequences/social_scrape.py",   ["instagram", "dorian_social", "niches/dorian_social_handles.txt", "--no-smtp", "--limit", "50"]),
+         ("sequences/social_scrape.py",   ["twitter", "dorian_social", "niches/dorian_social_handles.txt", "--no-smtp", "--limit", "50"]),
+     ]},
 ]
 BUFFER_MULTIPLIER = 2  # always keep 2x daily consumption available
 
@@ -97,7 +139,8 @@ def is_scrape_running(niche: str) -> bool:
         out = subprocess.check_output(
             ["powershell.exe", "-Command",
              f"Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object {{ $_.CommandLine -like '*lead_scrape*{niche}*' }} | Select-Object -ExpandProperty ProcessId"],
-            text=True, stderr=subprocess.DEVNULL, timeout=10)
+            text=True, stderr=subprocess.DEVNULL, timeout=10,
+            creationflags=_NOWINDOW)
         return bool(out.strip())
     except Exception:
         return False
@@ -139,10 +182,12 @@ def main() -> int:
         )
         enrolled = {r.get("prospect_id") for r in active_runs if r.get("prospect_id")}
         requires_city = p.get("requires_city", False)
+        requires_first_name = p.get("requires_first_name", True)
         unenrolled = [
             e for e in eligible
             if e["id"] not in enrolled
-            and e.get("first_name") and e.get("company")
+            and e.get("company")
+            and (e.get("first_name") or not requires_first_name)
             and (not requires_city or e.get("city"))
         ]
         pool = len(unenrolled)
@@ -153,44 +198,58 @@ def main() -> int:
         if args.dry:
             action = "[dry] " + action
 
-        print(f"  {p['slug']:18}  warmup_day={profile['warmup']['current_day']:>2}  "
+        print(f"  {p['slug']:18}  warmup_day={(profile.get('warmup',{}).get('current_day') or '?'):>2}  "
               f"per_sub={per_sub:>2}  subs={n_subs}  daily_need={daily_need:>3}  "
               f"target_pool={target:>3}  actual_pool={pool:>3}  gap={gap:>3}  -> {action}")
 
         if (below or args.force) and not args.dry:
-            if is_scrape_running(p["niche"]):
-                print(f"      [skip] scrape for {p['niche']} already running")
-                continue
-            print(f"      [spawn] py sequences/lead_scrape.py run {p['niche']} --no-smtp")
-            subprocess.Popen(
-                ["py", str(REPO / "sequences" / "lead_scrape.py"), "run", p["niche"], "--no-smtp"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                creationflags=subprocess.DETACHED_PROCESS if hasattr(subprocess, "DETACHED_PROCESS") else 0,
-                cwd=str(REPO),
-            )
-            # Profile-specific creator scrapers (AlgoAlpha: youtube + tradingview).
-            # Spawned detached so they run alongside lead_scrape, not in series.
+            # Team-page scrape. Skipped for creator-only profiles whose niche is
+            # None (dorian sources purely via creator_scrapers).
+            niche = p.get("niche")
+            if niche:
+                if is_scrape_running(niche):
+                    print(f"      [skip] scrape for {niche} already running")
+                else:
+                    print(f"      [spawn] pythonw sequences/lead_scrape.py run {niche} --no-smtp")
+                    subprocess.Popen(
+                        [PYW, str(REPO / "sequences" / "lead_scrape.py"), "run", niche, "--no-smtp"],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        creationflags=_NOWINDOW, cwd=str(REPO),
+                    )
+            # Extra scrapers (Google Places + creator platforms). Always run,
+            # ALONGSIDE any team-page scrape, each with its own niche-specific
+            # running check — so a brand's Places/creator refill is never blocked
+            # by its (or another brand's) team-page scrape still running.
             for script_rel, sargs in p.get("extra_scrapers", []):
                 script_abs = str(REPO / script_rel)
-                # Crude is-running check by script path
+                # Is-running check by script path AND niche arg. Several brands
+                # share one scraper script (e.g. places_scrape.py runs for aureon,
+                # energ AND lk with different niche args); matching on script name
+                # alone would let the first brand's run block all the others in the
+                # same tick, so we also require the niche token (sargs[1]).
+                name_tok = Path(script_rel).name
+                niche_tok = sargs[1] if len(sargs) >= 2 else ""
+                filt = f"$_.CommandLine -like '*{name_tok}*'"
+                if niche_tok:
+                    filt += f" -and $_.CommandLine -like '*{niche_tok}*'"
                 try:
                     out = subprocess.check_output(
                         ["powershell.exe", "-Command",
                          f"Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
-                         f"Where-Object {{ $_.CommandLine -like '*{Path(script_rel).name}*' }} | "
+                         f"Where-Object {{ {filt} }} | "
                          f"Select-Object -ExpandProperty ProcessId"],
-                        text=True, stderr=subprocess.DEVNULL, timeout=10)
+                        text=True, stderr=subprocess.DEVNULL, timeout=10,
+                        creationflags=_NOWINDOW)
                     if out.strip():
-                        print(f"      [skip] {Path(script_rel).name} already running")
+                        print(f"      [skip] {name_tok} {niche_tok} already running")
                         continue
                 except Exception:
                     pass
-                print(f"      [spawn] py {script_rel} {' '.join(sargs)}")
+                print(f"      [spawn] pythonw {script_rel} {' '.join(sargs)}")
                 subprocess.Popen(
-                    ["py", script_abs, *sargs],
+                    [PYW, script_abs, *sargs],
                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                    creationflags=subprocess.DETACHED_PROCESS if hasattr(subprocess, "DETACHED_PROCESS") else 0,
-                    cwd=str(REPO),
+                    creationflags=_NOWINDOW, cwd=str(REPO),
                 )
 
     return 0

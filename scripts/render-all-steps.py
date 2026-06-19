@@ -39,7 +39,6 @@ def q(path: str):
 PROFILES = [
     {"slug": "aureon",         "variants_dir": "aureon-default",         "requires_city": False},
     {"slug": "algoalpha",      "variants_dir": "algoalpha-default",      "requires_city": False},
-    {"slug": "f2-malergipser", "variants_dir": "f2-malergipser-default", "requires_city": True},
 ]
 
 ARTIFACT_RX = re.compile(r"\{[a-z_]+\}")            # unrendered {field}

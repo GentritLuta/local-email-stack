@@ -50,10 +50,8 @@ def profile_from_subdomain(addr: str) -> str:
     sub = addr.split("@")[-1]
     aureon = {"mail.aureonglobal.de","outreach.aureonglobal.de","hi.aureonglobal.de","connect.aureonglobal.de","partners.aureonglobal.de"}
     algoalpha = {"team.aureonglobal.de","desk.aureonglobal.de","hub.aureonglobal.de"}
-    f2 = {"news.aureonglobal.de","send.aureonglobal.de"}
     if sub in aureon:    return "aureon"
     if sub in algoalpha: return "algoalpha"
-    if sub in f2:        return "f2-malergipser"
     return f"unknown ({sub})"
 
 by_day = defaultdict(lambda: Counter())
@@ -106,7 +104,7 @@ for s in recent:
 
 # ── 3. ICP sample: 5 prospects per profile ────────────────────────────────
 section("PROSPECT ICP SAMPLES -- are leads actually fitting?")
-for slug in ("aureon", "algoalpha", "f2-malergipser"):
+for slug in ("aureon", "algoalpha"):
     print(f"\n--- {slug} (sample of 5) ---")
     rows = fetch(f"prospects?profile_slug=eq.{slug}&select=first_name,last_name,title,company,website,city,state,geo,verified,quality_score,niche_slug,industry_tags&order=created_at.desc&limit=5")
     for p in rows:

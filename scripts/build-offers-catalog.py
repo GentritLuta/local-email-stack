@@ -79,8 +79,8 @@ ENTRIES = [
          "<p style='font-size:9.5pt;color:#444'>The give is the number, not a PDF. The system reads the last-10-video average views and quotes a flat per-video fee (10 USD per 1,000 of that average) plus 30% lifetime commission. A free signup page captures interested creators. The rate stays internal.</p>"),
     ]),
 ]
-# the 7 new ones, from specs (each has a real visual deliverable PDF)
-for slug in ["mark-eting", "lk-advertising", "atalsolidrocks", "dorian", "energ", "f2-malergipser", "f2-bau"]:
+# the new ones, from specs (each has a real visual deliverable PDF)
+for slug in ["mark-eting", "lk-advertising", "atalsolidrocks", "dorian", "energ"]:
     sp = specs[slug]
     ENTRIES.append((slug, sp.get("accent_hex", "#222"), "NEW", [
         (", ".join(sp["magnet_keywords"]), sp["one_line_promise"], sp["deliverable_title"], slug, "")

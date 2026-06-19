@@ -58,28 +58,6 @@ VARIANT_ALGOALPHA = {
     ),
 }
 
-VARIANT_F2 = {
-    "n": 1,
-    "delay_days": 0,
-    "angle": "f2_human_v1_de",
-    "subject": "Wohnungsabnahme in 5 Werktagen — für {company}",
-    "body": (
-        "Guten Tag {first_name},\n\n"
-        "Kurz und direkt. Wir machen Wohnungsabnahmen für eine "
-        "Bewirtschaftung in Bern — 5 Werktage, Festpreis, keine "
-        "Nachträge.\n\n"
-        "Für {company} in {city} würde das so aussehen:\n\n"
-        "— Festpreis schriftlich nach der Vor-Ort-Begehung\n"
-        "— Termin innert 5 Werktagen oder die nächste Wohnung gratis\n"
-        "— eine Telefonnummer, eine Ansprechperson für alle Liegenschaften\n"
-        "— Foto-Dokumentation vor und nach jeder Wohnung\n\n"
-        "10 Prozent unter Ihrem aktuellen Anbieter. Wenn die Qualität "
-        "bei der ersten Wohnung nicht stimmt — Sie zahlen nichts.\n\n"
-        "Zwei Plätze pro Monat. Wie viele Wohnungen nehmen Sie in "
-        "{city} typischerweise pro Monat ab?\n\n"
-        "— Lukas"
-    ),
-}
 
 VARIANT_LK = {
     "n": 1,
@@ -109,7 +87,6 @@ VARIANT_LK = {
 SEQ_UPDATES = {
     "aureon-default": (VARIANT_AUREON, "Aureon Global — Real estate growth (human voice, Hormozi, em-dashes)"),
     "algoalpha-default": (VARIANT_ALGOALPHA, "AlgoAlpha — Creator partnership (human voice, Hormozi, em-dashes)"),
-    "f2-malergipser-default": (VARIANT_F2, "F2 Maler & Gipser — Liegenschaftsverwalter (kurz, human, Hormozi)"),
     "lk-advertising-default": (VARIANT_LK, "LK Advertising — Maklerbüro-Outreach (kurz, human, Hormozi)"),
 }
 
@@ -154,7 +131,7 @@ def main() -> int:
         print(f"  + {seq_dir:30s} subj: {variant['subject'][:55]!r:57s} body: {word_count} words")
 
     # Update each profile's persona voice.avoid lists
-    for slug in ("aureon", "algoalpha", "f2-malergipser", "lk-advertising"):
+    for slug in ("aureon", "algoalpha", "lk-advertising"):
         pf = PROFILES / f"{slug}.json"
         if not pf.exists():
             continue

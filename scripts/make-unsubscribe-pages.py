@@ -122,105 +122,6 @@ loadProspect();
 F2_LOGO = ("https://horizons-cdn.hostinger.com/2289cef3-cfe1-43c6-8890-321b9bb5fdc5/"
            "6dfa90e1c23f38fcb6efab9b0d2a107b.png")
 
-F2_HTML = f"""<!doctype html>
-<html lang="de-CH">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<title>Abmelden · F2 Maler &amp; Gipser</title>
-<style>
-  *, *::before, *::after {{ box-sizing: border-box; }}
-  html, body {{ margin: 0; padding: 0; background: #f9f9f5; min-height: 100vh; }}
-  body {{ font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          color: #1a2332; padding: 32px 16px; display: grid; place-items: center; }}
-  .card {{ width: 100%; max-width: 600px; background: #ffffff; border-radius: 12px;
-            overflow: hidden; box-shadow: 0 1px 3px rgba(15,46,42,.06); }}
-  .hero {{ background: #0a2620;
-           background-image: linear-gradient(135deg,#0f2e2a 0%,#0a2620 100%);
-           padding: 24px 28px; color: #ffffff; display: flex; align-items: center; gap: 14px; }}
-  .hero img {{ width: 56px; height: 56px; border-radius: 50%; background: #ffffff; }}
-  .brand-name {{ font-size: 17px; font-weight: 800; letter-spacing: .2px; }}
-  .brand-caps {{ font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #6ba94c;
-                  text-transform: uppercase; margin-top: 3px; }}
-  .body {{ padding: 36px 32px 8px; }}
-  h1 {{ font-size: 22px; font-weight: 800; margin: 0 0 12px; color: #1a2332; }}
-  p {{ font-size: 15px; line-height: 1.65; margin: 0 0 14px; color: #475569; }}
-  p .email {{ color: #1a2332; font-weight: 700; }}
-  .btn {{ display: inline-block; margin-top: 12px; padding: 14px 26px;
-          background: #6ba94c; color: #ffffff; font-size: 14px; font-weight: 700;
-          border: none; border-radius: 10px; cursor: pointer; letter-spacing: .2px; }}
-  .btn:hover {{ background: #5a9340; }}
-  .btn:disabled {{ opacity: .5; cursor: not-allowed; }}
-  .success {{ display: none; margin-top: 16px; padding: 14px 16px; border-radius: 8px;
-              background: #f0fdf4; color: #065f46; border-left: 4px solid #6ba94c;
-              font-size: 14px; line-height: 1.5; }}
-  .err {{ display: none; margin-top: 16px; padding: 14px 16px; border-radius: 8px;
-          background: #fef2f2; color: #991b1b; border-left: 4px solid #dc2626;
-          font-size: 13.5px; line-height: 1.5; }}
-  .footer {{ background: #0a2620; padding: 28px 32px 24px; text-align: center; }}
-  .footer .brand-name {{ color: #ffffff; }}
-  .footer img {{ width: 52px; height: 52px; border-radius: 50%; background: #ffffff;
-                  display: block; margin: 0 auto 10px; }}
-  .footer .info {{ font-size: 13px; color: #94a3ab; line-height: 1.6; margin-top: 14px;
-                    padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }}
-  .footer .info a {{ color: #6ba94c; text-decoration: none; font-weight: 600; }}
-  .footer .legal {{ font-size: 11px; color: rgba(148,163,171,.6); margin-top: 14px; }}
-</style>
-</head>
-<body>
-  <div class="card">
-    <div class="hero">
-      <img src="{F2_LOGO}" alt="F2 Maler Gipser">
-      <div>
-        <div class="brand-name">F2 Maler &amp; Gipser</div>
-        <div class="brand-caps">Handwerkskunst seit 2007</div>
-      </div>
-    </div>
-
-    <div class="body">
-      <h1>Vom F2-Verteiler abmelden</h1>
-      <p id="lead">Schade dass Sie gehen. Wenn Sie auf den grünen Knopf klicken,
-        nehmen wir Sie aus unserem Verteiler. Sie erhalten dann keine Mails mehr
-        von F2 Maler &amp; Gipser.</p>
-      <button class="btn" id="btn" type="button">Jetzt abmelden</button>
-
-      <div class="success" id="success-state">
-        <b><span id="email">Ihre Adresse</span></b> ist abgemeldet. Wir kontaktieren
-        Sie nicht mehr. Wenn Sie uns trotzdem einmal brauchen, rufen Sie einfach
-        an. Die Nummer steht auf <a href="https://f2-malergipser.ch" style="color:#065f46;font-weight:600;">f2-malergipser.ch</a>.
-      </div>
-
-      <div class="err" id="error-state"></div>
-      <div id="status" style="display:none"></div>
-    </div>
-
-    <div class="footer">
-      <img src="{F2_LOGO}" alt="F2 Maler Gipser">
-      <div class="brand-name">F2 Maler &amp; Gipser</div>
-      <div class="brand-caps">Handwerkskunst seit 2007</div>
-      <div class="info">
-        F2 Maler &amp; Gipser · Schweiz<br>
-        <a href="mailto:info@f2-malergipser.ch">info@f2-malergipser.ch</a>
-        &nbsp;·&nbsp;
-        <a href="https://f2-malergipser.ch">f2-malergipser.ch</a>
-      </div>
-      <div class="legal">© 2026 F2 Maler &amp; Gipser. Alle Rechte vorbehalten.</div>
-    </div>
-  </div>
-  {unsub_js(
-    success_msg="abgemeldet",
-    already_msg="Sie sind bereits abgemeldet.",
-    error_msg="Etwas ist schiefgelaufen",
-    missing_token_msg="Der Link ist unvollständig. Bitte verwenden Sie den Link aus der E-Mail.",
-    lookup_fail_msg="Wir konnten diesen Link nicht finden. Möglicherweise wurde er bereits verwendet."
-  )}
-</body>
-</html>"""
-
-
-# ─── Aureon Global — English, gold accent, premium dark feel ─────────────
-
 AUREON_HTML = """<!doctype html>
 <html lang="en">
 <head>
@@ -468,7 +369,6 @@ LK_HTML = """<!doctype html>
 # ─── Write files + update profile URL templates ─────────────────────────
 
 PAGES = {
-    "f2-malergipser": F2_HTML,
     "aureon":         AUREON_HTML,
     "algoalpha":      ALGOALPHA_HTML,
     "lk-advertising": LK_HTML,

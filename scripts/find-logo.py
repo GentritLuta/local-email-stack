@@ -4,7 +4,6 @@ import sys
 TARGETS = {
     "aureon":         "https://aureonglobal.de",
     "algoalpha":      "https://algoalpha.io",
-    "f2-malergipser": "https://f2-malergipser.ch",
     "lk-advertising": "https://lk-advertising.com",
 }
 

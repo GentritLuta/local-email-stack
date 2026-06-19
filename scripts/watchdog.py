@@ -38,6 +38,11 @@ if hasattr(sys.stdout, "reconfigure"):
 REPO = Path(__file__).resolve().parent.parent
 LOG_FILE = REPO / "warmup-state" / "watchdog.log"
 
+# This script runs under pythonw (no console). Every console-subsystem child
+# (powershell.exe, taskkill) would otherwise allocate a VISIBLE console window
+# per call — the hourly desktop popups. Same pattern as pool-monitor.py.
+_NOWINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+
 env = {}
 for line in (REPO / "sequences" / "supabase.env").read_text(encoding="utf-8").splitlines():
     if "=" in line and not line.strip().startswith("#"):
@@ -70,34 +75,19 @@ def supa(path: str) -> list:
 
 
 def send_alert(title: str, body_lines: list[str]) -> None:
-    """Email an alert to info@aureonglobal.de via Resend."""
-    if not RESEND_KEY:
-        log("  no Resend key — alert not sent")
-        return
-    html = (f"<h3>[WATCHDOG] {title}</h3>"
-            f"<pre style='font-family:ui-monospace,monospace;font-size:13px;"
-            f"background:#f8fafc;padding:12px;border-radius:8px'>"
-            + "\n".join(body_lines) + "</pre>")
-    payload = {
-        "from":    "Watchdog <alerts@hi.aureonglobal.de>",
-        "to":      ["info@aureonglobal.de"],
-        "subject": f"[WATCHDOG] {title}",
-        "html":    html,
-        "tags":    [{"name": "kind", "value": "watchdog"}],
-    }
-    req = urllib.request.Request(
-        "https://api.resend.com/emails",
-        data=json.dumps(payload).encode(),
-        method="POST",
-        headers={"Authorization": f"Bearer {RESEND_KEY}",
-                 "Content-Type": "application/json",
-                 "User-Agent": "watchdog/1.0"},
-    )
+    """CONSOLIDATED 2026-06-16: no longer emails per event. Watchdog remediations
+    were flooding info@; they now go into the ops_digest buffer and surface as ONE
+    "System events" section in the daily report. The watchdog still ACTS in real
+    time (re-enables tasks, revives the runner) — only the notification is
+    consolidated."""
     try:
-        urllib.request.urlopen(req, timeout=15)
-        log(f"  → alert emailed: {title}")
+        sys.path.insert(0, str(REPO / "sequences"))
+        import ops_digest
+        ops_digest.record(source="watchdog", subject=title,
+                          detail="\n".join(body_lines), severity="warn")
+        log(f"  recorded to ops digest: {title}")
     except Exception as e:
-        log(f"  ! alert send failed: {e}")
+        log(f"  ! ops_digest.record failed: {e}")
 
 
 def is_process_running(name_substr: str) -> list[int]:
@@ -111,7 +101,8 @@ def is_process_running(name_substr: str) -> list[int]:
                  f"Get-CimInstance Win32_Process -Filter \"Name='python.exe' or Name='pythonw.exe'\" | "
                  f"Where-Object {{ $_.CommandLine -like '*{name_substr}*' }} | "
                  f"Select-Object -ExpandProperty ProcessId"],
-                text=True, stderr=subprocess.DEVNULL, timeout=10)
+                text=True, stderr=subprocess.DEVNULL, timeout=10,
+                creationflags=_NOWINDOW)
             return [int(p) for p in out.strip().splitlines() if p.strip().isdigit()]
         else:
             out = subprocess.check_output(["pgrep", "-f", name_substr],
@@ -129,7 +120,8 @@ def process_age_seconds(pid: int) -> float | None:
                 ["powershell.exe", "-Command",
                  f"$p = Get-Process -Id {pid} -ErrorAction SilentlyContinue; "
                  f"if ($p) {{ (New-TimeSpan -Start $p.StartTime -End (Get-Date)).TotalSeconds }}"],
-                text=True, stderr=subprocess.DEVNULL, timeout=10)
+                text=True, stderr=subprocess.DEVNULL, timeout=10,
+                creationflags=_NOWINDOW)
             t = out.strip()
             return float(t) if t else None
         else:
@@ -144,7 +136,8 @@ def kill_pid(pid: int) -> None:
     try:
         if sys.platform.startswith("win"):
             subprocess.run(["taskkill", "/F", "/PID", str(pid)], timeout=10,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           creationflags=_NOWINDOW)
         else:
             subprocess.run(["kill", "-9", str(pid)], timeout=10,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -154,32 +147,52 @@ def kill_pid(pid: int) -> None:
 
 PROTECTED_TASKS = [
     "LES-lead-scrape-crypto_influencer",
-    "LES-lead-scrape-liegenschaftsverwalter_be",
     "LES-lead-scrape-real_estate_us",
     "LES-source-atal",
 ]
 
 
+def per_brand_runner_tasks() -> list[str]:
+    """The LES-sequence-runner-<brand> tasks — the SINGLE SOURCE OF TRUTH for the
+    per-brand sender fleet. Empty before the per-brand cutover (then the single
+    global LES-sequence-runner is in charge). Windows-only."""
+    if not sys.platform.startswith("win"):
+        return []
+    try:
+        out = subprocess.check_output(
+            ["powershell.exe", "-NoProfile", "-Command",
+             "(Get-ScheduledTask -TaskName 'LES-sequence-runner-*' "
+             "-ErrorAction SilentlyContinue).TaskName"],
+            text=True, stderr=subprocess.DEVNULL, timeout=15,
+            creationflags=_NOWINDOW)
+        return [ln.strip() for ln in out.splitlines() if ln.strip()]
+    except Exception:
+        return []
+
+
 def ensure_tasks_enabled() -> list[str]:
     """Re-enable protected scheduled tasks if anything disabled them.
     These lead-scrape tasks refill the prospect pool; a disabled scraper
-    silently starves the senders, so the watchdog keeps them on. The tasks
-    run as the interactive user (LeastPrivilege), so no elevation needed.
-    Windows-only; no-op elsewhere."""
+    silently starves the senders, so the watchdog keeps them on. Also keeps
+    every per-brand sender task (LES-sequence-runner-<brand>) enabled so a
+    stopped brand can't go silently dark. The tasks run as the interactive
+    user (LeastPrivilege), so no elevation needed. Windows-only; no-op elsewhere."""
     done: list[str] = []
     if not sys.platform.startswith("win"):
         return done
-    for t in PROTECTED_TASKS:
+    for t in PROTECTED_TASKS + per_brand_runner_tasks():
         try:
             state = subprocess.check_output(
                 ["powershell.exe", "-NoProfile", "-Command",
                  f"(Get-ScheduledTask -TaskName '{t}' -ErrorAction SilentlyContinue).State"],
-                text=True, stderr=subprocess.DEVNULL, timeout=15).strip()
+                text=True, stderr=subprocess.DEVNULL, timeout=15,
+                creationflags=_NOWINDOW).strip()
             if state.lower() == "disabled":
                 subprocess.run(
                     ["powershell.exe", "-NoProfile", "-Command",
                      f"Enable-ScheduledTask -TaskName '{t}'"],
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15,
+                    creationflags=_NOWINDOW)
                 done.append(f"re-enabled disabled task {t}")
                 log(f"  re-enabled protected task {t}")
         except Exception as e:
@@ -188,7 +201,33 @@ def ensure_tasks_enabled() -> list[str]:
 
 
 def revive_sequence_runner() -> bool:
-    """Spawn a detached sequence-runner tick. Returns True if spawned."""
+    """Revive the sender. Returns True if something was spawned/started.
+
+    POST-CUTOVER (per-brand fleet exists): re-enable and Start each
+    LES-sequence-runner-<brand> task. We must NOT spawn a bare global
+    `sequence-runner.py tick` here — the global task is retired after the
+    cutover, and a global tick running alongside the per-brand tasks would
+    DOUBLE-PROCESS the same due runs and double-send. Start-ScheduledTask
+    respects each task's MultipleInstances=IgnoreNew, so a brand already
+    running is not double-started.
+
+    PRE-CUTOVER (no per-brand tasks): fall back to a single detached global
+    tick, exactly as before — keeps this watchdog correct either way."""
+    tasks = per_brand_runner_tasks()
+    if tasks:
+        revived = False
+        for t in tasks:
+            try:
+                subprocess.run(
+                    ["powershell.exe", "-NoProfile", "-Command",
+                     f"Enable-ScheduledTask -TaskName '{t}'; Start-ScheduledTask -TaskName '{t}'"],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=20,
+                    creationflags=_NOWINDOW)
+                revived = True
+            except Exception as e:
+                log(f"  ! revive {t} failed: {e}")
+        return revived
+    # Pre-cutover fallback: single global runner.
     try:
         kwargs = {}
         if sys.platform.startswith("win"):
@@ -262,7 +301,7 @@ def main() -> int:
                 supa("runs?status=in.(queued,running,paused_replied,paused_bounced)&select=prospect_id&limit=5000")
                 if r.get("prospect_id")}
     total_real_pool = 0
-    for slug, requires_city in (("aureon", False), ("algoalpha", False), ("f2-malergipser", True), ("atalsolidrocks", True)):
+    for slug, requires_city in (("aureon", False), ("algoalpha", False), ("atalsolidrocks", True)):
         prosp = supa(f"prospects?profile_slug=eq.{slug}&verified=eq.true&unsubscribed=eq.false"
                      "&select=id,first_name,company,city&limit=10000")
         real = [p for p in prosp

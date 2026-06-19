@@ -709,7 +709,7 @@ def cmd_return(email: str, dry: bool) -> int:
 
 # ─── main pass ───────────────────────────────────────────────────────────────
 
-GERMAN_PROFILES = {"energ", "f2-malergipser", "f2-bau", "atalsolidrocks"}
+GERMAN_PROFILES = {"energ", "atalsolidrocks"}
 
 
 def mark_seen(reply: dict, **extra) -> None:

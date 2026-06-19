@@ -62,8 +62,12 @@ DEFAULT_CONFIG = {
     "bounce_window_hours":      72,     # 3-day rolling window for the rate
     "bounce_rate_limit":        0.05,   # 5% rolling bounce -> pause subdomain
     "complaint_rate_limit":     0.001,  # 0.1% rolling complaint -> pause
-    "min_sample_size_for_rate": 20,     # need >=20 sends in window before judging
-                                        # (1 bounce on <=20 sends => never pauses)
+    "min_sample_size_for_rate": 30,     # need >=30 sends in window before judging a rate
+    "min_bounces_to_block":     4,      # AND >=4 absolute bounces before the rate can pause.
+                                        # Without this, 2 bounces in the first 20 warmup sends
+                                        # (=10%) lock a subdomain, and a locked subdomain can
+                                        # never send enough to dilute them -> permanent deadlock.
+                                        # 1-3 bounces is warmup noise; 4+ at >5% is a real list problem.
     # Legacy keys (still honored as fallback if an old override file sets them)
     "bounce_rate_24h_limit":    0.05,
     "complaint_rate_24h_limit": 0.001,
@@ -95,14 +99,43 @@ def _load_state() -> dict:
         return {}
 
 
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write via a per-process temp file + os.replace (atomic on the same volume),
+    so concurrent per-brand runners sharing this file can never read a half-written,
+    corrupt JSON. The PID-suffixed temp avoids cross-process temp collisions.
+    2026-06-16 (per-brand runner cutover)."""
+    tmp = path.with_suffix(path.suffix + f".tmp.{os.getpid()}")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def _save_state(s: dict) -> None:
-    SAFE_STATE.write_text(json.dumps(s, indent=2), encoding="utf-8")
+    _atomic_write_text(SAFE_STATE, json.dumps(s, indent=2))
+
+
+_LOG_MAX_BYTES = 20 * 1024 * 1024  # rotate at 20MB (was unbounded -> grew to 271MB)
+
+
+def _rotate_log_if_big() -> None:
+    """Size-cap the guard log so it can't grow without bound (it was 271MB).
+    Rotate to a single .1 backup. Best-effort + race-tolerant: under the
+    per-brand runner cutover several processes append concurrently, so the
+    os.replace may already have been done by a peer — that's fine."""
+    try:
+        if LOG_FILE.exists() and LOG_FILE.stat().st_size > _LOG_MAX_BYTES:
+            os.replace(LOG_FILE, LOG_FILE.with_suffix(".jsonl.1"))
+    except Exception:
+        pass
 
 
 def _log(event: dict) -> None:
     event["ts"] = dt.datetime.now(dt.timezone.utc).isoformat()
-    with LOG_FILE.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(event) + "\n")
+    _rotate_log_if_big()
+    try:
+        with LOG_FILE.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(event) + "\n")
+    except Exception:
+        pass  # diagnostic log must never break a send
 
 
 # ── Guard 1: live subdomain reputation ────────────────────────────────────
@@ -127,7 +160,7 @@ def check_subdomain_reputation(supa_client, subdomain: str, cfg: dict | None = N
     # calc — a test send to info+livetest@aureonglobal.de that bounces is OUR
     # SMTP not accepting a plus-alias, not a real-recipient deliverability
     # signal. Including those poisons rep and stalls real outreach.
-    OWN_DOMAINS = ("aureonglobal.de", "algoalpha.io", "f2-malergipser.ch", "atalsolidrocks.io")
+    OWN_DOMAINS = ("aureonglobal.de", "algoalpha.io", "atalsolidrocks.io")
     rows = [r for r in rows
             if not any((r.get("to_addr") or "").lower().endswith("@" + d)
                        or d in (r.get("to_addr") or "").lower()
@@ -142,7 +175,8 @@ def check_subdomain_reputation(supa_client, subdomain: str, cfg: dict | None = N
     # New keys win; fall back to the legacy *_24h_limit names for old overrides.
     br_lim = float(cfg.get("bounce_rate_limit", cfg.get("bounce_rate_24h_limit", 0.05)))
     cr_lim = float(cfg.get("complaint_rate_limit", cfg.get("complaint_rate_24h_limit", 0.001)))
-    if br > br_lim:
+    min_bounces = int(cfg.get("min_bounces_to_block", 4))
+    if br > br_lim and bounced >= min_bounces:
         return False, f"bounce_{window_h}h={br:.1%} > {br_lim:.0%} on {subdomain} ({bounced}/{n} over {window_h}h)"
     if cr > cr_lim:
         return False, f"complaint_{window_h}h={cr:.2%} > {cr_lim:.1%} on {subdomain} ({complained}/{n} over {window_h}h)"
@@ -151,20 +185,47 @@ def check_subdomain_reputation(supa_client, subdomain: str, cfg: dict | None = N
 
 # ── Guard 2: per-recipient + step dedup ────────────────────────────────────
 
+_PROFILE_ROOT_CACHE: dict[str, str] = {}
+
+
+def _profile_sending_root(profile_slug: str) -> str | None:
+    """The registered sending domain for a profile (e.g. lk-advertising.site),
+    derived from its from_domains. Cached. Used to scope recipient dedup to THIS
+    profile's own sends so independent brands can each reach a shared ICP."""
+    if profile_slug in _PROFILE_ROOT_CACHE:
+        return _PROFILE_ROOT_CACHE[profile_slug] or None
+    root = ""
+    try:
+        pp = REPO / "profiles" / f"{profile_slug}.json"
+        if pp.exists():
+            cfg = json.loads(pp.read_text(encoding="utf-8"))
+            fds = [d.get("domain", "") for d in (cfg.get("relay", {}).get("from_domains") or [])]
+            if fds:
+                root = ".".join(fds[0].split(".")[1:])  # strip the subdomain label
+    except Exception:
+        root = ""
+    _PROFILE_ROOT_CACHE[profile_slug] = root
+    return root or None
+
+
 def check_recipient_dedup(supa_client, profile_slug: str, to_addr: str, step_n: int) -> tuple[bool, str | None]:
-    """Has this profile already sent this exact step to this recipient?
-    True = ok-to-send, False = duplicate."""
-    rows = supa_client.get(
-        f"/send_log?to_addr=eq.{urllib.parse.quote(to_addr.lower())}"
-        f"&step_n=eq.{step_n}"
-        f"&persona_slug=not.is.null"
-        f"&select=id,sent_at,from_addr&limit=5"
-    ).json()
-    # Filter to sends from THIS profile's subdomain pool. Cheaper to do
-    # client-side: profile_slug → its from-domains aren't fetched here, so
-    # accept any prior send to this address at this step as the dedup signal.
+    """Has THIS profile already sent this exact step to this recipient?
+    True = ok-to-send, False = duplicate.
+
+    Scoped to the profile's OWN sending domains so independent brands can each
+    contact a shared ICP — a recipient emailed by brand A is NOT blocked for
+    brand B. (Previously this matched ANY prior send to the address, which
+    starved brands sharing an ICP, e.g. two real-estate campaigns.)"""
+    root = _profile_sending_root(profile_slug)
+    q = (f"/send_log?to_addr=eq.{urllib.parse.quote(to_addr.lower())}"
+         f"&step_n=eq.{step_n}"
+         f"&persona_slug=not.is.null"
+         f"&select=id,sent_at,from_addr&limit=5")
+    if root:
+        q += f"&from_addr=ilike.*{root}"   # only THIS profile's subdomains
+    rows = supa_client.get(q).json()
     if rows:
-        return False, f"dup: {to_addr} already received step {step_n} (send_log {rows[0]['id'][:8]} at {rows[0]['sent_at'][:19]})"
+        return False, f"dup: {to_addr} already received step {step_n} from {profile_slug} (send_log {rows[0]['id'][:8]} at {rows[0]['sent_at'][:19]})"
     return True, None
 
 
@@ -309,6 +370,22 @@ def check_quiet_hours(cfg: dict | None = None) -> tuple[bool, str | None]:
     return check_send_window(cfg=cfg)
 
 
+# ── Guard 0: no-solicitation (recipient's site forbids marketing/outreach) ──
+
+def check_no_solicitation(prospect: dict | None = None) -> tuple[bool, str | None]:
+    """Block the send if this prospect's website declared it does not accept
+    unsolicited marketing / outreach email (EN notices or the German Impressum
+    anti-Werbung clause). The flag is set at scrape time (compliance.forbids_outreach)
+    into prospects.custom_fields.no_solicitation; this is the send-time backstop so
+    a flagged prospect can never be emailed even if it was enrolled before the gate."""
+    cf = ((prospect or {}).get("custom_fields") or {})
+    if cf.get("no_solicitation"):
+        who = (prospect or {}).get("email", "?")
+        label = cf.get("no_solicitation_label", "flagged")
+        return False, f"no_solicitation: {who} site forbids marketing email ({label})"
+    return True, None
+
+
 # ── Unified check ──────────────────────────────────────────────────────────
 
 def check_all(*, supa_client, profile_slug: str, profile_config: dict,
@@ -323,6 +400,7 @@ def check_all(*, supa_client, profile_slug: str, profile_config: dict,
     guard falls back to server-local time."""
     cfg = _load_config()
     for guard, args in [
+        (check_no_solicitation,       {"prospect": prospect}),
         (check_send_window,           {"profile_config": profile_config, "prospect": prospect, "cfg": cfg}),
         (check_subdomain_reputation,  {"supa_client": supa_client, "subdomain": subdomain, "cfg": cfg}),
         (check_global_daily_cap,      {"supa_client": supa_client, "profile_slug": profile_slug, "profile_config": profile_config, "cfg": cfg}),
@@ -363,48 +441,22 @@ def _should_alert(guard_key: str, cooldown_min: int) -> bool:
         except Exception:
             pass
     state[guard_key] = now.isoformat()
-    ALERT_STATE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+    _atomic_write_text(ALERT_STATE, json.dumps(state, indent=2))
     return True
 
 
 def send_alert(*, subject: str, body_text: str, body_html: str | None = None) -> None:
-    """Email info@aureonglobal.de when a guard trips. Uses the full-access
-    Resend key from hostinger.env (same path daily-report.py uses)."""
-    host_env = REPO / "sequences" / "hostinger.env"
-    if not host_env.exists():
-        print("  ! no hostinger.env, cannot send safeguard alert")
-        return
-    host = {}
-    for line in host_env.read_text(encoding="utf-8").splitlines():
-        if "=" in line and not line.strip().startswith("#"):
-            k, v = line.split("=", 1)
-            host[k.strip()] = v.strip()
-    # Use any profile's send key (they're all on the same Resend account)
-    priv = REPO / "profiles" / "aureon.private.json"
-    api_key = json.loads(priv.read_text(encoding="utf-8"))["relay"]["resend_api_key"]
-    payload = {
-        "from":    "Outreach Stack Safeguards <safeguards@hi.aureonglobal.de>",
-        "to":      ["info@aureonglobal.de"],
-        "subject": f"[SAFEGUARD] {subject}",
-        "text":    body_text,
-        "html":    body_html or f"<pre style='font-family:monospace;'>{body_text}</pre>",
-        "tags":    [{"name": "kind", "value": "safeguard_alert"}],
-    }
-    UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-          "Chrome/123.0.0.0 Safari/537.36")
-    req = urllib.request.Request(
-        "https://api.resend.com/emails",
-        data=json.dumps(payload).encode(),
-        method="POST",
-        headers={"Authorization": f"Bearer {api_key}",
-                  "Content-Type": "application/json",
-                  "User-Agent": UA},
-    )
+    """CONSOLIDATED 2026-06-16: no longer emails per event. Safeguard trips were
+    flooding info@; they now go into the ops_digest buffer and surface as ONE
+    "System events" section in the daily report. The guard still BLOCKS the send
+    in real time — only the notification is consolidated. (Signature unchanged so
+    alert_on_block / domain-check callers keep working.)"""
     try:
-        r = urllib.request.urlopen(req, timeout=30)
-        print(f"  + safeguard alert sent (Resend id={json.loads(r.read()).get('id','?')[:12]}..)")
-    except urllib.error.HTTPError as e:
-        print(f"  ! safeguard alert send failed {e.code}: {e.read().decode()[:200]}")
+        import ops_digest
+        ops_digest.record(source="safeguard", subject=subject, detail=body_text,
+                          severity="warn")
+    except Exception as e:
+        print(f"  ! ops_digest.record failed (safeguard): {e}")
 
 
 def alert_on_block(*, guard_name: str, profile_slug: str, subdomain: str,

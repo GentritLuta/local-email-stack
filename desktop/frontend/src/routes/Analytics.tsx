@@ -57,7 +57,7 @@ function buildNicheLookup(prospects: DbProspect[]): Map<string, string | null> {
 // subdomain (where prospect replies land — never info@aureonglobal.de
 // which is the operator's main business inbox).
 const PRODUCTION_PERSONAS = new Set(["anna", "tomas", "lukas"]);
-const ACTIVE_PROFILE_SLUGS = new Set(["aureon", "algoalpha", "f2-malergipser"]);
+const ACTIVE_PROFILE_SLUGS = new Set(["aureon", "algoalpha"]);
 
 function buildActiveSubdomains(profiles: DbProfile[]): Set<string> {
   const out = new Set<string>();
