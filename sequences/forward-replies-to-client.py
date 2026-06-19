@@ -304,7 +304,71 @@ def forward(reply: dict, client_email: str, dry: bool, answer: str | None = None
         return False
 
 
+def reconcile_forward_bounces(dry: bool) -> dict:
+    """Self-heal silent forward losses. forward() marks client_forwarded=True on
+    SMTP hand-off to Hostinger, so a lead sent to a dead/typo report_to bounces
+    asynchronously and stays 'forwarded' forever (this silently lost 18 algoalpha
+    leads to a dead support@algoalpha.io and 2 diraya leads to a dead
+    info@diraya.ca in 2026-06, with the client inbox receiving none of them).
+
+    Each pass: find the client addresses that appear in recent bounce notices,
+    then for every reply we forwarded to such an address, re-route it to the
+    profile's CURRENT report_to if that has been fixed (and is itself healthy),
+    otherwise flag it 'bounced_address_dead' so it is visible and never silently
+    retried in a loop.
+    """
+    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=35)).isoformat()
+    bounces = supa_get(f"replies?class=eq.bounce&received_at=gte.{urllib.parse.quote(since)}"
+                       f"&select=body_snippet,subject&limit=500")
+    btext = " ".join(((b.get("body_snippet") or "") + " " + (b.get("subject") or "")) for b in bounces).lower()
+    fwd = supa_get(f"replies?class=eq.reply&received_at=gte.{urllib.parse.quote(since)}"
+                   f"&select=id,profile_slug,raw_headers&order=received_at.desc&limit=500")
+
+    def _rh_to(r):
+        rh = r.get("raw_headers") or {}
+        if isinstance(rh, str):
+            try: rh = json.loads(rh)
+            except Exception: rh = {}
+        return rh, (rh.get("client_forwarded_to") or "").lower()
+
+    bounced = set()
+    for r in fwd:
+        _rh, to = _rh_to(r)
+        if to and to in btext:
+            bounced.add(to)
+    stats = {"recovered": 0, "still_dead": 0, "bounced_addrs": sorted(bounced)}
+    if not bounced:
+        print(f"reconcile_forward_bounces: {json.dumps(stats)}")
+        return stats
+    cache: dict[str, str] = {}
+    for r in fwd:
+        rh, to = _rh_to(r)
+        if to not in bounced:
+            continue
+        slug = r.get("profile_slug") or ""
+        if slug not in cache:
+            cache[slug] = (client_email_for_profile(slug) or "").lower()
+        cur = cache[slug]
+        if cur and cur != to and cur not in bounced:
+            # report_to was fixed and is healthy -> clear the forward flags so
+            # once() re-forwards this lead to the corrected address.
+            clean = {k: v for k, v in rh.items() if not k.startswith("client_forwarded")}
+            clean["forward_bounce_recovered"] = dt.datetime.now(dt.timezone.utc).isoformat()
+            if not dry:
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": clean})
+            stats["recovered"] += 1
+        else:
+            # still pointing at a dead address -> flag once (no loop), surface it.
+            if rh.get("client_forwarded") != "bounced_address_dead" and not dry:
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": {**rh, "client_forwarded": "bounced_address_dead"}})
+            stats["still_dead"] += 1
+    print(f"reconcile_forward_bounces: {json.dumps(stats)}")
+    return stats
+
+
 def once(limit: int, dry: bool) -> dict:
+    # First self-heal any leads that bounced off a dead/typo client address.
+    reconcile_forward_bounces(dry)
     # genuine prospect replies from the last 30 days not yet forwarded
     since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).isoformat()
     rows = supa_get(

@@ -1,6 +1,6 @@
 {
   "slug": "diraya",
-  "name": "Diraya — Custom AI engineering (seed-Series-B), 5-domain x 2-subdomain cold outbound",
+  "name": "Diraya - Custom AI engineering (seed-Series-B), 5-domain x 2-subdomain cold outbound",
   "created_at": "2026-05-31",
   "rebuilt_at": "2026-06-02",
   "active": true,
@@ -28,7 +28,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -46,7 +46,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -64,7 +64,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -82,7 +82,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -100,7 +100,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -118,7 +118,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -136,7 +136,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -154,7 +154,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -172,7 +172,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -190,7 +190,7 @@
         "verified_at": "2026-06-03T00:00:00+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 7,
+          "current_day": 16,
           "started_at": "2026-06-04",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -208,7 +208,7 @@
         "verified_at": "2026-06-05T13:25:13+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 6,
+          "current_day": 15,
           "started_at": "2026-06-06",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -226,7 +226,7 @@
         "verified_at": "2026-06-05T13:25:13+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 6,
+          "current_day": 15,
           "started_at": "2026-06-06",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -239,7 +239,8 @@
         }
       }
     ],
-    "from_domains_overrides": []
+    "from_domains_overrides": [],
+    "report_to": "amoura.ma@diraya.ca"
   },
   "personas": [
     {
@@ -554,10 +555,10 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0,
-      "complaint_rate_7d": 0,
-      "delivered_7d": 0,
-      "last_check": null
+      "bounce_rate_7d": 0.0085,
+      "complaint_rate_7d": 0.0,
+      "delivered_7d": 117,
+      "last_check": "2026-06-19T09:11:09.497157+00:00"
     },
     "started_at": "2026-06-04",
     "current_day": 1,
@@ -614,14 +615,15 @@
       ],
       "contact_email": "info@diraya.ca",
       "copyright_year": 2026,
-      "logo_url": "https://diraya.ca/logo.png",
+      "logo_url": "https://diraya.ca/wp-content/uploads/2024/06/Diraya-Logo.png",
       "logo_width": 140,
       "privacy_policy_url": "https://diraya.ca/privacy",
       "terms_of_service_url": "https://diraya.ca/terms",
       "legal_disclaimer": "This message is intended for the named recipient only. If you are not the intended recipient, please delete this email and inform the sender.",
       "partner_notice": "You are receiving this because we believe our work may be relevant to your roadmap. One-click unsubscribe at the bottom."
     },
-    "template": "diraya-custom"
+    "template": "diraya-custom",
+    "logo_needs_backing": true
   },
   "_note_template": "Custom template at sequences/email_template_diraya.py (matches live diraya.ca: orange #FF6B00, Kanit, founder-led). CTA button -> brand.cta_url (Calendly)."
 }
