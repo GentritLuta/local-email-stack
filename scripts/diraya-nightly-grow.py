@@ -39,24 +39,27 @@ def run(cmd: list[str]) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--target", type=int, default=40,
-                    help="verified new founders to aim for this run")
-    ap.add_argument("--max-pages", type=int, default=1200)
+    ap.add_argument("--limit", "--target", type=int, default=250, dest="limit",
+                    help="YC target domains per nightly run; with --rotate the cursor advances "
+                         "this many each night so the full ~1382-domain set is covered over ~6 nights. "
+                         "--target is an accepted alias (the LES-diraya-nightly-grow task passes --target).")
+    ap.add_argument("--workers", type=int, default=16)
     a = ap.parse_args()
 
-    # 1. harvest + verify a bounded slice of fresh YC AI founders
-    rc = run([PY, "scripts/yc-guess-verify.py",
-              "--target-leads", str(a.target),
-              "--max-pages", str(a.max_pages),
-              "--out", str(OUT)])
-    if rc != 0 or not OUT.exists():
-        print(f"harvest step rc={rc}, out exists={OUT.exists()} — nothing to import")
-        return rc or 1
-
-    # 2. import the verified founders into diraya (dedup on write)
-    rc = run([PY, "scripts/import-prospects-csv.py", "diraya", str(OUT),
-              "--niche", "yc_ai"])
-    print(f"nightly grow done (import rc={rc})")
+    # PUBLISHED-EMAIL harvest (replaces the old yc-guess-verify path, which
+    # verified ~0/night because guess+verify needs port 25 and most startup
+    # domains are catch-all or time out — pool sat frozen at 99). diraya-site-scrape
+    # harvests the founder emails the YC startups PUBLISH on their own /team,
+    # /about, /leadership etc. pages, MX-verifies (no port 25), name-matches, and
+    # imports the named ones (dedup on write). Published == real == ~0% bounce.
+    # 2026-06-13: switched here after the harvester's page coverage was widened
+    # (5 -> 16 paths + de-obfuscation) so it finds founder emails the narrow scan missed.
+    rc = run([PY, "scripts/diraya-site-scrape.py",
+              "--limit", str(a.limit),
+              "--workers", str(a.workers),
+              "--rotate",          # walk the cursor through the whole target set over nights
+              "--import"])
+    print(f"nightly grow done (published-email harvest rc={rc})")
     return rc
 
 
