@@ -86,6 +86,33 @@ HOST = load_env(REPO / "sequences" / "hostinger.env")
 URL = SUPA["SUPABASE_URL"].rstrip("/")
 KEY = SUPA["SUPABASE_ANON_KEY"]
 H = {"apikey": KEY, "Authorization": f"Bearer {KEY}", "Content-Type": "application/json"}
+
+
+# Give-first magnet replies (e.g. a prospect replying AUDIT) are fulfilled by
+# fulfill-magnets.py, which sends the branded PDF. reply-autodraft must NOT also
+# auto-reply to them, or the prospect gets a duplicate. This maps each client to
+# its magnet keyword(s); is_magnet_reply() flags a reply whose TOP matches one.
+def _load_magnet_kw() -> dict:
+    try:
+        specs = json.loads((REPO / "lead-magnets" / "magnet-specs.json").read_text(encoding="utf-8"))
+        return {s["client_slug"]: list(s.get("magnet_keywords", [])) for s in specs}
+    except Exception:
+        return {}
+
+
+_MAGNET_KW = _load_magnet_kw()
+
+
+def is_magnet_reply(slug: str, body: str) -> str | None:
+    kws = _MAGNET_KW.get(slug or "")
+    if not kws:
+        return None
+    top = re.split(r"(?im)^(?:on .+wrote:|am .+schrieb|le .+a écrit|from:|sent:|-{5,}|_{5,}|>)",
+                   body or "")[0][:400].lower()
+    for kw in kws:
+        if re.search(r"\b" + re.escape(kw.lower()) + r"\b", top):
+            return kw
+    return None
 # The operator draft is sent FROM drafts@hi.aureonglobal.de. That domain is
 # verified on the NEW-account Resend key (RESEND_NEW_ACCOUNT_API_KEY), NOT the
 # full-access key — sending with the wrong key 403s ("domain not verified").
@@ -985,6 +1012,19 @@ def one_pass(limit: int, dry: bool) -> dict:
                 rh = dict(r.get("raw_headers") or {})
                 rh["autodraft_sent"] = True
                 rh["autodraft_skipped"] = "not_active_prospect"
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": rh})
+            continue
+
+        # GATE 2.1 — give-first magnet keyword. fulfill-magnets.py sends the branded
+        # PDF for these, so do not also auto-reply or the prospect gets a duplicate.
+        mkw = is_magnet_reply((prow or {}).get("profile_slug") or "", r.get("body_snippet"))
+        if mkw:
+            print(f"  · {prospect}: magnet keyword [{mkw}] — left to fulfill-magnets, no draft")
+            stats["skipped"] += 1
+            if not dry:
+                rh = dict(r.get("raw_headers") or {})
+                rh["autodraft_sent"] = True
+                rh["autodraft_skipped"] = f"magnet:{mkw}"
                 supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": rh})
             continue
 
