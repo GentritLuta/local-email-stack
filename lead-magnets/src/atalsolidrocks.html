@@ -1,0 +1,133 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+ @page{ size:A4; margin:0; }
+ :root{ --acc:#1e3a8a; --acc2:#3b5bb5; --ink:#15171c; --muted:#6b7280; --line:#e6e7ea; --soft:#eef2fb; --green:#15803d; }
+ *{box-sizing:border-box;margin:0;padding:0;}
+ body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); font-size:10pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+ .page{ width:210mm; min-height:297mm; padding:16mm 16mm 14mm; position:relative; page-break-after:always; }
+ .page:last-child{ page-break-after:auto; }
+ .kicker{ font-size:8pt; letter-spacing:.2em; text-transform:uppercase; font-weight:800; color:var(--acc); }
+ h1{ font-size:28pt; line-height:1.08; font-weight:900; letter-spacing:-.02em; margin:8px 0; }
+ h2{ font-size:16pt; font-weight:800; letter-spacing:-.01em; margin:0 0 3px; }
+ h3{ font-size:11pt; font-weight:800; margin:0 0 3px; }
+ p{ margin:0 0 8px; } .muted{ color:var(--muted); } .b{ font-weight:700; }
+ .wm{ display:flex; align-items:center; gap:9px; }
+ .mark{ width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg,var(--acc2),var(--acc)); display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10pt; }
+ .wmtx{ font-weight:900; font-size:11.5pt; }
+ .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:16px; }
+ .tag{ font-size:8pt; font-weight:700; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:4px 11px; }
+ .cover{ background:linear-gradient(165deg,#fff 52%,var(--soft)); }
+ .lede{ font-size:12pt; line-height:1.5; color:#33373f; max-width:152mm; }
+ .pill-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; } .pill{ font-size:8.5pt; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 13px; } .pill b{ color:var(--acc); }
+ .callout{ background:var(--ink); color:#fff; border-radius:12px; padding:15px 17px; display:flex; gap:15px; align-items:center; }
+ .callout .big{ font-size:30pt; font-weight:900; line-height:1; color:#9ec1ff; }
+ /* assessment scorecard */
+ .q{ display:flex; gap:11px; align-items:center; padding:7px 0; border-bottom:1px solid #f1f1f3; }
+ .q:last-child{ border-bottom:0; } .q .t{ flex:1; font-size:9.3pt; }
+ .scale{ display:flex; gap:4px; flex:0 0 auto; } .sc{ width:15px; height:15px; border:1.5px solid var(--acc); border-radius:3px; }
+ .scl{ display:flex; gap:4px; font-size:6.8pt; color:var(--muted); justify-content:flex-end; }
+ .scl span{ width:15px; text-align:center; }
+ .panel{ background:var(--soft); border:1px solid #dbe4f7; border-radius:11px; padding:11px 14px; margin-top:10px; font-size:9.3pt; }
+ /* factor cards */
+ .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+ .fc{ border:1px solid var(--line); border-radius:10px; padding:10px 12px; } .fc h3{ font-size:9.7pt; color:var(--acc); }
+ .fc .muted{ font-size:8.6pt; }
+ /* measures by effort */
+ .eff{ border-left:4px solid var(--acc); border-radius:8px; background:#f7f9fe; padding:9px 13px; margin-bottom:8px; }
+ .efftag{ font-size:7.5pt; font-weight:800; color:#fff; background:var(--acc); border-radius:20px; padding:2px 9px; }
+ .eff.low .efftag{ background:var(--green); } .eff.low{ border-color:var(--green); }
+ .eff li{ margin:2px 0 0 16px; font-size:9pt; }
+ /* ROI ladder */
+ .roi{ border:1px solid var(--line); border-radius:11px; overflow:hidden; }
+ .roi .r{ display:flex; justify-content:space-between; padding:8px 14px; border-bottom:1px solid #f1f1f3; font-size:9.3pt; }
+ .roi .r:last-child{ border-bottom:0; background:var(--soft); font-weight:800; }
+ .roi .r .v{ font-weight:800; color:var(--acc); }
+ .next{ background:var(--ink); color:#fff; border-radius:13px; padding:16px 18px; margin-top:10px; } .next .muted{ color:#9aa6bd; } .next h3{ color:#fff; }
+ .foot{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); border-top:1px solid var(--line); padding-top:7px; }
+</style></head><body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="top"><div class="wm"><div class="mark">AS</div><div class="wmtx">Atal SolidRocks</div></div><div class="tag">Für HR-Teams</div></div>
+  <div class="kicker">Der kostenlose Schlaf-Check</div>
+  <h1>Der Schlaf-Check<br>für HR-Teams</h1>
+  <p class="lede">Eine anonyme Selbstbewertung für Ihr Team, die sieben betrieblichen Erholungsfaktoren, die Sie als Arbeitgeber steuern können, Maßnahmen nach Aufwand sortiert und die nüchterne Rechnung, was schlechter Schlaf pro Jahr kostet. Gehört Ihnen, ohne Anruf.</p>
+  <div class="pill-row"><div class="pill"><b>8</b> Fragen Selbstbewertung</div><div class="pill"><b>7</b> betriebliche Faktoren</div><div class="pill"><b>1</b> ROI-Rechnung für die GF</div></div>
+  <div class="callout" style="margin-top:20px"><div class="big">5&ndash;7%</div>
+    <div><div class="b" style="font-size:11pt">Krankenstand im deutschen Mittelstand, je nach Branche oft höher.</div>
+      <div style="font-size:9pt;opacity:.9">Ein großer, stiller Teil davon hängt an Schlaf und Erholung. Das ist genau der Hebel, den HR steuern kann, und genau die Zahl, mit der dieser Check arbeitet.</div></div></div>
+  <div class="foot"><span>Atal SolidRocks</span><span>Arbeitsmaterial, kein Werbeprospekt</span></div>
+</div>
+
+<!-- PAGE 2: Selbstbewertung -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">AS</div><div class="wmtx">Atal SolidRocks</div></div><div class="tag">Teil 1 &middot; Selbstbewertung</div></div>
+  <div class="kicker">Anonym, ab fünf Antworten je Gruppe auswerten</div>
+  <h2>Die acht Fragen für Ihr Team</h2>
+  <p class="muted">Verteilen Sie diese Aussagen anonym. Jede wird auf einer Skala von 1 (trifft nicht zu) bis 5 (trifft voll zu) bewertet. Werten Sie erst ab fünf Antworten je Gruppe aus, sonst ist die Anonymität nicht gewahrt.</p>
+  <div class="scl" style="margin:8px 0 2px"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+  <div>
+    <div class="q"><div class="t">Ich wache morgens meist erholt auf.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Ich kann nach Feierabend gut abschalten.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Erreichbarkeit am Abend und am Wochenende ist bei uns die Ausnahme.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Schichten und Dienstpläne lassen mir genug Zeit zur Erholung.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Ich fühle mich tagsüber selten so müde, dass meine Arbeit darunter leidet.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Mein Arbeitsplatz (Licht, Lärm, Pausen) unterstützt einen klaren Kopf.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Ich weiß, an wen ich mich wende, wenn Belastung oder Schlaf zum Problem werden.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+    <div class="q"><div class="t">Pausen werden bei uns wirklich genommen, nicht nur auf dem Papier.</div><div class="scale"><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div></div></div>
+  </div>
+  <div class="panel"><b>So lesen Sie das Ergebnis.</b> Bilden Sie je Frage den Mittelwert. Werte unter 3 sind Ihre Baustellen, dort setzt Teil 3 an. Wiederholen Sie den Check nach drei Monaten und Sie sehen schwarz auf weiß, ob Ihre Maßnahmen wirken.</div>
+  <div class="foot"><span>Atal SolidRocks</span><span>Teil 1 &middot; Selbstbewertung</span></div>
+</div>
+
+<!-- PAGE 3: Faktoren + Maßnahmen -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">AS</div><div class="wmtx">Atal SolidRocks</div></div><div class="tag">Teil 2 + 3 &middot; Hebel und Maßnahmen</div></div>
+  <div class="kicker">Was Sie als Arbeitgeber steuern</div>
+  <h2>Sieben betriebliche Erholungsfaktoren</h2>
+  <div class="grid2" style="margin-top:9px">
+    <div class="fc"><h3>1. Schicht- und Dienstplanung</h3><div class="muted">Genug Zeit zwischen Schichten, vorhersehbare Pläne, rückwärts rotierende Schichten vermeiden.</div></div>
+    <div class="fc"><h3>2. Erreichbarkeit nach Feierabend</h3><div class="muted">Klare Regel: keine Erwartung von Antworten am Abend und am Wochenende.</div></div>
+    <div class="fc"><h3>3. Pausenkultur</h3><div class="muted">Pausen sind eingeplant und werden vorgelebt, nicht nur erlaubt.</div></div>
+    <div class="fc"><h3>4. Licht und Arbeitsumgebung</h3><div class="muted">Tageslicht, gute Beleuchtung, Lärmschutz, ein Ort zum Durchatmen.</div></div>
+    <div class="fc"><h3>5. Führung und Belastung</h3><div class="muted">Realistische Ziele, Führungskräfte, die Erholung ernst nehmen.</div></div>
+    <div class="fc"><h3>6. Aufklärung</h3><div class="muted">Wissen zu Schlaf, Schicht und Erholung, niederschwellig und konkret.</div></div>
+  </div>
+  <div class="fc" style="margin-top:9px"><h3>7. Anlaufstelle</h3><div class="muted">Ein klarer, vertraulicher Weg, wenn Belastung oder Schlaf zum Problem werden.</div></div>
+
+  <h2 style="margin-top:16px">Maßnahmen, nach Aufwand sortiert</h2>
+  <div class="eff low" style="margin-top:8px"><span class="efftag">Geringer Aufwand</span>
+    <ul><li>Feierabend- und Wochenend-Erreichbarkeit klar regeln und vorleben.</li><li>Pausen fest in Kalender und Schichtplan eintragen.</li><li>Kurze Aufklärung zu Schlaf und Schicht im Team teilen.</li></ul></div>
+  <div class="eff"><span class="efftag">Mittlerer Aufwand</span>
+    <ul><li>Dienstpläne auf erholungsfreundliche Rotation umstellen.</li><li>Arbeitsplätze auf Licht und Lärm prüfen und nachbessern.</li><li>Führungskräfte für das Thema schulen.</li></ul></div>
+  <div class="eff"><span class="efftag">Höherer Aufwand</span>
+    <ul><li>Vertrauliche Anlaufstelle oder Programm für Belastung und Schlaf etablieren.</li><li>Schlaf- und Erholungsthema fest in die Gesundheitsstrategie aufnehmen.</li></ul></div>
+  <div class="foot"><span>Atal SolidRocks</span><span>Teil 2 + 3 &middot; Hebel und Maßnahmen</span></div>
+</div>
+
+<!-- PAGE 4: ROI + CTA -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">AS</div><div class="wmtx">Atal SolidRocks</div></div><div class="tag">Teil 4 &middot; Die Zahl für die GF</div></div>
+  <div class="kicker">Was schlechter Schlaf wirklich kostet</div>
+  <h2>Die Rechnung, die Sie der Geschäftsführung vorlegen</h2>
+  <p class="muted">Konservativ gerechnet, mit Annahmen, die Sie selbst nachvollziehen können. Beispiel für einen Betrieb mit 100 Mitarbeitenden.</p>
+  <div class="roi" style="margin-top:10px">
+    <div class="r"><span>Mitarbeitende</span><span class="v">100</span></div>
+    <div class="r"><span>Krankenstand (konservativ)</span><span class="v">5 %</span></div>
+    <div class="r"><span>Fehltage pro Jahr (gesamt)</span><span class="v">rund 1.150</span></div>
+    <div class="r"><span>Anteil, der an Schlaf und Erholung hängt (vorsichtig)</span><span class="v">15 %</span></div>
+    <div class="r"><span>Schlafbedingte Fehltage pro Jahr</span><span class="v">rund 170</span></div>
+    <div class="r"><span>Kosten je Fehltag (konservativer Richtwert)</span><span class="v">rund 400 EUR</span></div>
+    <div class="r"><span>Stilles Jahrespotenzial</span><span class="v">rund 68.000 EUR</span></div>
+  </div>
+  <p class="muted" style="font-size:8.5pt;margin-top:7px">Setzen Sie Ihre eigenen Zahlen ein. Schon ein Bruchteil davon, über Maßnahmen mit geringem Aufwand gehoben, rechnet sich. Präsentismus, also müde zwar anwesend, aber weniger produktiv, kommt oben drauf und ist meist größer als die Fehltage.</p>
+  <div class="next">
+    <div class="kicker" style="color:#9ec1ff">Der personalisierte Teil ist auf uns</div>
+    <h3>Ihre konkreten Zahlen?</h3>
+    <p class="muted" style="margin:4px 0 0">Gerechnet auf Ihre Mitarbeiterzahl und Ihre Branche, mit den passenden Richtwerten. Antworten Sie kurz mit Ihrer Mitarbeiterzahl und Branche, und Sie bekommen die Rechnung für Ihren Betrieb zurück. Das ist der einzige Teil, den ein PDF nicht leisten kann.</p>
+  </div>
+  <div class="foot"><span>Atal SolidRocks</span><span>Teil 4 &middot; ROI</span></div>
+</div>
+
+</body></html>

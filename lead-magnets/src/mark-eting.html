@@ -1,0 +1,189 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+ @page { size: A4; margin: 0; }
+ :root{ --acc:#f07307; --ink:#16181d; --muted:#6b7280; --line:#e7e7e9; --bg:#ffffff; --soft:#fff7f0; }
+ *{box-sizing:border-box; margin:0; padding:0;}
+ body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); font-size:10pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+ .page{ width:210mm; min-height:297mm; padding:16mm 16mm 14mm; position:relative; page-break-after:always; }
+ .page:last-child{ page-break-after:auto; }
+ .kicker{ font-size:8pt; letter-spacing:.22em; text-transform:uppercase; font-weight:800; color:var(--acc); }
+ h1{ font-size:30pt; line-height:1.06; font-weight:900; letter-spacing:-.02em; margin:8px 0; }
+ h2{ font-size:17pt; font-weight:800; letter-spacing:-.01em; margin:0 0 3px; }
+ h3{ font-size:11.5pt; font-weight:800; margin:0 0 4px; }
+ p{ margin:0 0 8px; } .muted{ color:var(--muted); } .b{ font-weight:700; }
+ .wm{ display:flex; align-items:center; gap:9px; }
+ .dot{ width:11px; height:11px; border-radius:3px; background:var(--acc); }
+ .wmtx{ font-weight:900; letter-spacing:-.01em; font-size:12pt; } .wmtx span{ color:var(--acc); }
+ .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:16px; }
+ .tag{ font-size:8pt; font-weight:700; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:4px 11px; }
+ /* cover */
+ .cover{ background:linear-gradient(160deg,#fff 55%,var(--soft)); }
+ .hero-num{ font-size:64pt; font-weight:900; color:var(--acc); line-height:1; letter-spacing:-.04em; }
+ .lede{ font-size:12.5pt; line-height:1.5; color:#33373f; max-width:150mm; }
+ .pill-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+ .pill{ font-size:8.5pt; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 13px; }
+ .pill b{ color:var(--acc); }
+ /* serp mock */
+ .serp{ border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.06); }
+ .serp .bar{ background:#f3f4f6; padding:9px 14px; display:flex; align-items:center; gap:8px; }
+ .serp .q{ background:#fff; border:1px solid #e3e3e6; border-radius:18px; padding:6px 13px; font-size:9pt; color:#444; flex:1; }
+ .surface{ display:flex; gap:12px; padding:11px 14px; border-bottom:1px dashed var(--line); align-items:flex-start; }
+ .surface:last-child{ border-bottom:0; }
+ .snum{ flex:0 0 26px; height:26px; border-radius:8px; background:var(--acc); color:#fff; font-weight:900; font-size:11pt; display:flex; align-items:center; justify-content:center; }
+ .mapbox{ background:#eef2ff; border:1px solid #dbe2ff; border-radius:8px; padding:8px 10px; flex:1; }
+ .row3{ display:flex; gap:7px; margin-top:6px; }
+ .mpitem{ flex:1; background:#fff; border:1px solid #e3e3e6; border-radius:7px; padding:7px; font-size:7.5pt; }
+ .stars{ color:#f4b400; font-size:8pt; letter-spacing:1px; }
+ .callout{ background:var(--acc); color:#fff; border-radius:12px; padding:14px 16px; display:flex; gap:14px; align-items:center; }
+ .callout .big{ font-size:30pt; font-weight:900; line-height:1; }
+ /* checklist */
+ .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+ .ck{ display:flex; gap:9px; align-items:flex-start; border:1px solid var(--line); border-radius:9px; padding:9px 11px; }
+ .box{ flex:0 0 16px; height:16px; border:2px solid var(--acc); border-radius:4px; margin-top:1px; }
+ .ck .t{ font-size:9pt; } .ck .t b{ font-size:9.2pt; }
+ .bench{ background:var(--soft); border:1px solid #ffe2cc; border-radius:11px; padding:12px 15px; margin-top:12px; }
+ /* reviews compare */
+ .vs{ display:grid; grid-template-columns:1fr 40px 1fr; gap:0; align-items:center; }
+ .card{ border:1px solid var(--line); border-radius:13px; padding:15px; }
+ .card.win{ border-color:var(--acc); background:var(--soft); }
+ .card .rate{ font-size:26pt; font-weight:900; line-height:1; }
+ .vsbadge{ text-align:center; font-weight:900; color:var(--muted); }
+ .barwrap{ margin-top:5px; } .barbg{ background:#eee; border-radius:6px; height:13px; overflow:hidden; }
+ .bar{ height:13px; background:var(--acc); border-radius:6px; }
+ /* fixes */
+ .fix{ display:flex; gap:13px; border:1px solid var(--line); border-left:5px solid var(--acc); border-radius:11px; padding:13px 15px; margin-bottom:10px; }
+ .fix .n{ flex:0 0 34px; height:34px; border-radius:50%; background:var(--ink); color:#fff; font-weight:900; font-size:15pt; display:flex; align-items:center; justify-content:center; }
+ .meta{ display:flex; gap:7px; margin-top:6px; }
+ .chip{ font-size:7.5pt; font-weight:800; padding:3px 9px; border-radius:20px; }
+ .chip.eff{ background:#e9f7ef; color:#137a43; } .chip.imp{ background:#fdeee2; color:#b4540a; }
+ .next{ background:var(--ink); color:#fff; border-radius:13px; padding:16px 18px; margin-top:6px; }
+ .next h3{ color:#fff; } .next .muted{ color:#9aa0ab; }
+ .foot{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); border-top:1px solid var(--line); padding-top:7px; }
+</style></head><body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="top">
+    <div class="wm"><div class="dot"></div><div class="wmtx">mark<span>-eting</span></div></div>
+    <div class="tag">For US service businesses</div>
+  </div>
+  <div class="kicker">The give-first teardown</div>
+  <h1>The Local Visibility<br>Teardown</h1>
+  <p class="lede">Where your business is invisible on Google, the benchmark to hit on each surface, and the three fixes that move the needle first. Real, and yours to act on today. No call, no pitch.</p>
+  <div class="pill-row">
+    <div class="pill"><b>5</b> surfaces that decide the call</div>
+    <div class="pill"><b>1</b> hour of highest-leverage work</div>
+    <div class="pill"><b>3</b> fixes, in order</div>
+  </div>
+
+  <div style="margin-top:20px" class="serp">
+    <div class="bar"><span style="font-weight:900;color:var(--acc)">G</span><div class="q">emergency plumber near me</div></div>
+    <div class="surface"><div class="snum">1</div><div class="mapbox"><div class="b" style="font-size:9pt">The Map Pack &middot; top 3 with the Call buttons</div>
+      <div class="row3">
+        <div class="mpitem"><b>Acme Plumbing</b><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>184 reviews</div>
+        <div class="mpitem"><b>City Drain Co</b><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>92 reviews</div>
+        <div class="mpitem" style="opacity:.55">You? &middot; not shown</div>
+      </div></div></div>
+    <div class="surface"><div class="snum">2</div><div style="flex:1"><div class="b">Google Business Profile</div><div class="muted" style="font-size:8.5pt">the engine behind the map pack</div></div></div>
+    <div class="surface"><div class="snum">3</div><div style="flex:1"><div class="b">Reviews</div><div class="muted" style="font-size:8.5pt">rating + count + recency</div></div></div>
+    <div class="surface"><div class="snum">4</div><div style="flex:1"><div class="b">Local organic</div><div class="muted" style="font-size:8.5pt">service &amp; city pages below the map</div></div></div>
+    <div class="surface"><div class="snum">5</div><div style="flex:1"><div class="b">Your website</div><div class="muted" style="font-size:8.5pt">speed, mobile, one-tap call</div></div></div>
+  </div>
+  <div class="foot"><span>Mark-eting &middot; mark-eting.co</span><span>Prepared for service businesses that want the phone to ring</span></div>
+</div>
+
+<!-- PAGE 2: the 5 surfaces + the stat -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="dot"></div><div class="wmtx">mark<span>-eting</span></div></div><div class="tag">01 &middot; Where buyers find you</div></div>
+  <div class="kicker">Start here</div>
+  <h2>A search is not one list. It is a stacked page, and you are on it or you are not.</h2>
+  <p class="muted">When someone searches "best CPA in [city]" or "roof repair [zip]", five surfaces decide whether you get the call. Most owners obsess over one (their website) and lose on the other four.</p>
+
+  <div class="callout" style="margin:14px 0">
+    <div class="big">44%</div>
+    <div><div class="b" style="font-size:11pt">of clicks go to the top 3 of the map pack.</div>
+      <div style="font-size:9pt;opacity:.92">Businesses inside the three-pack draw well over double the calls and direction requests of those ranked 4 to 10. Outside the top three, most searchers never scroll far enough to find you.</div></div>
+  </div>
+
+  <div class="grid2" style="margin-top:6px">
+    <div class="ck"><div class="snum" style="background:var(--acc)">1</div><div class="t"><b>The map pack.</b> The box of 3 with the map, stars and Call buttons. The most valuable real estate on the page.</div></div>
+    <div class="ck"><div class="snum" style="background:var(--acc)">2</div><div class="t"><b>Google Business Profile.</b> The free listing that powers your map-pack spot. The engine, not a side detail.</div></div>
+    <div class="ck"><div class="snum" style="background:var(--acc)">3</div><div class="t"><b>Reviews.</b> Rating, count and recency. They decide both your rank and whether anyone clicks.</div></div>
+    <div class="ck"><div class="snum" style="background:var(--acc)">4</div><div class="t"><b>Local organic.</b> Service and city pages below the map. A thin website quietly loses here.</div></div>
+    <div class="ck" style="grid-column:1/3"><div class="snum" style="background:var(--acc)">5</div><div class="t"><b>Your website.</b> You can win 1 to 4 and still lose the lead in the last ten seconds if the site is slow or hard to call from a phone.</div></div>
+  </div>
+  <div class="foot"><span>Mark-eting &middot; mark-eting.co</span><span>01 &middot; The five surfaces</span></div>
+</div>
+
+<!-- PAGE 3: GBP checklist -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="dot"></div><div class="wmtx">mark<span>-eting</span></div></div><div class="tag">02 &middot; The one-hour win</div></div>
+  <div class="kicker">Highest leverage</div>
+  <h2>The Google Business Profile checklist</h2>
+  <p class="muted">Almost always the fastest, cheapest win. Hold yourself to this standard. If you are missing three or more, that gap alone is likely keeping you out of the map pack, and it is fixable in an afternoon at zero cost.</p>
+  <div class="grid2" style="margin-top:12px">
+    <div class="ck"><div class="box"></div><div class="t"><b>Claimed &amp; verified</b><div class="muted">Verification takes days. Start it today.</div></div></div>
+    <div class="ck"><div class="box"></div><div class="t"><b>One precise primary category</b><div class="muted">+ every relevant secondary. A top ranking factor.</div></div></div>
+    <div class="ck"><div class="box"></div><div class="t"><b>Every service listed individually</b><div class="muted">Each as its own line, not one vague paragraph.</div></div></div>
+    <div class="ck"><div class="box"></div><div class="t"><b>20+ real photos</b><div class="muted">Team, trucks, before/after. Not stock. Add a few monthly.</div></div></div>
+    <div class="ck"><div class="box"></div><div class="t"><b>Accurate hours &amp; service area</b><div class="muted">Including holidays. Wrong hours send buyers away.</div></div></div>
+    <div class="ck"><div class="box"></div><div class="t"><b>A Google Post in the last 30 days</b><div class="muted">Plus a seeded Q&amp;A. Most competitors skip both.</div></div></div>
+  </div>
+  <div class="bench"><div class="b" style="color:var(--acc)">The benchmark</div>
+    A complete profile: verified, one precise primary category, every service listed, 20+ real photos, accurate hours and area, and at least one Post in the last 30 days. Six boxes. Hit all six before you spend a dollar on ads.</div>
+  <div class="foot"><span>Mark-eting &middot; mark-eting.co</span><span>02 &middot; Google Business Profile</span></div>
+</div>
+
+<!-- PAGE 4: reviews -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="dot"></div><div class="wmtx">mark<span>-eting</span></div></div><div class="tag">03 &middot; What wins the click</div></div>
+  <div class="kicker">Reviews</div>
+  <h2>You can rank and still lose the call</h2>
+  <p class="muted">Reviews do two jobs: they help you rank, and they decide who gets picked once you appear. Volume and recency beat a slightly higher rating with almost no reviews.</p>
+  <div class="vs" style="margin:14px 0">
+    <div class="card win"><div class="muted b" style="color:var(--acc)">WINS THE CLICK</div><div class="rate">4.7&#9733;</div><div class="b">180 reviews</div><div class="muted" style="font-size:8.5pt">Volume signals trust. Recent reviews signal you are still active.</div></div>
+    <div class="vsbadge">vs</div>
+    <div class="card"><div class="muted b">LOSES</div><div class="rate">4.9&#9733;</div><div class="b">11 reviews</div><div class="muted" style="font-size:8.5pt">A near-perfect rating no one trusts because there is no volume behind it.</div></div>
+  </div>
+  <h3>Your three benchmarks</h3>
+  <div style="margin-top:8px">
+    <div class="b" style="font-size:9.5pt">Rating &middot; hold 4.5&#9733; or above</div>
+    <div class="barwrap"><div class="barbg"><div class="bar" style="width:90%"></div></div></div>
+    <div class="muted" style="font-size:8pt;margin:3px 0 9px">Below ~4.0, a large share of buyers filter you out before clicking.</div>
+    <div class="b" style="font-size:9.5pt">Volume &middot; match or beat your top-3 map-pack rivals</div>
+    <div class="barwrap"><div class="barbg"><div class="bar" style="width:70%"></div></div></div>
+    <div class="muted" style="font-size:8pt;margin:3px 0 9px">Open the map pack, count their review numbers, target the highest. For many trades that is 50 to 300.</div>
+    <div class="b" style="font-size:9.5pt">Recency &middot; several fresh reviews every month</div>
+    <div class="barwrap"><div class="barbg"><div class="bar" style="width:55%"></div></div></div>
+    <div class="muted" style="font-size:8pt;margin:3px 0 0">A profile whose newest review is 14 months old reads as a business that slowed down.</div>
+  </div>
+  <div class="foot"><span>Mark-eting &middot; mark-eting.co</span><span>03 &middot; Reviews</span></div>
+</div>
+
+<!-- PAGE 5: the 3 fixes -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="dot"></div><div class="wmtx">mark<span>-eting</span></div></div><div class="tag">04 &middot; Do these first</div></div>
+  <div class="kicker">If you only do three things</div>
+  <h2>The three fixes that move the needle first</h2>
+  <p class="muted">In order. Each one compounds the next.</p>
+  <div style="margin-top:12px">
+    <div class="fix"><div class="n">1</div><div><h3>Complete the Google Business Profile to all six benchmarks</h3>
+      <div class="muted">The single fastest path into the map pack. Free, and doable this afternoon.</div>
+      <div class="meta"><span class="chip eff">Effort: 1 afternoon</span><span class="chip imp">Impact: highest</span></div></div></div>
+    <div class="fix"><div class="n">2</div><div><h3>Start a steady review engine</h3>
+      <div class="muted">A simple, repeatable ask after every job. Aim to pass your top-3 rivals' review count, then keep a fresh trickle.</div>
+      <div class="meta"><span class="chip eff">Effort: a 2-line system</span><span class="chip imp">Impact: high</span></div></div></div>
+    <div class="fix"><div class="n">3</div><div><h3>Give each core service its own page, fast to call from a phone</h3>
+      <div class="muted">Google cannot rank a page you never wrote. One-tap call button above the fold, loads in under 3 seconds on mobile.</div>
+      <div class="meta"><span class="chip eff">Effort: a few pages</span><span class="chip imp">Impact: compounds</span></div></div></div>
+  </div>
+  <div class="next">
+    <div class="kicker" style="color:var(--acc)">The personalized version is on me</div>
+    <h3>Want the teardown for your business?</h3>
+    <p class="muted" style="margin:4px 0 0">Send your business name, your city, and the 2 to 3 services you most want more calls for. I will write up exactly where you are leaking demand: the searches where you do not show up, who sits above you in the map pack, and the three things I would fix first for you. No call needed unless you want one.</p>
+  </div>
+  <div class="foot"><span>Mark-eting &middot; mark@mark-eting.co</span><span>04 &middot; Your next move</span></div>
+</div>
+
+</body></html>

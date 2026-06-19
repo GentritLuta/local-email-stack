@@ -1,0 +1,112 @@
+<!doctype html><html lang="de-CH"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+ @page{ size:A4; margin:0; }
+ :root{ --acc:#3f6b2c; --acc2:#6ba94c; --ink:#161a14; --muted:#667063; --line:#e6e8e4; --soft:#eef6e9; --amber:#b45309; }
+ *{box-sizing:border-box;margin:0;padding:0;}
+ body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); font-size:10pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+ .page{ width:210mm; min-height:297mm; padding:16mm 16mm 14mm; position:relative; page-break-after:always; }
+ .page:last-child{ page-break-after:auto; }
+ .kicker{ font-size:8pt; letter-spacing:.2em; text-transform:uppercase; font-weight:800; color:var(--acc); }
+ h1{ font-size:26pt; line-height:1.1; font-weight:900; letter-spacing:-.02em; margin:8px 0; }
+ h2{ font-size:15pt; font-weight:800; letter-spacing:-.01em; margin:0 0 3px; }
+ h3{ font-size:10.3pt; font-weight:800; margin:0 0 3px; }
+ p{ margin:0 0 8px; } .muted{ color:var(--muted); } .b{ font-weight:700; }
+ .wm{ display:flex; align-items:center; gap:9px; }
+ .mark{ width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--acc2),var(--acc));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10pt; }
+ .wmtx{ font-weight:900; font-size:11pt; }
+ .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:16px; }
+ .tag{ font-size:8pt; font-weight:700; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:4px 11px; }
+ .cover{ background:linear-gradient(165deg,#fff 52%,var(--soft)); }
+ .lede{ font-size:11.5pt; line-height:1.5; color:#33373f; max-width:152mm; }
+ .pill-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; } .pill{ font-size:8.5pt; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 13px; } .pill b{ color:var(--acc); }
+ .callout{ background:var(--ink); color:#fff; border-radius:12px; padding:14px 17px; display:flex; gap:15px; align-items:center; }
+ .callout .big{ font-size:24pt; font-weight:900; line-height:1.05; color:#9fd17f; }
+ .phase{ margin-top:13px; } .phlabel{ display:inline-block; font-size:8pt; font-weight:800; color:#fff; background:var(--acc); border-radius:20px; padding:3px 11px; margin-bottom:6px; }
+ .stp{ display:flex; gap:11px; padding:7px 0; border-bottom:1px solid #f0f2ef; } .stp:last-child{ border-bottom:0; }
+ .stp .n{ flex:0 0 26px;height:26px;border-radius:8px;background:var(--soft);color:var(--acc);font-weight:900;font-size:11pt;display:flex;align-items:center;justify-content:center;border:1px solid #cfe6c2; }
+ .stp .t{ font-size:9.3pt; } .stp .t b{ font-size:9.8pt; }
+ .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; }
+ .ck{ display:flex; gap:8px; align-items:flex-start; padding:3.5px 0; font-size:8.8pt; } .box{ flex:0 0 13px; height:13px; border:2px solid var(--acc); border-radius:3px; margin-top:1px; }
+ .ckcat{ font-size:8pt; font-weight:800; color:var(--acc); text-transform:uppercase; letter-spacing:.07em; margin:8px 0 1px; grid-column:1/3; }
+ .protocol{ background:#fff8ec; border:1px solid #f3dca8; border-radius:10px; padding:10px 13px; font-size:8.8pt; color:#7a4d10; margin-top:9px; }
+ .next{ background:var(--ink); color:#fff; border-radius:13px; padding:15px 18px; margin-top:10px; } .next .muted{ color:#b9c6b1; } .next h3{ color:#fff; }
+ .foot{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); border-top:1px solid var(--line); padding-top:7px; }
+</style></head><body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="top"><div class="wm"><div class="mark">F2</div><div class="wmtx">F2 Maler &amp; Gipser</div></div><div class="tag">Für Bauleitung und Verwaltung</div></div>
+  <div class="kicker">Die kostenlose Abnahme-Checkliste</div>
+  <h1>Abnahme-Checkliste<br>Maler- und Gipserpart</h1>
+  <p class="lede">Der mangelfreie Endausbau in neun Prüfschritten, vom Freigeben der Vorleistungen über die Zwischenkontrolle bis zur rechtssicheren Abnahme. Dieselbe Liste, die uns letztes Jahr über 40 Abnahmen in der Deutschschweiz mangelfrei und im Bauprogramm gehalten hat. Gehört Ihnen, ohne Anruf.</p>
+  <div class="pill-row"><div class="pill"><b>9</b> Prüfschritte</div><div class="pill"><b>3</b> Phasen, Vorleistung bis Abnahme</div><div class="pill"><b>1</b> Seite zum Mitnehmen</div></div>
+  <div class="callout" style="margin-top:20px"><div class="big">Streif-<br>licht</div>
+    <div><div class="b" style="font-size:11pt">Die meisten Mängel fallen erst an der Abnahme auf, weil falsch geprüft wird.</div>
+      <div style="font-size:9pt;opacity:.9">Die häufigsten Differenzen entstehen nicht beim Material, sondern beim Streiflicht, an den Anschlüssen und an undokumentierten Vorleistungen. Genau dort setzt diese Liste an, und zwar bevor gestrichen wird, nicht erst danach.</div></div></div>
+  <div class="foot"><span>F2 Maler &amp; Gipser</span><span>Nehmen Sie die Liste auf die nächste Begehung mit</span></div>
+</div>
+
+<!-- PAGE 2: 9 Prüfschritte -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">F2</div><div class="wmtx">F2 Maler &amp; Gipser</div></div><div class="tag">Die neun Prüfschritte</div></div>
+  <div class="kicker">In der Reihenfolge, in der sie zählen</div>
+  <h2>Vom Freigeben der Vorleistung bis zur Abnahme</h2>
+
+  <div class="phase"><span class="phlabel">Phase 1 &middot; Vorleistungen freigeben, bevor der Maler anfängt</span>
+    <div class="stp"><div class="n">1</div><div class="t"><b>Untergrund-Freigabe.</b> Restfeuchte prüfen. Verputz und Spachtelmasse müssen durchgetrocknet sein. Bei mineralischem Kalk-Zement-Putz gilt als Faustregel rund ein Tag pro Millimeter Schichtdicke. Zu früh gestrichen heisst später Risse und Abplatzer.</div></div>
+    <div class="stp"><div class="n">2</div><div class="t"><b>Vorleistungen anderer Gewerke abgenommen.</b> Elektro, Sanitär und Fenster eingebaut, dicht und freigegeben. Was danach noch geöffnet wird, beschädigt den fertigen Anstrich.</div></div>
+    <div class="stp"><div class="n">3</div><div class="t"><b>Schutz und Abdeckung kontrolliert.</b> Böden, Fenster, Rahmen und eingebaute Elemente geschützt, bevor die Arbeit beginnt.</div></div>
+  </div>
+
+  <div class="phase"><span class="phlabel">Phase 2 &middot; Die Zwischenkontrolle, die spätere Nachträge verhindert</span>
+    <div class="stp"><div class="n">4</div><div class="t"><b>Spachtel- und Schleifqualität im Streiflicht.</b> Mit der Lampe flach zur Wand prüfen, nicht frontal. Im Streiflicht zeigen sich Wellen und Grate, die frontal unsichtbar bleiben.</div></div>
+    <div class="stp"><div class="n">5</div><div class="t"><b>Anschlüsse und Kanten.</b> Decke zu Wand, Rahmen, Sockel sauber und gerade. Hier entstehen die meisten Reklamationen.</div></div>
+    <div class="stp"><div class="n">6</div><div class="t"><b>Erste Anstrichlage freigeben.</b> Deckend und gleichmässig, bevor die zweite Lage kommt. Eine schwache erste Lage rettet die zweite nicht.</div></div>
+  </div>
+
+  <div class="phase"><span class="phlabel">Phase 3 &middot; Die formelle Abnahme rechtssicher protokollieren</span>
+    <div class="stp"><div class="n">7</div><div class="t"><b>Begehung bei Tageslicht und mit Streiflicht.</b> Alle Räume, systematisch, nicht nur Stichproben.</div></div>
+    <div class="stp"><div class="n">8</div><div class="t"><b>Mängel im Protokoll festhalten.</b> Jeder Mangel mit Ort, Beschreibung und Frist zur Behebung. Was nicht im Protokoll steht, ist später schwer durchzusetzen.</div></div>
+    <div class="stp"><div class="n">9</div><div class="t"><b>Abnahmeprotokoll datieren und beidseitig unterschreiben.</b> Damit ist der Garantiebeginn fixiert. Halten Sie die Garantiegrundlage (Obligationenrecht oder SIA-Norm 118) fest.</div></div>
+  </div>
+  <div class="foot"><span>F2 Maler &amp; Gipser</span><span>Neun Prüfschritte in drei Phasen</span></div>
+</div>
+
+<!-- PAGE 3: printable checklist + CTA -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">F2</div><div class="wmtx">F2 Maler &amp; Gipser</div></div><div class="tag">Die Seite zum Mitnehmen</div></div>
+  <div class="kicker">Ausdrucken und auf die Begehung mitnehmen</div>
+  <h2>Die druckbare Abnahme-Checkliste</h2>
+  <div class="grid2" style="margin-top:8px">
+    <div class="ckcat">Vor dem Anstrich</div>
+    <div class="ck"><div class="box"></div><div>Untergrund trocken, Restfeuchte geprüft</div></div>
+    <div class="ck"><div class="box"></div><div>Elektro, Sanitär, Fenster abgenommen</div></div>
+    <div class="ck"><div class="box"></div><div>Böden und Elemente geschützt</div></div>
+    <div class="ck"><div class="box"></div><div>Raumtemperatur und Lüftung in Ordnung</div></div>
+    <div class="ckcat">Zwischenkontrolle</div>
+    <div class="ck"><div class="box"></div><div>Spachtel- und Schleifbild im Streiflicht geprüft</div></div>
+    <div class="ck"><div class="box"></div><div>Anschluss Decke zu Wand sauber</div></div>
+    <div class="ck"><div class="box"></div><div>Kanten, Rahmen und Sockel gerade</div></div>
+    <div class="ck"><div class="box"></div><div>Erste Anstrichlage deckend und gleichmässig</div></div>
+    <div class="ckcat">Endkontrolle (Streiflicht)</div>
+    <div class="ck"><div class="box"></div><div>Alle Wände frei von Wellen und Graten</div></div>
+    <div class="ck"><div class="box"></div><div>Deckung gleichmässig, keine Schatten</div></div>
+    <div class="ck"><div class="box"></div><div>Keine Farbnasen, Spritzer oder Übergänge</div></div>
+    <div class="ck"><div class="box"></div><div>Holzwerk und Heizkörper-Nischen kontrolliert</div></div>
+    <div class="ckcat">Protokoll und Abnahme</div>
+    <div class="ck"><div class="box"></div><div>Begehung bei Tageslicht, alle Räume</div></div>
+    <div class="ck"><div class="box"></div><div>Mängel mit Ort, Beschreibung, Frist notiert</div></div>
+    <div class="ck"><div class="box"></div><div>Protokoll datiert und beidseitig unterschrieben</div></div>
+    <div class="ck"><div class="box"></div><div>Garantiebeginn und Grundlage festgehalten</div></div>
+  </div>
+  <div class="protocol"><b>Tipp fürs Protokoll.</b> Fotografieren Sie jeden Mangel direkt neben einem Massband oder Klebezettel mit Nummer. Die Nummer kommt ins Protokoll. So ist später eindeutig, welcher Mangel gemeint ist, ohne Diskussion.</div>
+  <div class="next">
+    <div class="kicker" style="color:#9fd17f">Wenn es konkret wird</div>
+    <h3>Eine Stelle unklar auf Ihrer Baustelle?</h3>
+    <p class="muted" style="margin:4px 0 0">Wenn Sie eine konkrete Situation einordnen wollen, ein Streiflicht-Befund, ein strittiger Anschluss, eine Frage zur Frist, antworten Sie einfach auf diese Mail. Ich schaue es mir an, kostenlos und ohne Verkaufsgespräch.</p>
+  </div>
+  <div class="foot"><span>F2 Maler &amp; Gipser</span><span>Die druckbare Checkliste</span></div>
+</div>
+
+</body></html>

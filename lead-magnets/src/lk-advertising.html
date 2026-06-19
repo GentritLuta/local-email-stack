@@ -1,0 +1,142 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+ @page{ size:A4; margin:0; }
+ :root{ --acc:#b88a2f; --acc2:#c9a25a; --ink:#1a1c22; --muted:#6b7280; --line:#e7e7e9; --soft:#fbf6ec; --red:#c0392b; }
+ *{box-sizing:border-box;margin:0;padding:0;}
+ body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); font-size:10pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+ .page{ width:210mm; min-height:297mm; padding:16mm 16mm 14mm; position:relative; page-break-after:always; }
+ .page:last-child{ page-break-after:auto; }
+ .kicker{ font-size:8pt; letter-spacing:.22em; text-transform:uppercase; font-weight:800; color:var(--acc); }
+ h1{ font-size:30pt; line-height:1.06; font-weight:900; letter-spacing:-.02em; margin:8px 0; }
+ h2{ font-size:16.5pt; font-weight:800; letter-spacing:-.01em; margin:0 0 3px; }
+ h3{ font-size:11pt; font-weight:800; margin:0 0 4px; }
+ p{ margin:0 0 8px; } .muted{ color:var(--muted); } .b{ font-weight:700; }
+ .wm{ display:flex; align-items:center; gap:9px; }
+ .mark{ width:22px; height:22px; border-radius:6px; background:linear-gradient(135deg,var(--acc2),var(--acc)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:11pt; }
+ .wmtx{ font-weight:900; letter-spacing:-.01em; font-size:12pt; }
+ .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:16px; }
+ .tag{ font-size:8pt; font-weight:700; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:4px 11px; }
+ .cover{ background:linear-gradient(165deg,#fff 52%,var(--soft)); }
+ .lede{ font-size:12.5pt; line-height:1.5; color:#33373f; max-width:150mm; }
+ .pill-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+ .pill{ font-size:8.5pt; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 13px; } .pill b{ color:var(--acc); }
+ /* funnel */
+ .funnel{ display:flex; gap:0; align-items:stretch; margin:20px 0 4px; }
+ .stage{ flex:1; text-align:center; position:relative; padding:0 4px; }
+ .stbar{ height:14px; background:linear-gradient(90deg,var(--acc2),var(--acc)); border-radius:3px; }
+ .stage:nth-child(1) .stbar{ opacity:1 } .stage:nth-child(2) .stbar{ opacity:.82 } .stage:nth-child(3) .stbar{ opacity:.64 } .stage:nth-child(4) .stbar{ opacity:.46 }
+ .stnum{ font-size:8pt; font-weight:800; color:var(--acc); margin-top:7px; }
+ .stt{ font-size:9pt; font-weight:800; margin-top:1px; } .sts{ font-size:7.5pt; color:var(--muted); }
+ .leak{ font-size:7.5pt; color:var(--red); font-weight:700; margin-top:4px; }
+ .arrow{ flex:0 0 16px; display:flex; align-items:center; justify-content:center; color:#c9c9cc; font-size:13pt; }
+ .callout{ background:var(--ink); color:#fff; border-radius:12px; padding:15px 17px; display:flex; gap:15px; align-items:center; }
+ .callout .big{ font-size:32pt; font-weight:900; line-height:1; color:var(--acc2); }
+ /* link cards */
+ .lcard{ border:1px solid var(--line); border-radius:12px; padding:13px 15px; margin-bottom:9px; display:flex; gap:13px; }
+ .lcard .n{ flex:0 0 30px; height:30px; border-radius:8px; background:var(--soft); color:var(--acc); font-weight:900; font-size:13pt; display:flex; align-items:center; justify-content:center; border:1px solid #eadcc0; }
+ .badge{ display:inline-block; font-size:7.5pt; font-weight:800; background:var(--soft); color:var(--acc); border-radius:20px; padding:2px 9px; margin-top:5px; }
+ /* mistakes / checklist */
+ .mk{ display:flex; gap:9px; align-items:flex-start; padding:7px 0; border-bottom:1px solid #f1f1f3; }
+ .mk:last-child{ border-bottom:0; } .x{ flex:0 0 16px; height:16px; border-radius:4px; background:#fdecea; color:var(--red); font-weight:900; font-size:10pt; display:flex; align-items:center; justify-content:center; margin-top:1px; } .x:after{ content:"\00d7"; }
+ .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:7px 14px; }
+ .ck{ display:flex; gap:8px; align-items:flex-start; padding:5px 0; }
+ .box{ flex:0 0 14px; height:14px; border:2px solid var(--acc); border-radius:3px; margin-top:1px; }
+ .ckcat{ font-size:8pt; font-weight:800; color:var(--acc); text-transform:uppercase; letter-spacing:.08em; margin:9px 0 1px; grid-column:1/3; }
+ .next{ background:var(--ink); color:#fff; border-radius:13px; padding:16px 18px; margin-top:8px; } .next .muted{ color:#9aa0ab; } .next h3{ color:#fff; }
+ .foot{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); border-top:1px solid var(--line); padding-top:7px; }
+</style></head><body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="top"><div class="wm"><div class="mark">LK</div><div class="wmtx">LK Advertising</div></div><div class="tag">For real estate agents</div></div>
+  <div class="kicker">The give-first teardown</div>
+  <h1>The Seller-Lead<br>Teardown</h1>
+  <p class="lede">Where listing appointments leak out between a Facebook ad and your calendar, the numbers a healthy seller funnel actually hits, and the fixes most accounts are missing. Read it with your own ads open. Yours to act on, no call.</p>
+  <div class="pill-row"><div class="pill"><b>4</b> places appointments leak</div><div class="pill"><b>7</b> money-losing mistakes</div><div class="pill"><b>12</b>-point checklist</div></div>
+
+  <div class="funnel">
+    <div class="stage"><div class="stbar"></div><div class="stnum">LINK 1</div><div class="stt">Creative</div><div class="sts">stop the scroll</div><div class="leak">most ads die here</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LINK 2</div><div class="stt">Offer</div><div class="sts">why they click</div><div class="leak">weak = cheap clicks</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LINK 3</div><div class="stt">Funnel</div><div class="sts">click to booking</div><div class="leak">friction loses it</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LINK 4</div><div class="stt">Follow-up</div><div class="sts">lead to appointment</div><div class="leak">80% ignored</div></div>
+  </div>
+  <p class="muted" style="font-size:9pt;margin-top:10px">A seller lead has to survive all four links to become a listing appointment. Most agents fix the ad and ignore the three places the appointment is actually lost.</p>
+  <div class="foot"><span>LK Advertising</span><span>Prepared for agents who want listings, not just clicks</span></div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">LK</div><div class="wmtx">LK Advertising</div></div><div class="tag">01 &middot; The real problem</div></div>
+  <div class="kicker">Clicks are not appointments</div>
+  <h2>Most real estate ad money buys clicks. Almost none of it buys listings.</h2>
+  <p class="muted">A cheap cost-per-click feels like winning. It is not. A seller lead has to survive four links to turn into an appointment on your calendar, and the appointment is usually lost in the three links after the ad, the ones nobody optimises.</p>
+
+  <div class="callout" style="margin:14px 0">
+    <div class="big">80%</div>
+    <div><div class="b" style="font-size:11pt">of seller leads are never properly followed up.</div>
+      <div style="font-size:9pt;opacity:.9">Speed-to-lead decides it: a lead contacted in 5 minutes is many times more likely to convert than one contacted in an hour. Most agents take hours, or never call at all. This is the cheapest appointment you are leaving on the table.</div></div>
+  </div>
+
+  <h3>The four links, and where each one leaks</h3>
+  <div class="lcard"><div class="n">1</div><div><h3>Creative &mdash; stop a seller mid-scroll</h3><div class="muted">A homeowner is not looking for an agent. The first line and the first image have one job: pattern-interrupt with a neighborhood, a number, or a question. Most ads lead with the agent's face and brokerage, which a seller scrolls straight past.</div></div></div>
+  <div class="lcard"><div class="n">2</div><div><h3>Offer &mdash; the single biggest lever</h3><div class="muted">Not "thinking of selling?" Give a reason to raise a hand now: a specific home valuation, a list of recent sales on their street, a what-your-home-would-net estimate. The offer, not the budget, is what decides your lead cost.</div></div></div>
+  <div class="lcard"><div class="n">3</div><div><h3>Funnel &mdash; click to booking, with zero friction</h3><div class="muted">One promise, one form, one next step. Every extra field and every slow page sheds leads. The appointment is won or lost in the ten seconds after the click.</div></div></div>
+  <div class="lcard"><div class="n">4</div><div><h3>Follow-up &mdash; the 80% everyone leaves</h3><div class="muted">A booked call needs a reminder sequence. A form-fill needs a call in minutes and a multi-touch follow-up over days. This is where the listing is actually made.</div></div></div>
+  <div class="foot"><span>LK Advertising</span><span>01 &middot; The four links</span></div>
+</div>
+
+<!-- PAGE 3: mistakes -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">LK</div><div class="wmtx">LK Advertising</div></div><div class="tag">02 &middot; What I see in almost every account</div></div>
+  <div class="kicker">The leaks, named</div>
+  <h2>Seven money-losing mistakes</h2>
+  <p class="muted">Open almost any agent's account and at least four of these are live right now. Each one is an appointment walking out the door.</p>
+  <div style="margin-top:12px">
+    <div class="mk"><div class="x"></div><div><b>The ad leads with you, not the seller.</b> Your face and brokerage in line one. Sellers scroll past anything that looks like an ad for an agent.</div></div>
+    <div class="mk"><div class="x"></div><div><b>One creative, never tested.</b> A healthy account runs at least three angles at once and kills the losers. One ad means you are guessing.</div></div>
+    <div class="mk"><div class="x"></div><div><b>A vague offer ("thinking of selling?").</b> No reason to act now. The offer is the lever, and a weak one makes every click expensive.</div></div>
+    <div class="mk"><div class="x"></div><div><b>The landing page asks for too much.</b> Long forms and slow pages shed leads in the first ten seconds.</div></div>
+    <div class="mk"><div class="x"></div><div><b>No speed-to-lead.</b> Leads contacted hours later, or never. Five minutes versus one hour is a different business.</div></div>
+    <div class="mk"><div class="x"></div><div><b>No follow-up sequence.</b> One call, then silence. 80% of the value is in the next five touches.</div></div>
+    <div class="mk"><div class="x"></div><div><b>Optimising for clicks, not booked calls.</b> Cheap clicks, zero listings. You get what you tell the algorithm to buy.</div></div>
+  </div>
+  <div class="foot"><span>LK Advertising</span><span>02 &middot; Seven mistakes</span></div>
+</div>
+
+<!-- PAGE 4: checklist + CTA -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">LK</div><div class="wmtx">LK Advertising</div></div><div class="tag">03 &middot; Score your setup</div></div>
+  <div class="kicker">12-point teardown</div>
+  <h2>Run your own account against this</h2>
+  <p class="muted">Open your live ad and your landing page in another tab. Answer each honestly with a yes or a no. Every no is an appointment leaking out.</p>
+  <div class="grid2" style="margin-top:10px">
+    <div class="ckcat">Creative</div>
+    <div class="ck"><div class="box"></div><div>First line names a neighborhood or a number, not your name.</div></div>
+    <div class="ck"><div class="box"></div><div>At least three creative variations running right now.</div></div>
+    <div class="ck"><div class="box"></div><div>The image stops the scroll on its own, sound off.</div></div>
+    <div class="ckcat">Offer</div>
+    <div class="ck"><div class="box"></div><div>A specific reason to raise a hand today (valuation, comps, net estimate).</div></div>
+    <div class="ck"><div class="box"></div><div>The offer is the headline, not a "thinking of selling?".</div></div>
+    <div class="ck"><div class="box"></div><div>It is local, named to the area you actually work.</div></div>
+    <div class="ckcat">Funnel</div>
+    <div class="ck"><div class="box"></div><div>One promise, one form, one next step, no detours.</div></div>
+    <div class="ck"><div class="box"></div><div>Form asks for the minimum (name, contact, address).</div></div>
+    <div class="ck"><div class="box"></div><div>Page loads under 3 seconds on a phone.</div></div>
+    <div class="ckcat">Follow-up</div>
+    <div class="ck"><div class="box"></div><div>New leads are contacted within 5 minutes, automatically.</div></div>
+    <div class="ck"><div class="box"></div><div>A multi-touch sequence runs for at least 7 days.</div></div>
+    <div class="ck"><div class="box"></div><div>You optimise to booked calls, not clicks or cost-per-lead.</div></div>
+  </div>
+  <div class="next">
+    <div class="kicker" style="color:var(--acc2)">The personalized version is on me</div>
+    <h3>Want this run on your actual account?</h3>
+    <p class="muted" style="margin:4px 0 0">Send me the main area you work and a link to whatever you are running now, a Facebook ad, a valuation page, a Zillow lead form, anything. I will record a 5 minute video walking through your exact setup and the one change I would make first. No charge, no card, no obligation.</p>
+  </div>
+  <div class="foot"><span>LK Advertising</span><span>03 &middot; Your 12-point checklist</span></div>
+</div>
+
+</body></html>

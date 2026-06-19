@@ -1,0 +1,92 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+ @page{ size:A4; margin:0; }
+ :root{ --acc:#15803d; --acc2:#22c55e; --ink:#14181a; --muted:#667085; --line:#e6e8e7; --soft:#edf8f1; --red:#c0392b; }
+ *{box-sizing:border-box;margin:0;padding:0;}
+ body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); font-size:10pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+ .page{ width:210mm; min-height:297mm; padding:16mm 16mm 14mm; position:relative; page-break-after:always; }
+ .page:last-child{ page-break-after:auto; }
+ .kicker{ font-size:8pt; letter-spacing:.2em; text-transform:uppercase; font-weight:800; color:var(--acc); }
+ h1{ font-size:27pt; line-height:1.09; font-weight:900; letter-spacing:-.02em; margin:8px 0; }
+ h2{ font-size:15.5pt; font-weight:800; letter-spacing:-.01em; margin:0 0 3px; }
+ h3{ font-size:10.5pt; font-weight:800; margin:0 0 3px; }
+ p{ margin:0 0 8px; } .muted{ color:var(--muted); } .b{ font-weight:700; }
+ .wm{ display:flex; align-items:center; gap:9px; }
+ .mark{ width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--acc2),var(--acc));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:10pt; }
+ .wmtx{ font-weight:900; font-size:11.5pt; }
+ .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:16px; }
+ .tag{ font-size:8pt; font-weight:700; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:4px 11px; }
+ .cover{ background:linear-gradient(165deg,#fff 52%,var(--soft)); }
+ .lede{ font-size:12pt; line-height:1.5; color:#33373f; max-width:152mm; }
+ .pill-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; } .pill{ font-size:8.5pt; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 13px; } .pill b{ color:var(--acc); }
+ .callout{ background:var(--ink); color:#fff; border-radius:12px; padding:14px 17px; display:flex; gap:15px; align-items:center; }
+ .callout .big{ font-size:24pt; font-weight:900; line-height:1.05; color:#86efac; }
+ /* steps */
+ .step{ display:flex; gap:12px; padding:9px 0; border-bottom:1px solid #f0f2f1; } .step:last-child{ border-bottom:0; }
+ .step .n{ flex:0 0 28px;height:28px;border-radius:8px;background:var(--soft);color:var(--acc);font-weight:900;font-size:12pt;display:flex;align-items:center;justify-content:center;border:1px solid #c9ecd5; }
+ .step .t{ font-size:9.4pt; } .step .t b{ font-size:10pt; }
+ /* trap cards */
+ .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+ .trap{ border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+ .trap .h{ background:#fdecea; color:#9a2820; font-weight:800; font-size:9.3pt; padding:7px 11px; display:flex; gap:7px; align-items:center; }
+ .trap .h .tn{ background:var(--red); color:#fff; width:17px;height:17px;border-radius:50%;font-size:8.5pt;display:flex;align-items:center;justify-content:center;flex:0 0 17px; }
+ .trap .b1{ padding:7px 11px; font-size:8.7pt; color:#444; } .trap .b1 .g{ color:var(--acc); font-weight:800; }
+ .next{ background:var(--ink); color:#fff; border-radius:13px; padding:15px 18px; margin-top:10px; } .next .muted{ color:#9fb3a6; } .next h3{ color:#fff; }
+ .foot{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); border-top:1px solid var(--line); padding-top:7px; }
+</style></head><body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="top"><div class="wm"><div class="mark">EG</div><div class="wmtx">ENER-G Beratung</div></div><div class="tag">Für Gewerbe in NRW</div></div>
+  <div class="kicker">Der kostenlose Energiekosten-Check</div>
+  <h1>Der Energiekosten-Check<br>für Gewerbe in NRW</h1>
+  <p class="lede">Der Prüfrahmen, mit dem wir jeden Gewerbevertrag durchgehen, in sechs Schritten und ohne uns anwendbar. Dazu die Liste der typischen Vertragsfallen bei Strom und Gas, jede Falle mit Erklärung und konkretem Gegenmittel. Gehört Ihnen, ohne Anruf.</p>
+  <div class="pill-row"><div class="pill"><b>6</b> Schritte Prüfrahmen</div><div class="pill"><b>8</b> Vertragsfallen mit Gegenmittel</div><div class="pill"><b>15</b> Minuten, eine Abrechnung</div></div>
+  <div class="callout" style="margin-top:20px"><div class="big">15 Min.</div>
+    <div><div class="b" style="font-size:11pt">Mehr brauchen Sie für diesen Check nicht.</div>
+      <div style="font-size:9pt;opacity:.9">Legen Sie Ihre letzte Strom- und Gasjahresabrechnung sowie den Liefervertrag bereit. Arbeiten Sie die sechs Schritte der Reihe nach durch und notieren Sie zu jedem ein kurzes Ergebnis. Das ist die ganze Vorbereitung.</div></div></div>
+  <div class="foot"><span>ENER-G Beratung &middot; ener-g-beratung.de</span><span>Allgemeine Unterlage für Gewerbe ab etwa 30.000 kWh im Jahr</span></div>
+</div>
+
+<!-- PAGE 2: 6-step Prüfrahmen -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">EG</div><div class="wmtx">ENER-G Beratung</div></div><div class="tag">Teil 1 &middot; Der Prüfrahmen</div></div>
+  <div class="kicker">In sechs Schritten, der Reihe nach</div>
+  <h2>Der Energiekosten-Check für Gewerbe</h2>
+  <p class="muted">Dieselbe Reihenfolge, die wir in jedem Mandat gehen. Notieren Sie zu jedem Schritt ein Ergebnis, am Ende sehen Sie, ob Handeln sich lohnt.</p>
+  <div style="margin-top:10px">
+    <div class="step"><div class="n">1</div><div class="t"><b>Verbrauch und Lastprofil festhalten.</b> Jahresverbrauch in kWh für Strom und Gas. Wenn vorhanden, den Lastgang. Diese eine Zahl entscheidet fast alles Weitere.</div></div>
+    <div class="step"><div class="n">2</div><div class="t"><b>Preisbestandteile trennen.</b> Arbeitspreis (je kWh) und Grundpreis (je Monat) getrennt notieren. Netzentgelte, Steuern und Umlagen sind weitgehend fix, vergleichbar ist vor allem der Arbeitspreis.</div></div>
+    <div class="step"><div class="n">3</div><div class="t"><b>Vertragsende und Kündigungsfrist prüfen.</b> Wann läuft der Vertrag aus, wie lang ist die Frist, gibt es eine automatische Verlängerung? Das ist die häufigste teure Stelle.</div></div>
+    <div class="step"><div class="n">4</div><div class="t"><b>Preisbindung und Anpassungsklauseln lesen.</b> Festpreis, gleitend oder mit Preisänderungsvorbehalt? Ein Vorbehalt heißt, der Anbieter darf einseitig erhöhen.</div></div>
+    <div class="step"><div class="n">5</div><div class="t"><b>Mit dem heutigen Marktpreis vergleichen.</b> Stellen Sie Ihren Arbeitspreis dem aktuellen Marktniveau gegenüber. Eine Differenz mal Ihrem Jahresverbrauch ist Ihr grobes Sparpotenzial.</div></div>
+    <div class="step"><div class="n">6</div><div class="t"><b>Handlungsbedarf ableiten.</b> Lohnt jetzt ein Wechsel oder eine Nachverhandlung, oder warten Sie auf das Vertragsende? Erst rechnen, dann handeln.</div></div>
+  </div>
+  <div class="foot"><span>ENER-G Beratung &middot; ener-g-beratung.de</span><span>Teil 1 &middot; Der Prüfrahmen</span></div>
+</div>
+
+<!-- PAGE 3: 8 Vertragsfallen + CTA -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">EG</div><div class="wmtx">ENER-G Beratung</div></div><div class="tag">Teil 2 &middot; Die Vertragsfallen</div></div>
+  <div class="kicker">Jede Falle mit dem konkreten Gegenmittel</div>
+  <h2>Die typischen Vertragsfallen bei Strom und Gas</h2>
+  <div class="grid2" style="margin-top:10px">
+    <div class="trap"><div class="h"><span class="tn">1</span>Automatische Verlängerung</div><div class="b1">Kündigung verpasst, der Vertrag läuft oft ein Jahr teurer weiter. <span class="g">Gegenmittel:</span> Frist sofort in den Kalender, rechtzeitig schriftlich kündigen.</div></div>
+    <div class="trap"><div class="h"><span class="tn">2</span>Preisänderungsvorbehalt</div><div class="b1">Der Anbieter darf den Preis einseitig anheben. <span class="g">Gegenmittel:</span> Festpreis bevorzugen, sonst das Sonderkündigungsrecht bei Erhöhung nutzen.</div></div>
+    <div class="trap"><div class="h"><span class="tn">3</span>Vorkasse oder Kaution</div><div class="b1">Geld ist gebunden, bei Anbieterinsolvenz im Risiko. <span class="g">Gegenmittel:</span> Monatliche Abrechnung ohne Vorkasse wählen.</div></div>
+    <div class="trap"><div class="h"><span class="tn">4</span>Bonus nur im ersten Jahr</div><div class="b1">Der Lockbonus macht das erste Jahr günstig, danach wird es teuer. <span class="g">Gegenmittel:</span> Immer den Preis ohne Bonus vergleichen.</div></div>
+    <div class="trap"><div class="h"><span class="tn">5</span>Paket mit Mindestabnahme</div><div class="b1">Sie zahlen für kWh, die Sie nie verbrauchen. <span class="g">Gegenmittel:</span> Tarif am echten Verbrauch ausrichten, keine Pakettarife.</div></div>
+    <div class="trap"><div class="h"><span class="tn">6</span>Intransparente Aufschläge</div><div class="b1">Bündel aus Umlagen und Gebühren, schwer vergleichbar. <span class="g">Gegenmittel:</span> Nur Arbeits- und Grundpreis netto gegenüberstellen.</div></div>
+    <div class="trap"><div class="h"><span class="tn">7</span>Lange Laufzeit, keine Preisgarantie</div><div class="b1">Gebunden, aber der Preis darf steigen. <span class="g">Gegenmittel:</span> Laufzeit und Preisgarantie müssen zusammenpassen.</div></div>
+    <div class="trap"><div class="h"><span class="tn">8</span>Schätzung statt Zählerstand</div><div class="b1">Falsche Abschläge, am Jahresende eine böse Nachzahlung. <span class="g">Gegenmittel:</span> Zählerstand selbst melden, Abschlag realistisch setzen.</div></div>
+  </div>
+  <div class="next">
+    <div class="kicker" style="color:#86efac">Der persönliche Teil ist auf uns</div>
+    <h3>Soll ich genau hinschauen?</h3>
+    <p class="muted" style="margin:4px 0 0">Diese Unterlage macht bewusst keine Aussage über Ihren konkreten Vertrag, weil ich ihn nicht kenne. Mir genügen zwei Zahlen aus Ihrer Abrechnung: der ungefähre Jahresverbrauch in kWh und das Vertragsende. Dann schreibe ich Ihnen zurück, wo Sie stehen und ob Handeln sich lohnt. Antworten Sie dafür mit CHECK. Wenn nichts zu holen ist, sage ich es ehrlich.</p>
+  </div>
+  <div class="foot"><span>ENER-G Beratung &middot; ener-g-beratung.de</span><span>Teil 2 &middot; Acht Vertragsfallen</span></div>
+</div>
+
+</body></html>

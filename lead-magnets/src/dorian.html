@@ -1,0 +1,118 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+ @page{ size:A4; margin:0; }
+ :root{ --acc:#3730a3; --acc2:#5b54c9; --ink:#15161d; --muted:#6b7280; --line:#e7e7ea; --soft:#eef0fb; --red:#c0392b; }
+ *{box-sizing:border-box;margin:0;padding:0;}
+ body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); font-size:10pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+ .page{ width:210mm; min-height:297mm; padding:16mm 16mm 14mm; position:relative; page-break-after:always; }
+ .page:last-child{ page-break-after:auto; }
+ .kicker{ font-size:8pt; letter-spacing:.22em; text-transform:uppercase; font-weight:800; color:var(--acc); }
+ h1{ font-size:29pt; line-height:1.07; font-weight:900; letter-spacing:-.02em; margin:8px 0; }
+ h2{ font-size:16pt; font-weight:800; letter-spacing:-.01em; margin:0 0 3px; }
+ h3{ font-size:11pt; font-weight:800; margin:0 0 3px; }
+ p{ margin:0 0 8px; } .muted{ color:var(--muted); } .b{ font-weight:700; }
+ .wm{ display:flex; align-items:center; gap:9px; }
+ .mark{ width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--acc2),var(--acc));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:11pt; }
+ .wmtx{ font-weight:900; font-size:11.5pt; }
+ .top{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:16px; }
+ .tag{ font-size:8pt; font-weight:700; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:4px 11px; }
+ .cover{ background:linear-gradient(165deg,#fff 52%,var(--soft)); }
+ .lede{ font-size:12pt; line-height:1.5; color:#33373f; max-width:152mm; }
+ .pill-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; } .pill{ font-size:8.5pt; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 13px; } .pill b{ color:var(--acc); }
+ .funnel{ display:flex; align-items:stretch; margin:20px 0 4px; }
+ .stage{ flex:1; text-align:center; padding:0 3px; } .stbar{ height:13px; background:linear-gradient(90deg,var(--acc2),var(--acc)); border-radius:3px; }
+ .stage:nth-child(1) .stbar{opacity:1}.stage:nth-child(3) .stbar{opacity:.86}.stage:nth-child(5) .stbar{opacity:.7}.stage:nth-child(7) .stbar{opacity:.54}.stage:nth-child(9) .stbar{opacity:.4}
+ .stnum{ font-size:7.5pt;font-weight:800;color:var(--acc);margin-top:7px; } .stt{ font-size:8.7pt;font-weight:800;margin-top:1px; } .sts{ font-size:7.2pt;color:var(--muted); } .leak{ font-size:7pt;color:var(--red);font-weight:700;margin-top:3px; }
+ .arrow{ flex:0 0 13px; display:flex; align-items:center; justify-content:center; color:#c9c9cc; font-size:12pt; }
+ .callout{ background:var(--ink); color:#fff; border-radius:12px; padding:15px 17px; display:flex; gap:15px; align-items:center; }
+ .callout .big{ font-size:30pt; font-weight:900; line-height:1; color:#a9a3ee; }
+ .leakcard{ border:1px solid var(--line); border-radius:12px; padding:13px 15px; margin-bottom:10px; }
+ .lh{ display:flex; gap:11px; align-items:center; margin-bottom:7px; } .lh .n{ flex:0 0 30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;font-weight:900;font-size:13pt;display:flex;align-items:center;justify-content:center; }
+ .lrow{ display:grid; grid-template-columns:74px 1fr; gap:4px 10px; font-size:9.2pt; }
+ .lrow .k{ font-weight:800; color:var(--acc); } .lrow .k.fix{ color:#15803d; } .lrow .k.hl{ color:var(--muted); }
+ .next{ background:var(--ink); color:#fff; border-radius:13px; padding:16px 18px; margin-top:8px; } .next .muted{ color:#a3a6c2; } .next h3{ color:#fff; }
+ .foot{ position:absolute; left:16mm; right:16mm; bottom:9mm; display:flex; justify-content:space-between; font-size:7.5pt; color:var(--muted); border-top:1px solid var(--line); padding-top:7px; }
+</style></head><body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="top"><div class="wm"><div class="mark">MS</div><div class="wmtx">Mercury Scales</div></div><div class="tag">For creators &amp; coaches</div></div>
+  <div class="kicker">The give-first teardown</div>
+  <h1>The Funnel Leak<br>Teardown</h1>
+  <p class="lede">Where creators and coaches lose booked calls between the hook and the handoff. The one number to pull at each of the five leaks, the benchmark it should hit, and the exact change that closes it. Run it on your own funnel today. Yours either way, no call.</p>
+  <div class="pill-row"><div class="pill"><b>5</b> leaks, hook to handoff</div><div class="pill"><b>1</b> number to pull each</div><div class="pill"><b>0</b> calls attached</div></div>
+  <div class="funnel">
+    <div class="stage"><div class="stbar"></div><div class="stnum">LEAK 1</div><div class="stt">Hook</div><div class="sts">first 3 seconds</div><div class="leak">most leave here</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LEAK 2</div><div class="stt">Retain</div><div class="sts">attention to belief</div><div class="leak">no trust, no sale</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LEAK 3</div><div class="stt">CTA</div><div class="sts">the ask</div><div class="leak">vague = ignored</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LEAK 4</div><div class="stt">Capture</div><div class="sts">own the contact</div><div class="leak">renting, not owning</div></div>
+    <div class="arrow">&rsaquo;</div>
+    <div class="stage"><div class="stbar"></div><div class="stnum">LEAK 5</div><div class="stt">Follow-up</div><div class="sts">lead to call</div><div class="leak">too slow</div></div>
+  </div>
+  <p class="muted" style="font-size:9pt;margin-top:10px">Traffic is rarely the problem. A booked call has to survive all five. Most creators pour effort into the hook and bleed the pipeline at the four steps after it.</p>
+  <div class="foot"><span>Mercury Scales &middot; mercuryscales.com</span><span>Prepared for creators who get views but not calls</span></div>
+</div>
+
+<!-- PAGE 2: how to read + leaks 1-2 -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">MS</div><div class="wmtx">Mercury Scales</div></div><div class="tag">01 &middot; Read it with your analytics open</div></div>
+  <div class="kicker">How to use this</div>
+  <h2>Open your own numbers next to it</h2>
+  <p class="muted">Each leak gives you one number to pull, the benchmark it should hit, and the change that closes it. Most founders find their biggest leak in the first two sections, the hook and the gap right after the ask.</p>
+  <div class="callout" style="margin:13px 0">
+    <div class="big">3s</div>
+    <div><div class="b" style="font-size:11pt">The first three seconds decide whether the rest is even seen.</div>
+      <div style="font-size:9pt;opacity:.9">On short form, a view is counted almost instantly. The number that matters is how many are still watching at the 3-second mark and how far the average viewer gets. Fix the hook and every later number moves with it.</div></div>
+  </div>
+
+  <div class="leakcard">
+    <div class="lh"><div class="n">1</div><h3>The hook, where you lose most people in the first three seconds</h3></div>
+    <div class="lrow"><div class="k">The check</div><div>Your 3-second view rate and average view duration (or average percentage viewed).</div>
+      <div class="k hl">Healthy</div><div>Most viewers clear 3 seconds and the average viewer gets well past the opening, no cliff in the first few seconds.</div>
+      <div class="k fix">The fix</div><div>The first frame and first line have one job: earn the next 3 seconds. Open on the result, the tension, or a number, never a slow intro or your logo.</div></div>
+  </div>
+  <div class="leakcard">
+    <div class="lh"><div class="n">2</div><h3>Retention and trust, where attention without belief never converts</h3></div>
+    <div class="lrow"><div class="k">The check</div><div>Your retention curve and engagement (saves, comments, shares), not just views.</div>
+      <div class="k hl">Healthy</div><div>A smooth retention curve with no mid-video cliff, and saves or comments that show people believe you, not just watch.</div>
+      <div class="k fix">The fix</div><div>Earn belief with specifics and proof: a real number, a named mechanism, a concrete example. Vague authority gets attention but never the sale.</div></div>
+  </div>
+  <div class="foot"><span>Mercury Scales &middot; mercuryscales.com</span><span>01 &middot; Leaks 1 and 2</span></div>
+</div>
+
+<!-- PAGE 3: leaks 3-5 + CTA -->
+<div class="page">
+  <div class="top"><div class="wm"><div class="mark">MS</div><div class="wmtx">Mercury Scales</div></div><div class="tag">02 &middot; The ask, the list, the speed</div></div>
+  <div class="kicker">The three that actually book the call</div>
+  <h2>Where the pipeline is really lost</h2>
+  <div class="leakcard" style="margin-top:10px">
+    <div class="lh"><div class="n">3</div><h3>The CTA, where a vague ask gets a vague response</h3></div>
+    <div class="lrow"><div class="k">The check</div><div>Count the next steps you offer in one piece of content. Is there exactly one, and is it specific?</div>
+      <div class="k hl">Healthy</div><div>One clear, low-friction ask per piece. "Comment WORD", "DM me X", one link, not three.</div>
+      <div class="k fix">The fix</div><div>Pick a single named action and make it effortless. A confused viewer does nothing. One ask, one word, one tap.</div></div>
+  </div>
+  <div class="leakcard">
+    <div class="lh"><div class="n">4</div><h3>Lead capture, where you are renting your audience instead of owning it</h3></div>
+    <div class="lrow"><div class="k">The check</div><div>How many emails or direct contacts did you add this month, versus followers?</div>
+      <div class="k hl">Healthy</div><div>A list you own (email or a captured DM funnel) that grows every week, independent of the platform.</div>
+      <div class="k fix">The fix</div><div>Put a give-first lead magnet behind the CTA that moves people off-platform onto a list you own. Followers are rented, a list is yours.</div></div>
+  </div>
+  <div class="leakcard">
+    <div class="lh"><div class="n">5</div><h3>Follow-up, the booked call you never made because you were slow</h3></div>
+    <div class="lrow"><div class="k">The check</div><div>Your time-to-first-touch after someone raises a hand, and how many touches follow.</div>
+      <div class="k hl">Healthy</div><div>First touch in minutes, automated, then a multi-day sequence, not one message and silence.</div>
+      <div class="k fix">The fix</div><div>Reply instantly when they bite, then run a short sequence over several days. Most calls are made in the follow-up, not the first reply.</div></div>
+  </div>
+  <div class="next">
+    <div class="kicker" style="color:#a9a3ee">The personal version is on me</div>
+    <h3>Want this on your actual funnel?</h3>
+    <p class="muted" style="margin:4px 0 0">I record a short teardown of your real funnel, point at the exact spots leaking, and tell you what I would change first. No call, nothing to sit through live, in your inbox within 48 hours, and yours to keep either way. Reply with the word teardown and I will record yours.</p>
+  </div>
+  <div class="foot"><span>Mercury Scales &middot; mercuryscales.com</span><span>02 &middot; Leaks 3 to 5</span></div>
+</div>
+
+</body></html>
