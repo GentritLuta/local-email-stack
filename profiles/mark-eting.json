@@ -1,0 +1,643 @@
+{
+  "slug": "mark-eting",
+  "name": "Mark-eting - SEO & online visibility for US service businesses",
+  "created_at": "2026-06-14",
+  "active": true,
+  "company": {
+    "name": "Mark-eting B.V.",
+    "site": "mark-eting.co",
+    "tagline": "More qualified leads from Google for service businesses"
+  },
+  "brand": {
+    "wordmark": "Mark-eting",
+    "site": "mark-eting.co",
+    "tagline": "More qualified leads from Google for service businesses",
+    "font_stack": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    "colors": {
+      "accent": "#f07307",
+      "accent_2": "#c25608",
+      "text": "#1a1a1a",
+      "text_2": "#475569",
+      "muted": "#94a3b8",
+      "bg_page": "#f5f5f5",
+      "bg_card": "#ffffff",
+      "rule": "#ececec",
+      "heading": "#0b0b0b",
+      "navy": "#1a1a2e",
+      "navy_2": "#16213e"
+    },
+    "cta_url": "https://calendar.app.google/oh6EboZpqnM9uKx19",
+    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/mark-eting.html?t={token}",
+    "legal": {
+      "company_name": "Mark-eting B.V.",
+      "address_lines": [
+        "Mark-eting B.V.",
+        "Burgemeester Falkenaweg 36",
+        "8442 LD Heerenveen, Netherlands"
+      ],
+      "contact_email": "mark@mark-eting.co",
+      "vat_id": "",
+      "registration_number": "91237963",
+      "copyright_year": 2026,
+      "logo_url": "https://www.mark-eting.co/images/mark-eting-logo.jpg",
+      "logo_width": 50,
+      "privacy_policy_url": "https://www.mark-eting.co/privacy",
+      "terms_of_service_url": "https://www.mark-eting.co/terms",
+      "legal_disclaimer": "This message is intended only for the named recipient. If you are not the intended recipient, please delete it and let us know.",
+      "partner_notice": "You are receiving this because we believe Mark-eting could help your business get found on Google. Unsubscribe with one click."
+    },
+    "footer_style": "dark",
+    "template": "mark-eting-custom"
+  },
+  "relay": {
+    "backend": "resend",
+    "resend_region": "us-east-1",
+    "resend_api_key": "",
+    "_note": "Mark-eting B.V. (Mark Eizema). Sends on the PRO Resend account (re_iPPp8...), same as aureon/diraya/lk/dorian. DNS for getmark-eting.com via the client Hostinger token HOSTINGER_API_TOKEN_MARK_ETING. Replies route to mark@mark-eting.co + booking calendar.app.google/oh6EboZpqnM9uKx19.",
+    "from_domains": [
+      {
+        "domain": "outreach.getmark-eting.com",
+        "resend_domain_id": "90ce745d-fa84-4afe-8512-e8601a1ac50c",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "team.getmark-eting.com",
+        "resend_domain_id": "56503d90-3632-4b14-9c50-5142ba0c5ad2",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "mail.getmark-eting.com",
+        "resend_domain_id": "191e9fb3-6dfe-40ec-9a6b-79f03c01cebd",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hi.getmark-eting.com",
+        "resend_domain_id": "f533a909-14b1-4377-b179-e90906497f97",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "connect.getmark-eting.com",
+        "resend_domain_id": "69f4693f-d9bf-48ed-9646-1efca5d789e3",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "partners.getmark-eting.com",
+        "resend_domain_id": "2a603dca-eba7-4e6b-b082-c7b5886cedd8",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.getmark-eting.com",
+        "resend_domain_id": "5f9c0043-0a1e-4ac9-8854-f26f2655abbc",
+        "verified_at": "2026-06-14T18:47:10.597163+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "reach.getmark-eting.com",
+        "resend_domain_id": "9d80b499-7bfe-4fa6-9965-8b6523b764e5",
+        "verified_at": "2026-06-14T18:47:10.597163+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "news.getmark-eting.com",
+        "resend_domain_id": "45f4e944-8211-4968-814d-7c2f55e04e41",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "send.getmark-eting.com",
+        "resend_domain_id": "c369ef12-2ba4-4bd2-af0a-48ecac123b64",
+        "verified_at": "2026-06-14T18:47:10.597163+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "desk.getmark-eting.com",
+        "resend_domain_id": "682d371c-403a-4a5d-9d50-520d3619f6a4",
+        "verified_at": "2026-06-14T17:54:52.721098+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hub.getmark-eting.com",
+        "resend_domain_id": "dae62f6b-c8bd-48d1-85bc-aa17936a81e8",
+        "verified_at": "2026-06-14T18:47:10.597163+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 1,
+          "started_at": "2026-06-14",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      }
+    ],
+    "from_domains_overrides": [],
+    "report_to": "mark@mark-eting.co"
+  },
+  "personas": [
+    {
+      "slug": "alex",
+      "from_name": "Alex from Mark-eting",
+      "from_addr": "alex@outreach.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Alex\nMark-eting",
+      "full_name": "Alex Carter"
+    },
+    {
+      "slug": "sam",
+      "from_name": "Sam from Mark-eting",
+      "from_addr": "sam@team.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Sam\nMark-eting",
+      "full_name": "Sam Rivera"
+    },
+    {
+      "slug": "jordan",
+      "from_name": "Jordan from Mark-eting",
+      "from_addr": "jordan@mail.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Jordan\nMark-eting",
+      "full_name": "Jordan Lee"
+    },
+    {
+      "slug": "casey",
+      "from_name": "Casey from Mark-eting",
+      "from_addr": "casey@hi.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Casey\nMark-eting",
+      "full_name": "Casey Brooks"
+    },
+    {
+      "slug": "riley",
+      "from_name": "Riley from Mark-eting",
+      "from_addr": "riley@connect.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Riley\nMark-eting",
+      "full_name": "Riley Morgan"
+    },
+    {
+      "slug": "taylor",
+      "from_name": "Taylor from Mark-eting",
+      "from_addr": "taylor@partners.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Taylor\nMark-eting",
+      "full_name": "Taylor Reed"
+    },
+    {
+      "slug": "jamie",
+      "from_name": "Jamie from Mark-eting",
+      "from_addr": "jamie@hello.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Jamie\nMark-eting",
+      "full_name": "Jamie Cole"
+    },
+    {
+      "slug": "drew",
+      "from_name": "Drew from Mark-eting",
+      "from_addr": "drew@reach.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Drew\nMark-eting",
+      "full_name": "Drew Bennett"
+    },
+    {
+      "slug": "quinn",
+      "from_name": "Quinn from Mark-eting",
+      "from_addr": "quinn@news.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Quinn\nMark-eting",
+      "full_name": "Quinn Parker"
+    },
+    {
+      "slug": "avery",
+      "from_name": "Avery from Mark-eting",
+      "from_addr": "avery@send.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Avery\nMark-eting",
+      "full_name": "Avery Stone"
+    },
+    {
+      "slug": "morgan",
+      "from_name": "Morgan from Mark-eting",
+      "from_addr": "morgan@desk.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Morgan\nMark-eting",
+      "full_name": "Morgan Hayes"
+    },
+    {
+      "slug": "parker",
+      "from_name": "Parker from Mark-eting",
+      "from_addr": "parker@hub.getmark-eting.com",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Growth, Mark-eting",
+      "voice": {
+        "register": "direct and helpful",
+        "quirks": [
+          "short sentences",
+          "concrete",
+          "speaks to busy service-business owners"
+        ],
+        "avoid": [
+          "hype",
+          "exclamation marks",
+          "jargon",
+          "em-dashes"
+        ]
+      },
+      "signature": "Parker\nMark-eting",
+      "full_name": "Parker Quinn"
+    }
+  ],
+  "rotation": {
+    "strategy": "round_robin_by_persona",
+    "max_sends_per_persona_per_day": 2,
+    "min_seconds_between_sends_same_persona": 180,
+    "_comment": "12 subs x 12 personas. Warmup-gated; per-domain 15/day week1 via snowball_v1."
+  },
+  "send_ramp": {
+    "_doc": "Gentle new-sender ramp: per-persona 4->30 over ~2wk; subdomain warmup curve binds once per_persona exceeds it. Set 2026-06-16 (was stuck at static per_persona=2 -> 24/day).",
+    "started_at": "2026-06-16",
+    "curve": [
+      {
+        "from_day": 1,
+        "per_persona": 4
+      },
+      {
+        "from_day": 3,
+        "per_persona": 6
+      },
+      {
+        "from_day": 5,
+        "per_persona": 9
+      },
+      {
+        "from_day": 7,
+        "per_persona": 12
+      },
+      {
+        "from_day": 9,
+        "per_persona": 16
+      },
+      {
+        "from_day": 11,
+        "per_persona": 20
+      },
+      {
+        "from_day": 14,
+        "per_persona": 25
+      },
+      {
+        "from_day": 18,
+        "per_persona": 30
+      }
+    ]
+  },
+  "warmup": {
+    "enabled": true,
+    "warmup_targets": [],
+    "ramp_curve": "snowball_v1",
+    "real_send_mix": [],
+    "auto_pause_thresholds": {
+      "bounce_rate": 0.05,
+      "complaint_rate": 0.003
+    },
+    "reputation": {
+      "bounce_rate_7d": 0.0,
+      "complaint_rate_7d": 0.0,
+      "delivered_7d": 107,
+      "last_check": "2026-06-19T11:10:50.234109+00:00"
+    },
+    "advance_only_mode": true
+  },
+  "ramp_curve_snowball_v1": [
+    {
+      "from_day": 1,
+      "daily": 15
+    },
+    {
+      "from_day": 8,
+      "daily": 25
+    },
+    {
+      "from_day": 15,
+      "daily": 35
+    },
+    {
+      "from_day": 22,
+      "daily": 50
+    }
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/New_York",
+    "target_audience_note": "US service businesses, all states. 08:00-17:00 recipient-local via prospect_timezone.resolve; default America/New_York."
+  }
+}
