@@ -311,16 +311,17 @@ def reconcile_forward_bounces(dry: bool) -> dict:
     leads to a dead support@algoalpha.io and 2 diraya leads to a dead
     info@diraya.ca in 2026-06, with the client inbox receiving none of them).
 
-    Each pass: find the client addresses that appear in recent bounce notices,
-    then for every reply we forwarded to such an address, re-route it to the
-    profile's CURRENT report_to if that has been fixed (and is itself healthy),
-    otherwise flag it 'bounced_address_dead' so it is visible and never silently
-    retried in a loop.
+    Each pass: an address is DEAD only if a bounce to it arrived AT/AFTER the
+    latest forward to that address (an old bounce that predates a later, healthy
+    forward does NOT condemn it — that false-flagged diraya's amoura.ma@ once).
+    For every reply forwarded to a dead address, re-route it to the profile's
+    CURRENT report_to if that is fixed and itself healthy, else flag
+    'bounced_address_dead' (visible, never looped). A reply previously flagged
+    whose target is no longer dead is restored to delivered.
     """
     since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=35)).isoformat()
     bounces = supa_get(f"replies?class=eq.bounce&received_at=gte.{urllib.parse.quote(since)}"
-                       f"&select=body_snippet,subject&limit=500")
-    btext = " ".join(((b.get("body_snippet") or "") + " " + (b.get("subject") or "")) for b in bounces).lower()
+                       f"&select=body_snippet,subject,received_at&limit=500")
     fwd = supa_get(f"replies?class=eq.reply&received_at=gte.{urllib.parse.quote(since)}"
                    f"&select=id,profile_slug,raw_headers&order=received_at.desc&limit=500")
 
@@ -331,37 +332,51 @@ def reconcile_forward_bounces(dry: bool) -> dict:
             except Exception: rh = {}
         return rh, (rh.get("client_forwarded_to") or "").lower()
 
-    bounced = set()
+    # latest forward time per destination address
+    fwd_time: dict[str, str] = {}
     for r in fwd:
-        _rh, to = _rh_to(r)
-        if to and to in btext:
-            bounced.add(to)
-    stats = {"recovered": 0, "still_dead": 0, "bounced_addrs": sorted(bounced)}
-    if not bounced:
-        print(f"reconcile_forward_bounces: {json.dumps(stats)}")
-        return stats
+        rh, to = _rh_to(r)
+        at = rh.get("client_forwarded_at") or ""
+        if to and at and at > fwd_time.get(to, ""):
+            fwd_time[to] = at
+
+    def _bounced_after(addr: str, t: str) -> bool:
+        for b in bounces:
+            txt = ((b.get("body_snippet") or "") + " " + (b.get("subject") or "")).lower()
+            if addr in txt and (b.get("received_at") or "") >= t:
+                return True
+        return False
+    dead = {a for a, t in fwd_time.items() if t and _bounced_after(a, t)}
+
+    stats = {"recovered": 0, "still_dead": 0, "restored": 0, "dead_addrs": sorted(dead)}
     cache: dict[str, str] = {}
     for r in fwd:
         rh, to = _rh_to(r)
-        if to not in bounced:
+        flagged = rh.get("client_forwarded") == "bounced_address_dead"
+        if to not in dead and not flagged:
             continue
         slug = r.get("profile_slug") or ""
         if slug not in cache:
             cache[slug] = (client_email_for_profile(slug) or "").lower()
         cur = cache[slug]
-        if cur and cur != to and cur not in bounced:
-            # report_to was fixed and is healthy -> clear the forward flags so
-            # once() re-forwards this lead to the corrected address.
-            clean = {k: v for k, v in rh.items() if not k.startswith("client_forwarded")}
-            clean["forward_bounce_recovered"] = dt.datetime.now(dt.timezone.utc).isoformat()
+        if to in dead:
+            if cur and cur != to and cur not in dead:
+                # report_to was fixed and is healthy -> clear flags so once() re-forwards.
+                clean = {k: v for k, v in rh.items() if not k.startswith("client_forwarded")}
+                clean["forward_bounce_recovered"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                if not dry:
+                    supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": clean})
+                stats["recovered"] += 1
+            else:
+                # still pointing at a dead address -> flag once (no loop), surface it.
+                if not flagged and not dry:
+                    supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": {**rh, "client_forwarded": "bounced_address_dead"}})
+                stats["still_dead"] += 1
+        elif flagged:
+            # previously flagged but the target is no longer dead -> it delivered; restore.
             if not dry:
-                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": clean})
-            stats["recovered"] += 1
-        else:
-            # still pointing at a dead address -> flag once (no loop), surface it.
-            if rh.get("client_forwarded") != "bounced_address_dead" and not dry:
-                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": {**rh, "client_forwarded": "bounced_address_dead"}})
-            stats["still_dead"] += 1
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": {**rh, "client_forwarded": True}})
+            stats["restored"] += 1
     print(f"reconcile_forward_bounces: {json.dumps(stats)}")
     return stats
 
