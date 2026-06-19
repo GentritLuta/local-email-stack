@@ -107,23 +107,18 @@ _CLAUDE_EXE = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.
 _MAX_CLI_CALLS_PER_RUN = 5
 _CLI_TIMEOUT_S = 25
 _cli_calls_this_run = 0
-# Reject steps that look like injected payloads rather than close advice: a URL, the
-# UPPERCASE banking acronyms, or a long account/phone-style digit run (>=10 digits,
-# The prospect's raw reply is fed to the CLI, so a hostile prospect could try to steer
-# attacker-chosen "steps" into the client's inbox; a step that looks like a payment/
-# contact destination fails closed to FALLBACK_ACTIONS. This is a best-effort backstop,
-# NOT a complete filter (the primary defence is the data-not-instructions fencing and the
-# fact the recipient is a seller closing their own deal). Covers URLs, the banking
-# acronyms (uppercase so the word "swift" is fine), and email addresses.
-_RISKY_RX = re.compile(r"(?i:https?://|www\.)|\b(?:IBAN|BIC|SWIFT)\b|[\w.+-]+@[\w-]+\.[A-Za-z]{2,}")
-# Any number carrying 10+ digits once its inline separators (space . , - / parens) are
-# removed = a phone / account / card / IBAN body. Counting DIGITS (not characters) keeps
-# legit dates (8 digits: 2026-06-30), prices ($1,200) and times under the bar.
-_LONGNUM_RX = re.compile(r"\d[\d .,()/\-]*\d")
-
-
-def _looks_like_account(s: str) -> bool:
-    return any(len(re.sub(r"\D", "", m.group())) >= 10 for m in _LONGNUM_RX.finditer(s))
+# Reject steps that look like an injected payment/contact destination rather than close
+# advice. The prospect's raw reply is fed to the CLI, so a hostile prospect could try to
+# steer attacker-chosen "steps" into the client's inbox; such a step fails closed to
+# FALLBACK_ACTIONS. This is a BEST-EFFORT backstop, NOT a complete filter (the primary
+# defence is the data-not-instructions fencing and the fact the recipient is a seller
+# closing their own deal). Covers URLs, the UPPERCASE banking acronyms (so the word
+# "swift" is fine), email addresses, and a SOLID run of 10+ digits (account/phone/card/
+# IBAN body). Only solid runs are flagged: legit close steps with separated numbers
+# (dates "2026-06-30", price lists "1,500 / 3,000 / 6,000", ranges "1000-2000") must
+# survive, so separator-grouped numbers are deliberately NOT flagged (low-harm slip).
+_RISKY_RX = re.compile(
+    r"(?i:https?://|www\.)|\b(?:IBAN|BIC|SWIFT)\b|[\w.+-]+@[\w-]+\.[A-Za-z]{2,}|\d{10,}")
 
 
 def _claude_cli() -> str:
@@ -154,7 +149,7 @@ def _valid_step(x) -> str | None:
     s = " ".join(_scrub_dashes(x).split())
     if not (10 <= len(s) <= 300):
         return None
-    if _RISKY_RX.search(s) or _looks_like_account(s):
+    if _RISKY_RX.search(s):
         return None
     return s
 
