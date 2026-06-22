@@ -357,6 +357,19 @@ def _emails_touched_by_other_brands(profile_slug: str) -> set[str]:
     return touched
 
 
+def _avg_views_ok(profile_slug: str, p: dict) -> bool:
+    """AlgoAlpha only: a creator is enrollable only if their last-10-video average views
+    (enriched_context.avg_views_10) is >= 3000. Unknown counts as not-ok (never enroll a
+    creator we cannot confirm qualifies). Every other profile is unaffected."""
+    if profile_slug != "algoalpha":
+        return True
+    av = (p.get("enriched_context") or {}).get("avg_views_10")
+    try:
+        return av not in (None, "") and float(av) >= 3000
+    except (TypeError, ValueError):
+        return False
+
+
 def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
                               requires_first_name: bool = True) -> int:
     SID = get_sequence_id(profile_slug)
@@ -367,7 +380,7 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
                 http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
     rows = http_get(
         f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
-        f"&select=id,email,first_name,company,city&limit=2000"
+        f"&select=id,email,first_name,company,city,enriched_context&limit=2000"
     )
     cross = (_emails_touched_by_other_brands(profile_slug)
              if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
@@ -378,6 +391,7 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
         if requires_first_name and not p.get("first_name"): continue
         if requires_city and not p.get("city"): continue
         if cross is not None and (p.get("email") or "").lower() in cross: continue
+        if not _avg_views_ok(profile_slug, p): continue
         n += 1
     return n
 
@@ -395,7 +409,7 @@ def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
                 http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
     rows = http_get(
         f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
-        f"&select=id,email,first_name,company,city&limit=2000"
+        f"&select=id,email,first_name,company,city,enriched_context&limit=2000"
     )
     cross = (_emails_touched_by_other_brands(profile_slug)
              if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
@@ -404,7 +418,8 @@ def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
                 and p.get("company")
                 and (p.get("first_name") or not requires_first_name)
                 and (not requires_city or p.get("city"))
-                and (cross is None or (p.get("email") or "").lower() not in cross)]
+                and (cross is None or (p.get("email") or "").lower() not in cross)
+                and _avg_views_ok(profile_slug, p)]
     # Prefer leads we can personalize by NAME — send to the best prospects first,
     # leaving company-only / front-desk (info@) leads as overflow. Stable sort
     # keeps prior ordering within each tier.
