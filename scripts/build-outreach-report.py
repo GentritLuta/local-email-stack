@@ -164,6 +164,14 @@ def build_html(overall, per, prospects, clients, replies) -> str:
         step(7, "Replies reviewed & handed off", "Every reply is read and qualified; genuine leads are handed straight to the client, ready to talk."),
     ])
 
+    timeline = "".join([
+        step("1", "Week 1: kickoff and infrastructure", "A discovery call locks your ideal customer and your offer. We register dedicated sending domains and set SPF, DKIM and DMARC, so mail reaches the inbox from the very first send."),
+        step("2", "Week 1 to 2: warm-up and sourcing", "The new domains warm up on a staged schedule while we source and verify your first prospects, matched to the ICP, so the list is clean before anything goes out."),
+        step("3", "Week 2 to 3: copy and launch", "We write the multi-step sequence in your brand voice, you approve it, and sending begins, calendar-paced to protect deliverability."),
+        step("4", "Week 3 onward: replies and handoff", "Every reply is read and qualified. Genuine leads are handed straight to you, ready to talk, while the rest keep moving through the sequence."),
+        step("5", "Ongoing: tune, report, expand", "Copy and targeting are tuned every week on the real numbers, with a weekly report. As we learn what moves your result, we can agree to improve other parts of the funnel too."),
+    ])
+
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>
 @page{{size:A4;margin:0}}
 *{{box-sizing:border-box}}
@@ -296,6 +304,32 @@ td{{padding:11px 10px;border-bottom:1px solid #efece2}} td.hl{{color:{GOLD};font
   <p class="muted" style="max-width:140mm">Onboarding is a fixed, repeatable path. Here is every step we run for a new client,
      in order.</p>
   <div style="margin-top:18px">{steps}</div>
+  <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
+</div>
+
+<div class="page">
+  <div class="kick">Onboarding</div><h2>What the first weeks look like.</h2><div class="rule"></div>
+  <p class="muted" style="max-width:140mm">A pilot goes from kickoff to live sends in about three weeks, then settles into a
+     weekly rhythm. Here is the path, week by week.</p>
+  <div style="margin-top:18px">{timeline}</div>
+  <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
+</div>
+
+<div class="page">
+  <div class="kick">The pilot</div><h2>Three months, free, for an honest review.</h2><div class="rule"></div>
+  <p class="muted" style="max-width:140mm">The engagement starts as a pilot. The terms are deliberately simple, and weighted
+     in your favour.</p>
+  <div class="grid">
+    {stat("$0", "Cost during the pilot")}
+    {stat("3 months", "Pilot length")}
+    {stat("Yours", "Every lead we source")}
+  </div>
+  <div style="margin-top:14px">
+    {step("&rarr;", "Free for three months", "You pay nothing during the pilot. We run the campaign end to end and you keep every lead and appointment it produces.")}
+    {step("&rarr;", "All we ask is a review", "In return for the free pilot, an honest review at the end and a short case study if it worked. That is the whole exchange.")}
+    {step("&rarr;", "Not just email", "Email is the start, not the limit. As we see your numbers, we can agree to improve other parts of your funnel too, the landing page, the booking flow, the nurture, even the offer itself, wherever the leak is.")}
+    {step("&rarr;", "Continue only if it worked", "At the end, if both sides agree the campaign delivered, we continue under a commercial relationship. If not, you walk away owing nothing and keep everything we built.")}
+  </div>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
 
