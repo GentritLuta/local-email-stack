@@ -782,6 +782,26 @@ def tick(only_profiles: set[str] | None = None) -> None:
             prospect = prospect_by_id.get(run["prospect_id"])
             if not prospect:
                 continue
+            # AlgoAlpha qualification gate: only contact creators whose last-10-video
+            # average views (enriched_context.avg_views_10) is >= 3000. Below that we
+            # cancel the run (never contact an unqualified creator). Unknown = skip this
+            # tick only, so a backfill can still fill the metric and qualify them; we
+            # never contact a creator we cannot confirm qualifies.
+            if profile_slug == "algoalpha":
+                _av = (prospect.get("enriched_context") or {}).get("avg_views_10")
+                try:
+                    _avn = float(_av) if _av not in (None, "") else None
+                except (TypeError, ValueError):
+                    _avn = None
+                if _avn is None:
+                    print(f"  ~ run {run['id']} skipped: {prospect.get('email')} no avg_views_10 yet "
+                          f"(needs backfill) — not contacting until qualified")
+                    continue
+                if _avn < 3000:
+                    print(f"  ! run {run['id']} cancelled: {prospect.get('email')} "
+                          f"avg_views_10={int(_avn)} < 3000 (unqualified creator)")
+                    c.patch(f"/runs?id=eq.{run['id']}", json={"status": "cancelled"})
+                    continue
             # Enrich the prospect with synthesized optional merge fields
             # (geo_clause, team_phrase, etc) so personalization tags in the
             # variant body always have a value, even when underlying data
