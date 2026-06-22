@@ -1,0 +1,65 @@
+{
+  "name": "Mark-eting — 7-email give-first SEO/visibility sequence (US service businesses)",
+  "slug": "mark-eting-default",
+  "profile_slug": "mark-eting",
+  "created_at": "2026-06-14",
+  "target": "US service businesses ($2M+): trades (plumbers, HVAC, roofers, electricians, contractors, restoration, pest control) and professional services (law, accounting/CPA, dental, medspa, chiro/PT, insurance, financial advisors, landscaping). Owners/founders/GM/marketing leads who want more qualified leads from Google.",
+  "voice_notes": "Direct, helpful, founder-to-owner. No hype, no exclamation marks, no guru language, no fake scarcity, NO em dashes. One clear ask per email. Give-first: a free written visibility teardown (reply AUDIT), fulfilled manually by Mark. Booking via the Google Calendar link is the secondary ask. No fabricated case studies (no US track record yet); the audit and the search-demand logic carry the proof. Merges: {greeting} (name-optional) + {company}.",
+  "required_merges": [
+    "greeting",
+    "company"
+  ],
+  "schedule_doc": "delay_days = gap from previous step. 0,2,2,3,4,7,10 = days 0,2,4,7,11,18,28.",
+  "variants": [
+    {
+      "n": 1,
+      "delay_days": 0,
+      "angle": "give_first_visibility_audit",
+      "_ab_note": "STEP-1 SUBJECT A/B STARTED 2026-06-22. mark-eting is ALREADY give-first (leads with 'reply AUDIT for a free teardown, no call'), so the give-first body flip would be redundant. Its real problem is the LOW open rate (32%, the lowest of the group) = a subject/deliverability issue, not an offer issue. So this is a SUBJECT test: A-side subject = 'a free visibility teardown for {company}', B-side (inline on sequence_steps id 299e23e5-5816-4a3e-991b-c712120adb9f) subject = 'who shows up before {company} on Google' (curiosity/competitor angle, less spammy than 'free teardown'); the BODY is identical (copied from the variant) so the test isolates the subject. Read: py scripts/ab-status.py --profile mark-eting. If B does not lift opens, the lever is deliverability/list quality, not the subject. To END: clear step-1 inline.",
+      "subject": "a free visibility teardown for {company}",
+      "body": "{greeting}, reply AUDIT and I will send you a free written teardown of where {company} is invisible on Google, plus the 3 fastest fixes. No call, no pitch, just the document.\n\nIt is specific to {company}: the exact searches where you do not show up, who is showing up instead, and the three things I would fix first to change that. You can read it, hand it to whoever already runs your site, and act on it without ever talking to me.\n\nI do this for US service businesses, and most are quietly losing the customers who search for what they sell, because a competitor sits above them on the page and they have never seen it laid out.\n\nI write each one by hand, so I take a few at a time. If it is useful and you want help with the fixes, we can talk then. That part is optional.\n\nReply AUDIT and I will get yours back to you.\n\nMark"
+    },
+    {
+      "n": 2,
+      "delay_days": 2,
+      "angle": "how_it_works_plus_booking",
+      "subject": "what the teardown covers",
+      "body": "Hi {greeting},\n\nfollowing up on the visibility teardown for {company}.\n\nHere is what it covers: the exact searches your buyers run, where you rank on each today, what your Google Business Profile is doing for or against you, and the three changes that move the needle fastest.\n\nIt is written, not a call, so you can read it in two minutes and decide if any of it is worth acting on.\n\nReply AUDIT and I will put it together. If you would rather talk it through, grab a time here: https://calendar.app.google/oh6EboZpqnM9uKx19\n\nMark"
+    },
+    {
+      "n": 3,
+      "delay_days": 2,
+      "angle": "where_the_leads_go_logic",
+      "subject": "where the leads go",
+      "body": "Hi {greeting},\n\none thing most owners miss.\n\nThe businesses winning the most calls in your category are rarely the best at the work. They are the ones who show up first when someone searches, own the map pack, and have a site Google trusts.\n\nThat is fixable, and it is usually the cheapest growth a service business can buy, because the demand is already there. You pay for it whether you capture it or not.\n\nThe teardown shows you exactly where {company} is leaking that demand. Reply AUDIT and it is yours.\n\nMark"
+    },
+    {
+      "n": 4,
+      "delay_days": 3,
+      "angle": "cost_of_invisibility_problem_solution",
+      "subject": "the slow leak",
+      "body": "Hi {greeting},\n\nme again, I will keep it short.\n\nEvery month {company} is not visible for the searches your buyers run, those leads do not wait. They call whoever they find first. That gap never shows up on a P&L, which is exactly why it gets ignored for years.\n\nThe fix is not a rebuild. It is usually a handful of targeted changes to your site and your Google presence that compound over time.\n\n15 minutes and I will show you where to start: https://calendar.app.google/oh6EboZpqnM9uKx19\n\nOr reply AUDIT for the written version, no call.\n\nMark"
+    },
+    {
+      "n": 5,
+      "delay_days": 4,
+      "angle": "forced_yes_or_no",
+      "subject": "{greeting}, yes or no",
+      "body": "Hi {greeting},\n\nclean question.\n\nIf I showed you in writing exactly where {company} is invisible on Google and the three fixes that would bring in more calls, would that be worth two minutes of your time?\n\nA yes or a no both work. If yes, reply AUDIT or grab a time here: https://calendar.app.google/oh6EboZpqnM9uKx19\n\nMark"
+    },
+    {
+      "n": 6,
+      "delay_days": 7,
+      "angle": "pure_value_one_free_fix",
+      "subject": "one fix you can do today",
+      "body": "Hi {greeting},\n\nwhether we ever work together or not, here is one thing worth doing this week.\n\nClaim and fully fill out your Google Business Profile for {company}: every service listed, real photos, your service area, and a steady flow of reviews. For a lot of service businesses that single step is the difference between landing in the map pack or not, and it costs nothing.\n\nIf you want the full picture, the written teardown still stands. Reply AUDIT.\n\nMark"
+    },
+    {
+      "n": 7,
+      "delay_days": 10,
+      "angle": "breakup_give_open",
+      "subject": "closing your file",
+      "body": "Hi {greeting},\n\nclosing your file on my end, since I only take on a few service businesses at a time.\n\nIf the timing is off, I get it. If your SEO is already handled, even better. If you just have not gotten to it, the teardown is still here whenever you want it. Reply AUDIT and I will send it over.\n\nEither way, good luck with the growth.\n\nMark"
+    }
+  ]
+}

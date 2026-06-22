@@ -58,6 +58,10 @@ AB = {
                "b_lab": "B  give-first FALLEN list", "b_sub": "vertragsfallen"},
     "lk-advertising": {"a_lab": "A  seller-lead test", "a_sub": "seller-lead test",
                        "b_lab": "B  give-first teardown", "b_sub": "free teardown"},
+    "diraya": {"a_lab": "A  REVIEW one-pager", "a_sub": "one-pager",
+               "b_lab": "B  give-first GHOSTS list", "b_sub": "ghost-cases"},
+    "mark-eting": {"a_lab": "A  teardown subject", "a_sub": "visibility teardown",
+                   "b_lab": "B  curiosity subject", "b_sub": "who shows up before"},
 }
 
 
