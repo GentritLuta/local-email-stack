@@ -56,6 +56,8 @@ AB = {
                "b_lab": "B  give-first list", "b_sub": "attorneys who hand off"},
     "energ":  {"a_lab": "A  CHECK assessment", "a_sub": "schriftliche",
                "b_lab": "B  give-first FALLEN list", "b_sub": "vertragsfallen"},
+    "lk-advertising": {"a_lab": "A  seller-lead test", "a_sub": "seller-lead test",
+                       "b_lab": "B  give-first teardown", "b_sub": "free teardown"},
 }
 
 
