@@ -23,7 +23,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "out" / "reports"
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-GOLD = "#c9a227"
+GOLD = "#d4af37"  # aureonglobal.de primary gold
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -111,9 +111,10 @@ def bars(items, scale, decimals=0) -> str:
     drawn against `scale`. Pure HTML/CSS so it renders crisp in print-to-PDF."""
     out = []
     for letter, v, val in items:
-        w = max(4, round(val / scale * 100)) if scale else 4
+        w = max(2, round(val / scale * 100)) if scale else 2
         out.append(f'<div class="crow"><div class="clab">Client {letter}<span>{v}</span></div>'
-                   f'<div class="ctrack"><div class="cbar" style="width:{w}%">{val:.{decimals}f}%</div></div></div>')
+                   f'<div class="ctrack"><div class="cbar" style="width:{w}%"></div></div>'
+                   f'<div class="cval">{val:.{decimals}f}%</div></div>')
     return '<div class="chart">' + "".join(out) + '</div>'
 
 
@@ -172,39 +173,43 @@ def build_html(overall, per, prospects, clients, replies) -> str:
         step("5", "Ongoing: tune, report, expand", "Copy and targeting are tuned every week on the real numbers, with a weekly report. As we learn what moves your result, we can agree to improve other parts of the funnel too."),
     ])
 
-    return f"""<!doctype html><html><head><meta charset="utf-8"><style>
+    return f"""<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
 @page{{size:A4;margin:0}}
 *{{box-sizing:border-box}}
-body{{margin:0;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1b1b1b;font-size:13px;line-height:1.6}}
-.page{{width:210mm;height:296mm;overflow:hidden;padding:24mm 22mm;page-break-after:always;position:relative}}
+body{{margin:0;font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;color:#e3e3e3;background:#0a0a0a;font-size:13px;line-height:1.65;-webkit-font-smoothing:antialiased}}
+b,strong{{color:#e8c84a;font-weight:700}}
+.page{{width:210mm;height:296mm;overflow:hidden;padding:24mm 22mm;page-break-after:always;position:relative;background:#0a0a0a}}
 .page:last-child{{page-break-after:auto}}
-h1{{font-family:Georgia,serif;font-size:30px;font-weight:600;margin:0 0 6px;letter-spacing:-.3px}}
-h2{{font-family:Georgia,serif;font-size:20px;font-weight:600;margin:0 0 14px;letter-spacing:-.2px}}
-.kick{{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:{GOLD};font-weight:700;margin-bottom:10px}}
-.rule{{height:2px;background:{GOLD};width:54px;margin:14px 0 22px;border-radius:2px}}
+h1{{font-size:34px;font-weight:800;margin:0 0 8px;letter-spacing:-.6px;color:#fff;line-height:1.08}}
+h2{{font-size:22px;font-weight:700;margin:0 0 14px;letter-spacing:-.3px;color:#fff}}
+.kick{{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:{GOLD};font-weight:700;margin-bottom:12px}}
+.rule{{height:3px;width:58px;margin:14px 0 22px;border-radius:3px;background:linear-gradient(90deg,#fae5aa,{GOLD},#8a6e2f)}}
 .brand{{display:flex;align-items:center;gap:11px}}
-.brand .nm{{font-weight:700;font-size:16px}} .brand .tl{{font-size:8.5px;letter-spacing:.28em;text-transform:uppercase;color:{GOLD};font-weight:700}}
-.muted{{color:#6b6b6b}}
+.brand .nm{{font-weight:800;font-size:16px;color:#fff;letter-spacing:-.2px}} .brand .tl{{font-size:8.5px;letter-spacing:.3em;text-transform:uppercase;color:{GOLD};font-weight:600;margin-top:3px}}
+.muted{{color:#9a9a9a}}
 .grid{{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}}
-.stat{{flex:1 1 28%;background:#faf7ef;border:1px solid #ece3cb;border-radius:10px;padding:16px 18px}}
-.stat .num{{font-family:Georgia,serif;font-size:30px;font-weight:600;color:#1b1b1b;line-height:1}}
-.stat .lab{{font-size:11.5px;color:#6b6b6b;margin-top:7px}}
-table{{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px}}
-th{{text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a8a8a;font-weight:700;padding:0 10px 8px;border-bottom:1.5px solid #e7e2d3}}
-td{{padding:11px 10px;border-bottom:1px solid #efece2}} td.hl{{color:{GOLD};font-weight:700}}
-.step{{display:flex;gap:14px;margin:0 0 16px;align-items:flex-start}}
-.sn{{flex:0 0 30px;height:30px;border-radius:50%;background:{GOLD};color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;font-family:Georgia,serif}}
-.st{{font-weight:700;font-size:14px}} .sb{{color:#5d5d5d;font-size:12.5px}}
+.stat{{flex:1 1 28%;background:#141414;border:1px solid #262626;border-radius:14px;padding:18px 20px}}
+.stat .num{{font-size:31px;font-weight:800;color:#e8c84a;line-height:1;letter-spacing:-.5px}}
+.stat .lab{{font-size:11.5px;color:#9a9a9a;margin-top:9px}}
+table{{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}}
+th{{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#737373;font-weight:600;padding:0 10px 10px;border-bottom:1px solid #2a2a2a}}
+td{{padding:12px 10px;border-bottom:1px solid #1a1a1a;color:#dcdcdc}} td.hl{{color:{GOLD};font-weight:700}}
+.step{{display:flex;gap:14px;margin:0 0 17px;align-items:flex-start}}
+.sn{{flex:0 0 32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e6c259,#b68e2d);color:#0a0a0a;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}}
+.st{{font-weight:700;font-size:14px;color:#fff}} .sb{{color:#9a9a9a;font-size:12.5px}}
 .chart{{margin-top:22px}}
 .crow{{display:flex;align-items:center;gap:14px;margin:0 0 18px}}
-.clab{{flex:0 0 52mm;font-size:12.5px;font-weight:700}}
-.clab span{{display:block;font-weight:400;color:#8a8a8a;font-size:11px;margin-top:2px}}
-.ctrack{{flex:1;background:#f1ece0;border-radius:6px;height:28px}}
-.cbar{{background:{GOLD};height:28px;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;color:#fff;font-weight:700;font-size:12.5px;padding-right:11px;min-width:36px}}
-.foot{{position:absolute;bottom:14mm;left:22mm;right:22mm;display:flex;justify-content:space-between;font-size:10px;color:#9a9a9a;border-top:1px solid #ece3cb;padding-top:8px}}
-.note{{font-size:11px;color:#8a8a8a;margin-top:14px;font-style:italic}}
+.clab{{flex:0 0 52mm;font-size:12.5px;font-weight:700;color:#fff}}
+.clab span{{display:block;font-weight:400;color:#888;font-size:11px;margin-top:2px}}
+.ctrack{{flex:1;background:#1c1c1c;border-radius:7px;height:28px}}
+.cbar{{background:linear-gradient(90deg,{GOLD},#b68e2d);height:28px;border-radius:7px;min-width:6px}}
+.cval{{flex:0 0 50px;text-align:right;font-weight:700;font-size:13px;color:#e8c84a}}
+.foot{{position:absolute;bottom:14mm;left:22mm;right:22mm;display:flex;justify-content:space-between;font-size:10px;color:#5f5f5f;border-top:1px solid #262626;padding-top:8px}}
+.note{{font-size:11px;color:#737373;margin-top:14px;font-style:italic}}
 .cover{{display:flex;flex-direction:column;justify-content:center;min-height:249mm}}
-.bar{{height:8px;background:{GOLD};border-radius:4px;display:inline-block}}
 </style></head><body>
 
 <div class="page"><div class="cover">
