@@ -67,13 +67,20 @@ def pct(n, d):
 
 def fetch():
     overall = q("""select count(*) sends, count(*) filter (where delivered) delivered,
-        count(*) filter (where opened_at is not null) opened, count(*) filter (where bounced) bounced,
+        count(*) filter (where opened_at is not null) opened, count(*) filter (where clicked_at is not null) clicked,
+        count(*) filter (where bounced) bounced,
         min(sent_at)::date first, max(sent_at)::date last from send_log where sent_at is not null""")[0]
     per = q("""select p.profile_slug,
         count(*) sends, count(*) filter (where s.delivered) delivered,
-        count(*) filter (where s.opened_at is not null) opened
+        count(*) filter (where s.opened_at is not null) opened,
+        count(*) filter (where s.clicked_at is not null) clicked
         from send_log s join runs r on r.id=s.run_id join prospects p on p.id=r.prospect_id
         where s.sent_at is not null group by p.profile_slug""")
+    # genuine replies (class='reply') per client, merged onto each row
+    repl = {r["profile_slug"]: r["n"] for r in
+            q("select profile_slug, count(*) n from replies where class='reply' group by profile_slug")}
+    for r in per:
+        r["replies"] = repl.get(r["profile_slug"], 0)
     prospects = q("select count(*) n from prospects")[0]["n"]
     clients = q("select count(*) n from profiles where active")[0]["n"]
     replies = q("select count(*) n from replies where class='reply'")[0]["n"]
@@ -99,33 +106,45 @@ def step(n, title, body):
             f'<div class="sb">{body}</div></div></div>')
 
 
-def bar_chart(rows) -> str:
-    """Horizontal CSS bar chart of open rate per (anonymized) client. Pure HTML/CSS so it
-    renders crisp in print-to-PDF (no canvas/JS snapshot timing issues). Scale capped at 80%."""
-    bars = []
-    for i, (v, s, d, o) in enumerate(rows):
-        w = max(6, round(o / 80.0 * 100))
-        bars.append(f'<div class="crow"><div class="clab">Client {chr(65+i)}<span>{v}</span></div>'
-                    f'<div class="ctrack"><div class="cbar" style="width:{w}%">{o}%</div></div></div>')
-    return '<div class="chart">' + "".join(bars) + '</div>'
+def bars(items, scale, decimals=0) -> str:
+    """Horizontal CSS bar chart. items = [(letter, vertical, value)]; value is a percent
+    drawn against `scale`. Pure HTML/CSS so it renders crisp in print-to-PDF."""
+    out = []
+    for letter, v, val in items:
+        w = max(4, round(val / scale * 100)) if scale else 4
+        out.append(f'<div class="crow"><div class="clab">Client {letter}<span>{v}</span></div>'
+                   f'<div class="ctrack"><div class="cbar" style="width:{w}%">{val:.{decimals}f}%</div></div></div>')
+    return '<div class="chart">' + "".join(out) + '</div>'
 
 
 def build_html(overall, per, prospects, clients, replies) -> str:
     sent = overall["sends"]
-    dl = pct(overall["delivered"], sent)
-    op = pct(overall["opened"], overall["delivered"])
-    bo = pct(overall["bounced"], sent)
+    deliv = overall["delivered"]
+    dl = pct(deliv, sent)
+    op = pct(overall["opened"], deliv)
+    ck = pct(overall["clicked"], deliv)
+    rr = round(100 * replies / deliv, 1) if deliv else 0.0
     span_first = str(overall["first"]); span_last = str(overall["last"])
-    # per-client rows (anonymized), highest open rate first
-    rows = []
-    for r in sorted(per, key=lambda x: pct(x["opened"], x["delivered"]), reverse=True):
+    # per-client rows (anonymized), highest open rate first -> Client A..F
+    data = []
+    for r in per:
         v = VERTICAL.get(r["profile_slug"])
         if not v:
             continue
-        rows.append((v, r["sends"], pct(r["delivered"], r["sends"]), pct(r["opened"], r["delivered"])))
+        d = r["delivered"]
+        data.append({"v": v, "sent": r["sends"], "deliv": pct(d, r["sends"]),
+                     "open": pct(r["opened"], d), "click": pct(r["clicked"], d),
+                     "replies": r["replies"], "reply": round(100 * r["replies"] / d, 1) if d else 0.0})
+    data.sort(key=lambda x: x["open"], reverse=True)
+    for i, r in enumerate(data):
+        r["letter"] = chr(65 + i)
     rows_html = "".join(
-        f'<tr><td>Client {chr(65+i)}</td><td>{v}</td><td>{s:,}</td><td>{d}%</td><td class="hl">{o}%</td></tr>'
-        for i, (v, s, d, o) in enumerate(rows))
+        f'<tr><td>Client {r["letter"]}</td><td>{r["v"]}</td><td>{r["sent"]:,}</td><td>{r["deliv"]}%</td>'
+        f'<td class="hl">{r["open"]}%</td><td>{r["click"]}%</td><td>{r["reply"]:.1f}%</td></tr>'
+        for r in data)
+    open_bars = bars([(r["letter"], r["v"], r["open"]) for r in data], 80)
+    reply_bars = bars([(r["letter"], r["v"], r["reply"])
+                       for r in sorted(data, key=lambda x: x["reply"], reverse=True)], 4, 1)
 
     steps = "".join([
         step(1, "Discovery & ICP", "We define the ideal customer, the offer, and the exact niche so every email has a reason to be opened."),
@@ -191,38 +210,52 @@ td{{padding:11px 10px;border-bottom:1px solid #efece2}} td.hl{{color:{GOLD};font
   <div class="grid">
     {stat(f"{sent:,}", "Emails sent")}
     {stat(f"{dl}%", "Delivered to inbox")}
-    {stat(f"{op}%", "Opened")}
+    {stat(f"{op}%", "Open rate")}
   </div>
   <div class="grid">
-    {stat(f"{prospects:,}", "Prospects sourced &amp; verified")}
-    {stat(f"{bo}%", "Bounced")}
-    {stat(f"{clients}", "Active client campaigns")}
+    {stat(f"{ck}%", "Click rate")}
+    {stat(f"{rr}%", "Reply rate")}
+    {stat(f"{prospects:,}", "Prospects sourced")}
   </div>
-  <p style="margin-top:18px">A {dl}% inbox delivery rate and a {op}% open rate are the foundation everything else is built on.
-     Most cold email never reaches the inbox; ours does, because the infrastructure is built properly before a single
-     campaign goes live.</p>
-  <p class="note">Delivery = share of sent mail accepted by the recipient server. Open rate = opens over delivered.
-     Reply and booking volume builds after the warm-up window and is reported per client.</p>
+  <p style="margin-top:18px">A {dl}% inbox delivery rate and a {op}% open rate are the foundation. From there, {replies}
+     genuine replies came back over the period, and reply rate varies sharply by market, reported in full on the next page.</p>
+  <p class="note">Delivery = sent mail accepted by the recipient server. Open = opens over delivered. Reply = genuine
+     human replies (auto-replies and bounces excluded) over delivered. Click rate includes automated link scanning by
+     inbox-security systems (Safe Links, Proofpoint, Mimecast), which click every link to vet it, so it overstates
+     human clicks; opens and replies are the truer engagement signals.</p>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
 
 <div class="page">
-  <div class="kick">By campaign</div><h2>The same engine, across very different markets.</h2><div class="rule"></div>
-  <p class="muted" style="max-width:140mm">From DACH real estate to US performance media to B2B AI engineering, the same engine
-     delivers inbox placement and strong open rates. Clients anonymized to their vertical.</p>
-  <table><thead><tr><th>Campaign</th><th>Vertical</th><th>Sent</th><th>Delivered</th><th>Open rate</th></tr></thead>
+  <div class="kick">By campaign</div><h2>Every metric, every market.</h2><div class="rule"></div>
+  <p class="muted" style="max-width:140mm">Sent, delivered, opened, clicked and replied for each live campaign, anonymized to
+     its vertical. The full funnel, side by side.</p>
+  <table><thead><tr><th>Campaign</th><th>Vertical</th><th>Sent</th><th>Deliv.</th><th>Open</th><th>Click</th><th>Reply</th></tr></thead>
     <tbody>{rows_html}</tbody></table>
-  <p style="margin-top:20px">Open rates range across verticals because audiences differ, but inbox placement stays high everywhere.
-     That consistency is the product: a process that travels across markets without rebuilding it each time.</p>
+  <p style="margin-top:20px">Inbox placement stays high across every market; open and reply rates move with the audience.
+     One campaign already replies at {max(r['reply'] for r in data):.1f}%, several times the cold-email benchmark, while
+     others are earlier in their reply curve.</p>
+  <p class="note">Reply = genuine human replies over delivered. Click rate includes automated security-scanner clicks
+     and overstates human clicks (visible where it approaches or exceeds the open rate).</p>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
 
 <div class="page">
   <div class="kick">Open rate by vertical</div><h2>The inbox, visualized.</h2><div class="rule"></div>
   <p class="muted" style="max-width:140mm">Every campaign, ranked by the share of delivered mail that gets opened.
-     The shared floor under all of them is inbox placement, the part most cold email never solves.</p>
-  {bar_chart(rows)}
-  <p class="note">Bars scaled to an 80% axis for readability. Open rate = opens over delivered mail.</p>
+     The shared floor under all of them is inbox placement.</p>
+  {open_bars}
+  <p class="note">Bars scaled to an 80% axis. Open rate = opens over delivered mail.</p>
+  <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
+</div>
+
+<div class="page">
+  <div class="kick">Reply rate by vertical</div><h2>Where it turns into conversations.</h2><div class="rule"></div>
+  <p class="muted" style="max-width:140mm">Genuine human replies as a share of delivered mail. This is the number that
+     becomes pipeline, and where the strongest campaign pulls well ahead.</p>
+  {reply_bars}
+  <p class="note">Bars scaled to a 4% axis. Reply rate = genuine human replies (auto-replies and bounces excluded)
+     over delivered mail.</p>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
 
@@ -231,24 +264,6 @@ td{{padding:11px 10px;border-bottom:1px solid #efece2}} td.hl{{color:{GOLD};font
   <p class="muted" style="max-width:140mm">Onboarding is a fixed, repeatable path. Here is every step we run for a new client,
      in order.</p>
   <div style="margin-top:18px">{steps}</div>
-  <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
-</div>
-
-<div class="page">
-  <div class="kick">Beyond email</div><h2>A free seller-lead engine, built in.</h2><div class="rule"></div>
-  <p class="muted" style="max-width:140mm">For real estate clients we run a second engine alongside email: contactable seller
-     leads at zero data cost, plus a booking funnel that turns interest into appointments.</p>
-  <div class="grid">
-    {stat("$0", "Data cost per lead")}
-    {stat("40+", "Mail-ready leads per active zip")}
-    {stat("100%", "Consented bookings")}
-  </div>
-  <div style="margin-top:14px">
-    {step("&rarr;", "Free motivated-seller list", "Out-of-state absentee owners pulled from public county records, ranked by intent, mail-ready with no skip-trace.")}
-    {step("&rarr;", "Direct mail to the free address", "Each owner gets a branded letter with a QR code to their personal home-value page. No phone or email data needed, fully compliant.")}
-    {step("&rarr;", "Home-value page with booking", "The owner checks their value and books a time on the spot; the appointment routes straight to the agent.")}
-  </div>
-  <p class="note">The seller engine is delivered done-for-you; the client provides nothing and receives booked seller appointments.</p>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
 
@@ -264,7 +279,7 @@ def main() -> int:
     # dropping a full-height page; a real file in out/ renders all pages reliably).
     src_path = OUT / "_render.html"
     src_path.write_text(html, encoding="utf-8")
-    pdf = OUT / "Aureon-Outreach-Report.pdf"
+    pdf = OUT / "Aureon-Email-Report.pdf"
     tmp_pdf = OUT / "_report_tmp.pdf"
     # isolated profile per render: sharing the default profile with a running Chrome causes
     # contention that intermittently drops a full-height page from the print output.
@@ -283,7 +298,7 @@ def main() -> int:
     try:
         os.replace(tmp_pdf, pdf)
     except OSError:
-        target = OUT / "Aureon-Outreach-Report-new.pdf"
+        target = OUT / "Aureon-Email-Report-new.pdf"
         try:
             os.replace(tmp_pdf, target)
             print(f"   ! {pdf.name} is open in a viewer (locked) — wrote {target.name} instead; "
