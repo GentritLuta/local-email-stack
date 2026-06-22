@@ -67,6 +67,15 @@ ALERT_FROM = "Reply Draft <drafts@hi.aureonglobal.de>"
 _CLAUDE_EXE = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.exe"
 CLAUDE_CMD = os.environ.get("CLAUDE_CLI") or (_CLAUDE_EXE if os.path.exists(_CLAUDE_EXE) else r"D:\npm-global\claude.cmd")
 
+# REVIEW GATE (added 2026-06-21 at user request). When on, a drafted reply is NOT
+# auto-sent to the prospect; it is queued to reply-review.py's pending store and a
+# PC popup asks the operator to approve / edit / forward / block before anything
+# leaves. Off = the old AUTO-SEND behaviour.
+# LIVE since 2026-06-21 (operator flipped it ON): every prospect reply now waits
+# for popup approval in reply-review.py — no more auto-send. To revert to the old
+# auto-send behaviour, set env LES_REVIEW_GATE=0 (or change this default to "0").
+REVIEW_GATE = os.environ.get("LES_REVIEW_GATE", "1") == "1"
+
 
 # ─── env / supabase ──────────────────────────────────────────────────────────
 
@@ -134,6 +143,8 @@ SUPPRESS_DOMAINS = {
     # our own brands / internal — replies here are not prospects
     "aureonglobal.de", "algoalpha.io", "atalsolidrocks.com", "atalsolidrocks.io",
     "diraya.ca", "wolt.com",
+    # honored unsubscribes (opt-out requests) — never email/draft anyone here
+    "swiftkickmobile.com",            # Tim replied "Unsubscribe" 2026-06-22 (diraya)
 }
 
 
@@ -1150,11 +1161,47 @@ def one_pass(limit: int, dry: bool) -> dict:
         if not draft:
             draft = template_draft(persona or {}, msg, offer_recap=offer_recap)
             print("    (used template fallback)")
+        slug = (prow or {}).get("profile_slug") or ""
+
+        # REVIEW GATE: instead of auto-sending, queue the draft + context to the
+        # review popup and stop. Only genuine campaign replies reach here
+        # (suppression + active-prospect gates already passed). The operator
+        # approves / edits / forwards / blocks in reply-review.py before anything
+        # goes to the prospect.
+        if REVIEW_GATE:
+            if dry:
+                print(f"    -> [DRY] would QUEUE FOR REVIEW: {prospect} [{pname}]")
+                stats["drafted"] += 1
+                continue
+            try:
+                import importlib.util as _ilu
+                _spec = _ilu.spec_from_file_location(
+                    "reply_review", REPO / "sequences" / "reply-review.py")
+                _rr = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_rr)
+                _rr.enqueue(
+                    reply_id=r["id"], prospect_email=prospect,
+                    prospect_name=(prow or {}).get("first_name") or "",
+                    prospect_text=(r.get("body_snippet") or ""),
+                    subject=subject, slug=slug, run_id=r.get("run_id"),
+                    persona=persona, profile=profile, draft=draft,
+                    deal_context=offer_recap,
+                    unsub_token=(prow or {}).get("unsubscribe_token"))
+                rh = dict(r.get("raw_headers") or {})
+                rh["queued_for_review"] = True
+                rh["queued_for_review_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                rh["autodraft_sent"] = True  # so this pass never reprocesses it
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": rh})
+                print(f"    -> QUEUED FOR REVIEW: {prospect} (popup will ask you to decide)")
+                stats["drafted"] += 1
+            except Exception as e:
+                print(f"    ! review-queue failed ({e}); leaving reply for next pass")
+                stats["errors"] += 1
+            continue
+
         # AUTO-SEND: deliver the drafted reply straight to the prospect (bcc info@).
         # Only genuine campaign replies reach here (suppression + active-prospect
         # gates already passed). If auto-send cannot fire (no sender/key resolved),
         # fall back to queuing the draft to the operator so nothing is lost.
-        slug = (prow or {}).get("profile_slug") or ""
         sent = send_draft_to_prospect(
             reply=r, slug=slug, prospect_email=prospect, subject=subject,
             draft=draft, persona=persona, profile=profile, dry=dry,

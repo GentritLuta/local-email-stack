@@ -76,6 +76,11 @@ except Exception:
 
 UA = "local-email-stack seller-outreach/1.0"
 OPERATOR_ADDR = "info@aureonglobal.de"
+
+# REVIEW GATE: by default, queue seller-outreach follow-ups for the human review popup
+# (reply-review.py) instead of auto-sending, so EVERY AI reply to a prospect is gated the
+# same way reply-autodraft.py is. Set LES_REVIEW_GATE=0 to restore the old auto-send.
+REVIEW_GATE = os.environ.get("LES_REVIEW_GATE", "1") == "1"
 ALERT_FROM = "Seller Outreach <drafts@hi.aureonglobal.de>"
 _CLAUDE_EXE = r"D:\npm-global\node_modules\@anthropic-ai\claude-code\bin\claude.exe"
 CLAUDE_CMD = os.environ.get("CLAUDE_CLI") or (_CLAUDE_EXE if os.path.exists(_CLAUDE_EXE) else r"D:\npm-global\claude.cmd")
@@ -864,9 +869,36 @@ def one_pass(limit: int, dry: bool) -> dict:
             draft = template_followup(persona, is_german)
         thread = prior_thread(r.get("run_id"), prospect_email)
 
-        # AUTO-SEND the follow-up straight to the prospect (with info@ copied),
-        # then always email the operator a record digest so the full context
-        # (thread, site notes, what they wrote) lands in info@ too.
+        # REVIEW GATE: queue the follow-up for the human popup instead of auto-sending,
+        # so the operator approves / edits / blocks before it ever reaches the prospect.
+        if REVIEW_GATE:
+            if dry:
+                print(f"     [DRY] would QUEUE FOR REVIEW: {prospect_email}")
+                stats["drafted"] = stats.get("drafted", 0) + 1
+                continue
+            try:
+                import importlib.util as _ilu
+                _spec = _ilu.spec_from_file_location("reply_review", REPO / "sequences" / "reply-review.py")
+                _rr = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_rr)
+                _rr.enqueue(reply_id=r["id"], prospect_email=prospect_email,
+                            prospect_name=prospect.get("first_name") or "",
+                            prospect_text=msg or (r.get("body_snippet") or ""),
+                            subject=subject, slug=profile.get("slug") or "",
+                            run_id=r.get("run_id"), persona=persona, profile=profile,
+                            draft=draft, deal_context="Seller-outreach follow-up (books to Calendly).",
+                            unsub_token=prospect.get("unsubscribe_token"))
+                set_status(prospect, status="drafted", site_summary=site[:300],
+                           drafted_at=dt.datetime.now(dt.timezone.utc).isoformat())
+                mark_seen(r)
+                stats["drafted"] = stats.get("drafted", 0) + 1
+                print(f"     QUEUED FOR REVIEW (popup will ask you to decide)")
+            except Exception as e:
+                print(f"     ! review-queue failed ({e}); leaving for next pass")
+                stats["errors"] += 1
+            continue
+
+        # AUTO-SEND (only when LES_REVIEW_GATE=0): straight to the prospect (with info@
+        # copied), then email the operator a record digest with the full context.
         sent = auto_send_followup(prospect=prospect, profile=profile, persona=persona,
                                   subject=subject, draft=draft, reply=r, dry=dry)
         send_digest(prospect=prospect, profile=profile, persona=persona,
