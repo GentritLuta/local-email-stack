@@ -61,34 +61,75 @@ AB = {
 }
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--profile", default="aureon", choices=list(AB), help="which client A/B to read")
-    ap.add_argument("--since", default="2026-06-22", help="A/B start date (YYYY-MM-DD)")
-    a = ap.parse_args()
-    cfg = AB[a.profile]
-    rows = q(f"""
+def rows_for(profile: str, since: str):
+    cfg = AB[profile]
+    return q(f"""
       with s1 as (
         select s.run_id, s.delivered, s.opened_at,
           case when s.subject ilike '%%{cfg['b_sub']}%%' then '{cfg['b_lab']}'
                when s.subject ilike '%%{cfg['a_sub']}%%' then '{cfg['a_lab']}'
                else 'other' end side
         from send_log s join runs r on r.id=s.run_id join prospects p on p.id=r.prospect_id
-        where p.profile_slug='{a.profile}' and s.step_n=1 and s.sent_at >= '{a.since}'),
-      rep as (select distinct run_id from replies where profile_slug='{a.profile}' and class='reply')
+        where p.profile_slug='{profile}' and s.step_n=1 and s.sent_at >= '{since}'),
+      rep as (select distinct run_id from replies where profile_slug='{profile}' and class='reply')
       select s1.side, count(*) sends, count(*) filter (where s1.delivered) delivered,
         count(*) filter (where s1.opened_at is not null) opened,
         count(*) filter (where rep.run_id is not null) replies
       from s1 left join rep on rep.run_id=s1.run_id
       group by s1.side order by s1.side""")
-    print(f"{a.profile} step-1 A/B  (since {a.since})\n" + "-" * 64)
-    print(f"{'side':20} {'sends':>6} {'deliv':>6} {'open%':>7} {'repl':>5} {'reply%':>7}")
+
+
+def fmt(profile: str, since: str) -> str:
+    cfg = AB[profile]
+    rows = rows_for(profile, since)
+    out = [f"{profile} step-1 A/B  (since {since})", "-" * 64,
+           f"{'side':26} {'sends':>6} {'deliv':>6} {'open%':>7} {'repl':>5} {'reply%':>7}"]
     for r in rows:
-        print(f"{r['side']:20} {r['sends']:>6} {r['delivered']:>6} "
-              f"{pct(r['opened'], r['delivered']):>6}% {r['replies']:>5} {pct(r['replies'], r['delivered']):>6}%")
+        out.append(f"{r['side']:26} {r['sends']:>6} {r['delivered']:>6} "
+                   f"{pct(r['opened'], r['delivered']):>6}% {r['replies']:>5} {pct(r['replies'], r['delivered']):>6}%")
     if not rows:
-        print("(no step-1 sends since the start date yet — check back after the next send cycle)")
-    print(f"\n{cfg['a_lab'].strip()} = current opener · {cfg['b_lab'].strip()} = give-first challenger")
+        out.append("(no step-1 sends since the start date yet)")
+    out.append(f"{cfg['a_lab'].strip()} = current opener  |  {cfg['b_lab'].strip()} = give-first challenger")
+    return "\n".join(out)
+
+
+def send_email(subject: str, body: str) -> bool:
+    import smtplib
+    import ssl as _ssl
+    from email.mime.text import MIMEText
+    from email.utils import formatdate, make_msgid
+    H = env(REPO / "sequences" / "hostinger.env")
+    host, port = H.get("SMTP_HOST"), int(H.get("SMTP_PORT", "465"))
+    user, pw = H.get("SMTP_USER"), H.get("SMTP_PASS")
+    to = "info@aureonglobal.de"
+    if not (host and user and pw):
+        print("  ! SMTP creds missing — printed only"); return False
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["From"] = f"AB digest <{H.get('FROM_ADDR', user)}>"
+    msg["To"] = to; msg["Subject"] = subject
+    msg["Date"] = formatdate(localtime=True)
+    msg["Message-ID"] = make_msgid(domain="aureonglobal.de")
+    try:
+        with smtplib.SMTP_SSL(host, port, timeout=30, context=_ssl.create_default_context()) as s:
+            s.login(user, pw); s.send_message(msg)
+        return True
+    except Exception as e:
+        print(f"  ! send failed: {str(e)[:120]}"); return False
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--profile", default="aureon", choices=list(AB), help="single client A/B")
+    ap.add_argument("--all", action="store_true", help="report every client A/B")
+    ap.add_argument("--email", action="store_true", help="email the digest to info@aureonglobal.de")
+    ap.add_argument("--since", default="2026-06-22", help="A/B start date (YYYY-MM-DD)")
+    a = ap.parse_args()
+    profiles = list(AB) if (a.all or a.email) else [a.profile]
+    body = "\n\n".join(fmt(p, a.since) for p in profiles)
+    print(body)
+    if a.email:
+        ok = send_email("Give-first A/B digest", body + "\n\nRun yourself: py scripts/ab-status.py --all")
+        print("\n[emailed to info@aureonglobal.de]" if ok else "\n[email failed — printed above]")
     return 0
 
 
