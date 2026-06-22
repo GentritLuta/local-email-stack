@@ -145,6 +145,14 @@ def build_html(overall, per, prospects, clients, replies) -> str:
     open_bars = bars([(r["letter"], r["v"], r["open"]) for r in data], 80)
     reply_bars = bars([(r["letter"], r["v"], r["reply"])
                        for r in sorted(data, key=lambda x: x["reply"], reverse=True)], 4, 1)
+    # forward value projection (assumptions, not actuals — no bookings are tracked in-platform)
+    LEAD_V, MEET_V = 75, 300            # $ per warm-lead reply / per booked meeting
+    EPD, SDAYS, PRR, MCONV = 600, 22, 0.004, 1 / 3   # 600 emails/day, 22 send-days, 0.4% reply, 1-in-3 to meeting
+    m_emails = EPD * SDAYS
+    m_repl = m_emails * PRR
+    m_meet = m_repl * MCONV
+    lead_mo, lead_yr = m_repl * LEAD_V, m_repl * LEAD_V * 12
+    meet_mo, meet_yr = m_meet * MEET_V, m_meet * MEET_V * 12
 
     steps = "".join([
         step(1, "Discovery & ICP", "We define the ideal customer, the offer, and the exact niche so every email has a reason to be opened."),
@@ -256,6 +264,30 @@ td{{padding:11px 10px;border-bottom:1px solid #efece2}} td.hl{{color:{GOLD};font
   {reply_bars}
   <p class="note">Bars scaled to a 4% axis. Reply rate = genuine human replies (auto-replies and bounces excluded)
      over delivered mail.</p>
+  <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
+</div>
+
+<div class="page">
+  <div class="kick">Value generated</div><h2>What one campaign is worth.</h2><div class="rule"></div>
+  <p class="muted" style="max-width:140mm">At a conservative {PRR*100:.1f}% reply rate (the real-estate baseline, not the
+     outlier), {EPD} emails a day across {SDAYS} sending days a month. Each reply valued as a warm lead, and one in three
+     projected to a booked meeting.</p>
+  <div class="grid">
+    {stat(f"{m_emails:,}", f"Emails / month ({EPD} &times; {SDAYS})")}
+    {stat(f"{round(m_repl)}", f"Replies / month ({PRR*100:.1f}%)")}
+    {stat(f"~{round(m_meet)}", "Projected meetings / month")}
+  </div>
+  <div class="grid">
+    {stat(f"${round(lead_mo):,}", f"Lead value / month (${LEAD_V} each)")}
+    {stat(f"${round(meet_mo):,}", f"Meeting value / month (${MEET_V} each)")}
+    {stat(f"${round(meet_yr/1000)}K", "Meeting value / year")}
+  </div>
+  <p style="margin-top:16px">Sold as warm leads, one campaign generates about <b>${round(lead_mo):,}</b> a month
+     (<b>${round(lead_yr):,}</b> a year). Worked into booked meetings, the same replies are worth about
+     <b>${round(meet_mo):,}</b> a month (<b>${round(meet_yr):,}</b> a year), because each meeting is worth far more than a raw lead.</p>
+  <p class="note">Projection, not actuals. Reply rate {PRR*100:.1f}%; lead value ${LEAD_V}, meeting value ${MEET_V}; one in
+     three replies projected to a booked meeting. Lead and meeting figures are alternative framings of the same replies,
+     not additive. No bookings are tracked in-platform, so meeting figures are a projection.</p>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
 
