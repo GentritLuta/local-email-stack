@@ -14,51 +14,52 @@
     {
       "n": 1,
       "delay_days": 0,
-      "angle": "hormozi_are_you_open_personalised",
-      "subject": "a per video retainer for {company}?",
-      "body": "Hey {greeting},\n\n{personal_hook}\n\nAre you open to a flat retainer per video, paid whether your audience signs up or not?\n\nHere is the whole offer. You put AlgoAlpha in your videos. We pay you {retainer_quote}. The cash is yours up front, win or lose. On top of it you keep 30 percent lifetime commission on every paid signup you send, every month they stay.\n\nWe are AlgoAlpha. 14.1 million chart adds on TradingView, 75,000 paying traders, Editor Choice badge twice. So the product converts, which is what makes the commission stack on top of the retainer.\n\nDoes it make sense to hop on a quick 15 minute call to lock your rate and your link?\n\nJust hit reply with your channel link.\n\nP.s. reply no if not interested."
+      "angle": "give_first_locked_rate_single_ask",
+      "_ab_note": "STEP-1 A/B STARTED 2026-06-22. A-side (this linked variant) = rate-curiosity opener ('{company} rate', reply for your locked per-video number). B-side (inline on the algoalpha step-1 sequence_step) = cash-lead opener ('a paid feature for {company}', leads with 'we pay creators a flat fee plus 30% lifetime commission'). Tests curiosity-rate vs direct-cash framing; same {personal_hook}/{retainer_quote} merges, same char rules (no apostrophes/dashes/quotes/word-hyphens). Runner E1 split 50/50. Read: py scripts/ab-status.py --profile algoalpha. [[aureon-givefirst-ab]]",
+      "subject": "{company} rate",
+      "body": "Hey {greeting},\n\n{personal_hook}\n\nHere is something useful either way. Reply with your channel link and I will send back the exact retainer we would pay {company} per video, a flat number, locked, win or lose.\n\nHow it works once you have the number: you feature AlgoAlpha in a video, we pay you {retainer_quote} up front whether your audience signs up or not, and you keep 30 percent lifetime commission on every paid signup you send, every month they stay.\n\nFor context, we are AlgoAlpha. 14.1 million chart adds on TradingView, 75,000 paying traders, Editor Choice badge twice. The product converts, so the commission stacks on top of the cash you already banked.\n\nReply with your channel link and I send your number."
     },
     {
       "n": 2,
       "delay_days": 2,
-      "angle": "hormozi_was_checking_out",
-      "subject": "the retainer is paid even if nobody signs up",
-      "body": "Hey {greeting},\n\nWas checking out {company} and saw your audience already trades, which is exactly who this pays on.\n\nThe part most creators miss: the retainer is guaranteed. We pay you {retainer_quote} whether a single viewer signs up or not, so there is zero performance risk on your side. Then the 30 percent lifetime commission rides on top for the ones who do sign up, every month they stay. On top of both you get free lifetime VIP and one custom branded indicator. Five partner slots open this quarter.\n\nWorth 15 minutes to set your rate and your link?"
+      "angle": "give_repeat_no_risk_bridge",
+      "subject": "your number",
+      "body": "Hey {greeting},\n\nQuick follow up. The number for {company} still stands, reply with your channel link and I send your exact per video retainer back.\n\nThe part worth knowing before you ask: that retainer is paid up front whether a single viewer signs up or not, so there is zero performance risk on your side. The 30 percent lifetime commission rides on top for the ones who do sign up, every month they stay.\n\nWant your number?"
     },
     {
       "n": 3,
       "delay_days": 2,
-      "angle": "hormozi_data_point_creator_earnings",
-      "subject": "14k in retainer before any commission, one creator",
-      "body": "Hey {greeting},\n\nWhat this actually pays out.\n\n{retainer_math}\n\nTop creator partner last quarter, a channel in the 250k to 1M range, posted 4 videos and banked 14,000 USD in retainer before a single signup cleared. Then the commission stacked on top. Average paid signup spends 247 USD in year one, so your 30 percent is about 74 USD per signup per year, lifetime.\n\nSame math runs for {company} the moment your link is live."
+      "angle": "concrete_payout_proof",
+      "subject": "14k before any signup",
+      "body": "Hey {greeting},\n\nWhat this actually pays out.\n\n{retainer_math}\n\nOne creator partner last quarter, a channel in the 250k to 1M range, posted 4 videos and banked 14,000 USD in retainer before a single signup cleared. The commission stacked on top of that. Average paid signup spends 247 USD in year one, so your 30 percent is about 74 USD per signup per year, and it keeps paying as long as they stay.\n\nReply with your channel link and the same math runs for {company} with your real number."
     },
     {
       "n": 4,
       "delay_days": 3,
-      "angle": "hormozi_are_you_busy_problem_solution",
-      "subject": "one off sponsor money vs retainer plus commission",
-      "body": "Hey {greeting},\n\nMe again, considering this is the 4th email, I am sure you are busy.\n\nProblem: a one off sponsorship pays you once and then the money stops, and you carry all the risk if it does not convert.\n\nSolution: we pay a retainer per video up front, so you are paid like a sponsorship but with no conversion risk, and then the 30 percent lifetime commission keeps paying every month a subscriber stays. The same audience you would rent to a sponsor once, you get paid for up front and then keep collecting on, month after month.\n\n15 minutes and I set your rate and your link. Let me know what time works."
+      "angle": "problem_solution_one_off_vs_recurring",
+      "subject": "sponsor money runs out",
+      "body": "Hey {greeting},\n\nMe again. This is the fourth email so I will keep it short.\n\nProblem: a one off sponsorship pays you once, then the money stops, and you carry the risk if it does not convert.\n\nSolution: we pay a retainer per video up front, so you are paid like a sponsor but with no conversion risk, and the 30 percent lifetime commission keeps paying every month a subscriber stays. The same audience you would rent to a sponsor one time, you get paid for up front and then keep collecting on.\n\nReply with your channel link and I send the exact retainer for {company}."
     },
     {
       "n": 5,
       "delay_days": 4,
-      "angle": "hormozi_forced_yes_or_no",
-      "subject": "{company}, retainer plus 30 percent, yes or no",
-      "body": "Hey {greeting},\n\nIf we paid {company} {retainer_quote}, charged you nothing upfront or monthly, added 30 percent lifetime commission on every signup, and handed your audience a custom branded indicator for free, would you say yes?\n\nA clear yes or no both work."
+      "angle": "forced_yes_or_no",
+      "subject": "{company}, yes or no",
+      "body": "Hey {greeting},\n\nIf we paid {company} {retainer_quote} up front, win or lose, with nothing charged to you ever, plus 30 percent lifetime commission on every signup, would you say yes?\n\nA clear yes or no both work."
     },
     {
       "n": 6,
       "delay_days": 7,
-      "angle": "hormozi_pure_value_indicator_mockup",
-      "subject": "free mockup, and the retainer stands",
-      "body": "Hey {greeting},\n\nWhether {company} takes the retainer or not, here is a free thing.\n\nI will send a one page mockup of the custom indicator we would build and brand for your audience. Hit reply and I send it within 48 hours.\n\nNo call after. The retainer and the 30 percent commission stay open whenever you want them."
+      "angle": "pure_value_manual_give",
+      "subject": "a mockup for you",
+      "body": "Hey {greeting},\n\nWhether {company} takes the retainer or not, here is something useful.\n\nReply with your channel link and I will put together a one page mockup of the custom indicator we would build and brand for your audience, then send it over. No call attached to it.\n\nThe retainer and the 30 percent commission stay open whenever you want them."
     },
     {
       "n": 7,
       "delay_days": 10,
-      "angle": "hormozi_breakup",
-      "subject": "closing the retainer slot for {company}",
-      "body": "Hey {greeting},\n\nClosing your partner slot at AlgoAlpha today since the five quarterly seats fill this week. The per video retainer and the 30 percent lifetime commission go with the slot.\n\nIf the timing is off, I get it. If the offer is off, tell me what would land. Otherwise I will not write again."
+      "angle": "breakup_give_stays_open",
+      "subject": "closing your file",
+      "body": "Hey {greeting},\n\nI am closing your partner file at AlgoAlpha for now, so this is the last one from me.\n\nIf the timing is off for {company}, I get it. If the offer is off, tell me what would land and I will listen.\n\nEither way the door stays open. Reply with your channel link anytime and I send your exact per video retainer, plus the 30 percent lifetime commission, no call needed."
     }
   ]
 }

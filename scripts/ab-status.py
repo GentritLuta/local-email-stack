@@ -62,6 +62,8 @@ AB = {
                "b_lab": "B  give-first GHOSTS list", "b_sub": "ghost-cases"},
     "mark-eting": {"a_lab": "A  teardown subject", "a_sub": "visibility teardown",
                    "b_lab": "B  curiosity subject", "b_sub": "who shows up before"},
+    "algoalpha": {"a_lab": "A  rate-curiosity", "a_sub": "rate",
+                  "b_lab": "B  cash-lead", "b_sub": "paid feature"},
 }
 
 
