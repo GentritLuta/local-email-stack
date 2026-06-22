@@ -48,6 +48,53 @@ _ssl = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_ssl)
 source_seller_leads = _ssl.source_seller_leads
 
+# build-home-value-funnel (the agent's personal seller-capture page) — also hyphenated.
+_hv_spec = importlib.util.spec_from_file_location("hv_src", REPO / "scripts" / "build-home-value-funnel.py")
+_hv = importlib.util.module_from_spec(_hv_spec)
+_hv_spec.loader.exec_module(_hv)
+
+
+def home_value_page(agent: dict, zipc: str, dry: bool) -> str:
+    """Generate (refresh) the agent's personal seller-capture page and push it live.
+    The page routes every homeowner opt-in straight to this agent as a real,
+    contactable seller lead (source=home_value_funnel, for_agent). This is the
+    actual free engine — free public data has no contactable cold sellers, but a
+    homeowner who checks their own value opts in with their own contact. Returns
+    the public URL (empty on failure)."""
+    import shutil
+    import subprocess
+    import tempfile
+    email = (agent.get("email") or "").lower()
+    slug = _hv.slugify(email.split("@")[0])
+    name = (agent.get("first_name") or email.split("@")[0].title()).strip() or "there"
+    page = _hv.page_html(agent_name=name, agent_company=(agent.get("company") or "your brokerage"),
+                         agent_email=agent["email"], zip_code=zipc,
+                         profile_slug=agent.get("profile_slug", "aureon"))
+    out = _hv.OUT_DIR / f"{slug}.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(page, encoding="utf-8")
+    url = f"{_hv.PAGES_BASE}/{slug}.html"
+    if dry:
+        print(f"    [DRY] would generate + deploy home-value page: {url}")
+        return url
+    # Deploy the single page to the les_pages site. Best-effort: a push failure must
+    # never block the fulfillment (the page is on disk and deploys on the next run).
+    try:
+        wt = tempfile.mkdtemp(prefix="hv_")
+        run = lambda *a, cwd: subprocess.run(a, cwd=cwd, capture_output=True, timeout=90)
+        run("git", "fetch", "les_pages", cwd=REPO)
+        run("git", "worktree", "add", "--detach", wt, "les_pages/main", cwd=REPO)
+        (Path(wt) / "home-value").mkdir(exist_ok=True)
+        shutil.copy(out, Path(wt) / "home-value" / f"{slug}.html")
+        run("git", "add", f"home-value/{slug}.html", cwd=wt)
+        run("git", "-c", "user.name=Aureon", "-c", "user.email=info@aureonglobal.de",
+            "commit", "-q", "-m", f"home-value page: {slug}", cwd=wt)
+        run("git", "push", "les_pages", "HEAD:main", cwd=wt)
+        run("git", "worktree", "remove", wt, "--force", cwd=REPO)
+    except Exception as e:
+        print(f"    ! home-value page deploy failed (non-blocking): {str(e)[:120]}")
+    return url
+
 
 def load_env(path: Path) -> dict:
     env = {}
@@ -130,13 +177,16 @@ def supa_patch(path: str, body: dict) -> None:
                            headers={**H, "Prefer": "return=minimal"}, method="PATCH"), timeout=30).read()
 
 
-def active_aureon_agent(addr: str) -> dict | None:
+SELLER_TEST_PROFILES = {"aureon", "lk-advertising"}
+
+
+def active_agent(addr: str) -> dict | None:
     rows = supa_get("prospects?email=eq." + urllib.parse.quote((addr or "").lower())
                     + "&select=id,email,first_name,company,profile_slug,unsubscribed,custom_fields&limit=1")
     if not rows:
         return None
     p = rows[0]
-    if p.get("unsubscribed") or p.get("profile_slug") != "aureon":
+    if p.get("unsubscribed") or p.get("profile_slug") not in SELLER_TEST_PROFILES:
         return None
     return p
 
@@ -157,9 +207,28 @@ def mark_reply(reply: dict, fulfilled: bool, **extra) -> None:
     supa_patch(f"replies?id=eq.{reply['id']}", {"raw_headers": rh})
 
 
-def deliver(agent: dict, zipc: str, leads: list, dry: bool) -> bool:
+def brand_sender(profile_slug: str) -> tuple[str, str, str]:
+    """(from_header, reply_to, resend_key) for the agent's brand. aureon keeps the
+    Anna sender; other brands send from their own persona + Resend relay."""
+    if profile_slug == "aureon":
+        return FROM, REPLY_TO, RESEND_KEY
+    try:
+        prof = json.loads((REPO / "profiles" / f"{profile_slug}.json").read_text(encoding="utf-8"))
+    except Exception:
+        prof = {}
+    relay = prof.get("relay") or {}
+    key = relay.get("resend_api_key") or RESEND_KEY
+    p0 = (prof.get("personas") or [{}])[0]
+    from_name = p0.get("from_name") or prof.get("name") or "the team"
+    from_addr = p0.get("from_addr") or ""
+    from_hdr = f"{from_name} <{from_addr}>" if from_addr else FROM
+    return from_hdr, (relay.get("report_to") or REPLY_TO), key
+
+
+def deliver(agent: dict, zipc: str, leads: list, hv_url: str, dry: bool) -> bool:
     fn = (agent.get("first_name") or "there").strip() or "there"
     esc = _html.escape
+    # FSBO is an honest BONUS: listings to reach out to, never claimed as handed contacts.
     rows_html, text_lines = "", []
     for i, l in enumerate(leads, 1):
         addr = l.get("address") or "(address on request)"
@@ -167,51 +236,54 @@ def deliver(agent: dict, zipc: str, leads: list, dry: bool) -> bool:
         contact = " / ".join(x for x in [l.get("contact_phone"), l.get("contact_email")] if x)
         if not contact:
             src = l.get("source") or ""
-            if src.startswith("http"):
-                contact = "via listing: " + src
-            elif src:
-                contact = src
-            else:
-                contact = "no direct contact"
+            contact = ("reach out via the listing: " + src) if src.startswith("http") else (src or "no direct contact")
         if l.get("owner_name"):
             contact = l["owner_name"] + "  |  " + contact
-        ctx = l.get("context") or ""
         rows_html += (f"<tr><td style='padding:5px 10px;border-bottom:1px solid #eee'>{i}</td>"
                       f"<td style='padding:5px 10px;border-bottom:1px solid #eee'>{esc(addr)}</td>"
                       f"<td style='padding:5px 10px;border-bottom:1px solid #eee'>{esc(sig)}</td>"
-                      f"<td style='padding:5px 10px;border-bottom:1px solid #eee'>{esc(contact)}</td>"
-                      f"<td style='padding:5px 10px;border-bottom:1px solid #eee;color:#475569;font-size:13px'>{esc(ctx)}</td></tr>")
-        text_lines.append(f"{i}. {addr}  [{sig}]  {contact}" + (f"\n     {ctx}" if ctx else ""))
+                      f"<td style='padding:5px 10px;border-bottom:1px solid #eee'>{esc(contact)}</td></tr>")
+        text_lines.append(f"{i}. {addr}  [{sig}]  {contact}")
+    fsbo_html = (f"<p style='margin-top:18px'><b>Bonus, for-sale-by-owner listings in {esc(zipc)} right now</b> "
+                 f"you can reach out to directly:</p>"
+                 f"<table style=\"border-collapse:collapse;font-size:14px;border:1px solid #e2e8f0\">"
+                 f"<tr style=\"background:#f5f5f5\"><th style='padding:6px 10px;text-align:left'>#</th>"
+                 f"<th style='padding:6px 10px;text-align:left'>Property</th>"
+                 f"<th style='padding:6px 10px;text-align:left'>Signal</th>"
+                 f"<th style='padding:6px 10px;text-align:left'>How to reach</th></tr>{rows_html}</table>") if leads else ""
+    fsbo_text = (f"\n\nBonus, for-sale-by-owner listings in {zipc} you can reach out to now:\n\n"
+                 + "\n".join(text_lines)) if leads else ""
     html = (f"<div style=\"font-family:system-ui,sans-serif;color:#1e293b;max-width:640px\">"
             f"<p>Hi {esc(fn)},</p>"
-            f"<p>As promised, here is the first batch from your seller test in {esc(zipc)}. "
-            f"Motivated-seller signals in your area, with owner contact where we have it.</p>"
-            f"<table style=\"border-collapse:collapse;font-size:14px;border:1px solid #e2e8f0\">"
-            f"<tr style=\"background:#f5f5f5\"><th style='padding:6px 10px;text-align:left'>#</th>"
-            f"<th style='padding:6px 10px;text-align:left'>Property</th>"
-            f"<th style='padding:6px 10px;text-align:left'>Signal</th>"
-            f"<th style='padding:6px 10px;text-align:left'>Contact</th>"
-            f"<th style='padding:6px 10px;text-align:left'>Detail</th></tr>{rows_html}</table>"
-            f"<p>Work these however you like. More come in as the test runs. If you want the live "
-            f"version wired straight into your pipeline, just reply and I will set it up.</p>"
-            f"<p>Anna<br>Aureon Global</p></div>")
-    text = (f"Hi {fn},\n\nFirst batch from your seller test in {zipc}:\n\n"
-            + "\n".join(text_lines) + "\n\nMore come in as the test runs.\n\nAnna\nAureon Global")
+            f"<p>Your seller test is set up. Here is your personal seller-capture page:</p>"
+            f"<p><a href=\"{esc(hv_url)}\" style=\"font-weight:600\">{esc(hv_url)}</a></p>"
+            f"<p>Share it with your sphere, your past clients, and your social. Every homeowner who "
+            f"checks their home value there comes straight to you as a seller lead, with their name, "
+            f"contact, and what they tell us about their home and timeline. We send each one a "
+            f"consented follow-up on your behalf and route the conversation to you. The more you "
+            f"share it, the more sellers it brings.</p>"
+            f"{fsbo_html}"
+            f"<p>Want this wired deeper into your pipeline? Just reply.</p>"
+            f"<p>{esc(fn) and ''}Aureon Global</p></div>")
+    text = (f"Hi {fn},\n\nYour seller test is set up. Here is your personal seller-capture page:\n\n"
+            f"{hv_url}\n\nShare it with your sphere, past clients, and social. Every homeowner who "
+            f"checks their value there comes to you as a seller lead with their contact and timeline; "
+            f"we send a consented follow-up and route the conversation to you."
+            f"{fsbo_text}\n\nAureon Global")
     if dry:
-        print(f"  [DRY] would email {len(leads)} sellers for zip {zipc} to {agent.get('email')}")
-        for t in text_lines:
-            print("      " + t)
+        print(f"  [DRY] would email {agent.get('email')} [{agent.get('profile_slug')}]: capture page {hv_url} + {len(leads)} FSBO bonus")
         return True
-    if not RESEND_KEY:
-        print("  ! no RESEND key — cannot deliver")
+    from_hdr, reply_to, key = brand_sender(agent.get("profile_slug", "aureon"))
+    if not key:
+        print("  ! no RESEND key for this brand — cannot deliver")
         return False
-    payload = {"from": FROM, "to": [agent["email"]], "bcc": [BCC], "reply_to": REPLY_TO,
-               "subject": f"Your first sellers in {zipc}", "html": html, "text": text,
+    payload = {"from": from_hdr, "to": [agent["email"]], "bcc": [BCC], "reply_to": reply_to,
+               "subject": f"Your seller test is live, your capture page for {zipc}", "html": html, "text": text,
                "tags": [{"name": "kind", "value": "seller_test"}]}
     try:
         urllib.request.urlopen(urllib.request.Request("https://api.resend.com/emails",
                                data=json.dumps(payload).encode(), method="POST",
-                               headers={"Authorization": f"Bearer {RESEND_KEY}",
+                               headers={"Authorization": f"Bearer {key}",
                                         "Content-Type": "application/json", "User-Agent": UA}), timeout=25)
         return True
     except urllib.error.HTTPError as e:
@@ -241,38 +313,34 @@ def one_pass(limit: int, count: int, dry: bool) -> dict:
     stats["candidates"] = len(todo)
     print(f"seller-test zip replies to evaluate: {len(todo)}  (provider={_ssl.PROVIDER})")
     for r, msg in todo:
-        agent = active_aureon_agent(r.get("from_addr"))
+        agent = active_agent(r.get("from_addr"))
         if not agent:
             stats["skipped"] += 1
             if not dry:
-                mark_reply(r, True, seller_test_skipped="not_aureon_agent")
+                mark_reply(r, True, seller_test_skipped="not_an_agent")
             continue
         zipc = extract_zip(f"{r.get('subject','')} {msg}")
-        print(f"  · {agent['email']} zip {zipc} — sourcing sellers ...")
-        try:
-            res = source_seller_leads(zipc, limit=max(count, 5))
-        except Exception as e:
-            print(f"    ! source error: {str(e)[:120]}")
+        # The agent's personal seller-capture page is the real engine: free public
+        # data has no contactable cold sellers, but a homeowner who checks their own
+        # value opts in with their own contact, routed straight to this agent.
+        hv_url = home_value_page(agent, zipc, dry)
+        if not hv_url:
             stats["errors"] += 1
             continue
-        leads = [l for l in res.get("leads", [])
-                 if l.get("contact_phone") or l.get("contact_email") or l.get("address") or l.get("source")]
-        if not leads:
-            print(f"    - no sellers for {zipc} (coverage {res.get('coverage')}) — queued, will retry")
-            stats["queued"] += 1
-            if not dry:
-                set_status(agent, status="sourcing", zip=zipc)
-                # NOT fulfilled: leave retry-able so it delivers once the paid key is on.
-                mark_reply(r, False, seller_test_note=f"no_contactable_leads:{zipc}")
-            continue
-        leads = leads[:count]
-        if deliver(agent, zipc, leads, dry):
+        # FSBO listings in the zip are an honest BONUS (may be empty).
+        leads = []
+        try:
+            res = source_seller_leads(zipc, limit=max(count, 5))
+            leads = [l for l in res.get("leads", []) if l.get("address") or l.get("source")][:count]
+        except Exception as e:
+            print(f"    ! fsbo source error (non-blocking): {str(e)[:100]}")
+        print(f"  · {agent['email']} [{agent.get('profile_slug')}] zip {zipc} — page + {len(leads)} fsbo bonus")
+        if deliver(agent, zipc, leads, hv_url, dry):
             stats["delivered"] += 1
-            print(f"    -> delivered {len(leads)} sellers to {agent['email']}")
             if not dry:
-                set_status(agent, status="sellers_sent", zip=zipc, sellers_count=len(leads),
-                           delivered_at=dt.datetime.now(dt.timezone.utc).isoformat())
-                mark_reply(r, True, seller_test_delivered=len(leads))
+                set_status(agent, status="page_sent", zip=zipc, page=hv_url,
+                           fsbo_count=len(leads), delivered_at=dt.datetime.now(dt.timezone.utc).isoformat())
+                mark_reply(r, True, seller_test_delivered=hv_url)
         else:
             stats["errors"] += 1
     return stats

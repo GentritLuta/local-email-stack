@@ -44,7 +44,7 @@ SUPABASE_ANON = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 
 def page_html(*, agent_name: str, agent_company: str, agent_email: str,
-              zip_code: str, accent: str = "#d4af37") -> str:
+              zip_code: str, accent: str = "#d4af37", profile_slug: str = "aureon") -> str:
     esc = html.escape
     company = esc(agent_company)
     name = esc(agent_name)
@@ -186,7 +186,7 @@ f.addEventListener('submit',async(e)=>{{
     condition:val('cond'), sell_timeframe:val('timeframe')
   }};
   const row={{
-    profile_slug:"aureon", source:"home_value_funnel",
+    profile_slug:"{profile_slug}", source:"home_value_funnel",
     email:email, first_name:parts[0]||"", last_name:parts.slice(1).join(' ')||"",
     company:addr, phone:phone, verified:true,
     custom_fields:Object.assign({{}},CF,{{address:addr,zip:zip||CF.zip,details:details,submitted_at:new Date().toISOString()}})
@@ -216,13 +216,14 @@ def main() -> int:
     ap.add_argument("--agent-company", required=True)
     ap.add_argument("--agent-email", required=True)
     ap.add_argument("--zip", default="")
+    ap.add_argument("--profile", default="aureon", help="profile_slug the opt-ins are tagged with (aureon | lk-advertising)")
     a = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     slug = slugify(a.agent_slug)
     out = OUT_DIR / f"{slug}.html"
     out.write_text(page_html(agent_name=a.agent_name, agent_company=a.agent_company,
-                             agent_email=a.agent_email, zip_code=a.zip),
+                             agent_email=a.agent_email, zip_code=a.zip, profile_slug=a.profile),
                    encoding="utf-8")
     url = f"{PAGES_BASE}/{slug}.html"
     print(f"-> wrote {out}")
