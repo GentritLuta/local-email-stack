@@ -117,7 +117,10 @@ _CL_DETAIL_RX = re.compile(r"https?://[\w.-]+\.craigslist\.org/reo/d/[\w-]+/\d+\
 _CL_MAPADDR_RX = re.compile(r"mapaddress[^>]*>\s*([^<]+?)\s*<", re.I)
 _CL_TITLE_RX = re.compile(r"<title>(.*?)</title>", re.S | re.I)
 _CL_BODY_RX = re.compile(r'id="postingbody"[^>]*>(.*?)</section>', re.S | re.I)
-_PHONE_RX = re.compile(r"\(?\d{3}\)?[\s.\-]\d{3}[\s.\-]\d{4}")
+# FSBO posters write phones every which way: (317) 555-1234, 317-555-1234,
+# 317.555.1234, 317 555 1234, and bare 3175551234. Separators optional; word
+# boundaries keep it from matching inside a longer number (parcel id / mls).
+_PHONE_RX = re.compile(r"(?<!\d)\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4}(?!\d)")
 _STREET_RX = re.compile(
     r"\d{2,6}\s+[A-Z][A-Za-z0-9.\s]{2,40}?\b"
     r"(?:St|Street|Ave|Avenue|Rd|Road|Dr|Drive|Ln|Lane|Ct|Court|Blvd|Way|Pl|Place|Cir|Circle|Ter|Terrace|Pkwy)\b")
