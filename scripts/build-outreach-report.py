@@ -333,7 +333,7 @@ td{{padding:12px 10px;border-bottom:1px solid #1a1a1a;color:#dcdcdc}} td.hl{{col
     {step("&rarr;", "Free for three months", "You pay nothing during the pilot. We run the campaign end to end and you keep every lead and appointment it produces.")}
     {step("&rarr;", "All we ask is a review", "In return for the free pilot, an honest review at the end and a short case study if it worked. That is the whole exchange.")}
     {step("&rarr;", "Not just email", "Email is the start, not the limit. As we see your numbers, we can agree to improve other parts of your funnel too, the landing page, the booking flow, the nurture, even the offer itself, wherever the leak is.")}
-    {step("&rarr;", "Continue only if it worked", "At the end, if both sides agree the campaign delivered, we continue under a commercial relationship. If not, you walk away owing nothing and keep everything we built.")}
+    {step("&rarr;", "Continue only if it worked", "At the end, if both sides agree the campaign delivered, we continue under a commercial relationship. If not, you walk away owing nothing and keep every sale and lead the pilot generated.")}
   </div>
   <div class="foot"><span>Aureon Global &middot; Quality Converts</span><span>info@aureonglobal.de</span></div>
 </div>
