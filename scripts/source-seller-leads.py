@@ -696,6 +696,13 @@ def _county_assessor(zip_code: str, limit: int) -> tuple[list[dict], list[str]]:
             continue
         if _BIZ_RX.search(owner) and re.search(r"united states|department|county of|city of|township|school|church|cemetery", owner, re.I):
             continue
+        # Clear non-residential owners (utilities, agribusiness, railroads, telecom, municipal)
+        # are never home-sellers and only pollute a direct-mail run — drop even without a corp suffix.
+        if re.search(r"\b(power|electric|energy co|utilit|telephone|telecom|cellular|pipeline|"
+                     r"railroad|railway|gas (co|company|service)|water (co|company|works|district)|"
+                     r"ag solutions|agri[\s-]|farms? (inc|llc)|petroleum|oil (co|company)|"
+                     r"sanitar|municipal|authority)\b", owner, re.I):
+            continue
         if ctx.get("improvement"):
             iv = a.get(ctx["improvement"])
             try:
@@ -716,13 +723,22 @@ def _county_assessor(zip_code: str, limit: int) -> tuple[list[dict], list[str]]:
         # Free enrichment: property context (sale history, sqft, year, equity, homestead) that
         # the assessor layer already carries — tells the agent WHY this is a listing target.
         context = _fmt_context(a, ctx)
+        # Out-of-state absentee owners (owner state != property state) are the hardest to
+        # self-manage and the most motivated to sell — the strongest FREE intent signal the
+        # bare assessor record carries. Rank them ahead of in-state absentees for direct mail.
+        out_of_state = bool(o_state and pstate and o_state.strip().upper()[:2] != pstate.strip().upper()[:2])
         leads.append({
             "address": prop_full, "owner_name": owner, "signal": "absentee owner",
             "source": src, "contact_email": "", "contact_phone": "",
             "context": context,
+            "intent": "out-of-state owner" if out_of_state else "in-state absentee",
+            "intent_score": 2 if out_of_state else 1,
             "confidence": "owner_mailing", "needs_research": True,
         })
-    return leads, ["county assessor (%s): %d absentee-owner parcels in %s" % (cnty, len(leads), zip_code)]
+    leads.sort(key=lambda l: l.get("intent_score", 0), reverse=True)  # highest intent leads the run
+    oos = sum(1 for l in leads if l.get("intent_score") == 2)
+    return leads, ["county assessor (%s): %d absentee-owner parcels in %s (%d out-of-state)"
+                   % (cnty, len(leads), zip_code, oos)]
 
 
 def lookup_address(address: str, zip_code: str = "") -> dict:

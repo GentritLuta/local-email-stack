@@ -155,7 +155,7 @@ def main() -> int:
         mailers.append(mailer_html(owner=owner, mail_addr=mailto, prop_addr=prop, signal=sig,
                                    agent_name=a.agent_name, agent_company=a.agent_company, url=url))
         manifest.append({"owner": owner, "mailing_address": mailto, "property": prop,
-                         "signal": sig, "url": url})
+                         "signal": sig, "intent": l.get("intent", ""), "url": url})
         if len(mailers) >= a.limit:
             break
 
@@ -173,7 +173,7 @@ def main() -> int:
         Path(p).unlink(missing_ok=True)
     csv_out = OUT_DIR / f"mailers-{a.agent_slug}-{a.zip}.csv"
     with open(csv_out, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["owner", "mailing_address", "property", "signal", "url"])
+        w = csv.DictWriter(f, fieldnames=["owner", "mailing_address", "property", "signal", "intent", "url"])
         w.writeheader(); w.writerows(manifest)
     print(f"-> {pdf_out}  ({len(mailers)} print-ready mailers)")
     print(f"-> {csv_out}  (manifest)")
