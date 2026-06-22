@@ -50,32 +50,43 @@ def pct(n, d):
     return round(100 * n / d, 2) if d else 0.0
 
 
+# per-profile step-1 A/B: (label, subject substring) for each side. A = current opener, B = give-first.
+AB = {
+    "aureon": {"a_lab": "A  seller test", "a_sub": "seller test",
+               "b_lab": "B  give-first list", "b_sub": "attorneys who hand off"},
+    "energ":  {"a_lab": "A  CHECK assessment", "a_sub": "schriftliche",
+               "b_lab": "B  give-first FALLEN list", "b_sub": "vertragsfallen"},
+}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--profile", default="aureon", choices=list(AB), help="which client A/B to read")
     ap.add_argument("--since", default="2026-06-22", help="A/B start date (YYYY-MM-DD)")
     a = ap.parse_args()
+    cfg = AB[a.profile]
     rows = q(f"""
       with s1 as (
         select s.run_id, s.delivered, s.opened_at,
-          case when s.subject ilike '%%attorneys who hand off%%' then 'B  give-first list'
-               when s.subject ilike '%%seller test%%'            then 'A  seller test'
+          case when s.subject ilike '%%{cfg['b_sub']}%%' then '{cfg['b_lab']}'
+               when s.subject ilike '%%{cfg['a_sub']}%%' then '{cfg['a_lab']}'
                else 'other' end side
         from send_log s join runs r on r.id=s.run_id join prospects p on p.id=r.prospect_id
-        where p.profile_slug='aureon' and s.step_n=1 and s.sent_at >= '{a.since}'),
-      rep as (select distinct run_id from replies where profile_slug='aureon' and class='reply')
+        where p.profile_slug='{a.profile}' and s.step_n=1 and s.sent_at >= '{a.since}'),
+      rep as (select distinct run_id from replies where profile_slug='{a.profile}' and class='reply')
       select s1.side, count(*) sends, count(*) filter (where s1.delivered) delivered,
         count(*) filter (where s1.opened_at is not null) opened,
         count(*) filter (where rep.run_id is not null) replies
       from s1 left join rep on rep.run_id=s1.run_id
       group by s1.side order by s1.side""")
-    print(f"Aureon step-1 A/B  (since {a.since})\n" + "-" * 64)
+    print(f"{a.profile} step-1 A/B  (since {a.since})\n" + "-" * 64)
     print(f"{'side':20} {'sends':>6} {'deliv':>6} {'open%':>7} {'repl':>5} {'reply%':>7}")
     for r in rows:
         print(f"{r['side']:20} {r['sends']:>6} {r['delivered']:>6} "
               f"{pct(r['opened'], r['delivered']):>6}% {r['replies']:>5} {pct(r['replies'], r['delivered']):>6}%")
     if not rows:
         print("(no step-1 sends since the start date yet — check back after the next send cycle)")
-    print("\nA = current 'free seller test' opener · B = give-first 'attorney list' opener")
+    print(f"\n{cfg['a_lab'].strip()} = current opener · {cfg['b_lab'].strip()} = give-first challenger")
     return 0
 
 
