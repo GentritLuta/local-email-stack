@@ -198,3 +198,35 @@ home-value funnel + the appointment engine (the agent gets a booked meeting / a 
 Esri REST reference; Maricopa County Assessor GIS; Pasco County Clerk (foreclosures);
 Free Law Project / CourtListener (RECAP federal-only); TransUnion TLO terms (GLBA/DPPA);
 FTC CAN-SPAM compliance guide; BatchData (60-75% contact rate, self-reported volume).
+
+---
+
+## 8. Verified build log + findings (2026-06-22)
+
+What was built and what the live probes actually proved (so the next session does not
+re-walk the dead ends):
+
+**Shipped (committed):**
+- **Direct-mail pipeline** (`scripts/build-seller-mailers.py`, 1516cfd) — free list -> print-ready
+  letters to the free mailing address + QR to the agent's home-value page + CSV manifest. Proven.
+- **Booking step** (`build-home-value-funnel.py` + `fulfill-home-value.py`, 08b087a) — self-hosted
+  "pick a day + time window" on the opt-in -> `details.requested_call` -> HOT alert to info@. Needs
+  nothing from the agent, no external calendar.
+- **Out-of-state intent rank + junk filter** (`source-seller-leads.py`, b65b9e1) — rank owner-state !=
+  property-state first; drop utilities/agribusiness owners. The free intent ceiling for these counties.
+
+**Verified dead ends (do not retry as "free" routes):**
+- **Free people-search email-append: KILLED.** FastPeopleSearch + TruePeopleSearch hard-block automation
+  behind Cloudflare — urllib gets 403, headless Chrome gets "Attention Required! | Cloudflare". No contact
+  data. Past it needs residential proxies / CAPTCHA-solving (paid, ToS-violating, bot-bypass — not built).
+- **Agent-county assessor layers carry no distress fields.** Marion + Delaware IN ArcGIS expose only
+  sqft/acreage/use-class — NO sale price, sale date, or homestead. So long-tenure / high-equity / inherited
+  scoring has zero data there; out-of-state absentee is the only free intent signal the record carries.
+- **Indiana distress data is centralized on GovEase (auth-gated SPA).** in-sheriffsale.com is an empty
+  placeholder WordPress; hometaxsale.com is info-only and points to GovEase; the IN courts portal timed out;
+  www.govease.com is a HubSpot marketing site and the auction app has no open API (common endpoints 404).
+  A real foreclosure/tax-sale scraper here = bespoke, fragile, ToS-gray SPA reverse-engineering, per county.
+
+**Net:** the free, reliable, legal seller engine is **absentee + FSBO (out-of-state ranked) -> direct mail
+-> home-value page (with booking) -> agent.** Phone/email contact append and court-record distress at volume
+are the genuine paid floor; everything above the floor is built and free.
