@@ -92,6 +92,13 @@ BOUNCE_SUBJ = re.compile(r"(undelivered|delivery (status|failure)|returned mail|
 UNSUB_RX = re.compile(r"\b(unsubscribe|opt[\s-]?out|remove me|take me off|stop "
                       r"(?:emailing|sending|contacting)|do not (?:contact|email)|"
                       r"no longer.*(?:contact|email)|leave me alone|not interested.*stop)\b", re.I)
+# Free/shared email providers — never domain-suppress these on a single opt-out (a person
+# replying "unsubscribe" from their personal gmail must not opt out every gmail prospect).
+_FREE_EMAIL_DOMAINS = {
+    "gmail.com", "googlemail.com", "yahoo.com", "ymail.com", "hotmail.com", "outlook.com",
+    "live.com", "msn.com", "icloud.com", "me.com", "aol.com", "proton.me", "protonmail.com",
+    "gmx.de", "gmx.net", "web.de", "t-online.de", "mail.com", "yandex.com", "zoho.com",
+}
 _QUOTE_LINE = re.compile(r"^(_{5,}|-{5,}|from:|sent:|to:|subject:|on .+wrote:|>.*)", re.I)
 
 # Never treat mail from these as a prospect cold reply (no alert, no reply-stop,
@@ -351,17 +358,56 @@ class Supa:
                             params={"email": f"eq.{email.lower()}", "select": "id", "limit": "1"})
         return r.status_code == 200 and bool(r.json())
 
+    def resolve_profile_slug(self, *, from_addr: str, to_addr: str) -> str | None:
+        """Attribute a reply to a client profile so per-client reports can count it.
+        Primary: the prospect row's profile_slug (authoritative). Fallback: match the
+        root of our receiving address (to_addr = persona@sub.<root>.tld) to a profile's
+        sending domains. Fixes the replies.profile_slug=NULL gap (2026-06-11 audit)."""
+        fa = (from_addr or "").lower()
+        if fa:
+            r = self.client.get(f"{self.base}/prospects",
+                                params={"email": f"eq.{fa}", "select": "profile_slug", "limit": "1"})
+            if r.status_code == 200 and r.json():
+                slug = r.json()[0].get("profile_slug")
+                if slug:
+                    return slug
+        # Fallback: our receiving subdomain -> owning profile.
+        ta = (to_addr or "").lower()
+        sub = ta.split("@", 1)[1] if "@" in ta else ""
+        if sub:
+            try:
+                from profile_lib import list_profiles  # local import to avoid cycle
+                for prof in list_profiles():
+                    for d in (prof.get("relay") or {}).get("from_domains", []):
+                        if (d.get("domain") or "").lower() == sub:
+                            return prof.get("slug")
+            except Exception:
+                pass
+        return None
+
     def unsubscribe_email(self, email: str) -> int:
         """Honor an opt-out: set prospects.unsubscribed=true and cancel every
         run for this address, so NO further email can fire. Returns count."""
         if not email:
             return 0
+        email = email.lower()
         ps = self.client.get(f"{self.base}/prospects",
-                             params={"email": f"eq.{email.lower()}", "select": "id"})
-        if ps.status_code != 200 or not ps.json():
+                             params={"email": f"eq.{email}", "select": "id"})
+        rows = ps.json() if ps.status_code == 200 else []
+        # Cross-address opt-out: people often reply "unsubscribe" from a personal address
+        # while we emailed a role inbox (info@/hello@) at the same company. If the exact
+        # address is not a prospect, fall back to the company DOMAIN — but never for free
+        # providers (would opt out everyone on gmail/outlook/etc).
+        if not rows:
+            dom = email.split("@", 1)[1] if "@" in email else ""
+            if dom and dom not in _FREE_EMAIL_DOMAINS:
+                ds = self.client.get(f"{self.base}/prospects",
+                                     params={"email": f"ilike.*@{dom}", "select": "id"})
+                rows = ds.json() if ds.status_code == 200 else []
+        if not rows:
             return 0
         n = 0
-        for p in ps.json():
+        for p in rows:
             self.client.patch(f"{self.base}/prospects",
                              params={"id": f"eq.{p['id']}"},
                              json={"unsubscribed": True})
@@ -500,7 +546,7 @@ def one_pass(verbose: bool = True) -> dict:
 
                     supa.insert_reply({
                         "run_id":       run_id,
-                        "profile_slug": None,
+                        "profile_slug": supa.resolve_profile_slug(from_addr=from_addr, to_addr=to_addr),
                         "from_addr":    from_addr,
                         "to_addr":      to_addr,
                         "subject":      subject[:500],
@@ -540,6 +586,17 @@ def one_pass(verbose: bool = True) -> dict:
                     elif klass == "bounce" and run_id:
                         supa.pause_run(run_id, "bounced")
                         stats["runs_paused"] += 1
+                    # Opt-out can arrive on a NON-reply class too: a phone reply that drops
+                    # the In-Reply-To header is classed 'unrelated', so the reply-branch
+                    # opt-out check above never runs. An unsubscribe is ALWAYS honored, by
+                    # exact address or the company domain (unsubscribe_email handles both).
+                    if klass not in ("reply", "bounce", "complaint", "self_alert") and \
+                       UNSUB_RX.search(top_reply_text(snippet) + " " + subject):
+                        u = supa.unsubscribe_email(from_addr)
+                        if u:
+                            stats["unsubscribed"] = stats.get("unsubscribed", 0) + u
+                            if verbose:
+                                print(f"  ⊘ unsubscribed {from_addr} (opt-out, class={klass})")
 
                     # Send internal alert email to info@aureonglobal.de for real
                     # prospect replies (not bounces / complaints). Lets the operator
