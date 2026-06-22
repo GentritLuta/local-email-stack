@@ -1078,7 +1078,7 @@ def one_pass(limit: int, dry: bool) -> dict:
         # after they have received their first sellers). Run `reply-autodraft.py
         # unlock <email>` to flip it. aureon sends from info@ via Hostinger; other
         # brands via their own Resend relay.
-        if is_positive_call_intent(subject, msg) and not is_list_request(subject, msg):
+        if is_positive_call_intent(subject, msg) and not is_list_request(subject, msg) and not REVIEW_GATE:
             slug = (prow or {}).get("profile_slug") or ""
             cf = (prow or {}).get("custom_fields") or {}
             if cf.get("seller_outreach") and not cf.get("calendly_unlocked"):
