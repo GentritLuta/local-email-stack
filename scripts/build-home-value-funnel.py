@@ -156,13 +156,29 @@ def page_html(*, agent_name: str, agent_company: str, agent_email: str,
    <input id="email" type="email" required placeholder="you@email.com">
    <label>Phone (for a faster, more accurate report)</label>
    <input id="phone" placeholder="(555) 555-5555">
+
+   <div class="sec">Talk to a local expert (optional)</div>
+   <p class="more-note">Want your exact number confirmed on a quick call? Pick a time and a local real
+      estate expert will reach out to set it up. No pressure, no obligation to ever list.</p>
+   <div class="row2">
+     <div><label>Best day for a call</label><input id="bk_date" type="date"></div>
+     <div><label>Best time</label>
+       <select id="bk_win"><option value="">Select&hellip;</option>
+         <option>Morning (8&ndash;12)</option><option>Afternoon (12&ndash;5)</option>
+         <option>Evening (5&ndash;8)</option></select></div>
+   </div>
    <button id="btn" type="submit">Show me what my home is worth &rarr;</button>
    <div class="err" id="err"></div>
  </form>
- <div class="ok" id="ok"><h2>Got it.</h2>
-   <p>Your free home value report is on its way to your inbox. For your exact figure, book a quick call , 
-      a local real estate expert will then reach out as soon as possible to confirm it.</p>
-   <p style="margin-top:14px;"><a href="https://calendly.com/aureonglobal-info/30min" style="background:var(--accent);color:#0a0a0a;font-weight:700;padding:12px 20px;border-radius:9px;text-decoration:none;display:inline-block;">Book your free CMA call</a></p></div>
+ <div class="ok" id="ok">
+   <div id="book_confirm" style="display:none"><h2>You are set.</h2>
+     <p>Your free home value report is on its way to your inbox. A local real estate expert will reach out
+        to confirm your call for <b id="booked_when"></b> and walk you through your exact number. No pressure,
+        no obligation to ever list.</p></div>
+   <div id="book_default"><h2>Got it.</h2>
+     <p>Your free home value report is on its way to your inbox. For your exact figure, book a quick call ,
+        a local real estate expert will then reach out as soon as possible to confirm it.</p>
+     <p style="margin-top:14px;"><a href="https://calendly.com/aureonglobal-info/30min" style="background:var(--accent);color:#0a0a0a;font-weight:700;padding:12px 20px;border-radius:9px;text-decoration:none;display:inline-block;">Book your free CMA call</a></p></div></div>
  <p class="foot">Prepared by Aureon Global. Your information is used only to prepare your report and is never sold.</p>
 </div></div>
 <script>
@@ -179,12 +195,16 @@ f.addEventListener('submit',async(e)=>{{
   const phone=val('phone');
   const zip=val('zip');
   const parts=name.split(/\\s+/);
+  const bkDate=val('bk_date'), bkWin=val('bk_win');
   // Every detail the homeowner gives, captured to pin the property down + grade the lead.
   const details={{
     unit:val('unit'), zip:zip, beds:val('beds'), baths:val('baths'), sqft:val('sqft'),
     year_built:val('year'), property_type:val('ptype'), updates:val('updates'),
     condition:val('cond'), sell_timeframe:val('timeframe')
   }};
+  // Self-hosted booking: a motivated homeowner picks a time -> captured here, surfaced to
+  // the agent by fulfill-home-value as a HOT appointment request. Needs nothing from the agent.
+  if(bkDate||bkWin){{ details.requested_call={{date:bkDate,window:bkWin,requested_at:new Date().toISOString()}}; }}
   const row={{
     profile_slug:"{profile_slug}", source:"home_value_funnel",
     email:email, first_name:parts[0]||"", last_name:parts.slice(1).join(' ')||"",
@@ -199,7 +219,13 @@ f.addEventListener('submit',async(e)=>{{
       body:JSON.stringify(row)
     }});
     if(!r.ok && r.status!==201 && r.status!==204) throw new Error("HTTP "+r.status);
-    f.style.display='none'; document.getElementById('ok').style.display='block';
+    f.style.display='none';
+    if(bkDate||bkWin){{
+      document.getElementById('booked_when').textContent=[bkWin,bkDate?("on "+bkDate):""].filter(Boolean).join(' ');
+      document.getElementById('book_default').style.display='none';
+      document.getElementById('book_confirm').style.display='block';
+    }}
+    document.getElementById('ok').style.display='block';
   }}catch(ex){{ err.textContent="Something went wrong. Please try again."; err.style.display='block'; btn.disabled=false; }}
 }});
 </script></body></html>"""

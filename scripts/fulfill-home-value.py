@@ -179,6 +179,32 @@ def smtp_send(*, to_addr: str, reply_to: str, subject: str, html: str, text: str
         print(f"  ! send failed: {str(e)[:120]}"); return False
 
 
+def booking_when(rc: dict) -> str:
+    """Human phrasing of the homeowner's requested call time."""
+    bits = [rc.get("window", ""), ("on " + rc["date"]) if rc.get("date") else ""]
+    return " ".join(b for b in bits if b).strip() or "a time they will pick on the call"
+
+
+def notify_booking(*, owner_name: str, email: str, phone: str, address: str,
+                   mid_str: str, agent_email: str, rc: dict) -> bool:
+    """HOT alert to the operator: a homeowner asked to book a call about selling.
+    The operator confirms the time and hands the booked appointment to the agent."""
+    when = booking_when(rc)
+    subj = f"HOT seller appointment request — {address}"
+    body = ("A homeowner asked to book a call to discuss selling their home.\n\n"
+            f"Name:           {owner_name or '(not given)'}\n"
+            f"Email:          {email}\n"
+            f"Phone:          {phone or '(not given)'}\n"
+            f"Property:       {address}\n"
+            f"Estimated value:{mid_str or '(see their report)'}\n"
+            f"Requested time: {when}\n"
+            f"For agent:      {agent_email or '(unassigned)'}\n\n"
+            "Action: confirm the call with the homeowner, then hand the booked appointment to the agent.")
+    html = ("<pre style='font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;"
+            "color:#1e293b;white-space:pre-wrap'>" + _html.escape(body) + "</pre>")
+    return smtp_send(to_addr=BCC, reply_to=email or BCC, subject=subj, html=html, text=body)
+
+
 def one_pass(limit: int, dry: bool) -> dict:
     stats = {"candidates": 0, "sent": 0, "skipped": 0, "errors": 0}
     rows = supa_get("prospects?source=eq.home_value_funnel&select=id,email,first_name,"
@@ -199,6 +225,7 @@ def one_pass(limit: int, dry: bool) -> dict:
         agent_name = cf.get("agent_name") or "Your agent"
         agent_company = cf.get("agent_company") or (agent_email.split("@")[-1] if agent_email else "")
         details = cf.get("details") or {}
+        rc = details.get("requested_call") or {}
         res = value_estimate(address, zipc, details=details)
         mid = res.get("market_mid")
         mid_str = ("$%s" % format(int(mid), ",")) if mid else ""
@@ -215,6 +242,8 @@ def one_pass(limit: int, dry: bool) -> dict:
         if dry:
             pdf_ok = "yes" if _chrome() else "no-chrome"
             print(f"    [DRY] would email {p['email']} (from/reply-to Aureon) subj={subject!r} pdf={pdf_ok}")
+            if rc:
+                print(f"    [DRY] would alert {BCC}: HOT appointment request ({booking_when(rc)})")
             stats["sent"] += 1
             continue
         pdf = render_pdf(report_html_full)
@@ -229,6 +258,11 @@ def one_pass(limit: int, dry: bool) -> dict:
                                 "at": dt.datetime.now(dt.timezone.utc).isoformat(),
                                 "found": bool(res.get("found")),
                                 "assessed_value": res.get("assessed_value", "")}
+            if rc and notify_booking(owner_name=owner_first, email=p["email"],
+                                     phone=p.get("phone", ""), address=res.get("address") or address,
+                                     mid_str=mid_str, agent_email=agent_email, rc=rc):
+                cf["home_value"]["booking_notified"] = True
+                print(f"    -> HOT appointment alert -> {BCC} ({booking_when(rc)})")
             supa_patch(f"prospects?id=eq.{p['id']}", {"custom_fields": cf})
             print(f"    -> sent report to {p['email']}, bcc {BCC}")
         else:
