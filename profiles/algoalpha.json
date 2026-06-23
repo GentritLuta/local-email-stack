@@ -31,7 +31,7 @@
         "c/o AlgoAlpha",
         "Lisbon, Portugal"
       ],
-      "contact_email": "support@algoalpha.io",
+      "contact_email": "admin@algoalpha.io",
       "ceo": "Tomás Silva",
       "vat_number": "PT-PENDING",
       "registration_number": "PT-PENDING",
@@ -52,7 +52,7 @@
     "resend_region": "eu-west-1",
     "resend_api_key": "",
     "_note": "resend_api_key in algoalpha.private.json (gitignored). Uses Aureon's full-access key since AlgoAlpha shares the aureonglobal.de Resend domain pool while its own *.algoalpha.io subdomains are pending.",
-    "_pool_note": "Allocated 3 of the 10 verified aureonglobal.de subdomains exclusively to AlgoAlpha. The other 7 are split: 3 → aureon (own brand), 2 → lk-advertising, 2 → f2-malergipser.",
+    "_pool_note": "Allocated 3 of the 10 verified aureonglobal.de subdomains exclusively to AlgoAlpha. The other 7 are split: 3 → aureon (own brand), 2 → lk-advertising, 2 free (f2 removed).",
     "from_domains": [
       {
         "domain": "hello.tryalgoalpha.com",
@@ -60,7 +60,7 @@
         "verified_at": "2026-06-08T14:22:06.621166Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -78,7 +78,7 @@
         "verified_at": "2026-06-08T14:22:06.841084Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -96,7 +96,7 @@
         "verified_at": "2026-06-08T14:22:07.055298Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -114,7 +114,7 @@
         "verified_at": "2026-06-08T14:22:07.282273Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -132,7 +132,7 @@
         "verified_at": "2026-06-08T14:22:07.488704Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -150,7 +150,7 @@
         "verified_at": "2026-06-08T14:22:07.729410Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -168,7 +168,7 @@
         "verified_at": "2026-06-08T14:22:07.945139Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -186,7 +186,7 @@
         "verified_at": "2026-06-08T14:25:26.059624Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -204,7 +204,7 @@
         "verified_at": "2026-06-08T14:25:26.280339Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -222,7 +222,7 @@
         "verified_at": "2026-06-08T14:25:26.526117Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -240,7 +240,7 @@
         "verified_at": "2026-06-08T14:25:26.781771Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -258,7 +258,7 @@
         "verified_at": "2026-06-08T14:25:27.017204Z",
         "warmup": {
           "enabled": true,
-          "current_day": 11,
+          "current_day": 16,
           "started_at": "2026-06-08",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -627,8 +627,8 @@
     "reputation": {
       "bounce_rate_7d": 0.0,
       "complaint_rate_7d": 0.0,
-      "delivered_7d": 10,
-      "last_check": "2026-06-18T12:14:54.415712+00:00"
+      "delivered_7d": 17,
+      "last_check": "2026-06-23T14:09:41.111951+00:00"
     }
   },
   "ramp_curve_snowball_v1": [
