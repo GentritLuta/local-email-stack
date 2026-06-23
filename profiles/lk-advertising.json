@@ -1,31 +1,32 @@
 {
   "slug": "lk-advertising",
-  "name": "LK Advertising — performance media for US real estate agents",
+  "name": "LK Advertising - performance media for US real estate agents",
   "created_at": "2026-05-18",
   "updated_at": "2026-06-10",
   "active": true,
   "_note_pivot": "2026-06-10: repointed per Lukas Koehler's onboarding form (submitted 2026-06-06). ICP changed from German Maklerbueros to US Realtors; domain .com -> lk-advertising.site; replies route to cal.com/lkadvertising/15min (not info@aureonglobal.de); English copy. The prior German sequence is still preserved in sequences/lk-advertising-default/variants.json (rewritten to EN this session).",
   "company": {
     "name": "LK Advertising",
-    "site": "lk-advertising.site",
+    "site": "lk-advertising.com",
     "tagline": "More listing appointments for real estate agents, performance based"
   },
   "brand": {
     "wordmark": "LK Advertising",
-    "site": "lk-advertising.site",
+    "site": "lk-advertising.com",
     "tagline": "More listing appointments for real estate agents, performance based",
     "font_stack": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
     "_colors_note": "Pulled from the live lk-advertising.com (Framer) brand 2026-06-10: muted charcoal/slate + sage, off-white. Replaced the old electric-blue placeholder.",
     "colors": {
-      "accent": "#3d4848",
+      "accent": "#c9a25a",
       "accent_2": "#2b2a2b",
-      "text": "#2b2a2b",
-      "text_2": "#444444",
-      "muted": "#b8c6c6",
-      "bg_page": "#f2f2f1",
-      "bg_card": "#ffffff",
-      "rule": "#b8c6c6"
+      "text": "#e7edf3",
+      "text_2": "#aebccb",
+      "muted": "#7f93a6",
+      "bg_page": "#0a1b2b",
+      "bg_card": "#0d2236",
+      "rule": "#b8c6c6",
+      "heading": "#ffffff"
     },
     "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/lk-advertising.html?t={token}",
     "legal": {
@@ -35,12 +36,12 @@
         "Mathystrasse 9",
         "76133 Karlsruhe, Germany"
       ],
-      "contact_email": "info@lk-advertising.site",
+      "contact_email": "lukas@weltmonarch.de",
       "copyright_year": 2026,
-      "logo_url": "",
+      "logo_url": "https://onecdn.io/media/2efcc576-e46f-4c7c-8df6-d0d2726df045/lg",
       "logo_width": 50,
-      "privacy_policy_url": "https://lk-advertising.site/privacy",
-      "terms_of_service_url": "https://lk-advertising.site/terms",
+      "privacy_policy_url": "https://lk-advertising.com",
+      "terms_of_service_url": "https://lk-advertising.com",
       "legal_disclaimer": "This message is intended only for the named recipient. If you are not the intended recipient, please delete it and let the sender know.",
       "partner_notice": "You are receiving this because we believe LK Advertising's lead work could be relevant to your real estate business. Unsubscribe with one click."
     },
@@ -55,12 +56,12 @@
     "from_domains": [
       {
         "domain": "outreach.lk-advertising.site",
-        "resend_domain_id": "efaa1a27-7b1f-4bef-802b-24e12f292e53",
-        "verified_at": null,
+        "resend_domain_id": "4bde3fae-33e2-4665-8efd-a7c09d222989",
+        "verified_at": "2026-06-11T11:13:42.958114+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 576,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -73,12 +74,192 @@
       },
       {
         "domain": "team.lk-advertising.site",
-        "resend_domain_id": "42731679-a771-4e51-9121-fd671bcdb534",
-        "verified_at": null,
+        "resend_domain_id": "36e4ffb3-3fc0-4c9f-8017-98273ee1f76c",
+        "verified_at": "2026-06-11T11:13:42.958114+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 576,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "mail.lk-advertising.site",
+        "resend_domain_id": "54d08c21-ea4d-48a2-b583-c50a467cca1e",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hi.lk-advertising.site",
+        "resend_domain_id": "fa2a11b2-1b67-460e-9b71-3e98b9df74ab",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "connect.lk-advertising.site",
+        "resend_domain_id": "c42c047c-35ce-4c0f-912c-96de469fb7fe",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "partners.lk-advertising.site",
+        "resend_domain_id": "ec560637-6acf-470a-97d1-a2da8fbee6aa",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hello.lk-advertising.site",
+        "resend_domain_id": "59cfa8d3-d582-4463-b86e-cee3ee6db3b3",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "reach.lk-advertising.site",
+        "resend_domain_id": "8d69d080-a544-4151-979f-0eaf47ceb5f1",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "news.lk-advertising.site",
+        "resend_domain_id": "c6d38761-08cf-4906-83cb-3080b78b56c2",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "send.lk-advertising.site",
+        "resend_domain_id": "bc098214-ebcc-467c-9b35-abba37a8f19b",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "desk.lk-advertising.site",
+        "resend_domain_id": "00cf2966-125e-467c-9e7f-15c6827f228c",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
+          "ramp_curve": "snowball_v1",
+          "max_daily_sends": 50,
+          "reputation": {
+            "bounce_rate_7d": 0.0,
+            "complaint_rate_7d": 0.0,
+            "delivered_7d": 0,
+            "last_check": null
+          }
+        }
+      },
+      {
+        "domain": "hub.lk-advertising.site",
+        "resend_domain_id": "a18bfae1-2550-459e-b15a-92e67879cb83",
+        "verified_at": "2026-06-12T14:07:44.122778+00:00",
+        "warmup": {
+          "enabled": true,
+          "current_day": 523,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -89,67 +270,225 @@
           }
         }
       }
-    ]
+    ],
+    "report_to": "lukas@weltmonarch.de"
   },
   "personas": [
     {
-      "slug": "lukas",
-      "from_name": "Lukas Koehler",
-      "from_addr": "lukas@connect.aureonglobal.de",
-      "reply_to": "info@lk-advertising.site",
-      "title": "Founder, LK Advertising",
+      "slug": "alex",
+      "from_name": "Alex from LK Advertising",
+      "from_addr": "alex@mail.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
       "voice": {
-        "register": "calm-direct",
+        "register": "direct and confident",
         "quirks": [
-          "concrete numbers",
-          "one question per email",
-          "names the agent's market back"
+          "short sentences",
+          "concrete"
         ],
         "avoid": [
-          "marketing fluff",
-          "exclamation marks",
           "hype"
         ]
       },
-      "signature": "Lukas Koehler\nFounder, LK Advertising"
+      "signature": "Alex\nLK Advertising"
     },
     {
-      "slug": "marcus",
-      "from_name": "Marcus Reed",
-      "from_addr": "marcus@connect.aureonglobal.de",
-      "reply_to": "info@lk-advertising.site",
-      "title": "Senior Media Buyer",
+      "slug": "sam",
+      "from_name": "Sam from LK Advertising",
+      "from_addr": "sam@outreach.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
       "voice": {
-        "register": "direct-technical",
+        "register": "direct and confident",
         "quirks": [
-          "concrete cost-per-lead / cost-per-appointment numbers",
-          "short paragraphs"
+          "short sentences",
+          "concrete"
         ],
         "avoid": [
-          "hype",
-          "exclamation marks"
+          "hype"
         ]
       },
-      "signature": "Marcus Reed\nSenior Media Buyer, LK Advertising"
+      "signature": "Sam\nLK Advertising"
     },
     {
-      "slug": "elena",
-      "from_name": "Elena Brooks",
-      "from_addr": "elena@partners.aureonglobal.de",
-      "reply_to": "info@lk-advertising.site",
-      "title": "Account Director",
+      "slug": "jordan",
+      "from_name": "Jordan from LK Advertising",
+      "from_addr": "jordan@hi.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
       "voice": {
-        "register": "warm-direct",
+        "register": "direct and confident",
         "quirks": [
-          "names the agent's city back",
-          "one clear next step per email"
+          "short sentences",
+          "concrete"
         ],
         "avoid": [
-          "fluff",
-          "exclamation marks"
+          "hype"
         ]
       },
-      "signature": "Elena Brooks\nAccount Director, LK Advertising"
+      "signature": "Jordan\nLK Advertising"
+    },
+    {
+      "slug": "casey",
+      "from_name": "Casey from LK Advertising",
+      "from_addr": "casey@connect.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Casey\nLK Advertising"
+    },
+    {
+      "slug": "riley",
+      "from_name": "Riley from LK Advertising",
+      "from_addr": "riley@partners.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Riley\nLK Advertising"
+    },
+    {
+      "slug": "morgan",
+      "from_name": "Morgan from LK Advertising",
+      "from_addr": "morgan@hello.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Morgan\nLK Advertising"
+    },
+    {
+      "slug": "taylor",
+      "from_name": "Taylor from LK Advertising",
+      "from_addr": "taylor@reach.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Taylor\nLK Advertising"
+    },
+    {
+      "slug": "jamie",
+      "from_name": "Jamie from LK Advertising",
+      "from_addr": "jamie@news.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Jamie\nLK Advertising"
+    },
+    {
+      "slug": "drew",
+      "from_name": "Drew from LK Advertising",
+      "from_addr": "drew@send.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Drew\nLK Advertising"
+    },
+    {
+      "slug": "quinn",
+      "from_name": "Quinn from LK Advertising",
+      "from_addr": "quinn@team.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Quinn\nLK Advertising"
+    },
+    {
+      "slug": "avery",
+      "from_name": "Avery from LK Advertising",
+      "from_addr": "avery@desk.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Avery\nLK Advertising"
+    },
+    {
+      "slug": "parker",
+      "from_name": "Parker from LK Advertising",
+      "from_addr": "parker@hub.lk-advertising.site",
+      "reply_to": "info@aureonglobal.de",
+      "title": "Partnerships",
+      "voice": {
+        "register": "direct and confident",
+        "quirks": [
+          "short sentences",
+          "concrete"
+        ],
+        "avoid": [
+          "hype"
+        ]
+      },
+      "signature": "Parker\nLK Advertising"
     }
   ],
   "rotation": {
@@ -159,33 +498,45 @@
     "_comment": "Capped at 2/persona x 3 personas = 6/day until send_ramp completes (day 22 = 60/day)."
   },
   "send_ramp": {
-    "_doc": "Per-profile new-sender ramp. The FROM addresses (lukas@, marcus@, elena@) are new identities and need their own ramp even on mature subdomains.",
-    "started_at": null,
+    "_doc": "Gentle new-sender ramp: per-persona 4->30 over ~2wk; subdomain warmup curve binds once per_persona exceeds it. Set 2026-06-16 (was stuck at static per_persona=2 -> 24/day).",
+    "started_at": "2026-06-16",
     "curve": [
       {
         "from_day": 1,
-        "per_persona": 1
+        "per_persona": 4
       },
       {
-        "from_day": 4,
-        "per_persona": 3
+        "from_day": 3,
+        "per_persona": 6
       },
       {
-        "from_day": 8,
-        "per_persona": 5
+        "from_day": 5,
+        "per_persona": 9
       },
       {
-        "from_day": 15,
-        "per_persona": 10
+        "from_day": 7,
+        "per_persona": 12
       },
       {
-        "from_day": 22,
+        "from_day": 9,
+        "per_persona": 16
+      },
+      {
+        "from_day": 11,
         "per_persona": 20
+      },
+      {
+        "from_day": 14,
+        "per_persona": 25
+      },
+      {
+        "from_day": 18,
+        "per_persona": 30
       }
     ]
   },
   "warmup": {
-    "enabled": false,
+    "enabled": true,
     "warmup_targets": [],
     "ramp_curve": "snowball_v1",
     "real_send_mix": [],
@@ -194,33 +545,36 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0,
-      "complaint_rate_7d": 0,
-      "delivered_7d": 0,
-      "last_check": null
+      "bounce_rate_7d": 0.0173,
+      "complaint_rate_7d": 0.0,
+      "delivered_7d": 398,
+      "last_check": "2026-06-23T14:09:41.111951+00:00"
     },
     "advance_only_mode": true
   },
   "ramp_curve_snowball_v1": [
     {
       "from_day": 1,
-      "daily": 9
-    },
-    {
-      "from_day": 4,
-      "daily": 18
+      "daily": 15
     },
     {
       "from_day": 8,
-      "daily": 36
+      "daily": 25
     },
     {
       "from_day": 15,
-      "daily": 60
+      "daily": 35
     },
     {
       "from_day": 22,
-      "daily": 90
+      "daily": 50
     }
-  ]
+  ],
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/New_York",
+    "target_audience_note": "US real estate agents. 08:00-17:00 in their LOCAL time (per-prospect via prospect_timezone.resolve). Default if city missing = America/New_York (largest market for current seeds)."
+  }
 }
