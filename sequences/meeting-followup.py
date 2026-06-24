@@ -37,6 +37,7 @@ import argparse
 import datetime as dt
 import email
 import email.policy
+import email.utils
 import imaplib
 import json
 import re
@@ -75,6 +76,27 @@ _MONTHS = {m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
 EMAIL_RX = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _OWN_EMAIL_BITS = ("calendly", "aureonglobal", "example.com", "sentry", "no-reply", "noreply")
+
+# Zoom "participant joined" subject (the BACKSTOP signal). When Calendly's own
+# "New Event" notification never reaches info@ (lapsed plan / notifications off),
+# this is the only email that proves a meeting actually happened. Calendly's
+# Zoom integration auto-names the meeting topic "<Invitee>: <duration> Minute
+# Meeting", so the topic carries the invitee name + duration. German and English
+# both seen on this account:
+#   DE: "<Name> ist dem Meeting beigetreten - <Topic>"
+#   EN: "<Name> has joined ... - <Topic>"  /  "<Name> joined ... - <Topic>"
+ZOOM_SUBJ_RX = re.compile(
+    r"(?P<joiner>.+?)\s+(?:ist dem Meeting beigetreten|has joined|joined)\b.*?-\s*"
+    r"(?P<topic>.+?)\s*:\s*(?P<dur>\d+)\s*Minute",
+    re.I,
+)
+
+# Direct Google Calendar / Outlook invite (the THIRD meeting channel). When a
+# prospect schedules the call on THEIR side, they send info@ an .ics invite
+# (METHOD:REQUEST). It is neither a Calendly booking nor a Zoom-joined ping, so
+# the other two scans miss it. The subject is "Invitation: <title> @ <when>".
+# We parse the .ics for the real start/end/organizer rather than the subject.
+GCAL_SUBJ_HINT_RX = re.compile(r"\b(?:Invitation|Einladung|Updated invitation):", re.I)
 
 
 # ─── env / store ─────────────────────────────────────────────────────────────
@@ -225,6 +247,8 @@ def scan(verbose: bool = True) -> int:
                 if verbose:
                     print(f"  + {rec['invitee_name']} <{inv_email}> "
                           f"{meeting_at} [{rec['profile_slug'] or 'unmatched'}]")
+                # Double-notify: instant confirmation on top of Calendly's own email.
+                _send_booking_alert(rec, dry=False)
     finally:
         try: imap.logout()
         except Exception: pass
@@ -234,13 +258,442 @@ def scan(verbose: bool = True) -> int:
     return added
 
 
+# ─── scan_zoom: Zoom "joined" emails -> store (the blindspot backstop) ────────
+
+def _norm_name(name: str) -> str:
+    """Loose key for matching a Zoom topic name to a Calendly invitee name.
+    Calendly uses the booking name ('Andrew Barr'); Zoom may show a display
+    name ('Crypto Rapper') or the topic ('The Crypto Rapper'). Compare on a
+    lowercased, alphanumeric-only form so small differences don't double-count."""
+    return re.sub(r"[^a-z0-9]", "", (name or "").lower())
+
+
+def _send_blindspot_alert(mt: dict, dry: bool) -> None:
+    """A meeting happened that Calendly never told the operator about. Fire an
+    immediate heads-up to info@ so this is never silent again. Mirrors the
+    Resend alert recipe in imap-poll.send_reply_alert (sender, UA, quota note)."""
+    when = mt["meeting_at"].replace("T", " ")
+    body = (
+        f"A meeting was detected from a Zoom 'joined' notification, but NO Calendly\n"
+        f"'New Event' email ever arrived at info@ for it. You were not invited / notified\n"
+        f"the normal way. This is the exact failure that hid the crypto-rapper meeting.\n\n"
+        f"Invitee/topic : {mt['invitee_name']}\n"
+        f"Detected at   : {when} (when they joined the Zoom call)\n"
+        f"Client        : {mt.get('profile_slug') or 'unmatched'}\n"
+        f"Source        : Zoom participant-joined email (Calendly notification missing)\n\n"
+        f"What to check: Calendly > Account > Notifications (host email ON, to info@) and\n"
+        f"that the Calendly plan/trial is active. The booking itself worked; only the\n"
+        f"notification to you failed.\n"
+    )
+    ok = _resend_send(
+        OPERATOR_ADDR, f"[Meeting MISSED-INVITE] {mt['invitee_name']}",
+        body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+    if not dry:
+        print(f"  ! BLINDSPOT alert {'sent' if ok else 'FAILED'} to {OPERATOR_ADDR} "
+              f"for {mt['invitee_name']}")
+
+
+def _send_booking_alert(mt: dict, dry: bool) -> None:
+    """Double-notify: fire an instant confirmation to info@ the moment a Calendly
+    booking is ingested, ON TOP of Calendly's own 'New Event' email. The operator
+    asked for redundant notifications so no booking is ever missed again. Mirrors
+    the Resend alert recipe in imap-poll.send_reply_alert."""
+    when = mt["meeting_at"].replace("T", " ")
+    body = (
+        f"NEW BOOKING confirmed. (This is the stack's own alert, sent in addition\n"
+        f"to Calendly's 'New Event' email, so you always get a redundant heads-up.)\n\n"
+        f"Invitee : {mt['invitee_name']} <{mt['invitee_email']}>\n"
+        f"When    : {when} ({mt.get('duration_min', 30)} min)\n"
+        f"Client  : {mt.get('profile_slug') or 'unmatched'}\n"
+        f"Source  : Calendly 'New Event' email\n\n"
+        f"The outcome dialog will pop after the meeting ends to capture how it went.\n"
+    )
+    ok = _resend_send(
+        OPERATOR_ADDR, f"[New booking] {mt['invitee_name']} - {when}",
+        body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+    if not dry:
+        print(f"  > booking alert {'sent' if ok else 'FAILED'} to {OPERATOR_ADDR} "
+              f"for {mt['invitee_name']}")
+
+
+def scan_zoom(verbose: bool = True) -> int:
+    """Backstop scan: catch Zoom 'X joined your meeting' emails. The Zoom email
+    fires at join time, so we treat its Date as the meeting time. Any Zoom-joined
+    meeting that does NOT already match a Calendly booking in the store (same
+    person, same day) is a blindspot: the meeting happened with no Calendly
+    notification -> record it AND alert the operator immediately."""
+    user = HOST.get("SMTP_USER", OPERATOR_ADDR)
+    pw = HOST.get("SMTP_PASS", "")
+    if not pw:
+        print("missing SMTP_PASS in hostinger.env"); return 0
+    store = load_store()
+    # Existing meetings indexed by (normalized name, date) so a Calendly booking
+    # already captured does NOT get re-added from its Zoom-joined twin.
+    seen_day = {(_norm_name(mt["invitee_name"]), mt["meeting_at"][:10])
+                for mt in store["meetings"]}
+    # Avoid duplicate Zoom records too.
+    known_zoom = {(mt["invitee_email"], mt["meeting_at"])
+                  for mt in store["meetings"] if mt.get("source") == "zoom"}
+    added = 0
+    since = (dt.datetime.utcnow() - dt.timedelta(days=30)).strftime("%d-%b-%Y")
+    imap = imaplib.IMAP4_SSL("imap.hostinger.com", 993)
+    try:
+        imap.login(user, pw)
+        for folder in ("INBOX", "INBOX.Junk"):
+            if imap.select(folder, readonly=True)[0] != "OK":
+                continue
+            typ, data = imap.search(
+                None, f'(FROM "no-reply@zoom.us" SINCE {since})')
+            nums = data[0].split() if data and data[0] else []
+            for num in nums:
+                typ, md = imap.fetch(num, "(RFC822)")
+                if typ != "OK" or not md or not md[0]:
+                    continue
+                msg = email.message_from_bytes(md[0][1], policy=email.policy.default)
+                subj = msg.get("Subject", "") or ""
+                m = ZOOM_SUBJ_RX.search(subj)
+                if not m:
+                    continue  # not a "joined" email (verification code, app, etc.)
+                # Meeting time = when the Zoom email was sent (= join time).
+                try:
+                    msg_dt = email.utils.parsedate_to_datetime(msg.get("Date"))
+                    meeting_at = msg_dt.replace(tzinfo=None).isoformat(timespec="seconds")
+                except Exception:
+                    continue
+                # The topic is the real meeting label ("The Crypto Rapper"); the
+                # joiner field is the Zoom display name. Prefer the topic name.
+                inv_name = m.group("topic").strip() or m.group("joiner").strip()
+                day = meeting_at[:10]
+                nkey = _norm_name(inv_name)
+                # Already covered by a Calendly booking on the same day? skip silently.
+                if (nkey, day) in seen_day:
+                    continue
+                # A joiner that is the operator themselves on a known day is the
+                # operator joining their own booked call; the Calendly twin check
+                # above handles real bookings, so anything left here is a blindspot.
+                if (inv_name, meeting_at) in known_zoom:
+                    continue
+                rec = {
+                    "invitee_name": inv_name,
+                    "invitee_email": "(unknown - from Zoom)",
+                    "meeting_at": meeting_at,
+                    "duration_min": int(m.group("dur")),
+                    "profile_slug": None,
+                    "booked_subject": subj,
+                    "outcome": None,
+                    "notes": None,
+                    "reengage_at": None,
+                    "source": "zoom",
+                    "scanned_at": dt.datetime.utcnow().isoformat() + "Z",
+                }
+                store["meetings"].append(rec)
+                seen_day.add((nkey, day))
+                known_zoom.add((inv_name, meeting_at))
+                added += 1
+                if verbose:
+                    print(f"  + [ZOOM/blindspot] {inv_name} {meeting_at} "
+                          f"(no Calendly notification found)")
+                _send_blindspot_alert(rec, dry=False)
+    finally:
+        try: imap.logout()
+        except Exception: pass
+    save_store(store)
+    if verbose:
+        print(f"scan_zoom: +{added} blindspot meeting(s) "
+              f"({len(store['meetings'])} total in store)")
+    return added
+
+
+# ─── scan_gcal: direct calendar invites (.ics REQUEST) -> store ──────────────
+
+def _ics_unfold(text: str) -> list[str]:
+    """RFC 5545 line unfolding: a leading space/tab continues the previous line."""
+    out = []
+    for raw in text.splitlines():
+        if raw[:1] in (" ", "\t") and out:
+            out[-1] += raw[1:]
+        else:
+            out.append(raw)
+    return out
+
+
+def _ics_field(lines: list[str], name: str) -> str | None:
+    """Return the value of an ICS property (matches 'NAME' or 'NAME;params:')."""
+    for ln in lines:
+        if ln.upper().startswith(name.upper()):
+            head, _, val = ln.partition(":")
+            # Confirm it's the property, not a longer name (e.g. DTSTART vs DTSTAMP).
+            key = head.split(";", 1)[0].upper()
+            if key == name.upper():
+                return val.strip()
+    return None
+
+
+def _ics_event_time(lines: list[str], prop: str) -> str | None:
+    """Pull the *event* DTSTART/DTEND (the one with TZID or a Z time), not the
+    VTIMEZONE rule lines. Returns naive ISO 'YYYY-MM-DDTHH:MM:SS' (invite local)."""
+    cand = None
+    for ln in lines:
+        if not ln.upper().startswith(prop.upper()):
+            continue
+        head, _, val = ln.partition(":")
+        val = val.strip()
+        # VTIMEZONE rule DTSTARTs are bare 'YYYYMMDDT020000' with no TZID and
+        # often year 1970/2038. The real event time carries TZID= or ends Z.
+        if "TZID=" in head.upper() or val.endswith("Z"):
+            cand = val
+            break
+    if not cand:
+        return None
+    m = re.match(r"(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})", cand)
+    if not m:
+        return None
+    y, mo, d, hh, mm, ss = m.groups()
+    return f"{y}-{mo}-{d}T{hh}:{mm}:{ss}"
+
+
+def _ics_dtstart(lines: list[str]) -> str | None:
+    return _ics_event_time(lines, "DTSTART")
+
+
+def _ics_join_info(lines: list[str]) -> dict:
+    """Extract everything needed to JOIN the meeting from the .ics, so the alert
+    is a self-contained backup: the video link, phone dial-in + PIN, and the
+    reschedule/cancel links. Google puts the clean video URL in
+    X-GOOGLE-CONFERENCE and the dial-in inside the (escaped) DESCRIPTION."""
+    info = {"video": None, "phone": None, "more_phones": None,
+            "reschedule": None, "cancel": None}
+    # Clean machine-readable video link (Google Meet / Zoom / Teams).
+    for ln in lines:
+        u = ln.upper()
+        if u.startswith("X-GOOGLE-CONFERENCE") or u.startswith("X-MICROSOFT-SKYPETEAMSMEETINGURL"):
+            info["video"] = ln.partition(":")[2].strip()
+            break
+    # DESCRIPTION holds the dial-in + reschedule/cancel. ICS escapes \n \, \;.
+    desc_raw = _ics_field(lines, "DESCRIPTION") or ""
+    desc = (desc_raw.replace("\\n", "\n").replace("\\,", ",")
+            .replace("\\;", ";").replace("\\\\", "\\"))
+    if not info["video"]:
+        m = re.search(r"https://(?:meet\.google\.com|[\w.]*zoom\.us|teams\.microsoft\.com)\S+", desc)
+        if m:
+            info["video"] = m.group(0).rstrip(".")
+    m = re.search(r"Or dial:\s*(.+?PIN:\s*[\d#]+)", desc)
+    if m:
+        info["phone"] = m.group(1).strip()
+    m = re.search(r"More phone numbers:\s*(https?://\S+)", desc)
+    if m:
+        info["more_phones"] = m.group(1).strip()
+    m = re.search(r"Reschedule:\s*(https?://\S+)", desc)
+    if m:
+        info["reschedule"] = m.group(1).strip()
+    m = re.search(r"Cancel:\s*(https?://\S+)", desc)
+    if m:
+        info["cancel"] = m.group(1).strip()
+    return info
+
+
+def _local_when(meeting_at: str, tzid: str | None) -> str:
+    """Render the meeting time in BOTH the invite's timezone and the operator's
+    local timezone (Pristina, GMT+2) so there is no mental math at join time."""
+    base = meeting_at.replace("T", " ")
+    if not tzid:
+        return base
+    try:
+        from zoneinfo import ZoneInfo
+        src = dt.datetime.fromisoformat(meeting_at).replace(tzinfo=ZoneInfo(tzid))
+        local = src.astimezone(ZoneInfo("Europe/Belgrade"))  # GMT+2, == Pristina
+        return (f"{base} ({tzid})  =  "
+                f"{local.strftime('%Y-%m-%d %H:%M')} (your time, Pristina)")
+    except Exception:
+        return f"{base} ({tzid})"
+
+
+def _send_gcal_alert(mt: dict, dry: bool) -> None:
+    """Double-notify for a direct calendar invite. Fires the moment we see the
+    .ics REQUEST in info@, so a prospect-scheduled meeting (Google Calendar /
+    Outlook) is never silent. Carries ALL join info so the alert works as a
+    standalone backup. Same Resend recipe as the other alerts."""
+    when = _local_when(mt["meeting_at"], mt.get("tz"))
+    j = mt.get("join") or {}
+    join_block = "HOW TO JOIN (this email is your backup, save it):\n"
+    join_block += f"  Video link : {j.get('video') or mt.get('location') or '(see original invite)'}\n"
+    if j.get("phone"):
+        join_block += f"  Phone dial : {j['phone']}\n"
+    if j.get("more_phones"):
+        join_block += f"  More dial-in numbers: {j['more_phones']}\n"
+    extra = ""
+    if j.get("reschedule"):
+        extra += f"  Reschedule : {j['reschedule']}\n"
+    if j.get("cancel"):
+        extra += f"  Cancel     : {j['cancel']}\n"
+    body = (
+        f"MEETING INVITE received (direct calendar invite, NOT Calendly/Zoom).\n"
+        f"A prospect scheduled a call and sent info@ a calendar invite. Here is your\n"
+        f"redundant heads-up WITH the full join details so this email alone is enough.\n\n"
+        f"Title    : {mt['invitee_name']}\n"
+        f"When     : {when}\n"
+        f"Organizer: {mt['invitee_email']}\n"
+        f"Client   : {mt.get('profile_slug') or 'unmatched'}\n\n"
+        f"{join_block}"
+        + (f"\n{extra}" if extra else "")
+        + f"\nACTION: open the original invite email and RSVP (Accept) so it also lands on\n"
+        f"your calendar. The stack cannot RSVP for you on Google Calendar.\n"
+    )
+    ok = _resend_send(
+        OPERATOR_ADDR, f"[Meeting invite] {mt['invitee_name']} - {mt['meeting_at'][:10]}",
+        body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+    if not dry:
+        print(f"  > gcal-invite alert {'sent' if ok else 'FAILED'} to {OPERATOR_ADDR} "
+              f"for {mt['invitee_name']}")
+
+
+def scan_gcal(verbose: bool = True) -> int:
+    """Catch direct calendar invites: emails carrying a text/calendar part with
+    METHOD:REQUEST (Google Calendar, Outlook). Parses the .ics for the real
+    start time + organizer + location, logs it (source: gcal-invite), and fires
+    the double-notify. Dedups by ICS UID (stable across update resends) and by
+    (organizer, start). Ignores invites from our own / Calendly / Zoom senders
+    so we only capture genuine prospect-scheduled meetings."""
+    user = HOST.get("SMTP_USER", OPERATOR_ADDR)
+    pw = HOST.get("SMTP_PASS", "")
+    if not pw:
+        print("missing SMTP_PASS in hostinger.env"); return 0
+    store = load_store()
+    known_uid = {mt.get("ics_uid") for mt in store["meetings"] if mt.get("ics_uid")}
+    known_org = {(mt.get("invitee_email"), mt["meeting_at"])
+                 for mt in store["meetings"]}
+    added = 0
+    since = (dt.datetime.utcnow() - dt.timedelta(days=30)).strftime("%d-%b-%Y")
+    imap = imaplib.IMAP4_SSL("imap.hostinger.com", 993)
+    try:
+        imap.login(user, pw)
+        for folder in ("INBOX", "INBOX.Junk"):
+            if imap.select(folder, readonly=True)[0] != "OK":
+                continue
+            # Calendar invites set Content-Type text/calendar; search by subject
+            # hint (server-side BODY search on .ics is unreliable across servers).
+            typ, data = imap.search(None, f'(SUBJECT "Invitation" SINCE {since})')
+            nums = data[0].split() if data and data[0] else []
+            for num in nums:
+                typ, md = imap.fetch(num, "(RFC822)")
+                if typ != "OK" or not md or not md[0]:
+                    continue
+                msg = email.message_from_bytes(md[0][1], policy=email.policy.default)
+                from_addr = parseaddr(msg.get("From", ""))[1].lower()
+                if any(b in from_addr for b in _OWN_EMAIL_BITS) or "zoom.us" in from_addr:
+                    continue  # our own / calendly / zoom, not a prospect invite
+                # Find the text/calendar part.
+                ics = None
+                for part in (msg.walk() if msg.is_multipart() else [msg]):
+                    if part.get_content_type() == "text/calendar" or \
+                       (part.get_filename() or "").lower().endswith(".ics"):
+                        try:
+                            ics = part.get_content()
+                        except Exception:
+                            payload = part.get_payload(decode=True)
+                            ics = payload.decode("utf-8", "replace") if payload else None
+                        if isinstance(ics, bytes):
+                            ics = ics.decode("utf-8", "replace")
+                        break
+                if not ics:
+                    continue
+                lines = _ics_unfold(ics)
+                method = (_ics_field(lines, "METHOD") or "").upper()
+                if method and method != "REQUEST":
+                    continue  # cancellations / replies, not a new booking
+                meeting_at = _ics_dtstart(lines)
+                if not meeting_at:
+                    continue
+                uid = _ics_field(lines, "UID")
+                summary = _ics_field(lines, "SUMMARY") or msg.get("Subject", "Meeting")
+                organizer = _ics_field(lines, "ORGANIZER") or from_addr
+                org_email = organizer.split("mailto:")[-1].strip().lower() \
+                    if "mailto:" in organizer.lower() else from_addr
+                location = _ics_field(lines, "LOCATION")
+                tzid = None
+                for ln in lines:
+                    if ln.upper().startswith("DTSTART") and "TZID=" in ln.upper():
+                        tzid = ln.split("TZID=", 1)[1].split(":", 1)[0]
+                        break
+                if uid and uid in known_uid:
+                    continue
+                if (org_email, meeting_at) in known_org:
+                    continue
+                # Duration from DTEND if present.
+                dur = 30
+                dtend = _ics_event_time(lines, "DTEND")
+                try:
+                    if dtend:
+                        a = dt.datetime.fromisoformat(meeting_at)
+                        b = dt.datetime.fromisoformat(dtend)
+                        dur = max(1, int((b - a).total_seconds() // 60))
+                except Exception:
+                    pass
+                join = _ics_join_info(lines)
+                rec = {
+                    "invitee_name": summary.strip(),
+                    "invitee_email": org_email,
+                    "meeting_at": meeting_at,
+                    "duration_min": dur,
+                    "profile_slug": resolve_profile(org_email),
+                    "booked_subject": msg.get("Subject", ""),
+                    "location": re.split(r"\\?;", location or "")[0].strip() or None,
+                    "tz": tzid,
+                    "join": join,
+                    "ics_uid": uid,
+                    "outcome": None,
+                    "notes": None,
+                    "reengage_at": None,
+                    "source": "gcal-invite",
+                    "scanned_at": dt.datetime.utcnow().isoformat() + "Z",
+                }
+                store["meetings"].append(rec)
+                if uid:
+                    known_uid.add(uid)
+                known_org.add((org_email, meeting_at))
+                added += 1
+                if verbose:
+                    print(f"  + [GCAL-invite] {rec['invitee_name']} <{org_email}> "
+                          f"{meeting_at} [{rec['profile_slug'] or 'unmatched'}]")
+                _send_gcal_alert(rec, dry=False)
+    finally:
+        try: imap.logout()
+        except Exception: pass
+    save_store(store)
+    if verbose:
+        print(f"scan_gcal: +{added} calendar invite(s) "
+              f"({len(store['meetings'])} total in store)")
+    return added
+
+
 # ─── prompt: GUI pop-up for due meetings ─────────────────────────────────────
+
+def _resolved(mt: dict) -> bool:
+    """A meeting is fully resolved (won't re-pop) when its outcome is recorded AND
+    the follow-up decision is final. The follow-up step adds a `followup_status`:
+      sent / queued / skipped / not_sales  -> done, never re-pops.
+      later                                 -> deferred; the DRAFT popup re-pops.
+    A meeting with an outcome but NO followup_status is a legacy record handled under
+    the old code path (no draft popup existed); treat its handled_at as resolved so
+    those never spuriously re-pop."""
+    oc = mt.get("outcome")
+    if oc is None:
+        return False                      # outcome not captured yet -> show outcome dialog
+    if oc == "not_sales":
+        return True                       # not a buyer: no follow-up by design
+    fs = mt.get("followup_status")
+    if fs in ("sent", "queued", "skipped", "not_sales"):
+        return True
+    if fs == "later":
+        return False                      # deferred -> re-pop the draft popup only
+    return bool(mt.get("handled_at"))     # legacy record: handled_at means done
+
 
 def _due_meetings(store: dict) -> list[dict]:
     now = dt.datetime.utcnow()
     due = []
     for mt in store["meetings"]:
-        if mt.get("outcome"):
+        if _resolved(mt):
             continue
         try:
             end = dt.datetime.fromisoformat(mt["meeting_at"]) + dt.timedelta(
@@ -252,6 +705,22 @@ def _due_meetings(store: dict) -> list[dict]:
     return due
 
 
+# Injected text (invitee names from external email, AI drafts, subjects) goes into
+# the dialogs as LITERAL data via single-quoted PowerShell here-strings (@'...'@) and
+# single-quoted strings. Single-quoted PS literals do NOT expand $, $(...) or process
+# backticks, so a crafted name/draft/subject cannot execute code. _ps_heredoc guards
+# the only thing that can still break a single-quoted here-string: its '@ terminator.
+def _ps_heredoc(s: str) -> str:
+    """Neutralize the single-quoted here-string terminator so injected text stays inside."""
+    return (s or "").replace("'@", "' @")
+
+
+def _ps_singleline(s: str) -> str:
+    """Safe literal for a single-quoted single-line PS string: double embedded
+    single quotes and flatten newlines."""
+    return (s or "").replace("\r", " ").replace("\n", " ").replace("'", "''")
+
+
 _PS_DIALOG = r'''
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -261,9 +730,9 @@ $f.Size = New-Object System.Drawing.Size(460,390)
 $f.StartPosition = "CenterScreen"
 $f.TopMost = $true
 $lbl = New-Object System.Windows.Forms.Label
-$lbl.Text = @"
+$lbl.Text = @'
 {HEADER}
-"@
+'@
 $lbl.Location = New-Object System.Drawing.Point(15,12)
 $lbl.Size = New-Object System.Drawing.Size(420,55)
 $f.Controls.Add($lbl)
@@ -325,7 +794,7 @@ def _show_dialog(mt: dt.datetime) -> dict | None:
               f"Client: {mt.get('profile_slug') or 'unmatched'}\n"
               f"Meeting was: {mt['meeting_at'].replace('T', ' ')} "
               f"({mt.get('duration_min', 30)} min)")
-    script = _PS_DIALOG.replace("{HEADER}", header)
+    script = _PS_DIALOG.replace("{HEADER}", _ps_heredoc(header))
     try:
         proc = subprocess.run(
             ["powershell", "-NoProfile", "-NonInteractive", "-STA", "-Command", script],
@@ -402,8 +871,144 @@ def _followup_brief(outcome: str, mt: dict) -> str:
     return f"Write a brief, professional follow-up to {name}."
 
 
+# ─── draft-approval popup ────────────────────────────────────────────────────
+
+_PS_DRAFT_DIALOG = r'''
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+$f = New-Object System.Windows.Forms.Form
+$f.Text = "Follow-up draft - your decision"
+$f.Size = New-Object System.Drawing.Size(700,560)
+$f.StartPosition = "CenterScreen"
+$f.TopMost = $true
+
+$hdr = New-Object System.Windows.Forms.Label
+$hdr.Text = @'
+{HEADER}
+'@
+$hdr.Location = New-Object System.Drawing.Point(12,10)
+$hdr.Size = New-Object System.Drawing.Size(664,55)
+$hdr.Font = New-Object System.Drawing.Font("Segoe UI",9)
+$f.Controls.Add($hdr)
+
+$slbl = New-Object System.Windows.Forms.Label
+$slbl.Text = "Subject (editable):"
+$slbl.Location = New-Object System.Drawing.Point(12,72)
+$slbl.Size = New-Object System.Drawing.Size(664,18)
+$f.Controls.Add($slbl)
+
+$subj = New-Object System.Windows.Forms.TextBox
+$subj.Location = New-Object System.Drawing.Point(12,92)
+$subj.Size = New-Object System.Drawing.Size(664,24)
+$subj.Text = '{SUBJECT}'
+$f.Controls.Add($subj)
+
+$blbl = New-Object System.Windows.Forms.Label
+$blbl.Text = "Draft body (edit freely before sending):"
+$blbl.Location = New-Object System.Drawing.Point(12,126)
+$blbl.Size = New-Object System.Drawing.Size(664,18)
+$f.Controls.Add($blbl)
+
+$body = New-Object System.Windows.Forms.TextBox
+$body.Multiline = $true; $body.ScrollBars = "Vertical"
+$body.Location = New-Object System.Drawing.Point(12,146)
+$body.Size = New-Object System.Drawing.Size(664,290)
+$body.Font = New-Object System.Drawing.Font("Segoe UI",10)
+$body.Text = @'
+{DRAFT}
+'@
+$f.Controls.Add($body)
+
+# Default when the window is closed with no button = "later" (safe: defers, never
+# discards or sends). A real "skip" must be an explicit click.
+$result = New-Object System.Windows.Forms.TextBox
+$result.Visible = $false
+$result.Text = "later"
+
+function mk($text,$x,$w,$val) {
+  $b = New-Object System.Windows.Forms.Button
+  $b.Text = $text
+  $b.Location = New-Object System.Drawing.Point($x,456)
+  $b.Size = New-Object System.Drawing.Size($w,36)
+  $b.Add_Click({ $result.Text = $val; $f.Close() }.GetNewClosure())
+  $f.Controls.Add($b)
+}
+mk "Send to prospect now" 12 158 "send"
+mk "Queue as draft email" 178 150 "queue"
+mk "Skip (no follow-up)" 336 150 "skip"
+mk "Decide later" 494 110 "later"
+
+$f.Add_Shown({ $f.Activate() })
+[void]$f.ShowDialog()
+$out = @{ action = $result.Text; subject = $subj.Text; body = $body.Text } | ConvertTo-Json -Compress
+Write-Output $out
+'''
+
+
+def _show_draft_approval_dialog(mt: dict, outcome: str, draft: str, subj: str) -> dict | None:
+    pretty = {"no_show": "No-show", "interested": "Showed, interested",
+              "not_fit": "Showed, not a fit", "rescheduled": "Rescheduled / later"}.get(outcome, outcome)
+    sender = HOST.get("SMTP_USER", OPERATOR_ADDR)
+    header = (
+        f"Prospect : {mt['invitee_name']} <{mt['invitee_email']}>\n"
+        f"Outcome  : {pretty}   Client: {mt.get('profile_slug') or 'unmatched'}\n"
+        f"Sends as Gentrit <{sender}> if you click Send. Edit the draft, then choose."
+    )
+
+    script = (_PS_DRAFT_DIALOG
+              .replace("{HEADER}", _ps_heredoc(header))
+              .replace("{SUBJECT}", _ps_singleline(subj))
+              .replace("{DRAFT}", _ps_heredoc(draft)))
+    try:
+        proc = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-STA", "-Command", script],
+            capture_output=True, text=True, timeout=1800, encoding="utf-8",
+            errors="replace")
+        out = (proc.stdout or "").strip()
+        line = [ln for ln in out.splitlines() if ln.strip().startswith("{")]
+        if not line:
+            return None
+        return json.loads(line[-1])
+    except Exception as e:
+        print(f"  ! draft-approval dialog failed: {e}")
+        return None
+
+
+def _smtp_send_to_prospect(to_addr: str, subject: str, body_text: str,
+                           dry: bool) -> bool:
+    if dry:
+        print(f"  [DRY] would send to prospect {to_addr}: '{subject}'")
+        return True
+    pw = HOST.get("SMTP_PASS", "")
+    user = HOST.get("SMTP_USER", OPERATOR_ADDR)
+    if not pw:
+        print("  ! no SMTP_PASS; cannot send to prospect")
+        return False
+    try:
+        m = MIMEText(body_text, "plain", "utf-8")
+        m["Subject"] = subject
+        m["From"] = f"Gentrit <{user}>"
+        m["To"] = to_addr
+        m["Reply-To"] = user
+        with smtplib.SMTP_SSL("smtp.hostinger.com", 465,
+                              context=ssl.create_default_context()) as s:
+            s.login(user, pw)
+            s.sendmail(user, [to_addr], m.as_string())
+        return True
+    except Exception as e:
+        print(f"  ! SMTP send to prospect failed: {e}")
+        return False
+
+
 def handle_outcome(mt: dict, outcome: str, notes: str, reengage_at: str | None,
-                   dry: bool) -> None:
+                   dry: bool, store: dict | None = None) -> str:
+    """Run the follow-up step for a meeting outcome. Returns the follow-up status
+    the caller persists as mt['followup_status']: 'sent' / 'queued' / 'skipped' /
+    'later' / 'not_sales'. 'later' is the only non-final status (re-pops the draft).
+
+    `store` (when given) is persisted the instant a prospect send succeeds, so a
+    crash/kill between the irreversible send and the caller's own save cannot leave
+    the meeting un-marked and cause a duplicate send on the next run."""
     slug = mt.get("profile_slug")
     profile = None
     persona = None
@@ -423,42 +1028,105 @@ def handle_outcome(mt: dict, outcome: str, notes: str, reengage_at: str | None,
         )
         _resend_send(OPERATOR_ADDR, f"[Meeting] Not sales - {mt['invitee_name']}",
                      note_body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
-        return
-    # 1) NOTE email to the operator
+        return "not_sales"
+
     pretty = {"no_show": "No-show", "interested": "Showed, interested",
               "not_fit": "Showed, not a fit", "rescheduled": "Rescheduled / later"}.get(outcome, outcome)
-    note_body = (
-        f"Meeting outcome logged.\n\n"
-        f"Invitee : {mt['invitee_name']} <{mt['invitee_email']}>\n"
-        f"Client  : {slug or 'unmatched'}\n"
-        f"When    : {mt['meeting_at'].replace('T', ' ')} ({mt.get('duration_min', 30)} min)\n"
-        f"Outcome : {pretty}\n"
-        + (f"Re-engage: {reengage_at}\n" if reengage_at else "")
-        + f"Your notes: {notes or '(none)'}\n\n"
-        f"Follow-up: a draft has been queued below for your approval. Review and "
-        f"forward to the prospect if it looks good.\n"
-    )
-    _resend_send(OPERATOR_ADDR, f"[Meeting] {pretty} - {mt['invitee_name']}",
-                 note_body, "Aureon Meeting Bot",
-                 "drafts@hi.aureonglobal.de", dry)
 
-    # 2) DRAFT the follow-up (queued to operator, NOT sent to prospect)
+    # 1) Generate the AI draft immediately so it's ready for the popup.
     brief = _followup_brief(outcome, mt)
     if notes:
         brief += f"\n\nThe operator's notes from the call (use these, they are ground truth): {notes}"
     draft = _draft_followup(profile, persona, mt, brief)
     subj = {"no_show": f"Sorry we missed each other, {mt['invitee_name'].split()[0]}",
-            "interested": f"Following up on our call",
+            "interested": "Following up on our call",
             "not_fit": f"Good talking, {mt['invitee_name'].split()[0]}",
-            "rescheduled": f"Whenever the timing is right"}.get(outcome, "Following up")
-    draft_body = (
-        f"DRAFT follow-up for {mt['invitee_name']} <{mt['invitee_email']}> ({slug or 'unmatched'})\n"
-        f"Outcome: {pretty}\n"
-        f"--- suggested subject ---\n{subj}\n"
-        f"--- suggested body (edit, then send to the prospect) ---\n\n{draft}\n"
-    )
-    _resend_send(OPERATOR_ADDR, f"[Draft follow-up] {mt['invitee_name']} - {pretty}",
-                 draft_body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+            "rescheduled": "Whenever the timing is right"}.get(outcome, "Following up")
+
+    # 2) Show the draft-approval popup so the operator can review/edit + decide.
+    draft_action = "queue"  # default if popup is suppressed (dry mode)
+    final_subj = subj
+    final_body = draft
+    if not dry:
+        res = _show_draft_approval_dialog(mt, outcome, draft, subj)
+        if res:
+            draft_action = res.get("action") or "later"
+            final_subj = (res.get("subject") or subj).strip()
+            final_body = (res.get("body") or draft).strip()
+        else:
+            # Dialog subprocess failed (not a user choice). Queue so the operator
+            # still gets the draft, rather than silently deferring forever.
+            print(f"  ~ draft dialog failed; queuing as email")
+
+    # 2b) "Decide later" — defer with no send and no note. The meeting keeps a
+    # followup_status of 'later', so the next run re-pops the draft popup only
+    # (the outcome is already saved and is not re-asked).
+    if draft_action == "later":
+        print(f"  · {mt['invitee_name']}: follow-up deferred (draft re-pops next run)")
+        return "later"
+
+    # 3) Act on the operator's decision.
+    if draft_action == "send":
+        ok = _smtp_send_to_prospect(mt["invitee_email"], final_subj, final_body, dry)
+        sent_label = "SENT to prospect" if ok else "SEND FAILED"
+        # Persist the resolved state the instant the irreversible send succeeds, so a
+        # kill before the caller's own save() cannot re-pop this meeting and double-send.
+        if ok and not dry and store is not None:
+            mt["followup_status"] = "sent"
+            mt["handled_at"] = dt.datetime.utcnow().isoformat() + "Z"
+            save_store(store)
+        note_body = (
+            f"Meeting outcome logged + follow-up {sent_label}.\n\n"
+            f"Invitee : {mt['invitee_name']} <{mt['invitee_email']}>\n"
+            f"Client  : {slug or 'unmatched'}\n"
+            f"When    : {mt['meeting_at'].replace('T', ' ')} ({mt.get('duration_min', 30)} min)\n"
+            f"Outcome : {pretty}\n"
+            + (f"Re-engage: {reengage_at}\n" if reengage_at else "")
+            + f"Your notes: {notes or '(none)'}\n\n"
+            f"--- sent subject ---\n{final_subj}\n"
+            f"--- sent body ---\n{final_body}\n"
+        )
+        _resend_send(OPERATOR_ADDR, f"[Meeting] {pretty} - {mt['invitee_name']} ({sent_label})",
+                     note_body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+        return "sent"
+    elif draft_action == "queue":
+        # Original behavior: send note + draft email to operator for manual follow-through.
+        note_body = (
+            f"Meeting outcome logged.\n\n"
+            f"Invitee : {mt['invitee_name']} <{mt['invitee_email']}>\n"
+            f"Client  : {slug or 'unmatched'}\n"
+            f"When    : {mt['meeting_at'].replace('T', ' ')} ({mt.get('duration_min', 30)} min)\n"
+            f"Outcome : {pretty}\n"
+            + (f"Re-engage: {reengage_at}\n" if reengage_at else "")
+            + f"Your notes: {notes or '(none)'}\n\n"
+            f"Draft queued below. Forward to the prospect when ready.\n"
+        )
+        _resend_send(OPERATOR_ADDR, f"[Meeting] {pretty} - {mt['invitee_name']}",
+                     note_body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+        draft_body = (
+            f"DRAFT follow-up for {mt['invitee_name']} <{mt['invitee_email']}> ({slug or 'unmatched'})\n"
+            f"Outcome: {pretty}\n"
+            f"--- suggested subject ---\n{final_subj}\n"
+            f"--- suggested body (edit, then send to the prospect) ---\n\n{final_body}\n"
+        )
+        _resend_send(OPERATOR_ADDR, f"[Draft follow-up] {mt['invitee_name']} - {pretty}",
+                     draft_body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+        return "queued"
+    else:
+        # "skip" — operator chose NO follow-up for this meeting. Log a minimal note
+        # so the outcome stays on record, then resolve it permanently (won't re-pop).
+        note_body = (
+            f"Meeting outcome logged (NO follow-up - skipped by operator).\n\n"
+            f"Invitee : {mt['invitee_name']} <{mt['invitee_email']}>\n"
+            f"Client  : {slug or 'unmatched'}\n"
+            f"When    : {mt['meeting_at'].replace('T', ' ')} ({mt.get('duration_min', 30)} min)\n"
+            f"Outcome : {pretty}\n"
+            + (f"Re-engage: {reengage_at}\n" if reengage_at else "")
+            + f"Your notes: {notes or '(none)'}\n"
+        )
+        _resend_send(OPERATOR_ADDR, f"[Meeting] {pretty} - {mt['invitee_name']} (no follow-up)",
+                     note_body, "Aureon Meeting Bot", "drafts@hi.aureonglobal.de", dry)
+        return "skipped"
 
 
 def _draft_followup(profile: dict | None, persona: dict | None, mt: dict,
@@ -513,35 +1181,49 @@ def prompt(dry: bool = False) -> int:
     store = load_store()
     due = _due_meetings(store)
     if not due:
-        print("prompt: no meetings awaiting an outcome")
+        print("prompt: no meetings awaiting attention")
         return 0
-    print(f"prompt: {len(due)} meeting(s) awaiting outcome")
+    print(f"prompt: {len(due)} meeting(s) awaiting attention")
     handled = 0
     for mt in due:
         if dry:
-            print(f"  [DRY] would pop dialog for {mt['invitee_name']} "
+            stage = "draft popup" if mt.get("outcome") else "outcome dialog"
+            print(f"  [DRY] would pop {stage} for {mt['invitee_name']} "
                   f"<{mt['invitee_email']}> {mt['meeting_at']}")
             continue
-        res = _show_dialog(mt)
-        if not res:
-            print(f"  ~ skipped {mt['invitee_name']}")
-            continue
-        outcome = _OUTCOME_MAP.get(res["outcome"])
-        notes = (res.get("notes") or "").strip()
-        reengage_at = None
-        if outcome == "rescheduled":
-            reengage_at = _ask_reengage_date()
-        handle_outcome(mt, outcome, notes, reengage_at, dry=False)
-        mt["outcome"] = outcome
-        mt["notes"] = notes
-        mt["reengage_at"] = reengage_at
+        # A due meeting that ALREADY has an outcome is a deferred follow-up
+        # (followup_status 'later'): skip the outcome dialog and go straight to the
+        # draft popup, so the operator is never re-asked what already was answered.
+        if mt.get("outcome"):
+            outcome = mt["outcome"]
+            notes = (mt.get("notes") or "").strip()
+            reengage_at = mt.get("reengage_at")
+        else:
+            res = _show_dialog(mt)
+            if not res:
+                print(f"  ~ skipped {mt['invitee_name']}")
+                continue
+            outcome = _OUTCOME_MAP.get(res["outcome"])
+            notes = (res.get("notes") or "").strip()
+            reengage_at = None
+            if outcome == "rescheduled":
+                reengage_at = _ask_reengage_date()
+            # Persist the outcome now so a subsequent 'Decide later' never re-asks it.
+            mt["outcome"] = outcome
+            mt["notes"] = notes
+            mt["reengage_at"] = reengage_at
+            save_store(store)
+        status = handle_outcome(mt, outcome, notes, reengage_at, dry=False, store=store)
+        mt["followup_status"] = status
         mt["handled_at"] = dt.datetime.utcnow().isoformat() + "Z"
         save_store(store)
         handled += 1
-        if outcome == "not_sales":
-            print(f"  + {mt['invitee_name']}: not_sales -> logged, NO follow-up (note only to {OPERATOR_ADDR})")
+        if status == "later":
+            print(f"  · {mt['invitee_name']}: {outcome} -> follow-up deferred (re-pops next run)")
+        elif outcome == "not_sales":
+            print(f"  + {mt['invitee_name']}: not_sales -> logged, NO follow-up")
         else:
-            print(f"  + {mt['invitee_name']}: {outcome} -> note + draft queued to {OPERATOR_ADDR}")
+            print(f"  + {mt['invitee_name']}: {outcome} -> follow-up {status}")
     return handled
 
 
@@ -575,16 +1257,26 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("scan")
+    sub.add_parser("scan-zoom")
+    sub.add_parser("scan-gcal")
     p_prompt = sub.add_parser("prompt"); p_prompt.add_argument("--dry", action="store_true")
     p_run = sub.add_parser("run"); p_run.add_argument("--dry", action="store_true")
     sub.add_parser("list")
     a = ap.parse_args()
     if a.cmd == "scan":
         scan()
+        scan_zoom()
+        scan_gcal()
+    elif a.cmd == "scan-zoom":
+        scan_zoom()
+    elif a.cmd == "scan-gcal":
+        scan_gcal()
     elif a.cmd == "prompt":
         prompt(dry=a.dry)
     elif a.cmd == "run":
-        scan()
+        scan()        # Calendly "New Event" first, so the store is populated
+        scan_zoom()   # then the Zoom backstop only flags true blindspots
+        scan_gcal()   # and direct calendar invites (the third channel)
         prompt(dry=a.dry)
     elif a.cmd == "list":
         list_store()
