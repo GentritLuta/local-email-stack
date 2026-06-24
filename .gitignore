@@ -83,3 +83,12 @@ saas/dist/
 # ─── Local caches / tool state ────────────────────────────────────────────
 .site_cache/
 .wrangler/
+
+# session 2026-06-12: PII export backup + env key backup (never commit)
+out/
+sequences/supabase.env.bak-*
+ADMIN_PORTAL_CREDENTIALS.md
+out/AUREON-Admin-Portal-Credentials.pdf
+
+# all sequences env secrets (payoneer.env was exposed 2026-06-24)
+sequences/*.env
