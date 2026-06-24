@@ -349,6 +349,21 @@ def aggregate(data: dict) -> dict:
         if p.get("unsubscribed") and in_window(p.get("unsubscribed_at"), 30 * 24):
             row = per_client.get(p["profile_slug"])
             if row: row["unsubs"] += 1
+    # Per-client REAL replies come from the replies table (class='reply'), NOT the
+    # laggy/partial send_log.replied flag. send_log.replied only fills when a reply is
+    # header/subject-matched to its sent row (Resend rewrites Message-IDs, so most never
+    # match), which made working clients (e.g. algoalpha's 25 real replies) look dead.
+    _email2slug = {(p.get("email") or "").lower(): p.get("profile_slug")
+                   for p in prospects if p.get("email")}
+    for row in per_client.values():
+        row["real_replies"] = 0
+    for r in replies:
+        if r.get("class") != "reply":
+            continue
+        pslug = r.get("profile_slug") or _email2slug.get((r.get("from_addr") or "").lower())
+        row = per_client.get(pslug)
+        if row:
+            row["real_replies"] = row.get("real_replies", 0) + 1
 
     per_niche: dict[str, dict] = {}
     for p in prospects:
@@ -879,19 +894,21 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
             f"{r['sent']:,}",
             f"{r['delivered']:,}",
             pct(r["opened"], r["delivered"]),
-            pct(r["replied"], r["sent"]),
+            f"{r.get('real_replies', 0):,} ({pct(r.get('real_replies', 0), r['sent'])})",
             colored(pct(r["bounced"], r["sent"]), RED) if r["sent"] and r["bounced"] / r["sent"] > 0.05
               else pct(r["bounced"], r["sent"]),
             f"{r['unsubs']:,}",
         ])
     pc_inner = table(
-        ["Client", "Sent (30d)", "Delivered", "Open %", "Reply %", "Bounce %", "Unsubs"],
+        ["Client", "Sent (30d)", "Delivered", "Open %", "Replies (30d)", "Bounce %", "Unsubs"],
         pc_rows or [["(no data)", "", "", "", "", "", ""]],
         ["left", "right", "right", "right", "right", "right", "right"],
     )
     pc_block = section(
         "Per client (last 30d)",
-        "Cross-client comparison. Watch for any client trending high on bounce or complaint.",
+        "Cross-client comparison. Replies (30d) = actual prospect replies received (from the "
+        "replies table), so a client getting replies never reads as zero. Watch for any client "
+        "trending high on bounce or complaint, or stuck at 0 replies (deliverability or offer).",
         pc_inner,
     )
 
