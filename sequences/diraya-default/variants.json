@@ -33,10 +33,10 @@
     {
       "n": 1,
       "delay_days": 0,
-      "angle": "hormozi_open_question_give",
+      "angle": "give_first_edgecases_single_ask",
       "_ab_note": "STEP-1 A/B STARTED 2026-06-22. Diraya was already give-first (leads with REVIEW one-pager, GHOSTS in P.S., best of the group at 68% open / 0.2% reply). A-side (this linked variant) = REVIEW-led (a custom one-pager Mohammed writes per prospect = higher friction). B-side (inline on sequence_steps id 4e37c5f8-42a1-43f5-903a-4080a345938f) = GHOSTS-led ('the agent ghost-cases list for {company}', reply GHOSTS for the 40-edge-case list), the more believable/scalable keep-it give; REVIEW demoted to P.S. Tests whether the ready list beats the custom analysis [[aureon-givefirst-ab]]. Read: py scripts/ab-status.py --profile diraya. To END: clear step-1 inline.",
-      "subject": "a one-pager for {company}",
-      "body": "Hi {greeting},\n\nNo pitch, just something useful.\n\nReply REVIEW and I send you a written one-pager on the AI feature {company} is building: the stack I would pick, the three biggest risks, a realistic timeline, and the eval template we start every build with. No call attached.\n\nWhy it is worth reading: I am on the engineering team at Diraya. We help seed to Series B teams ship a working AI feature in 8 weeks with a written eval suite, not 6 months of demos. One fintech we worked with went from a brittle demo to passing a 300-case eval suite in 8 weeks, then kept shipping on the repo we handed over.\n\nIf the one-pager is useful and you want to talk, the call is there. If not, it is yours either way.\n\nP.s. if you would rather just see where agents break, reply GHOSTS for our list of 40 production-killer edge cases, each with the failure mode and the eval that catches it. Free, no call."
+      "subject": "40 ways AI agents break",
+      "body": "Hi {greeting},\n\nNo pitch, just something useful.\n\nReply GHOSTS and I will send you our list of 40 production killers for AI agents: the exact edge cases that break them in the wild, each with the failure mode and the eval that catches it before your users do. No call attached.\n\nWe are Diraya. We help seed to Series B teams ship a working AI feature in 8 weeks with a written eval suite, not 6 months of demos. One team went from a brittle demo to passing a 300 case eval suite in 8 weeks, then kept shipping on the repo we handed them.\n\nThe list is yours either way. If it is useful and you want help closing the gaps, the call is there. If not, keep it.\n\nReply GHOSTS and I will send it over."
     },
     {
       "n": 2,

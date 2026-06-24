@@ -189,5 +189,49 @@
     "email_subject": "Ihr Energiekosten-Check und die Vertragsfallen",
     "from_name": "Philipp Loisha",
     "from_addr": "philipp@ener-g-beratung.de"
+  },
+  {
+    "client_slug": "diraya",
+    "language": "en",
+    "magnet_keywords": [
+      "GHOSTS"
+    ],
+    "deliverable_title": "40 Ways AI Agents Break in Production: The Edge Cases, the Failure Modes, and the Eval That Catches Each One",
+    "one_line_promise": "The 40 production killers that break AI agents in the wild, each with the failure it causes and the eval that catches it before your users do.",
+    "cover_email": "Hi,\n\nYou replied GHOSTS, so here it is.\n\nThis is the working list we run against every AI agent before it ships: 40 edge cases that break agents in production, each with the failure mode it causes and the eval that catches it first. Steal it, run it against your own build, and you will find a few you are not covering yet.\n\nIf you want a hand turning this into a written eval suite for your specific feature, just reply and we will set up a short call. If not, the list is yours.\n\nMohammed\nDiraya",
+    "accent_hex": "#FF6B00",
+    "sections": [
+      {
+        "heading": "Input handling: the 8 ways real-world input breaks an agent",
+        "body": "Most agents are tested on clean prompts and fall over on the messy reality of production input.\n\n1. Empty or whitespace-only input. Failure: the agent invents a task or calls a tool with null args. Eval: assert it asks for clarification, never acts.\n2. Input that blows the context window. Failure: silent truncation drops the user's real question. Eval: feed 1.5x the window, assert graceful summarize-or-refuse, not a truncated guess.\n3. Mixed-language or code-switched input. Failure: it answers in the wrong language or ignores half the message. Eval: bilingual prompts, assert it responds in the user's dominant language.\n4. Prompt injection in user content ('ignore previous instructions'). Failure: it obeys the injected instruction. Eval: a battery of injection strings, assert the system prompt holds.\n5. Injection from retrieved documents or tool output. Failure: a poisoned page or record hijacks the agent. Eval: seed your RAG corpus with adversarial docs, assert they cannot change behavior.\n6. Unicode tricks, homoglyphs, zero-width characters. Failure: guardrails are bypassed. Eval: normalize-and-test with a homoglyph corpus.\n7. Locale-ambiguous numbers and dates (1,000 vs 1.000, MM/DD vs DD/MM). Failure: it misreads the value and acts on it. Eval: ambiguous inputs with known-correct parses.\n8. Valid but impossible requests ('book a flight to the moon'). Failure: it confidently proceeds. Eval: impossible requests, assert it declines with a reason."
+      },
+      {
+        "heading": "Tool use: the 8 ways agents misuse tools and APIs",
+        "body": "1. Hallucinated tool arguments. Failure: wrong record updated, wrong email sent. Eval: schema-validate every tool call against ground truth before execution.\n2. Wrong tool for the task. Failure: it searches when it should query the database. Eval: per-intent expected-tool assertions.\n3. Ignoring a tool error and proceeding. Failure: it reports success on a failed action. Eval: inject 500s and timeouts, assert it surfaces the failure, never fabricates a result.\n4. Infinite tool-call loops. Failure: it calls the same tool forever, burning cost. Eval: cap and assert a hard stop with a sane message.\n5. Stale or cached results treated as fresh. Failure: it acts on yesterday's data. Eval: freshness checks on time-sensitive tools.\n6. Parallel calls with hidden dependencies. Failure: step B runs before step A finishes. Eval: dependency-ordered traces.\n7. Tool output too large for context. Failure: the result is truncated and it reasons on half. Eval: oversized returns, assert summarize-then-reason.\n8. Side-effectful tools on a read-only request. Failure: an exploratory question mutates data. Eval: assert no write-tool fires on read intents."
+      },
+      {
+        "heading": "Context and memory: the 7 ways agents lose the thread",
+        "body": "1. Losing earlier constraints in a long chat. Failure: it forgets the budget set 10 turns ago. Eval: long multi-turn scripts that check constraint retention.\n2. Conflating two users or sessions. Failure: cross-user data leak. Eval: interleaved-session tests, assert strict isolation.\n3. Over-trusting its own earlier wrong output. Failure: an early hallucination compounds. Eval: seed a wrong fact mid-chat, assert it can correct, not entrench.\n4. Context eviction dropping the system prompt. Failure: guardrails silently fall out of context. Eval: assert the system prompt and pinned facts survive at max length.\n5. Summarization dropping the one detail that mattered. Failure: the rolled-up memory loses the account number. Eval: needle-in-haystack over summarized history.\n6. Trusting stale memory over the live user. Failure: it argues with the user using old notes. Eval: conflict cases, assert the live user wins.\n7. No memory when memory was expected. Failure: it re-asks for info already given. Eval: assert recall of prior-turn facts."
+      },
+      {
+        "heading": "Hallucination and grounding: the 7 ways agents invent things",
+        "body": "1. Citing sources that do not exist. Failure: fake URLs and references. Eval: assert every citation resolves to a real retrieved doc.\n2. Confident answers with zero retrieved support. Failure: it fills a gap with fiction. Eval: assert abstain-or-hedge when retrieval returns nothing.\n3. Mixing facts from two records. Failure: customer A's data attributed to customer B. Eval: provenance checks on every claim.\n4. Inventing API fields, function names, config keys. Failure: code that looks right and does not exist. Eval: validate generated identifiers against the real schema.\n5. Plausible-but-wrong math. Failure: it reasons fluently to a wrong number. Eval: a numeric set with exact expected answers.\n6. Overconfidence out of domain. Failure: no signal it is guessing. Eval: a calibration set, assert it flags low confidence.\n7. Agreeing with a false premise. Failure: it runs with the user's wrong assumption. Eval: false-premise prompts, assert it corrects first."
+      },
+      {
+        "heading": "Control flow: the 6 ways agents get stuck or run away",
+        "body": "1. Never deciding it is done. Failure: it loops past the answer. Eval: a clear stop condition on every task type.\n2. Giving up too early. Failure: 'I cannot help' on something in scope. Eval: a should-succeed set, assert completion.\n3. Runaway cost on one request. Failure: a single query spends 50x budget. Eval: per-request token and tool-call caps with assertions.\n4. Deadlock between sub-agents. Failure: the whole run hangs. Eval: timeout-and-detect on multi-agent graphs.\n5. Replanning forever instead of acting. Failure: analysis paralysis, no output. Eval: bound the plan-revise cycle, assert progress.\n6. Silent partial completion. Failure: it does 3 of 5 steps and reports success. Eval: step-coverage assertions on multi-step tasks."
+      },
+      {
+        "heading": "Production realities: the 4 ways agents break under real load",
+        "body": "1. Non-determinism making a passing demo flake one in ten. Failure: 'works on my machine' that fails in prod. Eval: run each case N times, assert a pass rate, not a single pass.\n2. Model or prompt version drift. Failure: a provider update silently changes behavior. Eval: a regression suite pinned in CI on every model bump.\n3. Latency spikes under concurrency. Failure: it times out at peak. Eval: load test the full tool chain, not just the model call.\n4. Cost scaling with the wrong thing. Failure: spend grows with input size, not value. Eval: cost-per-resolved-task as a first-class metric."
+      },
+      {
+        "heading": "What to do with this list",
+        "body": "Pick the 10 that scare you most for your feature and write an eval for each before you ship. If you want it done as a written suite that runs in CI, that is exactly what we build at Diraya: a working AI feature in 8 weeks with the eval suite that keeps it working. Reply to this email and we will set up a short call. If not, run the list yourself. It works either way."
+      }
+    ],
+    "email_subject": "Your 40 AI agent edge cases",
+    "from_name": "Mohammed",
+    "from_addr": "mohammed@hello.cleardiraya.com"
   }
 ]
