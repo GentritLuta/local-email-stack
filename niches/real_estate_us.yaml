@@ -8,6 +8,38 @@ engine: team_pages
 # front-desk info@/office@ inboxes) just because the email carries no name.
 require_first_name: false
 
+# Google Maps / Places source (places_scrape.py). Brokerages live on Google
+# Business Profiles; Places returns the agency name + city directly. The
+# categories x cities space is rotated by the .places.done cursor.
+places:
+  country: us
+  max_per_query: 20
+  categories:
+    - "real estate agency"
+    - "real estate brokerage"
+    - "realtor"
+  cities:
+    - "Austin TX"
+    - "Dallas TX"
+    - "Houston TX"
+    - "Phoenix AZ"
+    - "Denver CO"
+    - "Atlanta GA"
+    - "Charlotte NC"
+    - "Tampa FL"
+    - "Orlando FL"
+    - "Nashville TN"
+    - "Columbus OH"
+    - "Indianapolis IN"
+    - "Kansas City MO"
+    - "Las Vegas NV"
+    - "Salt Lake City UT"
+    - "Seattle WA"
+    - "Portland OR"
+    - "Minneapolis MN"
+    - "St Louis MO"
+    - "San Antonio TX"
+
 # WHAT THIS NICHE DOES
 # Walks the seed URLs below, extracts every mailto: link with its surrounding
 # context (name, role, phone), verifies each address (syntax + disposable +
@@ -164,6 +196,180 @@ seeds:
   - https://www.charleskingre.com
   - https://www.thefcrgroup.com/agents
   - https://pr.mo.gov/realestate.asp
+
+  # auto-discovered 2026-06-11 08:18 via seed_discover.py
+  - https://www.fastexpert.com/top-real-estate-agents/henderson-nv
+  - https://mirealteam.com
+  - https://www.greenridge.com
+  - https://capstonecre.com/about-us
+  - https://www.fastexpert.com/top-real-estate-agents/virginia
+  - https://www.kwevolution.com/leadership
+  - https://www.thevirtualrealtygroup.com/join-mo
+  - https://kw.com/en-us/agents
+  - https://www.myyazelgroup.com/meet-our-agents
+  - https://wrgpros.com
+  - https://www.thevirtualrealtygroup.com/join-sc
+  - https://www.eliternj.com
+  - https://www.fastexpert.com/top-real-estate-agents/new-jersey
+  - https://www.presidioteam.com
+  - https://ventureonerealtyllc.com
+
+  # auto-discovered 2026-06-11 09:40 via seed_discover.py
+  - https://www.thebrokerageky.com/realestateagent/search
+  - http://www.thefcrgroup.com
+  - https://www.fastexpert.com/top-real-estate-agents/massachusetts
+  - https://www.homes-by-network.com/default.asp.f-meetouragents
+  - https://www.realtyofamerica.com/real-estate-agents/location/state/New-Jersey
+  - https://www.fastexpert.com/top-real-estate-agents/connecticut
+  - https://www.compass.com/agents/locations/nashville-tn/27781
+  - https://www.greaternashvillerealtors.org
+  - https://revel.realestate/the-benefits-of-working-with-a-boutique-real-estate-brokerage
+  - https://www.realtyboutiquenc.com
+  - https://www.irg-cny.com
+
+  # auto-discovered 2026-06-12 08:11 via seed_discover.py
+  - https://homebychoicenyc.com/agents
+  - https://bizzarroagency.com
+  - https://www.parrettgroup.com/about
+  - https://www.soldbybenton.com/projects-1
+  - https://www.fastexpert.com/top-real-estate-agents/missouri
+  - https://www.fastexpert.com/top-real-estate-agents/south-carolina
+  - https://www.fastexpert.com/top-real-estate-agents/utah
+  - https://theboutiquere.com/meet-our-team
+
+  # auto-discovered 2026-06-12 09:43 via seed_discover.py
+  - https://chapelhillrealty.com/meet-the-team
+  - https://www.fastexpert.com/top-real-estate-agents/columbus-oh
+  - https://www.thevirtualrealtygroup.com/join-tx
+  - https://www.fastexpert.com/top-real-estate-agents/myrtle-beach-sc
+  - https://www.phillyhomegirls.com/the-team
+  - https://www.listingleaders.com/brokers
+  - https://www.realtyofamerica.com/real-estate-agents/location/state/Wisconsin
+
+  # auto-discovered 2026-06-12 10:00 via seed_discover.py
+  - https://connrealty.com
+  - https://www.fastexpert.com/top-real-estate-agents/macon-ga
+  - https://www.theboutiquere.com
+  - http://www.bloomreg.com
+  - https://www.alandrealty.com
+
+  # auto-discovered 2026-06-13 08:11 via seed_discover.py
+  - https://www.fastexpert.com/top-real-estate-agents/virginia-beach-va
+  - https://rockhouserealty.com/agents
+  - https://web.lehighvalleychamber.org/Real-Estate-Agents,-Brokers-and-Other-Services
+
+  # auto-discovered 2026-06-13 09:42 via seed_discover.py
+  - https://www.phillyhomegirls.com
+  - https://www.fastexpert.com/top-real-estate-agents/philadelphia-pa
+  - https://recolorado.com
+  - https://www.realtyco.com
+  - https://huntchicago.com/join-our-team-crystal-tran-team-chicago-il
+
+  # auto-discovered 2026-06-14 08:58 via seed_discover.py
+  - https://www.kaimteam.com/team-page
+  - https://signaturerealtypros.com
+  - https://www.mdrealtor.org
+  - https://www.sharifsells.com
+
+  # auto-discovered 2026-06-15 08:46 via seed_discover.py
+  - https://dre.colorado.gov/broker-applications-documents-and-fees
+  - https://www.fastexpert.com/top-real-estate-agents/rochester-ny
+  - https://joinkale.com
+
+  # auto-discovered 2026-06-16 09:40 via seed_discover.py
+  - https://ourtexasrealestate.com/agents
+  - https://solidoakre.com
+
+  # auto-discovered 2026-06-17 09:41 via seed_discover.py
+  - https://theyoungteam.com/meet-our-team/terry-young
+  - https://www.omniaelevate.com/jla-realty-omnia-elevate-members-directory
+  - https://www.fastexpert.com/top-real-estate-agents/seattle-wa
+  - https://www.nevadarealestategroup.com
+  - https://www.keypointpartners.com/our-team
+  - https://www.brixtwincities.com
+  - https://smgmo.com/who-we-are
+  - https://www.truebloodre.com
+  - https://www.shorewest.com
+  - https://www.jenniferlandro.com
+  - https://www.compass.com/agents/locations/maryland-md/30422
+  - https://www.scmidlandsagent.com
+  - https://sentryresidential.net/agents
+  - https://indprealty.com/agents-2-2
+
+  # auto-discovered 2026-06-18 09:41 via seed_discover.py
+  - https://www.ltpcommercial.com/our-company/our-team
+  - https://www.carriemccormickre.com
+  - https://midpennrealty.com/about-us
+  - https://www.advocaterealtyma.com/meet-our-team
+  - https://lregmn.com
+  - https://www.missourirealtor.org/about/starting-your-career
+  - https://wrgpros.com/our-team
+  - https://the608team.com
+  - https://wibrokers.com
+
+  # auto-discovered 2026-06-18 09:57 via seed_discover.py
+  - https://dakotarealty.com/meet-our-agents
+  - https://www.apollorealestateservices.com/meet-our-team
+  - https://teamfallico.com
+
+  # auto-discovered 2026-06-20 09:38 via seed_discover.py
+  - https://enterpriserealtyassociates.com/agents
+  - https://www.tawakonilakerealestate.com/default.asp.f-meetouragents
+  - https://dtdrealty.com
+  - https://theyoungteam.com/meet-our-team/ryan-young
+  - https://orraportal.ramcoams.net/Education/Registration/Details.aspx?cid=9d0260ff-923d-f011-9cde-00155d0079cb
+  - https://www.homediscoveryteam.com
+  - https://www.millerchicagorealestate.com/chicago-property-brokers
+  - https://www.unionrealestate.com/about/our-team
+  - https://americandreamsrealestate.com/agents
+  - https://acrosscountryre.com/meet-across-country-real-estate-team
+  - https://www.reindiana.com/AgentSearch/Search.aspx
+  - https://www.athomeindiana.com
+  - https://wisconsin.properties/our-team
+  - https://www.teamklumb.com
+  - https://the608team.com/about
+
+  # auto-discovered 2026-06-21 10:18 via seed_discover.py
+  - https://www.texasrealestate.com/about-us/leadership-and-staff/officers
+  - https://www.thevillages.com/sales-reps
+  - https://www.corcoran.com/real-estate-agents/search/regionId/1
+  - https://www.stubblebinecompany.com/meet-the-team
+  - https://www.compass.com/agents/locations/south-carolina/192343
+
+  # auto-discovered 2026-06-23 08:56 via seed_discover.py
+  - https://www.corcoranperry.com/realestate/agents/group/agents
+  - https://www.mcdhomes.com/our-team
+  - https://irebgroup.com/agents
+  - https://www.compass.com/agents/locations/new-york-ny/21429
+  - https://www.tryagresti.com/meet-our-team
+  - https://www.scofieldgroup.com
+  - https://metrorealtycorp.com/agents
+  - https://www.buysellwithub.com/team-page
+  - https://www.compass.com/agents/locations/minneapolis-mn/7425
+  - http://www.indianaintegrityrealtors.com/default.asp.f-meetouragents
+  - https://www.truebloodre.com/team
+  - https://www.teamtrimblerealestate.com
+  - https://www.independent.com
+
+  # auto-discovered 2026-06-23 09:41 via seed_discover.py
+  - https://www.compass.com/agents/wiehn-pollard-team
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

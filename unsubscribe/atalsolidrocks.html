@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Unsubscribe · Atal SolidRocks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #1f1b16; min-height: 100vh; }
+  body { font-family: "Plus Jakarta Sans", sans-serif; color: #ffffff; padding: 40px 18px;
+         display: grid; place-items: center; background: radial-gradient(1100px 620px at 50% -8%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.0) 60%), #1f1b16; background-attachment: fixed; }
+  .card { position: relative; width: 100%; max-width: 540px; background: #36322e;
+          border: 1px solid #5c5a56; border-radius: 22px; overflow: hidden;
+          box-shadow: 0 24px 70px rgba(255,255,255,0.22), 0 2px 8px rgba(0,0,0,.18); }
+  .accent-rule { height: 4px; background: linear-gradient(90deg, #ffffff, rgba(255,255,255,0.35)); }
+  .body { padding: 40px 38px 30px; }
+  .logo { max-width: 170px; height: auto; border-radius: 10px; }
+  .wordmark { font-size: 21px; font-weight: 700; color: #ffffff; letter-spacing: .3px; }
+  .tagline { font-size: 12px; color: #9a9896; margin-top: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
+  h1 { font-size: 25px; font-weight: 700; margin: 28px 0 12px; color: #ffffff; letter-spacing: -.2px; }
+  p { font-size: 15px; line-height: 1.7; margin: 0 0 14px; color: #d6d5d5; }
+  .btn { display: inline-block; margin-top: 16px; padding: 15px 30px; background: #ffffff;
+         color: #0a0a0a; font-size: 14.5px; font-weight: 700; border: none; border-radius: 14px;
+         cursor: pointer; letter-spacing: .3px; transition: background .15s ease, transform .1s ease;
+         box-shadow: 0 8px 22px rgba(255,255,255,0.3); }
+  .btn:hover { background: #e0e0e0; transform: translateY(-1px); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+  .success { display: none; margin-top: 18px; padding: 15px 18px; background: rgba(255,255,255,0.1);
+             border: 1px solid rgba(255,255,255,0.4); font-size: 14px; line-height: 1.5; color: #ffffff; border-radius: 14px; }
+  .err { display: none; margin-top: 18px; padding: 15px 18px; background: rgba(220,38,38,.1);
+         border: 1px solid rgba(220,38,38,.4); font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 14px; }
+  .footer { padding: 22px 38px 30px; border-top: 1px solid #5c5a56; font-size: 12px; color: #9a9896; line-height: 1.7; }
+  .footer a { color: #ffffff; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="accent-rule"></div>
+    <div class="body">
+      <img class="logo" src="https://atalsolidrocks.com/logo.png" alt="Atal SolidRocks" style="max-width:140px;height:auto;display:block;margin-bottom:4px;">
+      <div class="tagline">Weniger Krankenstand im Mittelstand. Messbar, in 90 Tagen.</div>
+      <h1>Unsubscribe from Atal SolidRocks</h1>
+      <p id="lead">Click below and we will remove your address from every Atal SolidRocks
+        campaign. No follow-up, no second attempt.</p>
+      <button class="btn" id="btn" type="button">Confirm unsubscribe</button>
+      <div class="success" id="success-state">
+        <b><span id="email">Your address</span></b> has been unsubscribed. You will not hear from us again.
+      </div>
+      <div class="err" id="error-state"></div>
+    </div>
+    <div class="footer">
+      Atal SolidRocks · DACH<br>
+      <a href="mailto:info@atalsolidrocks.io">info@atalsolidrocks.io</a> &nbsp;·&nbsp; <a href="https://atalsolidrocks.com">atalsolidrocks.com</a><br>
+      © 2026 Atal SolidRocks
+    </div>
+  </div>
+<script>
+const SUPABASE_URL  = "https://ccmqkljsjiuavpydbkva.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
+const token = new URLSearchParams(location.search).get("t") || "";
+const btn = document.getElementById("btn");
+const lead = document.getElementById("lead");
+const successWrap = document.getElementById("success-state");
+const errorWrap = document.getElementById("error-state");
+function showSuccess() { successWrap.style.display="block"; btn.style.display="none"; lead.style.display="none"; }
+function showError(m) { errorWrap.textContent=m; errorWrap.style.display="block"; btn.disabled=false; }
+async function doUnsub() {
+  btn.disabled = true;
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`, {
+      method:"POST",
+      headers:{ apikey:SUPABASE_ANON, Authorization:"Bearer "+SUPABASE_ANON, "Content-Type":"application/json" },
+      body: JSON.stringify({ p_token: token })
+    });
+    if (!r.ok) throw new Error("HTTP "+r.status);
+    showSuccess();
+  } catch (e) { showError("Something went wrong: "+e.message); }
+}
+if (!token) { showError("This link is incomplete. Please use the link from the email."); btn.disabled = true; }
+btn.addEventListener("click", doUnsub);
+</script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+slug: mark_eting_us_service
+name: "mark-eting — US service businesses (trades + professional services), $2M+ revenue"
+profile_slug: mark-eting
+engine: team_pages
+
+# ICP: US service businesses (trades + professional services), $2M+ revenue
+require_first_name: false
+
+seeds:   # seed_discover.py appends discovered URLs here
+
+  # auto-discovered 2026-06-14 04:55 via seed_discover.py
+  - https://www.metropolitanplumbing.com
+  - https://www.loudounroofinghic.com
+  - https://www.alterlawfirm.com
+  - https://www.claconnect.com/en/locations/missouri/offices/cla-st-louis
+  - https://www.godwinagency.com/team
+  - https://colby-group.com/about-our-agency/meet-our-team
+  - https://www.nfp.com/about-nfp/find-an-office/120-bridgepoint-way-suite-c-st-paul-mn
+  - https://www.riverviewco.com/meet-the-team
+
+  # auto-discovered 2026-06-14 08:48 via seed_discover.py
+  - https://guntherplumbing.com
+  - https://therightbrothers.com
+  - https://theroofmentors.com/raeford-nc
+  - https://oaktreeroofers.com/roofing-contractor-raeford-nc-621987
+  - https://modernelectric.com
+  - https://www.sanfranciscofloodrepair.com
+  - https://lp-cpa.com/princeton-nj
+  - https://www.cpaphilly.com
+  - https://magnoliasmedspa.com/our-team
+  - https://remcoagency.com
+  - https://agency.nationwide.com/ny/new-york
+  - https://www.smartchoiceagents.com/new-york
+  - https://dblaz.com
+  - https://azcornerstone.com
+
+  # auto-discovered 2026-06-14 19:54 via seed_discover.py
+  - https://www.connellyplumbingsolutions.com
+  - https://www.commercialcomfort.com/toledo
+  - https://smockhvac.com/meet-the-team
+  - https://www.mikesroofing.net
+  - https://roof-ohio.com
+  - https://www.white-electrical.com
+  - https://electricalcontractorinc.com
+  - https://vantixelectric.com
+  - https://www.rapidrecoveryteamorlando.com/groveland-fl
+  - https://organicpestcontrolinmichigan.com
+  - https://www.mipma.org/member-search
+  - https://pestmanagementinc.com
+  - https://www.roselawfirm.com/attorneys
+  - https://www.thetaylorlawfirmatl.com/our-attorneys
+  - https://treasurecoastcpas.com
+  - https://howardcpas.com/port-st-lucie
+  - https://www.cpaaccounting.biz
+  - https://www.miketillettcpa.com
+  - https://www.wileycpaprofessionals.com/our-company/meet-our-professionals
+  - https://www.friedlerdentalgroup.com/about/meet-our-team
+
+  # auto-discovered 2026-06-14 22:15 via seed_discover.py
+  - https://www.tectaamerica.com/location/fort-wayne-commercial-roofing-indiana
+  - https://swecinc.com
+  - https://www.caribbeanfl.com
+  - https://npic.orst.edu/pest/selectpco.html
+  - https://www.themichiganlawfirm.com
+  - https://www.lhcpafirm.com
+  - https://smilecentermemphis.com
+  - https://www.moderndentistrymemphis.com/meet-the-doctors/meet-the-team
+  - https://www.foresthilldental.com/our-office-team
+  - https://gleammedspa.com/estheticians-in-denver
+  - https://mdbodyandmedspa.com/our-team
+  - https://www.brewerytownchiropractic.com
+  - https://rittenhousechiro.com
+  - https://www.torresinsuranceagency.com/about-our-agency/meet-our-team
+
+  # auto-discovered 2026-06-14 22:28 via seed_discover.py
+  - https://proserveplumbers.com
+  - https://azcpg.com/team
+  - https://www.fredericroofing.com
+  - https://aaaroofingstl.com
+  - https://servicemasterofcolumbia.com
+  - https://www.peachtreepestcontrol.com
+  - https://phillylawyers.com
+  - https://www.cozen.com/offices/philadelphia
+  - https://www.mijcpa.com
+  - https://www.taylorcpagroup.com/ourfirm.php
+  - https://warrenaverett.com/offices/pensacola
+  - https://www.smilebr.com/staff
+  - https://www.perfectmedspa.com
+  - https://www.compassionchiro.com
+  - https://www.insurancebycollins.com/about-our-agency/meet-our-team
+  - https://allisonagency.net/about-our-agency/meet-our-team
+  - https://insurewithasi.com/about-our-agency/meet-our-team
+  - https://theinsuranceagency.us/team
+  - https://www.insurancesolutionsgroup.com
+  - https://www.littlerocktriallawyers.com
+
+  # auto-discovered 2026-06-14 22:42 via seed_discover.py
+  - https://www.owatonnaplumbers.com
+  - https://todayshomeowner.com/near-me/minnesota/owatonna/plumbing
+  - https://villageplumbing.com/meet-our-team
+  - https://coopwood.com/about-us
+  - https://preferredroofinginc.com
+  - https://www.roofreplacementca.com
+  - https://www.specialtyelectric.com
+  - https://www.almightyelectricaz.com/about
+  - https://www.shieldpestcontrol.net
+  - https://www.wsatlaw.com/our-attorneys
+  - https://warrenaverett.com/offices/birmingham
+  - https://www.foxchapelfamilydental.com/meet-our-team
+  - https://www.georgeroyerdmd.com/meet-our-team-25.html
+  - https://www.authenticmedicalaesthetics.com
+  - https://www.weightogomedicalspa.com
+  - https://jcainsure.com/about-our-agency/meet-our-team
+  - https://insuranceinc.com/about-our-agency/meet-our-team
+  - https://broadwayinsurance.agency
+  - https://fastactlandscaping.com/mishawaka-indiana-landscaping-service
+
+  # auto-discovered 2026-06-14 22:55 via seed_discover.py
+  - https://aircomfort.com/about
+  - https://universalhvacgroup.com
+  - https://www.craftbuiltroofing.com/roofing-payson-az
+  - https://roofkingusa.com/paysonaz
+  - https://electriciansincomaha.com
+  - https://bugoffexterminatorsflorida.com
+  - https://thepestcontrol.co
+  - https://www.jmcpagroup.com
+  - https://facekcmedspa.com
+  - https://greatercarolinaclinic.com
+  - https://www.iaofohio.com/our-staff-members
+
+  # auto-discovered 2026-06-15 08:37 via seed_discover.py
+  - https://ruffroofers.com
+  - https://www.fourtwelvedev.com
+  - https://www.fourseasonsroofingmd.com
+  - https://www.therestorationcontractors.com/queens-ny
+  - https://lawgroupofiowa.com
+  - https://www.regalgroupcpa.com
+  - https://www.cpasdca.com
+  - https://ibcpa.com
+  - https://www.whiteleafmed.com/meet-our-team
+  - https://www.medspamedicaldirector.com/about
+  - https://newhorizonsmedspa.com/meet-our-team
+  - https://bpinsured.com/about-our-agency/meet-our-team
+  - https://skaggsinsurance.com/about/meet-our-team
+  - https://green-weaver.com/our-team
+  - https://bloomslandscapingllc.com
+
+  # auto-discovered 2026-06-16 10:51 via seed_discover.py
+  - https://www.customplumbingpros.com/plumbing-pros
+  - https://southsideplumbing.com/meet-our-team
+  - https://www.hollandroofing.com/join-our-team
+  - https://www.mcdonaldwetle.com
+  - https://www.necanet.org
+  - https://www.goldbergsegalla.com/our-team
+  - https://www.jw.com/people
+  - https://www.bhmcpagroup.com/hub.php
+  - https://jakcpa.com/about-us/our-team
+  - https://www.meridiandentalclinic.com/meet-the-team
+  - https://www.dermamedispa.com/our-team-3
+  - https://spamd.net
+  - https://www.brinkchiropractic.com/our-team
+  - https://www.cloudchiropracticclinic.com/full-team
+  - https://cjfig.com/about-our-agency/meet-our-team
+  - https://www.mdpins.com/about-our-agency/meet-our-team
+  - https://ryanssignaturelandscaping.net/our-team
+  - https://junipercares.com/our-team
+
+  # auto-discovered 2026-06-17 08:28 via seed_discover.py
+  - https://www.aicpa-cima.com/resources/toolkit/cpa-exam
+  - https://ashburndentalcare.com
+  - https://www.ashburndivinedental.com
+  - https://www.brchs.com/locations/blue-ridge-health-lake-lure
+  - https://www.brchs.com
+  - https://www.personal.com.ar
+
+  # auto-discovered 2026-06-17 10:42 via seed_discover.py
+  - https://todayshomeowner.com/near-me/illinois/benton/electrical
+  - https://www.socialcirclelawyer.com
+  - https://www.waynesborochiropracticclinic.com
+
+  # auto-discovered 2026-06-18 08:45 via seed_discover.py
+  - https://dalesac.com/locations/north-port
+  - https://www.polarbear.ac
+  - https://www.acromanservice.com
+  - https://www.bestlawyers.com/united-states/texas/fort-worth
+  - https://nycdent.com
+  - https://www.209nycdental.com
+  - https://www.geico.com
+
+  # auto-discovered 2026-06-18 11:10 via seed_discover.py
+  - https://penderlandscaping.co.uk
+
+  # auto-discovered 2026-06-19 08:55 via seed_discover.py
+  - https://www.rightwayplumbing.com/about/team
+  - https://www.onedayroofing.com/our-people
+  - https://genesisroofing.net/our-team
+  - https://roofmaxx.com/about-us/our-team
+  - https://www.electricianoncall.com/about-us
+  - https://www.langerelectricservices.com/about-us
+  - https://www.the-cpa-group.com
+  - https://bhddc.com/about-us/our-team
+  - https://griffithagency.com/about-us/our-team
+  - https://www.carpenterinsuranceagency.com/about-our-agency/meet-our-team
+  - https://www.teamheritage.com/team
+  - https://www.personalinjurylaw.org
+
+  # auto-discovered 2026-06-19 10:58 via seed_discover.py
+  - https://austin-hendsbeesons.com
+  - https://www.activerestoration.com/kettering
+  - https://www.deltadentalky.com
+  - https://www.seilerslandscaping.com
+  - https://www.bzak.com
+
+  # auto-discovered 2026-06-20 09:13 via seed_discover.py
+  - https://www.hvacrecruitment.com/consultants
+  - https://cornerstoneroofingrestoration.com
+  - https://www.electricianoncall.com
+  - https://indianarestoration.com/about-us/our-team
+  - https://www.lakecpa.com/ourteam.php
+  - https://pascackdental.com/our-practice/meet-our-team
+  - https://kesslerdental.net/meet-our-team
+  - https://www.myskinmedicalspa.com/our-team
+  - https://renewmedspabeauty.com/meet-the-team
+  - https://synergychirowellness.com/meet-our-team
+  - https://insoneagency.com/about-our-agency/meet-our-team
+  - https://boyleinsuranceagency.com/about-our-agency/meet-our-team
+  - https://hartinsurance.com/about-our-agency/meet-our-team
+
+  # auto-discovered 2026-06-21 09:58 via seed_discover.py
+  - https://www.callpurerestore.com
+  - https://libertylandscaping.com/our-team
+  - https://www.luxurylandscape-llc.com/our-team
+
+  # auto-discovered 2026-06-21 11:34 via seed_discover.py
+  - https://www.teamplumbinganddrains.com
+  - https://www.wardandsmith.com/our-team
+  - https://www.helenwileycpa.com/team.php
+  - https://www.bcpas.com/team-sort-final.php
+  - https://www.katzabosch.com/our-firm/our-team
+  - https://www.pcareycpa.com/our-team.php
+  - https://www.mtvcpa.com/our-team.php
+  - https://www.sedoramedspa.com/our-team.html
+  - https://www.rsclandscaping.com
+
+  # auto-discovered 2026-06-22 08:27 via seed_discover.py
+  - https://parksplumbingandsewer.com/about/our-team
+  - https://www.superiorplumbingmt.com/team
+  - https://www.centralroofing.com/why-central-roofing/team-central
+  - https://harlandelectric.com/about-us
+  - https://centervilleinsure.com/about-our-agency/meet-our-team
+  - https://bonagency.com/about-our-agency/meet-our-team
+
+  # auto-discovered 2026-06-22 11:38 via seed_discover.py
+  - https://www.acwelectrichuntsville.com
+
+  # auto-discovered 2026-06-23 08:45 via seed_discover.py
+  - https://wallawallahvaccontractor.com/meet-the-team
+  - https://hollandroofing.net/aboutus
+  - https://lumenasainsurance.com/our-team
+  - https://associatesins.com/our-team
+  - http://www.imgagents.com/our-team
+  - https://acerlandscapeservices.com/meet-our-team
+
+  # auto-discovered 2026-06-23 10:50 via seed_discover.py
+  - https://www.marvsplumbing.com
+  - https://merrittplumbingandheating.com
+  - https://brp307.com
+  - https://appleroof.com
+  - https://www.roofing-directory.com
+  - https://moonlightelectricsolutions.com
+  - https://americanpest.net
+  - https://acb.wa.gov
+  - https://ygacpa.com
+  - https://perfectskinsolutions.co.uk/laser-hair-removal-for-dark-skin
+  - https://www.medicalphysics.institute/papers/the-ultimate-guide-to-laser-hair-removal-for-dark-skin-2025
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+search_queries:
+  - "plumbing company our team"
+  - "HVAC contractor meet our team"
+  - "roofing company our team"
+  - "electrician company about us"
+  - "restoration company our team"
+  - "pest control company about us"
+  - "law firm attorneys our team"
+  - "CPA accounting firm our team"
+  - "dental practice meet our team"
+  - "medical spa our team"
+  - "chiropractic clinic our team"
+  - "insurance agency our team"
+  - "landscaping company our team"
+  - "personal injury law firm attorneys"
+
+seed_require_keywords: ["team", "about", "contact", "our"]
+
+# Google Maps / Places source (places_scrape.py). Local service businesses live
+# on Google Business Profiles, not "team pages", so this is the high-yield path.
+# categories x cities = the query space the .places.done cursor rotates through.
+places:
+  country: us
+  max_per_query: 20
+  categories:
+    - "plumbing company"
+    - "HVAC contractor"
+    - "roofing company"
+    - "electrician"
+    - "water damage restoration"
+    - "pest control company"
+    - "general contractor"
+    - "personal injury law firm"
+    - "accounting CPA firm"
+    - "dental practice"
+    - "medical spa"
+    - "chiropractor"
+    - "insurance agency"
+    - "landscaping company"
+  cities:
+    - "Austin TX"
+    - "Dallas TX"
+    - "Houston TX"
+    - "San Antonio TX"
+    - "Phoenix AZ"
+    - "Denver CO"
+    - "Atlanta GA"
+    - "Charlotte NC"
+    - "Raleigh NC"
+    - "Tampa FL"
+    - "Orlando FL"
+    - "Nashville TN"
+    - "Columbus OH"
+    - "Indianapolis IN"
+    - "Kansas City MO"
+    - "Las Vegas NV"
+    - "Salt Lake City UT"
+    - "Minneapolis MN"
+    - "St Louis MO"
+    - "Jacksonville FL"
+
+discovery:
+  max_seeds_per_run: 20
+  search_country:    us
+  require_mailto:    true
+
+sequence:
+  variants_file: sequences/mark-eting-default/variants.json

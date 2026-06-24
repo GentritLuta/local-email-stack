@@ -1,0 +1,85 @@
+# EU GDPR-safe B2B intent signal pack.
+# For German/Swiss/EU clients (ENER-G, f2, etc.). Company-level signals only,
+# all public and intended-to-be-seen. No individual life-event data (GDPR).
+#
+# jurisdiction: EU. Enforced by signal_pack_lib against the client's
+# profiles.lead_intent.location_geos.
+pack: eu_b2b
+audience: b2b
+jurisdiction: EU
+tone: |
+  Direct, professional, relevant to the public business event. Reference the
+  trigger (hiring, expansion, funding) as the reason for reaching out.
+
+signals:
+  - id: hiring
+    description: Company is publicly hiring or has open roles
+    public_sources: [company_site, public_job_boards]
+    access_method: public_index
+    kind: company_signal
+    query_templates:
+      - '"{company}" careers OR open positions OR hiring'
+    evidence_keywords: ["hiring", "careers", "open position", "we are hiring", "join our team"]
+    confidence_weight: 0.7
+    recency_days: 120
+    channel: cold_email
+
+  - id: funding
+    description: Company announced funding or investment
+    public_sources: [press, public_registers, news]
+    access_method: public_index
+    kind: company_signal
+    query_templates:
+      - '"{company}" funding OR investment OR raised round'
+    evidence_keywords: ["funding", "investment", "raised", "round", "series"]
+    confidence_weight: 0.8
+    recency_days: 180
+    channel: cold_email
+
+  - id: expansion
+    description: Company opening a new location or expanding
+    public_sources: [news, company_site]
+    access_method: public_index
+    kind: company_signal
+    query_templates:
+      - '"{company}" new location OR expansion OR opening'
+    evidence_keywords: ["new location", "expansion", "expanding", "opening", "new office"]
+    confidence_weight: 0.7
+    recency_days: 180
+    channel: cold_email
+
+  - id: leadership_change
+    description: New leadership or management change
+    public_sources: [press, company_site]
+    access_method: public_index
+    kind: company_signal
+    query_templates:
+      - '"{company}" new CEO OR appoints OR managing director'
+    evidence_keywords: ["new ceo", "appoints", "managing director", "joins as", "named"]
+    confidence_weight: 0.6
+    recency_days: 180
+    channel: cold_email
+
+  - id: tech_stack_change
+    description: Public change in the company's tech stack or website
+    public_sources: [company_site, review_platforms]
+    access_method: public_index
+    kind: company_signal
+    query_templates:
+      - '"{company}" relaunch OR new website OR migrated'
+    evidence_keywords: ["relaunch", "new website", "migrated", "now using", "switched to"]
+    confidence_weight: 0.5
+    recency_days: 180
+    channel: prioritize_existing
+
+  - id: public_reviews
+    description: Recent public reviews or complaints worth a relevant outreach
+    public_sources: [review_platforms]
+    access_method: public_index
+    kind: company_signal
+    query_templates:
+      - '"{company}" reviews OR rating'
+    evidence_keywords: ["review", "rating", "stars", "complaint", "feedback"]
+    confidence_weight: 0.5
+    recency_days: 365
+    channel: prioritize_existing

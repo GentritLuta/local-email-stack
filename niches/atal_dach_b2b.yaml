@@ -3,6 +3,40 @@ name: "DACH B2B Mittelstand — Präventionsseminare (Atal SolidRocks)"
 profile_slug: atalsolidrocks
 engine: team_pages   # httpx + bs4, auto-upgrades to playwright if static HTML is empty
 
+# Google Maps / Places source (places_scrape.py), Germany. Mid-market firms in
+# the high-sick-leave sectors of the ICP (Maschinenbau, Pflege, Industrie, IT).
+# require_first_name: true (atal enrolls named HR/BGM/GF deciders; city comes
+# from Places, satisfying requires_city).
+places:
+  country: de
+  max_per_query: 20
+  require_first_name: true
+  categories:
+    - "Maschinenbau Unternehmen"
+    - "Metallverarbeitung Betrieb"
+    - "Pflegedienst"
+    - "Pflegeheim"
+    - "Industrieunternehmen"
+    - "Logistikunternehmen"
+    - "Kunststoffverarbeitung"
+    - "IT Dienstleister Mittelstand"
+  cities:
+    - "München"
+    - "Stuttgart"
+    - "Frankfurt am Main"
+    - "Köln"
+    - "Düsseldorf"
+    - "Hamburg"
+    - "Nürnberg"
+    - "Hannover"
+    - "Leipzig"
+    - "Dortmund"
+    - "Essen"
+    - "Mannheim"
+    - "Karlsruhe"
+    - "Augsburg"
+    - "Bielefeld"
+
 # WHAT THIS NICHE SCRAPES
 # Mid-market DACH companies in HIGH-Krankenstand sectors (Industrie/Maschinenbau,
 # Gesundheit & Pflege, plus mid-market IT) — the ICP from atalsolidrocks.com:

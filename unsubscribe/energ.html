@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Unsubscribe · ENER-G</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #0b0f20; min-height: 100vh; }
+  body { font-family: 'Inter', sans-serif; color: #ffffff; padding: 40px 18px;
+         display: grid; place-items: center; background: radial-gradient(1100px 620px at 50% -8%, rgba(34,197,94,0.16) 0%, rgba(34,197,94,0.0) 60%), #0b0f20; background-attachment: fixed; }
+  .card { position: relative; width: 100%; max-width: 540px; background: #19252f;
+          border: 1px solid #264640; border-radius: 22px; overflow: hidden;
+          box-shadow: 0 24px 70px rgba(34,197,94,0.22), 0 2px 8px rgba(0,0,0,.18); }
+  .accent-rule { height: 4px; background: linear-gradient(90deg, #22C55E, rgba(34,197,94,0.35)); }
+  .body { padding: 40px 38px 30px; }
+  .logo { max-width: 170px; height: auto; border-radius: 10px; }
+  .wordmark { font-size: 21px; font-weight: 700; color: #22C55E; letter-spacing: .3px; }
+  .tagline { font-size: 12px; color: #91939a; margin-top: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
+  h1 { font-size: 25px; font-weight: 700; margin: 28px 0 12px; color: #ffffff; letter-spacing: -.2px; }
+  p { font-size: 15px; line-height: 1.7; margin: 0 0 14px; color: #d3d3d6; }
+  .btn { display: inline-block; margin-top: 16px; padding: 15px 30px; background: #22C55E;
+         color: #0a0a0a; font-size: 14.5px; font-weight: 700; border: none; border-radius: 14px;
+         cursor: pointer; letter-spacing: .3px; transition: background .15s ease, transform .1s ease;
+         box-shadow: 0 8px 22px rgba(34,197,94,0.3); }
+  .btn:hover { background: #3ccb71; transform: translateY(-1px); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+  .success { display: none; margin-top: 18px; padding: 15px 18px; background: rgba(34,197,94,0.1);
+             border: 1px solid rgba(34,197,94,0.4); font-size: 14px; line-height: 1.5; color: #22C55E; border-radius: 14px; }
+  .err { display: none; margin-top: 18px; padding: 15px 18px; background: rgba(220,38,38,.1);
+         border: 1px solid rgba(220,38,38,.4); font-size: 13.5px; line-height: 1.5; color: #fca5a5; border-radius: 14px; }
+  .footer { padding: 22px 38px 30px; border-top: 1px solid #264640; font-size: 12px; color: #91939a; line-height: 1.7; }
+  .footer a { color: #22C55E; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="accent-rule"></div>
+    <div class="body">
+      <div class="wordmark">ENER-G</div>
+      <div class="tagline">100 % transparent. 100 % auf Ihrer Seite.</div>
+      <h1>Unsubscribe from ENER-G</h1>
+      <p id="lead">Click below and we will remove your address from every ENER-G
+        campaign. No follow-up, no second attempt.</p>
+      <button class="btn" id="btn" type="button">Confirm unsubscribe</button>
+      <div class="success" id="success-state">
+        <b><span id="email">Your address</span></b> has been unsubscribed. You will not hear from us again.
+      </div>
+      <div class="err" id="error-state"></div>
+    </div>
+    <div class="footer">
+      ENER-G Beratung · Rincklakeweg 9, 48153 Münster<br>
+      <a href="mailto:info@ener-g-beratung.de">info@ener-g-beratung.de</a> &nbsp;·&nbsp; <a href="https://ener-g-beratung.de">ener-g-beratung.de</a><br>
+      © 2026 ENER-G Beratung
+    </div>
+  </div>
+<script>
+const SUPABASE_URL  = "https://ccmqkljsjiuavpydbkva.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUsImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc";
+const token = new URLSearchParams(location.search).get("t") || "";
+const btn = document.getElementById("btn");
+const lead = document.getElementById("lead");
+const successWrap = document.getElementById("success-state");
+const errorWrap = document.getElementById("error-state");
+function showSuccess() { successWrap.style.display="block"; btn.style.display="none"; lead.style.display="none"; }
+function showError(m) { errorWrap.textContent=m; errorWrap.style.display="block"; btn.disabled=false; }
+async function doUnsub() {
+  btn.disabled = true;
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/unsubscribe_by_token`, {
+      method:"POST",
+      headers:{ apikey:SUPABASE_ANON, Authorization:"Bearer "+SUPABASE_ANON, "Content-Type":"application/json" },
+      body: JSON.stringify({ p_token: token })
+    });
+    if (!r.ok) throw new Error("HTTP "+r.status);
+    showSuccess();
+  } catch (e) { showError("Something went wrong: "+e.message); }
+}
+if (!token) { showError("This link is incomplete. Please use the link from the email."); btn.disabled = true; }
+btn.addEventListener("click", doUnsub);
+</script>
+</body>
+</html>

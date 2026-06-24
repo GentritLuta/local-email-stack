@@ -13,6 +13,39 @@ engine: team_pages
 # Copy greets by {greeting}/{first_name}; a parseable first name is NOT required.
 require_first_name: false
 
+# Google Maps / Places source (places_scrape.py). Same local-brokerage universe
+# as real_estate_us; LK's cross-brand dedup keeps it from re-emailing aureon's
+# contacts at enroll time, so sharing the Places categories is safe. Different
+# city set than aureon to spread coverage.
+places:
+  country: us
+  max_per_query: 20
+  categories:
+    - "real estate agency"
+    - "real estate brokerage"
+    - "realtor"
+  cities:
+    - "Miami FL"
+    - "San Diego CA"
+    - "Sacramento CA"
+    - "Chicago IL"
+    - "Philadelphia PA"
+    - "Boston MA"
+    - "Richmond VA"
+    - "Madison WI"
+    - "Baltimore MD"
+    - "Newark NJ"
+    - "Pittsburgh PA"
+    - "Cleveland OH"
+    - "Cincinnati OH"
+    - "Milwaukee WI"
+    - "Saint Paul MN"
+    - "Birmingham AL"
+    - "Memphis TN"
+    - "Louisville KY"
+    - "Oklahoma City OK"
+    - "New Orleans LA"
+
 # RUN
 #   py sequences/lead_scrape.py run real_estate_us_lk
 
@@ -42,17 +75,159 @@ seeds:
   - https://www.tnrealestategroup.com/our-team
   - https://www.ascendgroupre.com/home
 
+  # auto-discovered 2026-06-11 08:22 via seed_discover.py
+  - https://kw.com/en-us/agents
+  - https://www.har.com/realestatepro
+  - https://txrealestatebrokers.com
+  - https://www.reprosfl.com
+  - https://www.thevirtualrealtygroup.com/join-fl
+  - https://c21northwest.com/real-estate-license-az/best-real-estate-brokerages
+  - https://dre.colorado.gov
+  - https://www.corealestatebrokers.com
+  - https://erinkrueger.com
+  - https://www.realtyofamerica.com/real-estate-agents/location/state/Tennessee
+  - https://www.fastexpert.com/top-real-estate-agents/north-carolina
+  - https://www.kaimteam.com/team
+  - https://ohiorealtitle.com/2023/04/meet-our-april-all-stars
+  - https://onereal.com/search-agent
+
+  # auto-discovered 2026-06-12 08:13 via seed_discover.py
+  - https://www.merealty.com
+  - https://www.fastexpert.com/top-real-estate-agents/texas
+  - https://listwithclever.com/discount-real-estate-brokers/colorado
+  - https://www.e-merge.com
+  - https://nationalrealestatebrokers.org
+
+  # auto-discovered 2026-06-13 08:13 via seed_discover.py
+  - https://www.realtytexas.com/agents
+  - https://oedit.colorado.gov/taxonomy/term/100466
+  - https://recolorado.com
+  - https://www.thevirtualrealtygroup.com/join-tn
+  - https://rockhouserealty.com/agents
+
+
+
+
+# OWN-LANE 2026-06-14: LK previously shared aureon's exact queries (TX/FL/AZ/CO/GA/
+# TN/NC/OH), so discovery surfaced the SAME brokerages aureon already emails and the
+# cross-brand dedup starved LK. These target DIFFERENT states aureon does not cover,
+# so seed_discover finds brokerages that are fresh to LK. The dedup is the backstop.
+
+  # auto-discovered 2026-06-15 08:49 via seed_discover.py
+  - https://www.goodagent.org
+  - https://www.fastexpert.com/top-real-estate-agents/washington
+  - https://www.thevirtualrealtygroup.com/join-wa
+  - https://everydoorrealestate.com/our-agents
+  - https://www.rogsupreme.com
+  - https://www.fastexpert.com/top-real-estate-agents/pennsylvania
+  - https://www.realtyofamerica.com/real-estate-agents/location/state/Pennsylvania
+  - https://www.thevirtualrealtygroup.com/join-pa
+  - https://vabrokerage.com
+  - https://www.fastexpert.com/top-real-estate-agents/nevada
+  - https://portlandworksrealestate.co/agent-page
+  - https://www.mass.gov/orgs/board-of-registration-of-real-estate-brokers-and-salespersons
+  - https://www.fastexpert.com/top-real-estate-agents/massachusetts
+  - https://www.fastexpert.com/top-real-estate-agents/missouri
+  - https://www.mdrealtor.org/About-Us/Meet-the-Staff
+
+  # auto-discovered 2026-06-16 10:36 via seed_discover.py
+  - https://www.carimcgee.com/team
+  - https://toptrendingagent.com/top-real-estate-agents-in-washington-state
+  - https://www.kellilangrealestate.com
+  - https://camporealty.com/meet-our-agents
+  - https://garryrealestate.com/meet-our-agents
+  - https://www.dandridgerealtygroup.com/team
+  - https://listwithclever.com/discount-real-estate-brokers/nevada
+  - https://dukewarner.com
+  - https://nationalrealestateoregon.com/join-our-team
+  - https://www.compass.com/agents/locations/massachusetts/192329
+  - https://www.gdp.homes/team
+  - https://fretwellland.com/meet-our-agents
+  - https://kropteam.com/team
+  - https://www.buyersagent.com/meet-top-rated-buyers-agents
+  - https://joinreal.com
+
+  # auto-discovered 2026-06-17 10:29 via seed_discover.py
+  - https://castlerealty.net
+  - https://www.onpointhomesales.com/meet-our-team
+  - https://www.corcoran.com/real-estate-agents/search/state/illinois
+  - https://www.compass.com/agents/locations/illinois/192327
+
+  # auto-discovered 2026-06-18 10:54 via seed_discover.py
+  - https://onereal.com
+  - https://www.carimcgee.com
+  - https://www.sullivanrealty.com/jodaviess-county-real-estate-experts
+  - https://www.h2hrealty.net
+  - https://www.nevadarealestategroup.com/blog/how-to-choose-real-estate-agent-las-vegas
+  - https://nevadarealtors.org
+  - https://nationalrealestateoregon.com/our-agents
+  - https://shorepineproperties.com/profile/meet-our-team
+  - https://manorrealestate.com/about
+  - https://theindependent.co
+
+  # auto-discovered 2026-06-20 09:52 via seed_discover.py
+  - https://joinkale.com
+  - https://www.nevadarealestategroup.com
+  - https://listwithclever.com/top-real-estate-agents/massachusetts
+  - https://excelsiorrealestate.com/our-team
+  - https://www.prospera.properties/meet-the-team
+  - https://www.avenuerealtymn.com/our-team
+  - https://www.tangletownrealty.com
+  - https://www.eliternj.com
+  - https://www.homelight.com/blog/top-real-estate-brokerages-in-new-jersey
+  - https://wisconsin.properties/our-team
+  - https://www.teamcunninghamwi.com/meetourteam
+  - https://www.dream-realty.com/team-members
+  - https://downhomerealestateco.com
+
+  # auto-discovered 2026-06-21 11:06 via seed_discover.py
+  - https://www.ironvalleyrealestate.com/real-estate-agents
+  - https://nedbaker.com/team
+  - https://lovejoyrealestate.com/our-team
+  - https://www.cmshomegroup.com/meet_the_team
+  - https://www.jonesreg.com/our-team
+  - https://www.jenniferlandro.com
+
+  # auto-discovered 2026-06-21 11:20 via seed_discover.py
+  - https://www.rebny.com
+  - https://www.shorewest.com
+  - https://wrgpros.com
+  - https://www.livwisconsin.com
+
+  # auto-discovered 2026-06-22 08:52 via seed_discover.py
+  - https://wise.com/gb/currency-converter/usd-to-eur-rate?amount=5
+  - https://wise.com/gb/currency-converter/usd-to-eur-rate/history
+
+  # auto-discovered 2026-06-23 09:02 via seed_discover.py
+  - https://www.independent.com
+
+  # auto-discovered 2026-06-23 10:32 via seed_discover.py
+  - https://www.tryagresti.com/meet-our-team
+
+
+
+
+
+
+
+
+
+
 search_queries:
-  - "meet our agents real estate brokerage"
-  - "real estate brokerage agents page Texas"
-  - "small real estate brokerage Florida"
-  - "small real estate brokerage Arizona"
-  - "small real estate brokerage Colorado"
-  - "real estate brokerage agents Georgia"
-  - "real estate brokerage Tennessee team"
-  - "real estate brokerage North Carolina team"
-  - "real estate brokerage Ohio meet our team"
-  - "independent real estate brokerage our agents"
+  - "small real estate brokerage California meet our agents"
+  - "real estate brokerage agents page New York"
+  - "small real estate brokerage Washington state our team"
+  - "real estate brokerage Illinois meet our agents"
+  - "real estate brokerage Pennsylvania our agents"
+  - "real estate brokerage Virginia meet our team"
+  - "small real estate brokerage Nevada agents"
+  - "real estate brokerage Oregon our team"
+  - "real estate brokerage Massachusetts agents"
+  - "small real estate brokerage Minnesota meet our team"
+  - "real estate brokerage Missouri our agents"
+  - "real estate brokerage Maryland meet our team"
+  - "independent real estate brokerage New Jersey agents"
+  - "small real estate brokerage Wisconsin our team"
 
 seed_require_keywords: ["real estate", "realtor", "realty", "brokerage", "mls", "homes for sale", "listing"]
 

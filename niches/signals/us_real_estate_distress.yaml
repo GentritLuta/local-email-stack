@@ -1,0 +1,167 @@
+# US real-estate seller-intent signal pack.
+# Feeds the seller-appointment engine for US real-estate agent-clients:
+# likely-seller signals -> direct mail / opt-in funnel / ad audiences.
+# Homeowners are emailed ONLY after opting into the funnel; no consumer cold email.
+#
+# jurisdiction: US only. Enforced by signal_pack_lib against the client's
+# profiles.lead_intent.location_geos.
+#
+# Public-record signals are metro-scannable (free web search finds the county
+# notice/list sources); run with --enrich-addresses to fetch those pages and pull
+# the individual property addresses off them. The {owner}/{address} templates are
+# kept for future lead-check mode against a known homeowner list.
+pack: us_real_estate_distress
+audience: b2c
+jurisdiction: US
+tone: |
+  Respectful and helpful, never predatory. Reference the situation only obliquely.
+  Lead with usefulness (a free home-value estimate), never with the person's distress.
+
+signals:
+  # --- public-record distress signals (route to legal direct mail) ----------
+  - id: pre_foreclosure
+    description: Pre-foreclosure, notice of default, or trustee sale on the property
+    public_sources: [county_recorder, legal_notices]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'notice of trustee sale {metro}'
+      - 'foreclosure notices {county} county'
+      - '"notice of default" OR "lis pendens" {address} {metro}'
+    evidence_keywords: ["foreclosure", "notice of default", "lis pendens", "trustee sale", "notice of sale"]
+    confidence_weight: 0.95
+    recency_days: 365
+    channel: direct_mail
+
+  - id: auction_notice
+    description: Sheriff, constable, or trustee sale notice for the property
+    public_sources: [legal_notices, county_recorder]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'constable sale OR sheriff sale notice {metro}'
+      - 'trustee auction notice {county} county'
+      - 'sheriff sale OR trustee auction {address} {metro}'
+    evidence_keywords: ["sheriff sale", "constable sale", "trustee sale", "auction", "notice of sale"]
+    confidence_weight: 0.95
+    recency_days: 180
+    channel: direct_mail
+
+  - id: tax_delinquency
+    description: Property tax sale / delinquency list for the county
+    public_sources: [county_tax, county_recorder]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'delinquent tax sale properties list {county} county'
+      - 'tax sale properties {metro}'
+      - 'tax lien OR delinquent property tax {address} {county}'
+    evidence_keywords: ["tax sale", "tax lien", "delinquent", "tax office", "constable", "struck off"]
+    confidence_weight: 0.7
+    recency_days: 730
+    channel: direct_mail
+
+  - id: probate_inherited
+    description: Probate notices / estate filings in the county (heirs often sell)
+    public_sources: [probate_court, legal_notices]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'probate notices OR notice to creditors estate {county} county'
+      - 'estate of probate {metro}'
+      - 'estate of {owner} probate {metro}'
+    evidence_keywords: ["probate", "estate of", "notice to creditors", "executor", "administrator"]
+    confidence_weight: 0.85
+    recency_days: 730
+    channel: direct_mail
+
+  - id: divorce_filing
+    description: Divorce / dissolution filings in the county district clerk
+    public_sources: [county_court, legal_notices]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'divorce filings {county} county district clerk records'
+      - '"{owner}" divorce OR dissolution filing {county} county'
+    evidence_keywords: ["divorce", "dissolution", "petition", "district clerk", "family court"]
+    confidence_weight: 0.9
+    recency_days: 540
+    channel: direct_mail
+
+  - id: bankruptcy
+    description: Bankruptcy filings tied to owners in the area
+    public_sources: [pacer, legal_notices]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'bankruptcy filings notices {metro}'
+      - '"{owner}" bankruptcy chapter 7 OR 13 {metro}'
+    evidence_keywords: ["bankruptcy", "chapter 7", "chapter 13", "debtor", "trustee", "341 meeting"]
+    confidence_weight: 0.75
+    recency_days: 730
+    channel: direct_mail
+
+  - id: expired_listing
+    description: Expired / withdrawn listings and FSBOs in the metro
+    public_sources: [mls_adjacent]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'expired real estate listings OR for sale by owner {metro}'
+      - '"{address}" expired listing OR for sale by owner {metro}'
+    evidence_keywords: ["expired", "withdrawn", "fsbo", "for sale by owner"]
+    confidence_weight: 0.6
+    recency_days: 180
+    channel: optin_funnel
+
+  - id: absentee_owner
+    description: Absentee / out-of-state / vacant owner properties in the metro
+    public_sources: [county_recorder, usps_vacancy]
+    access_method: public_index
+    kind: public_record
+    query_templates:
+      - 'absentee owner OR out of state owner properties {metro}'
+      - '"{address}" absentee owner OR vacant {metro}'
+    evidence_keywords: ["absentee", "out of state", "vacant", "non-owner occupied"]
+    confidence_weight: 0.55
+    recency_days: 0
+    channel: direct_mail
+
+  # --- social-listening public-intent signals (voluntary public solicitation) -
+  - id: public_intent_recommend_agent
+    description: Public post asking for a realtor or agent recommendation in the metro
+    public_sources: [reddit, nextdoor, x, forums]
+    access_method: public_index
+    kind: social_listening
+    query_templates:
+      - 'site:reddit.com recommend OR looking for realtor OR real estate agent {metro}'
+      - '"recommend a realtor" OR "good real estate agent" {metro}'
+    evidence_keywords: ["realtor", "real estate agent", "recommend", "looking for"]
+    confidence_weight: 0.9
+    recency_days: 60
+    channel: reply_or_dm
+
+  - id: public_intent_relocating_sell
+    description: Public post about relocating and needing to sell
+    public_sources: [reddit, x, forums]
+    access_method: public_index
+    kind: social_listening
+    query_templates:
+      - '"relocating" OR "moving" "need to sell" house {metro}'
+      - 'site:reddit.com selling my house relocating {metro}'
+    evidence_keywords: ["relocating", "moving", "need to sell", "selling my house"]
+    confidence_weight: 0.85
+    recency_days: 60
+    channel: optin_funnel
+
+  - id: public_intent_inherited
+    description: Public post about inheriting a property and what to do
+    public_sources: [reddit, forums]
+    access_method: public_index
+    kind: social_listening
+    query_templates:
+      - 'site:reddit.com "just inherited" house OR property sell {metro}'
+    evidence_keywords: ["inherited", "inheritance", "sell", "what do i do"]
+    confidence_weight: 0.8
+    recency_days: 120
+    channel: optin_funnel

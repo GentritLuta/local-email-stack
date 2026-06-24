@@ -1,0 +1,269 @@
+slug: diraya_b2b_saas
+name: "diraya — B2B SaaS / software / tech companies that want to ship an AI feature (fintech, healthtech, devtools, data, vertical SaaS)"
+profile_slug: diraya
+engine: team_pages
+
+# Google Maps / Places source (places_scrape.py), US. SUPPLEMENTARY for diraya:
+# B2B SaaS is not Maps-native, but "software / app development / IT services
+# company in <tech hub>" returns real product and dev shops with sites + emails.
+# The team-page scrape stays primary; a paid bulk source is the real volume lever.
+places:
+  country: us
+  max_per_query: 20
+  categories:
+    - "software company"
+    - "software development company"
+    - "app development company"
+    - "IT services company"
+    - "data analytics company"
+  cities:
+    - "San Francisco CA"
+    - "New York NY"
+    - "Austin TX"
+    - "Seattle WA"
+    - "Boston MA"
+    - "Denver CO"
+    - "Chicago IL"
+    - "Los Angeles CA"
+    - "Atlanta GA"
+    - "Miami FL"
+    - "San Diego CA"
+    - "Portland OR"
+    - "Salt Lake City UT"
+    - "Raleigh NC"
+    - "Nashville TN"
+
+# ICP: B2B SaaS / software / tech companies that want to ship an AI feature (fintech, healthtech, devtools, data, vertical SaaS)
+require_first_name: false
+
+seeds:   # seed_discover.py appends discovered URLs here (block style; do NOT use [])
+
+  # auto-discovered 2026-06-14 06:00 via seed_discover.py
+  - https://www.scnsoft.com/finance/fintech
+  - https://fintech.com/our-team
+  - https://www.euvic.com/us/post/fintech-software-development-companies
+  - https://www.health-tech.us
+  - https://healthtechsolutions.com
+  - https://www.heidrick.com/en/industries/technology/health-tech
+  - https://www.infotech.com/research/ss/build-your-data-practice-and-platform
+  - https://medium.com/swlh/building-a-data-platform-to-enable-analytics-and-ai-driven-innovation-1bd95e37efb9
+  - https://futurumgroup.com/research-reports/customer-data-platform-the-key-for-contact-center-transformations
+  - https://www.agicent.com/blog/what-is-vertical-saas
+  - https://lasoft.org/martech-software
+  - https://www.itransition.com/logistics
+  - https://www.softsuave.com/blog/top-logistics-software-development-companies
+  - https://www.intertech.com/transportation-and-logistics
+  - https://www.euvic.com/us/post/enterprise-software-development-companies
+  - https://saas.group
+  - https://www.vegaitglobal.com/industries/insurance-software-development
+  - https://keyholesoftware.com/experience/industries/insurance
+  - https://openkoda.com/best-insurance-software-development-companies
+  - https://lasoft.org/insurtech-software
+
+  # auto-discovered 2026-06-14 08:16 via seed_discover.py
+  - https://supportyourapp.com/saas-support
+  - https://directrecruiters.com/practice-areas/legal-tech-recruiting-and-executive-search
+  - https://www.helpspot.com/solutions/b2b-customer-support
+  - https://www.edtech.com/companies
+  - https://bluepes.com/edtech
+
+  # auto-discovered 2026-06-14 20:18 via seed_discover.py
+  - https://www.freshworks.com/customer-service/support/saas
+  - https://euristiq.com/fintech-software-development-companies
+  - https://seamless.ai/b/health-tech-solutions-226113153
+  - https://www.failory.com/startups/developer-tools
+  - https://blog.ledwards.com/developer-tools-are-enterprise-software-dfaebf87e808
+  - https://medium.com/@jayadebaj/a-playbook-for-api-first-transformation-at-scale-api-platform-team-roles-and-responsibilities-81654cee217a
+  - https://www.cleanlist.ai/glossary/contact-data-platform
+  - https://celinewee.medium.com/b2b2c-deep-diving-vertical-saas-9037cd2ceee2
+  - https://altairzen.com/martech-software-solutions-for-businesses
+  - https://www.blog.technyc.org/news/companies-to-watch-proptech
+  - https://directrecruiters.com/practice-areas/real-estate-technology-proptech-recruiters-and-executive-search
+  - https://www.svproptech.com/our-team
+  - https://www.softermii.com/solutions/logistics-software-development-services
+  - https://www.forbes.com/lists/ai50
+  - https://www.ever-help.com/saas
+  - https://djangostars.com/blog/top-insurance-software-development-companies
+  - https://eastern-peak.medium.com/software-solutions-for-insurance-companies-best-practices-9c4ef4e0c1d6
+  - https://www.jamesonlegal.com/jameson-legal-tech
+  - https://www.legaltechconnect.com
+  - https://www.quora.com/What-is-the-best-way-to-contact-new-customers-regarding-your-B2B-startup-Do-you-cold-call-the-executives-or-send-an-email
+
+  # auto-discovered 2026-06-14 22:58 via seed_discover.py
+  - https://www.healthcatalyst.com/contact
+
+  # auto-discovered 2026-06-15 08:21 via seed_discover.py
+  - https://www.health-tech.us/our-people
+  - https://www.reacthealth.com/contact-us
+  - https://desmart.com/logistics-software/the-best-8-logistic-software-companies-categorized
+  - https://medium.com/emerge-edtech-insights/the-top-emerging-edtech-companies-for-workforce-development-in-2024-edtech-20-20-vision-6e8c69286721
+
+  # auto-discovered 2026-06-15 10:13 via seed_discover.py
+  - https://send-burg.com/b2b-contact-database/saas
+  - https://healthtechusa.com/contact-us
+
+  # auto-discovered 2026-06-16 08:16 via seed_discover.py
+  - https://www.42agency.com/contact-us
+  - https://healthtechsolutions.com/about-us/our-team
+  - https://leadiq.com/c/api-platform-inc/601113a8881cc9057f8d0f77/employee-directory?page=2
+  - https://leadiq.com/c/apiplatformio/601113a8881cc9057f8d0f77/employee-directory
+  - https://www.vastdata.com/about
+  - https://devsquad.com/blog/vertical-saas
+  - https://tracxn.com/d/sectors/vertical-saas/__lBgpM-wMjFEil4mU-rLN7aipI6z-10MznvPZNS2l9UI/companies
+  - https://www.elitemartech.com
+  - https://www.proptechcollective.com/about-us
+  - https://www.logisticssoftware.com
+  - https://www.logipulse.com/contact-us
+  - https://www.mantis.group
+  - https://site.tradetech.net/contact
+  - https://www.scnsoft.com/software-development/startup/how-to-launch-a-saas-startup
+  - https://www.n-ix.com/insurtech
+  - https://www.edtech.com
+
+  # auto-discovered 2026-06-17 08:11 via seed_discover.py
+  - https://www.azilen.com/learning/top-fintech-software-development-companies
+  - https://www.kindgeek.com/blog/top-fintech-software-development-companies
+  - https://lumitech.co/insights/top-fintech-software-development-companies
+  - https://www.health-tech.us/contact-us
+  - https://devtools.in/about-us
+  - https://www.designrush.com/agency/digital-marketing/martech
+  - https://proptech.ai/about-proptech-ai
+  - https://www.proptiger.com/aboutus
+  - https://andersenlab.com/industries/logistics
+  - https://www.apptunix.com/solutions/logistics-software-development
+  - https://cybersecuritynews.com/best-cyber-security-companies
+  - https://www.f6s.com/companies/cyber-security/united-states/co
+  - https://product10x.com/contact-us
+  - https://www.linkedin.com/posts/freyalily_saas-saascompanies-startups-activity-7413509427292622848--KSw
+
+  # auto-discovered 2026-06-17 09:58 via seed_discover.py
+  - https://healthtech.altron.com
+  - https://alphahealthtech.co.uk/contact.html
+  - https://www.wellsterhealth.com
+  - https://martech.nyc
+  - https://orion-martech.com/how-we-help
+  - https://www.n-ix.com/insurance-software-development
+  - https://anadea.info/blog/top-insurance-software-development-companies
+  - https://synergybb.com/listings/edtech-company-global-reach-b2b-b2c-channels
+
+  # auto-discovered 2026-06-18 08:19 via seed_discover.py
+  - https://innovateproptech.com/about-us
+  - https://twincore.net/blog/best-logistics-software-development-companies
+  - https://trueplatform.com/industries/enterprise-software-services
+  - https://www.wildnetedge.com/blogs/top-insurtech-software-development-companies-in-usa
+  - https://legaltechcolab.com
+  - https://time.com/7344235/worlds-top-edtech-companies-of-2025
+
+  # auto-discovered 2026-06-18 10:21 via seed_discover.py
+  - https://www.fortinet.com/resources/cyberglossary/what-is-cybersecurity
+  - https://www.cisa.gov/news-events/news/what-cybersecurity
+  - https://www.investopedia.com/terms/b/btob.asp
+  - https://www.shopify.com/blog/what-is-b2b
+  - https://www.edtechconnect.com/our-team
+  - https://www.edtechgroup.com.au
+
+  # auto-discovered 2026-06-19 08:19 via seed_discover.py
+  - https://wow24-7.com/blog/outsourcing-saas-customer-support-101-guideline
+  - https://www.devteam.space/blog/fintech-software-development-how-to-build-the-right-team
+  - https://tracxn.com/d/companies/apiplatform/__uBOAxUgDVd8ns9FLMXTVC7mq3XOandecliYudohQDfA
+  - https://orion-martech.com/contact-us
+  - https://www.martech3d.com/contact-us
+  - https://sdlccorp.com/logistic-software-development-company
+  - https://www.eliftech.com/logistics
+  - https://www.insurtechexpress.com
+
+  # auto-discovered 2026-06-20 08:25 via seed_discover.py
+  - https://www.failory.com/startups/developer-tools-unicorns
+  - https://startupdata.com
+  - https://coredevsltd.com/articles/top-vertical-saas-companies
+  - https://martechtechnologies.com
+  - https://proptechsolutions.in/our-team
+  - https://launchsaas.org/contact
+  - https://aeroleads.com
+
+  # auto-discovered 2026-06-21 09:42 via seed_discover.py
+  - https://computools.com/industries/logistics
+  - https://www.edvantis.com/industries/transportation-logistics-software-solutions
+  - https://www.f6s.com/companies/insurtech/united-states/co
+
+  # auto-discovered 2026-06-21 10:31 via seed_discover.py
+  - https://fintech.com
+  - https://developers.avito.ru
+  - https://developers.avito.ru/api-catalog
+  - https://developers.avito.ru/about-api
+  - https://developers.avito.ru/api-catalog/item/documentation
+  - https://deepai.org
+  - https://www.rrc.co.uk/courses/nebosh
+
+  # auto-discovered 2026-06-22 08:12 via seed_discover.py
+  - https://websiteforengineers.com/fintech-software-development-companies
+  - https://www.hdwebsoft.com/industries/logistics-software-development
+  - https://www.forbes.com/sites/rashishrivastava/2025/11/13/four-cofounders-of-popular-ai-coding-tool-cursor-are-now-billionaires
+  - https://saas.group/about
+  - https://saas.group/get-in-touch
+
+  # auto-discovered 2026-06-23 08:15 via seed_discover.py
+  - https://sumatosoft.com/blog/best-b2b-saas-companies
+  - https://www.leewayhertz.com/logistics-software-development
+  - https://yellow.systems/logistics-software-development-services
+  - https://www.cyderes.com
+
+  # auto-discovered 2026-06-23 09:58 via seed_discover.py
+  - https://medium.com/@MelanieCrissey/what-you-learn-working-in-early-stage-saas-startups-b2250a07211f
+  - https://www.itransition.com/insurance
+
+  # auto-discovered 2026-06-24 08:26 via seed_discover.py
+  - https://theapicompany.com/contact
+  - https://startupintros.com/orgs/datarpm
+  - https://martechbreakthrough.com/about-us
+  - https://logistics360llc.com/contact-us
+  - https://apextechinc.com/insurtech
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+search_queries:
+  - "B2B SaaS company contact us team"
+  - "fintech software company team about"
+  - "healthtech company team contact"
+  - "developer tools company about us team"
+  - "API platform company contact team"
+  - "data platform startup team contact"
+  - "vertical SaaS company about us team"
+  - "martech software company team contact"
+  - "proptech company team about us"
+  - "logistics software company contact team"
+  - "cybersecurity software company team"
+  - "enterprise software company leadership team"
+  - "AI software company founders contact"
+  - "SaaS startup about us team contact"
+  - "insurtech software company team"
+  - "legaltech company team contact"
+  - "B2B software company contact email team"
+  - "edtech platform company team about"
+
+seed_require_keywords: ["team", "about", "contact", "our"]
+
+discovery:
+  max_seeds_per_run: 20
+  search_country:    us
+  require_mailto:    true
+
+sequence:
+  variants_file: sequences/diraya-default/variants.json

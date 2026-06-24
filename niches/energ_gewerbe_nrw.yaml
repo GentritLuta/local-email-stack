@@ -1,5 +1,5 @@
 slug: energ_gewerbe_nrw
-name: "ENER-G — energieintensives KMU/Gewerbe in NRW (~100 km um Neuss/Düsseldorf, ab 30.000 kWh)"
+name: "ENER-G — energieintensive Betriebe in ganz Deutschland (ab 30.000 kWh/Jahr, alle Branchen)"
 profile_slug: energ
 engine: team_pages   # httpx + bs4, auto-upgrade to playwright on empty static HTML
 
@@ -8,6 +8,48 @@ engine: team_pages   # httpx + bs4, auto-upgrade to playwright on empty static H
 # keep first-name extraction on; the backfill/synthesis fills {first_name} from the
 # Impressum "Geschäftsführer" line where the mailto context did not.
 require_first_name: false
+
+# Google Maps / Places source (places_scrape.py), country=de. Energy-intensive
+# German businesses by sector x city. The site visit then pulls the Impressum/
+# Kontakt email; company + city come from the Places listing. Nationwide cities
+# per the widened ICP (all of Germany, >= 30.000 kWh, all sectors).
+places:
+  country: de
+  max_per_query: 20
+  categories:
+    - "Metallverarbeitung Betrieb"
+    - "Galvanik"
+    - "Gießerei"
+    - "Kunststoffverarbeitung"
+    - "Lebensmittelproduktion Betrieb"
+    - "Großbäckerei"
+    - "Kühlhaus Logistik"
+    - "Wäscherei Großbetrieb"
+    - "Druckerei"
+    - "Brauerei"
+    - "Lackiererei Industrie"
+    - "Kunststofftechnik Hersteller"
+  cities:
+    - "Düsseldorf"
+    - "Köln"
+    - "Duisburg"
+    - "Essen"
+    - "Dortmund"
+    - "Wuppertal"
+    - "Mönchengladbach"
+    - "Stuttgart"
+    - "München"
+    - "Hamburg"
+    - "Frankfurt am Main"
+    - "Nürnberg"
+    - "Hannover"
+    - "Leipzig"
+    - "Bremen"
+    - "Mannheim"
+    - "Augsburg"
+    - "Bielefeld"
+    - "Bochum"
+    - "Münster"
 
 # WHAT THIS NICHE SCRAPES
 # Energy-intensive German commercial businesses (KMU/Gewerbe) whose annual
@@ -119,68 +161,749 @@ seeds:
   - https://www.cvjm-gastfreunde.de/cvjm-gastfreunde-haeuser/deutschland/nordrhein-westfalen/cvjm-duesseldorf-hotel-tagung
   - https://ds-maschinenbau.de
 
+  # auto-discovered 2026-06-11 08:03 via seed_discover.py
+  - https://eavor.de/impressum
+  - https://energy.ecoflow.com/de/impressum
+  - https://de.gigroup.com/impressum
+  - https://metallbau-itria.de/impressum
+  - https://www.metallbau-ley.de/impressum
+  - https://polywest.de/impressum
+  - https://galeria-restaurant.de/impressum
+  - https://jander-galvanik.de/kontakt-impressum
+  - https://pallaskg.de
+  - https://saxonia-galvanik.de
+  - https://www.galvanik-kreile.de
+  - https://www.vdkl.de/mitglieder/kuehlhaeuser
+  - https://www.stenkamp.net/frischelogistik-kuehllager
+  - https://www.eurekfrost.de/impressum
+  - https://www.baecker-baier.de/impressum
+
+  # auto-discovered 2026-06-12 08:02 via seed_discover.py
+  - https://www.ha-group.com/impressum
+  - http://metallbautroeger.de/impressum.html
+  - https://www.hans-fischer.de/impressum
+  - https://www.kunststoffweb.de/firmen/kunststoffland_nrw_e_v_f104883
+  - https://www.90-10.de/impressum
+  - https://www.mtl-duisburg.de/impressum
+  - https://friends-logistik.de/impressum
+  - https://havi.com/de/impressum
+  - https://www.baeckerei-hoefer.de/impressum
+  - https://wupperinst.org/impressum
+  - https://jaeger-ttc.com/de/impressum
+  - https://bahn-hotel.de/impressum
+  - https://www.airporthotelduesseldorf.de/impressum
+  - https://www.lindnerhotels.com/impressum
+  - https://hotelmayfair.de/impressum
+
+  # auto-discovered 2026-06-13 08:02 via seed_discover.py
+  - https://www.luzar.de/luzar/kontakt/impressum/uebersicht.php
+  - https://swertz-gruppe.de/impressum
+  - https://www.gruenwerke.de/pages/impressum
+  - https://www.moebius-baeckerei.de/impressum
+  - https://www.claytonhotels.com/duesseldorf/impressum
+  - https://www.uni-due.de/de/impressum.shtml
+  - https://www.maschinenbau-feld.de/de/kontakt/impressum.html
+  - https://autolackiererei-bischoff.de/impressum
+  - https://www.kyocera-unimerco.com/de-de/legal/impressum
+  - https://www.kuepper-karosserie.de/index.php/ueber-uns/impressum
+  - https://www.reinartz.de/impressum
+  - https://www.foodbeverage.de/impressum
+  - https://mags.de/impressum
+  - https://www.karriere.reinersfuerst.de/impressum
+  - https://www.bivano.com/impressum
+
+  # auto-discovered 2026-06-13 10:15 via seed_discover.py
+  - https://www.printmg.de/impressum.html
+  - https://www.moebel-baecker.de/impressum
+  - https://www.westfalenbaecker.de/impressum
+  - https://www.metron-essen.de/Kontakt.9.0.html
+  - https://www.reinersfuerst.de/impressum
+  - https://oekozentrum.nrw/impressum
+
+  # auto-discovered 2026-06-14 05:31 via seed_discover.py
+  - https://www.vditz.de/impressum
+  - https://www.cfp-brands.de/impressum
+
+
+
+
+
+
+
+
+
+
+# WIDENED 2026-06-14: ALL German businesses >= 30.000 kWh/year qualify, nationwide,
+# every energy-intensive sector (the copy self-qualifies on the 30k kWh threshold).
+# Sector x nationwide queries so discovery casts a wide net across all of Germany.
+
+  # auto-discovered 2026-06-14 05:47 via seed_discover.py
+  - https://www.sage.com/de-de/impressum
+  - https://de.adp.com/ueber-adp/impressum.aspx
+  - https://www.sgs.com/de-de/unternehmen/uber-sgs/sgs-in-deutschland/impressum-deutschland
+  - https://www.lipphardt-metallbau.de/impressum
+  - https://metallbau-giesser.de/impressum
+  - https://ws-metallbau.com/impressum
+  - https://www.weiss-metallverarbeitung.de/impressum/?L=0
+  - https://heimsch-metallbau.de/impressum
+  - https://www.metallhandwerk.de/impressum
+  - https://www.multi-kunststoff.de/impressum
+  - https://motzener.de/impressum
+  - https://gws-spritzguss.de/impressum
+  - https://www.atka.de/impressum.php
+  - https://ks-kunststoff.de/impressum
+  - https://landlinie.de/impressum
+  - https://www.dreistern-food.de/impressum
+  - https://www.knorr.com/de/impressum.html
+  - https://www.bempflinger.com/impressum
+  - https://suess-galvanik.de/impressum.php
+  - https://www.galvanotechnik-kessel.de/impressum
+  - http://www.damm-oberflaechentechnik.de/impressum.html
+  - https://www.wiotec.com/impressum.html
+  - https://www.kt-oberflaechentechnik.de/impressum
+  - https://www.giesserei-schmidt.de/impressum
+  - https://aluminium-giesserei.com/impressum
+  - http://www.metallgiesserei-stauss.de/impressum.html
+  - https://www.offsetdruck-friese.de/impressum
+  - https://www.inprint-gmbh.de/service/impressum
+  - https://www.druckerei-sauerland.de/impressum
+  - https://www.bk-offset.de/unternehmen/kontakt-anfahrt
+  - https://kh-woernitz.de/impressum
+  - https://www.wellmann-baeckerei.de/impressum
+  - https://www.baeckerei-middelberg.de/impressum
+  - https://www.baeckerei-huenerberg.de/meta_impressum/index.html
+  - https://www.baeckerei-huge.de/impressum.html
+  - https://oettinger1731.de/kontakt
+  - https://www.zillertal-bier.at/service/impressum
+  - https://kraft-braeu.de/impressum
+  - https://www.zoetler.de/impressum.html
+  - https://dietex.at/impressum
+  - https://www.waescherei-oberland.at/impressum
+  - https://www.textilpflege-moebius.de
+  - http://www.diewaescherei.info/Textilreinigung-Waescherei-Hamburg-Textilpflege-Impressum.html
+  - https://waescherei-schoeberl.at/html/impressum.html
+  - https://sama.sacmi.com/de-DE/impressum
+  - https://asd-maschinenbau.de/de/impressum
+  - https://www.imm-maschinenbau.de/impressum
+  - https://www.ptf-maschinen.de/impressum
+  - https://www.grupp.de/Rechtliches/Informationen/Impressum
+  - https://kubat-oberflaechen.de
+  - https://www.hlkpulverbeschichtung.de/impressum
+  - https://www.die-pulverisierer.de/kontakt
+  - https://www.hico-pulverbeschichtung.de/kontakt
+  - https://trommer-textil-technik.de/impressum
+  - https://wesom-textil.de/impressum
+  - https://www.palm.de/impressum.html
+  - https://maxauer-papierfabrik.com/service/impressum
+  - https://www.nordpack24.de/Impressum
+  - https://www.packpack.de/contact
+  - https://www.nordpack-gmbh.info/kontakt
+  - https://www.verpacken24.com/kontakt
+  - https://www.glas-janssen.de/impressum
+  - https://heiler-glas.de/impressum
+  - https://www.glas-strack.de/impressum
+  - https://www.glas-star.de/policies/legal-notice?srsltid=AfmBOoqGwO-MhJxr3EeZNmQy_uEYcJJyxJwLVweDN4p_5-JVThdjcRAd
+  - https://www.fm-kunststofftechnik.de/impressum
+  - https://www.sr-kunststofftechnik.de/impressum.html
+  - https://www.skt-kunststoff.com/de/unternehmen/impressum.html
+  - https://artemis-kautschuk.de/de/impressum
+  - https://www.seg-automotive.com/de/contact
+  - https://www.era-contact.com/de/branchen/automotive
+  - https://www.ac-bb.de/impressum
+  - https://digital-automotive-supplier.com/de/impressum
+  - https://www.osse-logistik.com/index.php/impressum.html
+  - https://martin.gmbh/impressum-martin-logistik
+  - https://www.hohl.de/impressum
+  - https://spedition-meier.de/impressum
+  - https://spedition-logistikregion.de/impressum
+  - https://leipziger-logistik.com/imprint
+  - https://www.lanfer-logistik.com/impressum
+
+  # auto-discovered 2026-06-14 08:33 via seed_discover.py
+  - https://zilken.com/impressum
+  - https://www.copy-druck.de/impressum.html
+  - https://www.berk-druck.de/impressum
+  - https://www.hofbraeu-muenchen.de/impressum
+  - https://oettinger-getraenke.de/impressum
+  - https://ks-cleaning.de
+  - https://www.waescherei-reichel.de
+  - https://www.schley-maschinenbau.de/kontakt/impressum
+  - https://www.rey-maschinenbau.de/impressum
+  - https://pulverbeschichtungen.biz
+  - https://www.arnold-glas.de/impressum
+  - https://boehme-kunststoff.de/impressum
+  - https://www.internorm.de/impressum
+  - https://www.gva.de/impressum
+  - https://www.haerterei.com
+  - https://www.hw-arnstadt.de/impressum
+  - https://w-cnc.de/impressum1
+  - https://www.gindner.de/de/impressum
+  - https://www.saegewerkzeh.de/impressum-datenschutz
+  - https://www.schafferholz.com/impressum
+  - https://www.fleischerei-richter.de/impressum.html
+  - https://www.huber-fleisch.de/impressum
+  - https://www.fleischerei-erchinger.de/impressum
+  - https://shop.bergbauernmilch.de/Informationen/Kontakt-Impressum
+  - https://www.ass-stahl-und-metallbau.de/impressum
+  - https://www.ovenhausen-metallbau.de/impressum
+  - https://metallbau-stahlbau-stuttgart.de/impressum
+  - https://www.metallbau-stahl.de/impressum
+  - https://www.stmuv.bayern.de/impressum/index.htm
+  - https://bayern-chemie.com/de/impressum
+  - https://www.produktentwicklung.ihk.de/produktmarken/impressum/impressum2-4677320
+  - https://www.i40-bw.de/impressum
+  - https://www.vermoegenundbau-bw.de/impressum
+  - https://www.ukbw.de/impressum
+  - https://www.statistik.niedersachsen.de/themen/industrie-handwerk-niedersachsen
+  - https://niedersachsen.online/impressum
+  - https://bvn.de/Impressum.php
+  - https://www.sib.sachsen.de/impressum-5030.html
+  - http://dynatec-sachsen.de/impressum.html
+  - https://www.sachsen-kaelte.de/impressum
+  - https://www.frankfurt-main.ihk.de/ueber-uns/impressum-5309854
+  - https://hessen.de/impressum
+  - https://www.bmh-hessen.de/impressum
+  - https://www.innovationsfoerderung-hessen.de/impressum
+  - https://riverside-entertainment.de/impressum
+  - https://sagemcom.com/de/energie-telekommunikation/sagemcom-dr-neuhaus/dr-neuhaus-impressum?language_content_entity=de
+  - https://www.streamworkproduktion.de/impressum.html
+  - https://www.klueh.de/dienstleistungen/catering/ueber-catering
+  - https://www.srk-rohstoffe.de
+  - https://dev.kunststoff-recycling.de/kontakt
+  - https://www.henneverpackung.de/de/impressum?srsltid=AfmBOoqok_8m5-ThvB7R6Sw7-jRjA5AeE0NXYQnkhSsdh18n395RhZci
+  - https://shop.knueppel.de/impressum
+  - https://druckundverpackung.de/impressum
+  - https://www.wdv-online.com/kontakt/impressum
+  - https://www.energieintensive.de/ueber-uns
+  - https://www.lobbyregister.bundestag.de/suche/R001128
+  - https://www.webergmbh.de/impressum/DE_index_2099.html
+  - https://fertigungstechniken.de/impressum
+  - https://ziller-holding.de/impressum
+
+  # auto-discovered 2026-06-14 20:08 via seed_discover.py
+  - https://www.porr.de/impressum
+  - https://de.pg.com/impressum
+  - https://www.kirchberg-gmbh.de/impressum
+  - https://www.drueeke-springob.de/impressum
+  - https://metallverarbeitung-nrw.de/impressum
+  - https://rgblech.de/impressum.htm
+  - https://hk-spritzguss.de/impressum
+  - https://multi-food.com/kontakt
+  - https://www.ingredion.com/emea/en-uk/legal/impressum
+  - https://mbo-gmbh.com/oberflaechentechnik/impressum
+  - https://www.w-funke.de/index.php/de/impressum.html
+  - https://www.wir-machen-druck.de/impressum.htm
+  - https://www.druck-kultur.de/impressum
+  - https://www.print.de/impressum
+  - https://www.offsetdruckbernauer.de/impressum
+  - https://www.kuehlhaus-berlin.com/de/kontakt/impressum
+  - https://www.der-baecker-eifler.de/impressum
+  - https://www.warsteiner.de/impressum
+  - https://www.bolten-brauerei.de/de/Impressum.htm
+  - https://www.waescherei-boehm.de/impressum
+  - http://www.reinigungtuna.de/impressum
+  - https://sauberland-spandau.de/impressum
+  - https://waescherei-rose.de/impressum
+  - https://www.holmer-maschinenbau.com/impressum
+  - https://menzel-maschinenbau.de/impressum
+  - https://www.maschinenraum.io/impressum
+  - https://www.grossteile-pulverbeschichtung.de/impressum
+  - https://pulverbeschichtung-walleri.de/Impressum
+  - https://www.muehlheimer-pulverbeschichtung.de/kontakt
+  - https://www.herrmannlack.de/kontakt
+  - https://www.hijomatex.de/legal/impressum
+  - https://www.weberei-pahl.de/legal/impressum
+  - https://go-textile.de/unternehmen/cf-weber-gmbh
+  - https://www.wortmannverpackungen.de/impressum
+  - https://www.papier-fleck.de/impressum
+  - https://ovol.de/unternehmen/kontakt
+  - https://www.baehr-verpackung.de/impressum
+  - https://www.papacks.com/kontakt
+  - https://maxauer-papierfabrik.com/service/kontaktformular
+  - https://www.bode-glas.de/impressum
+  - https://www.gruenderwerkstatt-glas.de/impressum
+  - https://fwglas.com/Impressum
+  - https://www.fgt-glas.de/impressum
+  - https://www.keim-kunststofftechnik.de/impressum
+  - https://www.koch-chemie.com/de/impressum
+  - https://mkt.de/impressum
+  - https://www.htm-automotive.de/impressum
+  - https://www.hoermann-automotive.com/de/impressum
+  - https://www.heinz-logistik.de/impressum
+  - https://www.rieck-logistik.de/impressum
+  - https://alte.de/waermebehandlung
+  - https://haerterei-thun.de/impressum
+  - https://www.kindervater-cnc.de/impressum.html
+  - https://ms-cnc.wixsite.com/index/impressum
+  - https://www.pakulla.de/impressum
+  - https://cnc-drehteile-nuernberg.de/impressum
+  - https://holz-maag.de/impressum
+  - https://www.holz-schmitz.de/impressum
+  - https://www.weber-saegewerk.de/impressum
+  - https://www.holz-wiedemann.de/impressum
+  - https://informationsdienst-holz.de/impressum
+  - https://www.holz-richter.de/impressum
+  - https://fleischerei-augst.de/impressum
+  - https://www.fleischerei-sieveneck.de/impressum
+  - https://bartsch-oldenburg.de/kontakt/impressum
+  - https://www.human-manufaktur.de
+  - https://www.fleischerei-borghs.de/impressum
+  - https://beisser.de/impressum
+  - https://www.elb-milch.de/impressum
+  - https://www.milch.bayern/kontakt
+  - https://www.milchhandwerk.info/impressum
+  - https://molkerei-ammerland.com/de-de/impressum
+  - https://www.stahl-metallbau-schmid.eu/impressum-metallbau-schmid.htm
+  - https://www.metallbau-kolb.de/impressum
+  - https://stahlbau-bender.de/impressum
+  - https://medien-bayern.de/impressum
+  - https://www.schmierstoffe-bayern.de/impressum
+  - https://www.nutzfahrzeuge-bayern.de/impressum
+  - https://riester.de/de/impressum
+  - https://www.wr-industry.de/impressum
+
+  # auto-discovered 2026-06-15 08:28 via seed_discover.py
+  - https://www.metallbau-schlotter.de/impressum
+  - https://www.glas-maas.de/impressum
+  - https://www.berlin-chemie.de/de/impressum.html
+  - https://auto-scan.eu/en/impressum
+  - https://www.haerterei.com/impressum
+  - https://www.berglandmilch.at/de/kontakt
+  - https://www.lfu.bayern.de/impressum/index.htm
+  - https://www.statistik.niedersachsen.de/startseite/uber_uns/impressum/impressum-87389.html
+  - https://www.gsh-sachsen.com
+  - https://karriere.hessen.de/impressum
+  - https://pekutherm.com/kunststoff-recycling/lohnaufbereitung
+  - https://www.polyserve.ch
+  - https://www.krm-recycling.com/impressum
+  - https://www.industriewaescherei-blume.de
+  - https://www.waescherei-ruck.de/impressum
+  - https://www.henneverpackung.de/de/impressum?srsltid=AfmBOooLXiI_6EVW7OtpnQUbD-p0Hti5Qawvlw6EK-MvWYeze1CGlESA
+  - https://www.prosol-farben.de/impressum/?srsltid=AfmBOootO0pP0Z3LpYLAvVI-jKUYXXqE5AAKzoTSTfRHuovgbIETNiL9
+
+  # auto-discovered 2026-06-17 08:21 via seed_discover.py
+  - https://www.firma.de/firmengruendung/impressum-gmbh-und-ug-pflichtangaben-faq-muster-impressum
+  - https://www.e-recht24.de/impressum/6048-impressum-gmbh.html
+  - http://www.sme-ehingen.de/impressum
+  - https://www.hmv-ahlen.de/impressum
+  - https://www.lebensmittel-produktion.de/kontakt
+  - https://phoenix-metallguss.de/impressum
+  - https://mecklenburger-metallguss.com/impressum
+  - https://www.metallguss-steinruecken.de/de/impressum
+  - https://www.bk-offset.de
+  - https://bk-sucht-dich.de
+  - https://ce-print.de
+  - https://www.vdkl.de/der-verband/geschaeftsstelle
+  - https://www.vdkl.de
+  - https://www.baeckerei-ebbing.de/impressum
+  - https://cafe-engelke.de/impressum
+  - https://oettinger-getraenke.de/kontakt
+  - https://www.fix-balzers.ch/DE/Impressum/tblid/1/Default.asp
+  - https://www.dapeci.com/impressum.html
+  - https://bohnet.de/kontakt
+  - https://www.kersten-maschinenbau.net/impressum
+  - https://www.sn-packaging.com/impressum
+  - https://meisterlackierung.ch/impressum
+  - https://www.weberei-pahl.de/ueber-uns
+  - https://coastlandwool.de/pages/impressum?srsltid=AfmBOoos9jpsyTVqCLdatVyEfMxU0PhHDV9n27oPScXewiOZte0ldUrK
+  - https://www.bosinius.de/impressum
+  - https://www.gude.de/de/impressum
+  - https://opfermann-verpackungen.de/impressum-verpackungsgrosshandel-kartonagen
+  - https://www.glas-bach.de/impressum
+  - https://www.elkalub.com/impressum
+  - https://kudernak.de/impressum
+  - https://www.css-kunststofftechnik.de/impressum.html
+  - https://www.ideal-automotive.com/impressum
+  - https://laepple-automotive.de/impressum
+  - https://www.swisspost-cargo.com/de-de/impressum
+  - https://www.urban-group.com/en_index.html
+  - https://mayer.at/kontakt
+  - https://www.zufall.de/impressum
+  - https://www.haerterei-technotherm.de/impressum
+  - https://haerterei-schmidthaus.de/impressum
+  - https://hw-eppingen.de/impressum
+  - https://www.hammelmann-werk.de/impressum/kontakt.html
+  - https://werkzeugbau-vorrichtungsbau-maschinenbau-cnc-erodieren.de/impressum
+  - https://ruwmaschinenbau.de
+  - http://www.weiss-kahn.de
+  - https://saegewerk-hensler.de/impressum
+  - https://www.zumkeller-holz.de/impressum
+  - https://www.human-manufaktur.de/ueber-uns
+  - https://www.eg-suedbayern.de/schlachtbetriebe/standort-landshut
+  - https://www.oml.at/impressum
+  - https://www.stahlbau-scholuebbers.de/impressum
+  - https://siba-industries.de/impressum
+  - https://www.ihk.de/hannover/hauptnavigation/recht/wirtschafts-und-wettbewerbsrecht2/wettbewerbsrecht/internet-impressum-5226584
+  - https://www.niedersachsen.de/startseite/service/presse/impressum-20049.html
+  - https://www.ihk.de/regensburg/fachthemen/recht/online-recht-und-datenschutz/online-recht/pflichtangaben-im-internet-impressum-1394836
+  - https://www.firma.de/firmengruendung/impressum-einzelunternehmen-sollten-auf-diese-angaben-achten-mit-muster-pdf
+  - https://www.agrartechnik-sachsen.de/de/impressum
+  - https://www.hihk.de/impressum-4131168
+  - https://www.bso-hessen.de/impressum-haftung-4093070
+  - https://www.sweco-gmbh.de/impressum
+  - https://www.secjur.com/impressum
+  - https://www.htk-hamburg.com/impressum
+  - https://www.sandwich-haus.at/impressum
+  - https://kunststoff-recycling.de/kontakt
+  - https://kunststoff-recycling.de/impressum
+  - https://www.mrg-ww.de/kunststoff-recycling
+  - https://www.waescherei-koeln.de/impressum.html
+  - https://www.centtex.at/kontakt.html
+  - https://www.waescherei-bodensee.ch/waescherei-bodensee2023/index.php/unternehmen/mitarbeiter
+  - https://www.greif-mietwaesche.de/impressum
+  - https://www.sonic-drink.de/impressum
+  - https://www.lohnabfuellung-bayern.de
+  - https://www.spitz.at/getraenke/getraenke
+  - https://www.wpp-druck.de/impressum
+  - https://www.hamberger.com/de/impressum
+
+  # auto-discovered 2026-06-17 10:17 via seed_discover.py
+  - https://www.powercownt.de/impressum
+  - https://www.metallbau-rothmeier.de/impressum
+  - https://www.ellicomelli.de/impressum
+  - https://www.bioceval.de/impressum
+  - https://www.schachtel-gp.de/impressum
+  - https://www.vdkl.de/presse/pressebilder
+  - https://www.fischmagazin.de/detail-seriennummer-12525-firma-Emder+Kuehlhaus+Logistik+EKL+GmbH.htm
+  - https://www.baeckerei-staib.de/impressum
+  - https://www.baeckerei-woermann.de/impressum
+  - https://www.rothmooser.com/en/impressum
+  - https://baisinger.de/impressum
+  - https://coastlandwool.de/pages/impressum?srsltid=AfmBOoprmniIz0sgiEAmzPCGPaxWjzfERyCc0wCnP3gjg-LhnPX8Hzl3
+  - https://www.tct-spedition.de/de/impressum.php
+  - https://www.wuest.com/kontakt
+  - https://alte.de
+  - https://www.wmetall.at/?page_id=5639
+  - https://www.saegewerkzeh.de/kontakt
+  - https://www.noem.at/impressum
+  - https://solarlandbayern.de/impressum
+  - https://fliegengitter-risse.de/%C3%BCber-fliegengitter-risse.html
+  - https://bauwirtschaft-hessen.de/impressum
+  - https://www.karriere-mittelhessen.de/verband-der-metall-und-elektro-unternehmen-hessen-bezirksgruppe-mittelhessen
+  - https://il-buon-palato.de/impressum
+  - https://susanamortedecoracion.com/como-colocar-los-cojines-en-la-cama
+  - https://www.wir-machen-druck.de/?msockid=21f1c3afbc926511243dd4d4bd346442
+  - https://www.esterer-giesserei.de
+  - https://siempelkamp-giesserei.com
+  - https://rodanco.nl/pitting-corrosion-pipelines
+  - https://inspenet.com/en/articles/pitting-corrosion-causes-and-prevention
+
+  # auto-discovered 2026-06-18 08:30 via seed_discover.py
+  - https://www.diedrich-metallbau.de/impressum.html
+  - https://fb-food.de
+  - https://www.helzle-druck.de/impressum
+  - https://www.heenemann-druck.de/impressum
+  - https://druckerei-seybold.de/impressum
+  - https://www.diebels.de/impressum
+  - https://oettinger1731.de/impressum
+  - https://www.textilreinigung-oberrosler.at/Impressum
+  - https://wmm-maschinenbau.de/impressum
+  - https://www.kuhne-mb.de/impressum
+  - https://www.profil-maschinenbau.de/impressum
+  - https://coastlandwool.de/pages/impressum?srsltid=AfmBOopirIpCG6p2DxjTlyXj1IExzvf2w-s-rcCCFu1gJ8inKhZzLbSO
+  - https://www.koblenzer-werkzeugbau.de/impressum.html
+  - https://www.deutsche-molkerei-zeitung.de/impressum
+  - https://reich-germany.de/de/impressum
+  - https://www.w-quadrat.de/fakten
+  - https://www.uwd.de/web/unternehmenswerkstatt-s%C3%BCdhessen/impressum
+  - https://www.keineproduktion.de/en/impressum
+  - https://www.re-pet.de/impressum
+  - https://www.treysse-waeschereitechnik.de/impressum-treysse
+  - https://www.wir-machen-druck.de/?msockid=12e12733467e6ef13523304f47d86f65
+
+  # auto-discovered 2026-06-18 10:40 via seed_discover.py
+  - https://hmf-food.de/hmf-food-production-das-impressum
+  - https://www.kb-logistik.at/ansprechpartner
+  - https://www.baeckerei-hanisch.de/impressum
+  - https://baeckerei-keim.de/impressum
+  - https://weberei-wirth.store/Informationen/UEber-uns/?srsltid=AfmBOoqm4Z0DkdDhb6ImVHgt2NXK9pvsReOXZ0lXP1iHAvOEL6EO6Qkn
+  - https://www.vmilch.at/kontakt
+  - https://www.hutterer.ws/impressum
+  - https://www.socialmedia-schwaben.de
+  - https://www.kreussler.com/impressum
+  - https://www.gesundheitsindustrie-hessen.de/impressum
+  - https://www.heico.de/impressum
+  - https://www.gourmet.at
+  - https://www.druckerei-ullrich.de/impressum
+  - https://scheurle-siebdruck.de/unternehmen/impressum
+  - https://angele-shop.com/Informationen/Impressum
+  - https://www.wochner-partner.de/impressum
+
+  # auto-discovered 2026-06-19 08:48 via seed_discover.py
+  - https://www.esterbauer.org/impressum.html
+  - https://afk-kunststoff.de
+  - https://www.eurofins.de/lebensmittel/informationen/impressum
+  - http://www.bk-offset.de
+  - https://www.rosenbaum-druck.de/public/impressum.php
+  - https://a3offset.de/kontakt
+  - https://www.der-beck.de/cms/impressum
+  - https://www.paulaner-gruppe.de/impressum
+  - https://www.wb-grosswaescherei.de/impressum
+  - https://www.duncker-iphotex.de/impressum
+  - https://www.clean-bitterfeld.de/wir/impressum.html
+  - https://www.papierfabrik-vreden.de/impressum
+  - https://algummi.de/impressum
+  - https://www.lzbw.de/impressum
+  - https://www.haerterei.com/impressum/page
+  - https://shl-gero.de
+  - http://www.haerterei-haferbier.de
+  - https://www.dehutec.de
+  - https://reuth.de
+  - https://holz-aukenthaler.com/kontakt-formular/impressum
+  - https://www.metzgerei-roehr.de/impressum
+  - https://www.vollertsen-fleisch.de/impressum.html
+  - https://www.fleischerei-kotz.de/impressum
+  - https://www.bayernwelle.de/impressum
+  - https://www.ihk.de/stuttgart/serviceleiste/impressum-haftung-datenschutz/impressum-657160
+  - https://www.ihk-n.de/servicemarken/ueber-uns/impressum-ihkn-893898
+  - https://www.ihk-n.de
+  - https://simu-fertigung.de/impressum
+  - https://www.fes-aes.de/impressum
+  - http://www.stf-chemnitz.de/html/impressum.html
+  - https://www.wocogroup.com/de/impressum
+  - https://www.ihk.de/stuttgart/fuer-unternehmen/konjunktur-stuttgart/bedeutende-unternehmen-677868
+  - https://bw.ihk.de
+  - https://broich.catering
+  - https://www.feinkost-kaefer.de/pages/impressum
+  - https://www.companyhouse.de/Schmiedeberger-Giesserei-GmbH-Dippoldiswalde
+  - https://www.energieintensive.de
+  - https://www.energieintensive.de/impressum
+  - https://gepvolt.com
+  - https://mbn-gmbh.de/impressum
+
+  # auto-discovered 2026-06-20 08:52 via seed_discover.py
+  - https://as-sprenger.de/impressum
+  - https://www.weimann-metall.de/impressum
+  - https://www.skt-schreiber.de/impressum
+  - https://kühlhaus.com/impressum
+  - https://www.essmanns-backstube.de/impressum
+  - https://www.hijomatex.de
+  - https://www.hoefer-stoffe.de/impressum
+  - https://www.provenexpert.com/de-de/kosel-textil-gbr
+  - https://www.schoenfelder-papierfabrik.de/?cnt=Kontakt
+  - https://www.glaswerkag.ch/datenschutz-und-impressum
+  - https://veritasauto.com/de_de/unternehmen
+  - https://loceh.de
+  - https://we-engl.de/impressum
+  - https://www.blechbearbeitung.eu/impressum
+  - https://stahlbau.de
+  - https://www.stahlbau-naegele.de/impressum
+  - https://www.unternehmensregister.de/ureg
+  - https://www.ihnen-rammschutz.de/impressum
+  - https://elsaesser.industries/impressum
+  - https://ims-industriemontage.de
+  - https://arbeitgeber-nordhessen.de/Impressum
+  - https://retecplast.de
+  - https://pbs-recycling.de
+  - https://www.akr.gmbh
+  - https://www.fischer-kunststoffe.com
+  - https://www.mc-recyclingservices.de
+  - https://hcdrinkssolutions.com
+
+  # auto-discovered 2026-06-21 09:52 via seed_discover.py
+  - https://www.sauerbrei-service.de/impressum
+  - https://jewa.de/impressum
+  - https://www.akahl.com/de/impressum
+  - https://coastlandwool.de/pages/impressum?srsltid=AfmBOortziTekDyRX4ALqN1gYW-32_ZFPMluag_f5JH-mMw5KA_NiP01
+  - https://glasweseloh.de/impressum
+  - https://www.glas-online-shop.de/impressum
+  - https://www.ulmschneider-logistik.de/kontakt
+  - https://www.hqm-haertetechnik.de/impressum
+  - https://www.wer-zu-wem.de/firma/essig-frischmenue.html
+  - https://www.designveloper.com/blog/internet-of-things-examples
+
+  # auto-discovered 2026-06-22 08:23 via seed_discover.py
+  - https://www.deutschlandgpt.de/impressum
+  - https://www.lukasmetall.de/impressum
+  - http://mks-spritzguss.de/impressum
+  - https://coastlandwool.de/pages/impressum?srsltid=AfmBOooNE1bOi45xvWG3U0xs9Qp2pIDTn8KkpA1t3W2Z5JQGHDOYZs8h
+  - https://www.glaswerkconsulting.com/impressum
+  - https://www.arge-auto.at/en/impressum
+  - https://www.scheiwe-holz.de/impressum.html
+  - https://www.bizerba.com/de/de/rechtliches/impressum
+  - https://www.sbs-abgastechnik.de/impressum
+  - https://www.hessenwasser.de/unternehmen
+  - https://moin-filmfoerderung.de/film-commission/production-guide/ac3e9bba-c063-42f0-b878-6a7750bdfebd/produktionsunternehmen
+  - https://www.lohnabfuellung.de
+  - https://www.scada.online/unternehmen/impressum
+
+  # auto-discovered 2026-06-23 08:29 via seed_discover.py
+  - https://mecklenburger-metallguss.com/unternehmen/kontakt
+  - https://www.isar-metallguss.de
+  - https://metallgiesserei.biz/kontakt
+  - https://bode-druckerei.de/impressum
+  - https://bkr-regus.de/de/kontakt-ueber/impressum
+  - https://www.clean-bitterfeld.de/kontakt/kontakt.html
+  - https://www.grosswaescherei.net/impressum
+  - https://www.industrielackierungen.de/pulverbeschichtung
+  - https://ficociello.de/pulverbeschichtung
+  - https://www.ar-textil.com
+  - https://winterhalter-stahlbau.com/impressum
+  - https://wirtschaft.hessen.de/presse/hessische-online-anwendung-zeigt-deutschen-unternehmen-resilienzpotenziale-auf
+  - https://arbeitgeber-nordhessen.de/unternehmerverband-nordhessen
+  - https://stern-wywiol-gruppe.de/impressum
+  - https://faktum-b.de/impressum
+  - https://www.gcs-gmbh.eu/impressum
+  - https://www.bigcatering.com
+  - https://www.pure-beverage.de
+  - https://www.fronius.com/de-de/germany/impressum
+
+  # auto-discovered 2026-06-24 09:00 via seed_discover.py
+  - https://www.unternehmensregister.de
+  - https://www.bvl.bund.de/SharedDocs/Downloads/01_Lebensmittel/betriebslisten/betriebe_hochverarbeitende_erzeugnisse_deutschland.html
+  - https://chromfabrik.co/impressum
+  - https://www.firmenabc.at/galvanik-schmidt-gesellschaft-m-b-h_NhZ
+  - https://www.ghg.ch
+  - https://www.brummer-logistik.de
+  - https://www.trumpf.com/de_DE/meta/impressum
+  - https://www.e-recht24.de/impressum/6516-impressum-einzelunternehmen.html
+  - https://www.firmenabc.at/papierfabrik-wattens-gmbh-co-kg_GivR
+  - https://kunststofftechnik.gira.de/de/impressum.html
+  - https://www.valeo.com/de/deutschland
+  - https://www.frankenbach.com/impressum
+  - https://www.hschmidag.ch
+  - https://rht-ag.ch
+  - https://saegewerk.it
+  - https://www.wood-energy.group
+  - https://wermachtwas.online/saegewerk-in-meiner-naehe
+  - https://www.roithinger-holz.at
+  - https://www.baden-wuerttemberg.de/de/header-und-footer/impressum
+  - https://www.ihk.de/karlsruhe/fachthemen/recht/internetrecht/impressumspflichten-6266634
+  - https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover/Dezernate-und-Fachbereiche-der-LHH/Finanzen,-Ordnung-und-Feuerwehr/Fachbereich-%C3%96ffentliche-Ordnung/Gewerbe-und-Veterin%C3%A4rangelegen%C2%ADheiten/Gewerbeangelegen%C2%ADheiten-und-Verbraucherschutz
+  - https://www.rennert-kassel.de/impressum
+  - https://www.jung-machines.com/de/impressum
+  - https://www.siemens.com/de-de/company/global-locations/germany/stuttgart-branch
+  - https://r-express.com/Impressum
+  - https://www.bofillex.cz/de/kontakt-de
+  - https://www.canable.co/de
+  - https://www.gruenig.de/de/impressum
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 search_queries:
-  - "produzierendes Unternehmen Düsseldorf Impressum Geschäftsführer"
-  - "Metallverarbeitung Neuss Kontakt Impressum"
-  - "Kunststoffverarbeitung NRW Impressum Geschäftsführer"
-  - "Lebensmittelproduktion Köln Impressum Kontakt"
-  - "Galvanik Oberflächentechnik NRW Impressum"
-  - "Gießerei NRW Impressum Geschäftsführer"
-  - "Druckerei Mönchengladbach Impressum Kontakt"
-  - "Kühlhaus Logistik Duisburg Impressum"
-  - "Großbäckerei NRW Impressum Geschäftsführer"
-  - "metallverarbeitender Betrieb Krefeld Kontakt"
-  - "Industriebetrieb Wuppertal Impressum Geschäftsführer"
-  - "Hotel Tagungshaus Düsseldorf Impressum Kontakt"
-  - "Maschinenbau Essen Impressum Geschäftsführer"
-  - "Lackiererei Beschichtung Neuss Impressum"
-  - "Lebensmittelhersteller Mönchengladbach Kontakt Impressum"
-  - "energieintensiver Betrieb NRW Impressum"
+  - "produzierendes Unternehmen Deutschland Impressum Geschäftsführer"
+  - "Metallverarbeitung Betrieb Impressum Geschäftsführer"
+  - "Kunststoffverarbeitung Spritzguss Impressum Geschäftsführer"
+  - "Lebensmittelproduktion Hersteller Impressum Kontakt"
+  - "Galvanik Oberflächentechnik Impressum Geschäftsführer"
+  - "Gießerei Metallguss Impressum Geschäftsführer"
+  - "Druckerei Offsetdruck Impressum Kontakt"
+  - "Kühlhaus Kühllogistik Impressum Geschäftsführer"
+  - "Großbäckerei Backbetrieb Impressum Geschäftsführer"
+  - "Brauerei Getränkehersteller Impressum Kontakt"
+  - "Großwäscherei Textilreinigung Impressum Geschäftsführer"
+  - "Maschinenbau Unternehmen Impressum Geschäftsführer"
+  - "Lackiererei Pulverbeschichtung Impressum Kontakt"
+  - "Textilproduktion Weberei Impressum Geschäftsführer"
+  - "Papierfabrik Verpackungshersteller Impressum Kontakt"
+  - "Glaswerk Glasherstellung Impressum Geschäftsführer"
+  - "Chemiebetrieb Kunststofftechnik Impressum Geschäftsführer"
+  - "Automobilzulieferer Zulieferer Impressum Kontakt"
+  - "Logistikzentrum Spedition Lager Impressum Geschäftsführer"
+  - "Härterei Wärmebehandlung Impressum Geschäftsführer"
+  - "Werkzeugbau Zerspanung CNC Impressum Geschäftsführer"
+  - "Holzverarbeitung Sägewerk Impressum Kontakt"
+  - "Fleischverarbeitung Schlachtbetrieb Impressum Geschäftsführer"
+  - "Molkerei Milchverarbeitung Impressum Kontakt"
+  - "Stahlbau Metallbau Betrieb Impressum Geschäftsführer"
+  - "Industriebetrieb Bayern Impressum Geschäftsführer"
+  - "Industriebetrieb Baden-Württemberg Impressum Geschäftsführer"
+  - "produzierendes Gewerbe Niedersachsen Impressum"
+  - "Fertigungsbetrieb Sachsen Impressum Geschäftsführer"
+  - "Industrieunternehmen Hessen Impressum Geschäftsführer"
+  - "Produktionsbetrieb Hamburg Impressum Geschäftsführer"
+  - "Industrieunternehmen Baden-Württemberg Stuttgart Impressum"
+  - "Lebensmittelbetrieb Großküche Catering Impressum Geschäftsführer"
+  - "Kunststoffrecycling Aufbereitung Impressum Kontakt"
+  - "Industriewäscherei Wäscherei Impressum Geschäftsführer"
+  - "Getränkeabfüllung Abfüllbetrieb Impressum Kontakt"
+  - "Druck und Verpackung Betrieb Impressum Geschäftsführer"
+  - "Gießerei Schmiede Impressum Geschäftsführer Deutschland"
+  - "energieintensiver Produktionsbetrieb Deutschland Impressum"
+  - "Produktionsunternehmen GmbH Impressum Geschäftsführer"
 
 # scrape-time ICP gate (lead_scrape.py): EVERY seed page must contain one of
 # these terms or the seed is skipped before any lead is extracted. These signal
 # a real producing/energy-using Gewerbe (not an agency, shop-only, or utility).
 seed_require_keywords:
   - "Produktion"
+  - "Produktions"
   - "Fertigung"
   - "Herstellung"
+  - "Hersteller"
   - "Werk"
   - "Industrie"
   - "Maschinen"
+  - "Anlagen"
   - "Metall"
+  - "Stahl"
   - "Kunststoff"
   - "Lebensmittel"
   - "Logistik"
+  - "Spedition"
+  - "Lager"
   - "Kühl"
   - "Gießerei"
+  - "Schmiede"
   - "Galvanik"
+  - "Härterei"
+  - "Beschichtung"
+  - "Lackier"
   - "Druckerei"
+  - "Druck"
+  - "Verpackung"
+  - "Papier"
+  - "Textil"
+  - "Wäscherei"
   - "Bäckerei"
+  - "Brauerei"
+  - "Molkerei"
+  - "Getränke"
+  - "Fleisch"
+  - "Großküche"
+  - "Glas"
+  - "Chemie"
+  - "Holz"
+  - "Säge"
   - "Hotel"
-  - "Produktions"
+  - "Betrieb"
   - "Geschäftsführer"
 
 discovery:
-  max_seeds_per_run: 15
+  max_seeds_per_run: 80          # widened: build the pool fast enough to feed up to 600/day
   search_country:    de          # German results
   require_mailto:    true
   require_keywords:
     - "Produktion"
     - "Fertigung"
     - "Herstellung"
+    - "Hersteller"
     - "Industrie"
     - "Metall"
     - "Kunststoff"
     - "Lebensmittel"
     - "Logistik"
+    - "Spedition"
     - "Maschinen"
     - "Gießerei"
     - "Galvanik"
     - "Druckerei"
+    - "Wäscherei"
+    - "Brauerei"
+    - "Textil"
+    - "Papier"
+    - "Betrieb"
     - "Geschäftsführer"
     - "Impressum"
   exclude_domains:
