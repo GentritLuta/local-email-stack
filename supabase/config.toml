@@ -1,0 +1,5 @@
+# Minimal Supabase project config — just enough to deploy the auth-admin function.
+project_id = "ccmqkljsjiuavpydbkva"
+
+[functions.auth-admin]
+verify_jwt = false

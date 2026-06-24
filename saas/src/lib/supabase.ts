@@ -9,7 +9,13 @@ if (!url || !anon) {
 }
 
 export const supabase = createClient(url, anon, {
-  auth: { persistSession: true },
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    // Let supabase-js consume the access_token/recovery token from the URL hash
+    // on /reset and /auth/callback so password-reset + magic-link links work.
+    detectSessionInUrl: true,
+  },
 });
 
 export const HAS_CONFIG = Boolean(url && anon);

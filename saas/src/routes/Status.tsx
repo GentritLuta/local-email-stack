@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getSubmission, getProvSteps, Submission, ProvStep } from "../lib/api";
 
-const STEP_ORDER = ["profile", "copy", "domains", "leads", "warmup", "golive"];
+const STEP_ORDER = ["contract", "profile", "copy", "domains", "leads", "warmup", "golive"];
 const STEP_LABEL: Record<string, string> = {
+  contract: "Sign your service agreement",
   profile: "Create your account profile",
   copy: "Draft your email sequence",
   domains: "Provision & verify sending domains",
@@ -45,14 +46,30 @@ export default function Status() {
 
   const byStep = Object.fromEntries(steps.map((s) => [s.step, s]));
   const live = sub?.status === "live";
+  const profileSlug = byStep["profile"]?.payload?.profile_slug || "";
+  const doneCount = STEP_ORDER.filter((k) => byStep[k]?.state === "done").length;
+  const pct = Math.round((doneCount / STEP_ORDER.length) * 100);
 
   return (
     <div className="card">
-      <h2>Setting up {sub?.raw_answers?.company || "your campaign"}</h2>
+      <div className="eyebrow">Setup in progress</div>
+      <h2>{sub?.raw_answers?.company || "Your campaign"}</h2>
       <p className="sub">
-        This page updates live. You can close it and come back, your progress is saved.{" "}
+        This page updates live. You can close it and come back any time.{" "}
         {sub && <span className={`pill ${live ? "live" : sub.status === "error" ? "error" : "pending"}`}>{sub.status}</span>}
       </p>
+      {sub && (
+        <div style={{ margin: "0 0 22px" }}>
+          <div style={{ height: 6, borderRadius: 99, background: "var(--field)", overflow: "hidden" }}>
+            <div style={{
+              width: `${pct}%`, height: "100%", borderRadius: 99,
+              background: "var(--gold-grad)", transition: "width .6s var(--ease)",
+              boxShadow: "0 0 12px rgba(230,197,88,.5)",
+            }} />
+          </div>
+          <div className="hint" style={{ marginTop: 6 }}>{doneCount} of {STEP_ORDER.length} steps complete</div>
+        </div>
+      )}
       {err && <div className="banner">{err}</div>}
       {!sub && !err && <p className="sub">Loading…</p>}
 
@@ -79,8 +96,8 @@ export default function Status() {
         );
       })}
 
-      {live && sub?.client_id && (
-        <Link className="btn" to={`/dashboard/${byStep["profile"]?.payload?.profile_slug || ""}`}>
+      {profileSlug && (
+        <Link className="btn" to={`/dashboard/${profileSlug}`} style={{ display: "inline-block", textDecoration: "none" }}>
           Open my campaign dashboard
         </Link>
       )}
