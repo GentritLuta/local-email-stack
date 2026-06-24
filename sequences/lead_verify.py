@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import random
 import socket
 import smtplib
 import sys
@@ -83,6 +84,11 @@ GENERIC_LOCAL_PARTS = {
     "editor", "newsdesk", "newsroom", "tips", "pitch", "business", "bizdev",
     "partnerships", "sponsors", "sponsorships", "advertise", "advertising",
     "affiliate", "affiliates", "ambassador",
+    # Non-mailbox business nouns scraped from bio/site text — confirmed dorian
+    # bounces (out@, officer@, businesses@, customers@, career@, audit@ all hard-
+    # bounced: real MX, no such mailbox). 2026-06-14.
+    "out", "officer", "officers", "businesses", "customer", "customers",
+    "audit", "audits", "career", "prospecting", "prospect", "outreach",
     # Social / CTA / text-scrape junk (button labels, footer prompts, etc.)
     "click", "view", "watch", "listen", "read", "learn", "find", "discover",
     "share", "follow", "like", "comment", "post", "today", "now", "here",
@@ -153,6 +159,39 @@ _MALFORMED_RE = re.compile(
 )
 
 
+# Provider-specific local-part rules. These mailbox providers PUBLISH their
+# username rules, so an address that violates them CANNOT exist and is rejected
+# with ZERO network calls (no SMTP probe, no IP rate-limit risk). This is the
+# permanent free layer that catches most dead big-provider addresses up front.
+GMAIL_DOMAINS = {"gmail.com", "googlemail.com"}
+
+
+def _provider_local_invalid(local: str, domain: str) -> str | None:
+    """Return a reason string if `local` cannot be a real mailbox at `domain`
+    per that provider's published username rules, else None.
+
+    Gmail (support.google.com/mail/answer/9211434): 6-30 chars, only letters,
+    digits and dots; no leading/trailing dot; no consecutive dots; the other
+    specials (_ - + = etc.) are not allowed in the account name. (A '+tag' alias
+    is delivered, so we tolerate a single '+'; everything before it must obey the
+    rules.) Dots are ignored by Gmail, so they do not count toward length.
+    """
+    if domain in GMAIL_DOMAINS:
+        base = local.split("+", 1)[0]          # strip +tag alias
+        core = base.replace(".", "")           # dots are ignored by Gmail
+        if not re.fullmatch(r"[a-z0-9]+", base.replace(".", "")):
+            return "gmail_invalid_chars"
+        if base.startswith(".") or base.endswith("."):
+            return "gmail_edge_dot"
+        if ".." in base:
+            return "gmail_consecutive_dots"
+        if len(core) < 6:
+            return "gmail_too_short"
+        if len(core) > 30:
+            return "gmail_too_long"
+    return None
+
+
 def _is_malformed(email: str, local: str, domain: str) -> tuple[bool, str]:
     """Catch obvious junk patterns the simplified RFC regex lets through.
     Returns (is_malformed, reason). These get hard-rejected by verify()."""
@@ -170,6 +209,9 @@ def _is_malformed(email: str, local: str, domain: str) -> tuple[bool, str]:
         return True, "edge_special_char_in_local"
     if len(domain) < 4 or "." not in domain:
         return True, "domain_too_short_or_no_dot"
+    prov = _provider_local_invalid(local, domain)
+    if prov:
+        return True, prov
     return False, ""
 
 # Placeholder / example domains that show up in tutorial copy-paste blocks on
@@ -233,9 +275,30 @@ def _mx_hosts(domain: str) -> list[str]:
         return []
 
 
-def _smtp_probe(mx_host: str, target_email: str, helo_domain: str,
-                from_addr: str, timeout: int = 8) -> tuple[Optional[int], str]:
-    """Return (rcpt_code, message). rcpt_code None if connection failed."""
+# Per-MX-host pacing. Gmail (and other big providers) rate-limit repeated RCPT
+# probes from one IP within a short window. We keep a per-host last-probe clock and
+# enforce a minimum gap so SUSTAINED verification stays under the throttle threshold
+# indefinitely from a single IP. The earlier test-time timeouts were burst probing;
+# at the real ~36/day send rate, paced probing keeps the IP healthy permanently.
+_LAST_PROBE: dict[str, float] = {}
+_MIN_HOST_GAP_S = 20.0   # at least 20s between probes to the same MX host
+
+
+def _pace_host(mx_host: str) -> None:
+    import time as _t
+    key = mx_host.split(".", 1)[-1] if "." in mx_host else mx_host  # group by provider zone
+    last = _LAST_PROBE.get(key, 0.0)
+    wait = _MIN_HOST_GAP_S - (_t.time() - last)
+    if wait > 0:
+        _t.sleep(wait + random.random())   # jitter
+    _LAST_PROBE[key] = _t.time()
+
+
+def _smtp_probe_once(mx_host: str, target_email: str, helo_domain: str,
+                     from_addr: str, timeout: int = 12) -> tuple[Optional[int], str]:
+    """Return (rcpt_code, message). rcpt_code None if connection failed.
+    One attempt, no retry. Paced per MX-host to avoid IP rate-limiting."""
+    _pace_host(mx_host)
     try:
         with smtplib.SMTP(mx_host, 25, timeout=timeout) as s:
             s.ehlo(helo_domain)
@@ -253,6 +316,30 @@ def _smtp_probe(mx_host: str, target_email: str, helo_domain: str,
             return code, (msg.decode("utf-8", errors="ignore") if isinstance(msg, bytes) else str(msg))
     except (socket.timeout, OSError, smtplib.SMTPException) as e:
         return None, f"{type(e).__name__}: {e}"
+
+
+def _smtp_probe(mx_host: str, target_email: str, helo_domain: str,
+                from_addr: str, timeout: int = 12, retries: int = 2) -> tuple[Optional[int], str]:
+    """SMTP RCPT probe with retry+backoff on transient failures. Big mail hosts
+    (Gmail especially) rate-limit repeated RCPT probes from one IP and answer with
+    a timeout or a 4xx; that is NOT a signal the mailbox is bad. We retry with
+    exponential backoff + jitter (the same approach paid verifiers use) so a
+    rate-limit does not get mistaken for an invalid address.
+
+    Returns the FIRST definitive code (250/251 accept, 550/551/553/554 reject).
+    If every attempt is transient (connect failure or 4xx), returns the last
+    transient result so the caller classifies it as 'unknown', never as valid."""
+    last: tuple[Optional[int], str] = (None, "no attempt")
+    for attempt in range(retries + 1):
+        code, msg = _smtp_probe_once(mx_host, target_email, helo_domain, from_addr, timeout)
+        # Definitive accept or reject -> return immediately.
+        if code is not None and (code in (250, 251) or 500 <= code < 560):
+            return code, msg
+        # Transient (None connect-fail, or 4xx greylist/rate-limit): back off and retry.
+        last = (code, msg)
+        if attempt < retries:
+            time.sleep((2 ** attempt) + random.random() * 1.5)  # 1-2.5s, then 2-3.5s
+    return last
 
 
 def verify(email: str, *,
@@ -274,6 +361,17 @@ def verify(email: str, *,
                                   error=mal_why)
 
     is_generic = local in GENERIC_LOCAL_PARTS
+
+    # Hard-reject JUNK local-parts (automated/wrong-department/scrape-noise that
+    # is never a real human mailbox) for EVERY scraper path. lead_scrape already
+    # pre-filters these, but the creator scrapers (youtube/social) did not, which
+    # is how out@/officer@/website@/businesses@/support@ reached dorian's pool and
+    # hard-bounced. Front-desk ADMITTABLE locals (info@/team@/hello@) are NOT junk
+    # and still pass — the per-brand requires_first_name gate decides those.
+    if local in JUNK_LOCAL_PARTS:
+        return VerificationResult(email=email, verified=False, method="junk_local",
+                                  is_generic=is_generic,
+                                  error=f"{local}@ is a junk/role local-part, not a real mailbox")
 
     if domain in DISPOSABLE_DOMAINS:
         return VerificationResult(email=email, verified=False, method="disposable",
@@ -299,30 +397,43 @@ def verify(email: str, *,
                                   mx_hosts=mx, is_generic=is_generic)
 
     rcpt_code, rcpt_msg = _smtp_probe(mx[0], email, helo_domain, from_addr)
-    if rcpt_code is None:
-        # Couldn't connect (port 25 blocked, etc). Fall back to MX-only verification.
-        return VerificationResult(email=email, verified=True, method="mx_verified",
-                                  mx_hosts=mx, is_generic=is_generic,
-                                  error=f"smtp_probe_failed: {rcpt_msg}")
 
     if rcpt_code in (250, 251):
+        # Mailbox accepted. Now distinguish a real mailbox from a catch-all/accept-all
+        # domain (accepts every RCPT, then may async-bounce). A catch-all cannot be
+        # verified at SMTP time by anyone, paid or free, so we mark it not-verified
+        # with a distinct method rather than trusting it.
         catchall = False
         if do_catchall_probe:
             random_local = f"verify-probe-{uuid.uuid4().hex[:10]}"
             ca_code, _ = _smtp_probe(mx[0], f"{random_local}@{domain}", helo_domain, from_addr)
             catchall = ca_code in (250, 251)
+        if catchall:
+            return VerificationResult(email=email, verified=False, method="catch_all",
+                                      mx_hosts=mx, catchall=True, is_generic=is_generic,
+                                      error="domain accepts all RCPT (accept-all); mailbox unprovable")
         return VerificationResult(email=email, verified=True, method="smtp_verified",
-                                  mx_hosts=mx, catchall=catchall, is_generic=is_generic)
+                                  mx_hosts=mx, catchall=False, is_generic=is_generic)
 
     if rcpt_code in (550, 551, 553, 554):
         return VerificationResult(email=email, verified=False, method="smtp_rejected",
                                   mx_hosts=mx, is_generic=is_generic,
                                   error=f"RCPT {rcpt_code}: {rcpt_msg.strip()}")
 
-    # Greylisting (450/451/452) and other soft fails — treat as MX-verified, unknown mailbox.
-    return VerificationResult(email=email, verified=True, method="mx_verified",
-                              mx_hosts=mx, is_generic=is_generic,
-                              error=f"soft_smtp_code_{rcpt_code}: {rcpt_msg.strip()}")
+    # Everything else is UNKNOWN: a connect failure (our IP got rate-limited, or a
+    # transient port issue, rcpt_code is None) or a 4xx (greylisting/throttle) that
+    # survived all retries. We must NOT drop the lead on uncertainty, or a throttled
+    # probe would discard perfectly valid addresses and shrink the pool. So we keep
+    # it send-eligible (verified=True) but tag method 'smtp_unknown' so the paced
+    # re-verify pass (reverify-unknowns.py) can later resolve it and flip it to
+    # verified=False ONLY on a definitive 550. The dead-mailbox wins come from the
+    # provider format rules (zero-network, above) and definitive 550 smtp_rejected,
+    # both of which already mark verified=False. This is the build-up, no-compromise
+    # design: certainty drops a lead, uncertainty never does.
+    detail = (f"smtp_unknown: connect failed ({rcpt_msg})" if rcpt_code is None
+              else f"smtp_unknown: soft code {rcpt_code} ({rcpt_msg.strip()})")
+    return VerificationResult(email=email, verified=True, method="smtp_unknown",
+                              mx_hosts=mx, is_generic=is_generic, error=detail)
 
 
 def main() -> int:

@@ -110,8 +110,20 @@ def render_html_aureon(*, body: str, persona: dict,
            style="max-width:600px;width:100%;background:{PAL['card']};border-radius:6px;
                   overflow:hidden;border:1px solid {PAL['slate']};">
 
-      <!-- BODY (no top header, email opens straight into the message) -->
-      <tr><td style="padding:32px 36px 4px 36px;background:{PAL['card']};">
+      <!-- HEADER: brand logo + wordmark on every step (2026-06-12, user request) -->
+      <tr><td style="padding:26px 36px 0 36px;background:{PAL['card']};">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
+          <td style="vertical-align:middle;padding-right:12px;">{AUREON_LOGO_SVG}</td>
+          <td style="vertical-align:middle;">
+            <div style="font-family:{FONT};font-size:20px;font-weight:800;color:{PAL['text']};
+                        letter-spacing:-.3px;line-height:1;">Aureon Global</div>
+          </td>
+        </tr></table>
+        <div style="height:1px;background:{PAL['slate']};margin-top:18px;"></div>
+      </td></tr>
+
+      <!-- BODY -->
+      <tr><td style="padding:24px 36px 4px 36px;background:{PAL['card']};">
         {body_html}
       </td></tr>
 
@@ -174,6 +186,10 @@ def render_html_aureon(*, body: str, persona: dict,
                     <a href="https://aureonglobal.de/privacy.html" style="color:#d4af37;text-decoration:none;margin:0 8px;font-weight:500;">Privacy Policy</a>
                     <span style="color:#333333;margin:0 4px;">|</span>
                     <a href="https://aureonglobal.de/terms.html" style="color:#d4af37;text-decoration:none;margin:0 8px;font-weight:500;">Terms of Service</a>
+                  </p>
+                  <!-- UNSUBSCRIBE button (every step, CAN-SPAM/GDPR) -->
+                  <p style="font-size:12px;line-height:1.6;margin:16px 0 0 0;">
+                    <a href="{unsub_url}" style="display:inline-block;padding:9px 20px;border:1px solid #555555;border-radius:6px;color:#cccccc;text-decoration:none;font-size:12px;font-weight:600;">Unsubscribe</a>
                   </p>
                   <div style="margin-top:25px;padding-top:25px;border-top:1px solid #1a1a1a;">
                     <p style="font-size:10px;color:#555555;margin:0;">

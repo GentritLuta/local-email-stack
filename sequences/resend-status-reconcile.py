@@ -266,7 +266,75 @@ def main() -> int:
     # Domain-level hygiene: pull every prospect on any domain that has
     # hard-bounced repeatedly. Runs every reconcile pass (hourly), idempotent.
     suppress_repeat_bounce_domains(dry=args.dry)
+
+    # Refresh each profile's warmup reputation snapshot from live send_log so the
+    # warmup auto-pause (bounce_rate threshold) actually trips. Previously this was
+    # only updated by the Resend webhook; if that was not firing, bounce_rate_7d
+    # stayed 0.0 and a high-bounce sender (e.g. algoalpha 5.9%) never auto-paused.
+    refresh_reputation_snapshots(dry=args.dry)
     return 0
+
+
+def refresh_reputation_snapshots(dry: bool = False) -> None:
+    """Per profile, compute 7d delivered/bounced/complained from send_log (keyed
+    by the profile's own sending-domain roots) and write bounce_rate_7d /
+    complaint_rate_7d into profiles/<slug>.json warmup.reputation. This is the
+    data the warmup auto-pause reads."""
+    from pathlib import Path as _P
+    import glob as _glob
+    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rows = supa_get(
+        f"send_log?sent_at=gte.{urllib.parse.quote(since)}"
+        f"&select=from_addr,delivered,bounced,complained&limit=20000"
+    )
+    # Bucket counts by sending-domain root (e.g. tryalgoalpha.com).
+    from collections import defaultdict
+    by_root = defaultdict(lambda: {"total": 0, "bounced": 0, "complained": 0})
+    for r in rows:
+        fa = (r.get("from_addr") or "").lower()
+        dom = fa.split("@", 1)[1] if "@" in fa else ""
+        root = ".".join(dom.split(".")[-2:]) if dom else ""
+        if not root:
+            continue
+        b = by_root[root]
+        b["total"] += 1
+        if r.get("bounced"):
+            b["bounced"] += 1
+        if r.get("complained"):
+            b["complained"] += 1
+
+    repo = _P(__file__).resolve().parent.parent
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    for pf in _glob.glob(str(repo / "profiles" / "*.json")):
+        if pf.endswith(".private.json") or ".bak" in pf:
+            continue
+        try:
+            prof = json.loads(_P(pf).read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        roots = set()
+        for d in (prof.get("relay") or {}).get("from_domains", []):
+            dom = (d.get("domain") or "").lower()
+            if dom:
+                roots.add(".".join(dom.split(".")[-2:]))
+        if not roots:
+            continue
+        total = sum(by_root[r]["total"] for r in roots)
+        bounced = sum(by_root[r]["bounced"] for r in roots)
+        complained = sum(by_root[r]["complained"] for r in roots)
+        br = (bounced / total) if total else 0.0
+        cr = (complained / total) if total else 0.0
+        rep = prof.setdefault("warmup", {}).setdefault("reputation", {})
+        old_br = rep.get("bounce_rate_7d", 0.0)
+        rep["bounce_rate_7d"] = round(br, 4)
+        rep["complaint_rate_7d"] = round(cr, 4)
+        rep["delivered_7d"] = total - bounced
+        rep["last_check"] = now_iso
+        flag = " (AUTO-PAUSE RANGE)" if br > 0.05 else ""
+        print(f"  reputation {prof.get('slug','?'):16} bounce_7d={br:.3f} "
+              f"complaint_7d={cr:.4f} n={total}{flag}")
+        if not dry:
+            _P(pf).write_text(json.dumps(prof, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -71,11 +71,34 @@ def iter_send_domains(profile: dict, *, only_verified: bool = True, only_enabled
     return out
 
 
-def daily_target_for_domain(profile: dict, domain_entry: dict) -> int:
-    """Per-domain daily ceiling using the domain's current_day and either its
-    own warmup.ramp_curve or the profile's default snowball curve."""
+def warmup_day(domain_entry: dict) -> int:
+    """Authoritative warmup age = calendar days since warmup.started_at + 1.
+
+    The stored `current_day` field is UNRELIABLE: warmup-scheduler's
+    advance_only_mode incremented it once per tick (every 30 min), so on
+    domains only a few days old it inflated to 100+ — which made the cap read
+    the day-22 ceiling (50/day) and would open a brand-new cold subdomain at
+    full blast (the top deliverability landmine, live-visible on lk/dorian:
+    stored ~118 vs 4 real calendar days). Deriving the day from started_at
+    fixes it without depending on the scheduler's bookkeeping. Falls back to
+    the stored current_day only when started_at is missing. 2026-06-14."""
+    import datetime as _dt
     w = (domain_entry or {}).get("warmup") or {}
-    day = int(w.get("current_day", 0))
+    sa = w.get("started_at")
+    if sa:
+        try:
+            return max((_dt.date.today() - _dt.date.fromisoformat(str(sa)[:10])).days + 1, 1)
+        except Exception:
+            pass
+    return int(w.get("current_day", 0))
+
+
+def daily_target_for_domain(profile: dict, domain_entry: dict) -> int:
+    """Per-domain daily ceiling using the domain's CALENDAR warmup day (see
+    warmup_day) and either its own warmup.ramp_curve or the profile's default
+    snowball curve."""
+    w = (domain_entry or {}).get("warmup") or {}
+    day = warmup_day(domain_entry)
     if day < 1: return 0
     curve_id = w.get("ramp_curve") or "snowball_v1"
     curve = profile.get(f"ramp_curve_{curve_id}", profile.get("ramp_curve_snowball_v1", []))
@@ -104,17 +127,28 @@ def reputation_exceeded_for_domain(profile: dict, domain_entry: dict) -> tuple[b
 
 
 def materialize_persona(persona: dict, domain_entry: dict) -> dict:
-    """Return a copy of a persona with from_addr/reply_to bound to a specific
-    domain from the pool. Lets one persona slug 'daniel' send from any of
-    daniel@<sub>.aureonglobal.de in the pool."""
+    """Return a copy of a persona bound to its OWN dedicated subdomain.
+
+    STANDARD (hardcoded for every client): each persona sends only from its own
+    subdomain — the one in its declared from_addr. The picker now always passes
+    the persona together with that same subdomain, so this is a binding-preserver,
+    not a rebind. We keep the persona's declared from_addr verbatim when its
+    domain matches domain_entry; if a caller ever passes a mismatched domain we
+    still honor the persona's OWN subdomain (never send a persona from a foreign
+    sub), and only fall back to building localpart@domain when the persona has no
+    usable from_addr at all."""
     p = dict(persona)
-    domain = domain_entry["domain"]
-    # Localpart from the persona's declared from_addr (e.g. "sami"), NOT the slug.
-    # Aureon/Atal slugs already equal their from_addr localpart so this is a no-op
-    # for them; Diraya slugs are tier-suffixed ("sami-hello") and would otherwise
-    # send from ugly sami-hello@ addresses. Falls back to the slug if no from_addr.
-    localpart = (persona.get("from_addr") or persona["slug"]).split("@")[0]
-    p["from_addr"] = f'{localpart}@{domain}'
+    declared = persona.get("from_addr") or ""
+    declared_localpart = declared.split("@")[0] if "@" in declared else persona["slug"]
+    declared_domain = declared.split("@")[1] if "@" in declared else ""
+    target_domain = domain_entry.get("domain", "")
+    if declared_domain:
+        # Honor the persona's own subdomain. If the caller's domain disagrees,
+        # the persona's own binding wins — we do NOT rebind to a foreign sub.
+        p["from_addr"] = f'{declared_localpart}@{declared_domain}'
+    else:
+        # No declared subdomain on the persona — fall back to the pool domain.
+        p["from_addr"] = f'{declared_localpart}@{target_domain}'
     # Reply-To stays on the canonical mailbox (info@<root>) so replies converge.
     return p
 

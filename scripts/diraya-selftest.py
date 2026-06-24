@@ -77,7 +77,8 @@ def main() -> int:
         try:
             subprocess.run(["powershell", "-NoProfile", "-Command",
                             "Disable-ScheduledTask -TaskName LES-diraya-selftest"],
-                           capture_output=True, timeout=30)
+                           capture_output=True, timeout=30,
+                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except Exception as e:
             print("note: could not disable own task:", e)
         print("SELF-TEST SENT to", TO, "(GHOSTS + REVIEW). Sentinel written; task disabled.")

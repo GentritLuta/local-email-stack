@@ -26,11 +26,34 @@ if hasattr(sys.stdout, "reconfigure"):
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 EMAIL_RX = re.compile(r'[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}')
-PAGES = ["", "about", "team", "contact", "company"]   # highest-yield pages
+# Widened from 5 -> 16 paths: team-heavy ICPs (real estate, agencies, coaches)
+# publish founder/agent emails on /our-team, /agents, /staff, /leadership,
+# /impressum etc. that the original 5-path list never reached. 2026-06-13.
+PAGES = ["", "about", "about-us", "team", "our-team", "agents", "our-agents",
+         "staff", "people", "leadership", "meet-the-team", "contact", "kontakt",
+         "company", "press", "impressum"]   # highest-yield pages
+
+# De-obfuscation: many sites publish "name (at) domain (dot) com" to dodge naive
+# scrapers. We normalize ONLY full email-shaped obfuscations (local (at) domain
+# (dot) tld) so the published-email yield isn't silently halved. A single targeted
+# regex avoids the danger of replacing every " at " / "." in prose.
+_DEOBF_RX = re.compile(
+    r'([A-Za-z0-9._%+\-]+)'                       # local part
+    r'\s*[\(\[]?\s*(?:at|@)\s*[\)\]]?\s*'         # (at) / [at] / at / @
+    r'([A-Za-z0-9.\-]+)'                          # domain body
+    r'\s*[\(\[]?\s*(?:dot|punkt)\s*[\)\]]?\s*'    # (dot) / [dot] / dot / punkt
+    r'([A-Za-z]{2,})',                            # tld
+    re.I)
+
+def _deobfuscate(html: str) -> str:
+    out = html.replace("&#64;", "@").replace("&commat;", "@").replace("&#46;", ".")
+    return _DEOBF_RX.sub(lambda m: f"{m.group(1)}@{m.group(2)}.{m.group(3)}", out)
+
+GET_TIMEOUT = 6   # was 9; lower so hung domains don't eat the batch budget
 
 def get(url):
     try:
-        return urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=9).read().decode("utf-8", "replace")
+        return urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=GET_TIMEOUT).read().decode("utf-8", "replace")
     except Exception:
         return ""
 
@@ -44,21 +67,25 @@ def emails_on_site(domain):
         html = get(f"{base}/{pg}" if pg else base)
         if not html:
             continue
+        html = _deobfuscate(html)
         for e in EMAIL_RX.findall(html):
             e = e.lower().strip(".")
             ed = e.split("@")[-1]
             if root(ed) == root(domain) or root(ed).endswith("." + root(domain)):
                 found.add(e)
-        if len(found) >= 8:
+        if len(found) >= 15:   # raised from 8 so multi-agent team pages aren't truncated
             break
     return found
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--limit", type=int, default=2000, help="freshest N domains to scan")
+    ap.add_argument("--limit", type=int, default=2000, help="N domains to scan this run")
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--in", dest="inp", default=str(REPO / "out" / "diraya_linkedin_targets.csv"))
     ap.add_argument("--out", default=str(REPO / "out" / "diraya_site_emails.csv"))
+    ap.add_argument("--rotate", action="store_true",
+                    help="advance a persisted cursor each run so successive runs cover the WHOLE "
+                         "target set instead of re-scanning the same first N (where the pool already lives)")
     ap.add_argument("--import", dest="do_import", action="store_true",
                     help="after writing the CSV, import named founders into the diraya pool")
     args = ap.parse_args()
@@ -68,7 +95,25 @@ def main():
     for r in rows:
         if r.get("domain"):
             by_dom[r["domain"]].append(r)
-    domains = list(by_dom.keys())[:args.limit]
+    all_domains = list(by_dom.keys())
+    # Cursor rotation: the first ~100 domains already produced the live pool, so
+    # re-scanning them every night yields ~0 net-new. With --rotate we walk a
+    # persisted cursor through the full target set, wrapping at the end, so each
+    # nightly run hits a FRESH slice where un-harvested published emails actually are.
+    cursor_file = REPO / "out" / ".diraya_harvest_cursor"
+    start = 0
+    if args.rotate:
+        try:
+            start = int(cursor_file.read_text().strip())
+        except Exception:
+            start = 0
+        if start >= len(all_domains):
+            start = 0
+    domains = all_domains[start:start + args.limit]
+    if args.rotate:
+        nxt = start + len(domains)
+        cursor_file.write_text("0" if nxt >= len(all_domains) else str(nxt))
+        print(f"[rotate] scanning domains {start}..{start+len(domains)} of {len(all_domains)} (next cursor {cursor_file.read_text()})")
     print(f"scanning {len(domains)} domains for published founder emails ...")
 
     # Per-batch wall-clock budget so a few hung sockets can never stall the whole

@@ -34,7 +34,8 @@ def harvest_already_running() -> bool:
     """True if another diraya-site-scrape / harvest-full process is active."""
     try:
         out = subprocess.run(["wmic", "process", "where", "name='python.exe'", "get", "CommandLine"],
-                             capture_output=True, text=True, timeout=30).stdout
+                             capture_output=True, text=True, timeout=30,
+                             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
     except Exception:
         return False
     n = out.count("diraya-site-scrape") + out.count("diraya-harvest-full")

@@ -4,7 +4,7 @@ offer: an overview table, then for each client an offer divider page followed by
 the actual visual deliverable a prospect receives (the real PDF pages merged in,
 vector, not rasterised). Distinguishes LIVE offers from the newly built ones.
 
-    py scripts/build-offers-catalog.py   ->  out/Aureon-Client-Offers-Catalog-Visual.pdf
+    py scripts/build-offers-catalog.py   ->  out/Aureon-Client-Offers-Catalog-v3.pdf
 """
 from __future__ import annotations
 import glob
@@ -19,7 +19,7 @@ import fitz  # PyMuPDF
 
 REPO = Path(__file__).resolve().parent.parent
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-OUT = REPO / "out" / "Aureon-Client-Offers-Catalog-Visual.pdf"
+OUT = REPO / "out" / "Aureon-Client-Offers-Catalog-v3.pdf"
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 

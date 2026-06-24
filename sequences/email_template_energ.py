@@ -74,7 +74,11 @@ def render_html_energ(*, body: str, persona: dict,
 
     site = brand.get("site", "ener-g-beratung.de")
     site_url = f"https://{site}"
-    cta_url = brand.get("cta_url") or site_url
+    # Only render a CTA button when there is a REAL booking/scheduling URL.
+    # Falling back to the website (old behavior) was routing 39% of clickers to
+    # the homepage instead of into a reply, which is why energ had 39% clicks and
+    # 0 replies. With no booking link, the reply-ask in the body is the sole CTA.
+    cta_url = brand.get("cta_url") or ""
     contact_email = _esc(legal.get("contact_email", "info@ener-g-beratung.de"))
     company = _esc(legal.get("company_name", "ENER-G Beratung"))
     addr = legal.get("address_lines") or []
@@ -86,9 +90,9 @@ def render_html_energ(*, body: str, persona: dict,
                     "https://gentritluta.github.io/local-email-stack/unsubscribe/energ.html?t={token}")
     unsub_url = _esc(tpl.replace("{token}", unsubscribe_token or "preview"))
 
-    # CTA only on persuasion steps (2-5).
+    # CTA only on persuasion steps (2-5), and only when a real booking URL exists.
     cta = ""
-    if step_n in (2, 3, 4, 5):
+    if cta_url and step_n in (2, 3, 4, 5):
         cta = f"""
       <tr><td style="background:{PAL['sheet']};padding:2px 36px 12px 36px;">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0">
