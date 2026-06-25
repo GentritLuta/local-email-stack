@@ -1,206 +1,203 @@
 # Content Creator Sponsorship Agreement
 
-**AlgoAlpha and the Creator**
+This agreement is dated <span class="fill"></span>.
 
-> **How to use this template.** Fill every field shown in `[SQUARE BRACKETS]`. The only
-> ones you set per deal are the fee, the commission percentage, the commission duration,
-> and the deliverable details (Schedule 1). The AlgoAlpha signatory is fixed: Gabriel Yong,
-> Chief Executive Officer. Items marked `[AlgoAlpha to confirm]` are entity details that
-> stay the same across all creators once you set them once.
+## Parties
 
----
+(1) <span class="fill fill-lg"></span>, a company incorporated in <span class="fill"></span> under company number <span class="fill"></span> whose registered office is at <span class="fill fill-lg"></span> (**AlgoAlpha**); and
 
-This Content Creator Sponsorship Agreement (the **Agreement**) is made on **[EFFECTIVE DATE]** (the **Effective Date**)
-
-**BETWEEN:**
-
-**(1) [AlgoAlpha legal entity name]**, a company incorporated in **[AlgoAlpha jurisdiction of incorporation]** under registration number **[AlgoAlpha registration number]**, whose registered office is at **[AlgoAlpha registered address]** (**AlgoAlpha**); and
-
-**(2) [Creator full legal name / entity name]**, of **[Creator address]**, operating the channel **[Creator channel name and URL]** (the **Creator**),
-
-each a **Party** and together the **Parties**.
+(2) <span class="fill fill-lg"></span> of <span class="fill fill-lg"></span> (the **Creator**).
 
 ## Background
 
-A. AlgoAlpha provides trading indicators and analytics tools for traders on the TradingView platform and operates a paid subscription product (the **Product**).
+(A) AlgoAlpha develops trading indicators and analytics tools used on the TradingView platform and operates a paid subscription service for those tools (the **Product**).
 
-B. The Creator produces and publishes content for an audience on **[platform, e.g. YouTube]** and elsewhere.
+(B) The Creator produces and publishes video and related content to an audience on the channel identified in Schedule 1.
 
-C. AlgoAlpha wishes to engage the Creator to produce and publish sponsored content featuring the Product, and to pay the Creator a fixed fee together with an ongoing commission on paid subscriptions the Creator generates, on the terms set out below.
+(C) AlgoAlpha wishes to engage the Creator to produce and publish sponsored content promoting the Product in return for a fixed fee and a commission, and the Creator wishes to accept that engagement, on the terms of this agreement.
 
-## 1. Definitions
+It is agreed as follows.
 
-1.1 In this Agreement:
+## 1. Definitions and interpretation
 
-**Deliverable** means each item of content the Creator agrees to produce and publish as set out in Schedule 1.
+1.1 In this agreement:
 
-**Fee** means the fixed sponsorship fee for the Deliverable, being **[CURRENCY AND AMOUNT, e.g. USD 2,500]**, payable in two instalments under clause 4.
+**Business Day** means a day other than a Saturday, Sunday, or public holiday on which banks are generally open for business.
 
-**Commission** means **[COMMISSION PERCENTAGE, e.g. 30]** percent of the Net Revenue AlgoAlpha actually receives from each Referred Subscriber, payable under clause 5.
+**Commencement Date** means the date of this agreement.
 
-**Commission Period** means, for each Referred Subscriber, the period beginning when that subscriber first becomes a paying subscriber and continuing for **[COMMISSION DURATION, e.g. the lifetime of that subscription / 12 months]**.
+**Commission** means the percentage of Net Revenue stated in Schedule 1, payable on each Referred Subscriber for the Commission Period.
 
-**Net Revenue** means the subscription amounts AlgoAlpha actually receives from a Referred Subscriber, after deduction of payment processing fees, taxes, chargebacks, and refunds.
+**Commission Period** means, for each Referred Subscriber, the period stated in Schedule 1.
 
-**Referred Subscriber** means a person who becomes a paying subscriber to the Product through the Creator's unique tracking link or discount code provided under clause 6.
+**Deliverable** means the content the Creator is to produce and publish, as described in Schedule 1.
 
-**Tracking Link** means the unique referral link and/or discount code AlgoAlpha issues to the Creator for attribution.
+**Fee** means the fixed sponsorship fee stated in Schedule 1.
+
+**Net Revenue** means the subscription sums AlgoAlpha actually receives from a Referred Subscriber, less payment processing fees, taxes, refunds, and chargebacks.
+
+**Referred Subscriber** means a person who first becomes a paying subscriber to the Product through the Creator's tracking link or code issued under clause 6.
+
+1.2 A reference to a clause or Schedule is to a clause of or Schedule to this agreement. Clause headings do not affect interpretation. Words following *including*, *includes*, or *for example* are illustrative and do not limit the words before them.
 
 ## 2. Engagement
 
-2.1 AlgoAlpha engages the Creator to produce and publish the Deliverable described in Schedule 1, and the Creator accepts that engagement, on the terms of this Agreement.
+2.1 AlgoAlpha engages the Creator, and the Creator agrees, to produce and publish the Deliverable and to perform its other obligations under this agreement.
 
-2.2 The Creator performs this Agreement as an independent contractor. Nothing in this Agreement creates an employment, partnership, agency, or joint venture relationship between the Parties.
+2.2 The Creator is engaged as an independent contractor. Nothing in this agreement creates an employment, partnership, agency, or joint venture relationship between the parties.
 
-## 3. The Deliverable
+## 3. Term
 
-3.1 The Creator shall produce and publish the Deliverable in accordance with the specification, format, and publication date set out in Schedule 1.
+3.1 This agreement begins on the Commencement Date and continues until the Deliverable has been published and every Commission Period has ended, unless terminated earlier under clause 13.
 
-3.2 The Creator shall give AlgoAlpha a reasonable opportunity to review a draft or outline before publication where Schedule 1 requires it. AlgoAlpha may request changes only to ensure factual accuracy about the Product and compliance with clause 8. AlgoAlpha shall not control the Creator's editorial voice or opinions beyond that.
+## 4. The Deliverable
 
-3.3 The Deliverable is **complete** when it has been published in the agreed format and remains publicly available, and the Tracking Link or code is present and functioning as required by Schedule 1.
+4.1 The Creator shall produce and publish the Deliverable in accordance with Schedule 1, including any format, content points, and publication date stated there.
 
-## 4. Fee and payment of the Fee
+4.2 Where Schedule 1 requires it, the Creator shall submit a draft or outline to AlgoAlpha before publication. AlgoAlpha may require changes only to correct factual inaccuracies about the Product or to secure compliance with clause 8, and shall not otherwise direct the Creator's editorial content or opinions.
 
-4.1 In consideration of the Deliverable, AlgoAlpha shall pay the Creator the Fee in two equal instalments:
+4.3 The Deliverable is complete when it has been published in the required format, remains publicly available, and includes a functioning tracking link or code as required by clause 6 and Schedule 1.
 
-&nbsp;&nbsp;&nbsp;&nbsp;(a) **fifty percent (50%) on signing**, payable within **[NUMBER, e.g. 5]** business days of the Effective Date; and
+## 5. Fee
 
-&nbsp;&nbsp;&nbsp;&nbsp;(b) **fifty percent (50%) on completion**, payable within **[NUMBER, e.g. 5]** business days after the Deliverable is complete under clause 3.3.
+5.1 In consideration of the Deliverable, AlgoAlpha shall pay the Creator the Fee in two equal instalments: as to fifty per cent (50%) within five Business Days of the Commencement Date, and as to the remaining fifty per cent (50%) within five Business Days after the Deliverable is complete under clause 4.3.
 
-4.2 All payments under this clause 4 are made to the account the Creator nominates in writing, in the currency stated for the Fee. Each Party bears its own taxes arising from the Fee, and the Creator is responsible for any income or self-employment tax on amounts it receives.
+5.2 AlgoAlpha shall pay the Fee to the account the Creator notifies in writing. Each party bears its own taxes, and the Creator is responsible for any income or self-employment tax on sums it receives.
 
-4.3 If the Creator does not publish the Deliverable by the date in Schedule 1 and the delay is not caused by AlgoAlpha, AlgoAlpha may by written notice extend the date by a reasonable period or, if the Deliverable is still not published, terminate under clause 11.2 and recover the instalment paid under clause 4.1(a), save for reasonable, evidenced production costs the Creator has already incurred.
+5.3 If the Creator fails to publish the Deliverable by the date in Schedule 1 for reasons not attributable to AlgoAlpha, AlgoAlpha may by written notice allow a reasonable further period and, failing publication within it, terminate under clause 13.2 and recover the instalment paid under clause 5.1, less any reasonable production costs the Creator has actually and demonstrably incurred.
 
-## 5. Commission
+## 6. Commission and tracking
 
-5.1 In addition to the Fee, AlgoAlpha shall pay the Creator the Commission on each Referred Subscriber for the duration of that subscriber's Commission Period.
+6.1 In addition to the Fee, AlgoAlpha shall pay the Creator the Commission on each Referred Subscriber for that subscriber's Commission Period.
 
-5.2 Commission accrues only on Net Revenue AlgoAlpha actually receives. No Commission is payable on amounts that are refunded, charged back, fraudulent, or never collected, and AlgoAlpha may deduct or reverse Commission already paid on such amounts from future payments.
+6.2 AlgoAlpha shall issue the Creator a unique tracking link and, where applicable, a discount code before the publication date. A subscriber is a Referred Subscriber only where AlgoAlpha's systems record that the subscriber used the Creator's link or code.
 
-5.3 AlgoAlpha shall calculate Commission monthly and pay accrued Commission within **[NUMBER, e.g. 30]** days of the end of each calendar month, provided the accrued amount is at least **[MINIMUM PAYOUT, e.g. USD 50]**; amounts below that threshold roll over to the next month.
+6.3 Commission accrues only on Net Revenue actually received. No Commission is payable on sums that are refunded, charged back, uncollected, or fraudulent, and AlgoAlpha may set off or recover Commission already paid on such sums against future payments.
 
-5.4 AlgoAlpha shall provide the Creator with a monthly statement showing Referred Subscribers, Net Revenue, and Commission for the period. AlgoAlpha's records of attribution and Net Revenue are the basis for calculation, absent manifest error.
+6.4 AlgoAlpha shall account for Commission monthly and pay accrued Commission within thirty days of each month end, with a statement showing Referred Subscribers, Net Revenue, and Commission for the period. AlgoAlpha's records are conclusive as to attribution and Net Revenue, absent manifest error.
 
-## 6. Tracking and attribution
+6.5 The Creator shall not generate referrals by automated, incentivised, self-referred, spam, or otherwise deceptive means, bid on AlgoAlpha's trademarks in paid search, or otherwise manipulate attribution. AlgoAlpha may withhold or recover Commission connected with any such conduct.
 
-6.1 AlgoAlpha shall issue the Creator a Tracking Link and/or discount code before the publication date.
+## 7. AlgoAlpha's obligations
 
-6.2 A subscriber is attributed to the Creator only where AlgoAlpha's tracking system records that the subscriber used the Creator's Tracking Link or code. The Parties acknowledge that attribution depends on third party platforms, cookies, and user behaviour, and that not every genuine referral will be captured.
+7.1 AlgoAlpha shall pay the Fee and Commission when due, issue the tracking link and any agreed brief and brand assets, and respond promptly to the Creator's reasonable requests under clause 4.2.
 
-6.3 The Creator shall not bid on AlgoAlpha trademarks in paid search, generate referrals through spam, bots, incentivised clicks, self-referrals, or any deceptive or automated means, or otherwise manipulate attribution. AlgoAlpha may withhold or reclaim Commission connected to any such activity and terminate under clause 11.2.
+7.2 AlgoAlpha grants the Creator a limited, non-exclusive, revocable licence to use AlgoAlpha's name, logo, and Product imagery solely to produce and publish the Deliverable.
 
-## 7. AlgoAlpha obligations
+## 8. Disclosure, accuracy, and financial promotion
 
-7.1 AlgoAlpha shall pay the Fee and Commission when due, provide the Tracking Link and any agreed brand assets and brief, and respond to the Creator's reasonable review requests promptly.
+8.1 The Creator shall disclose the Deliverable as a paid promotion clearly and prominently, in compliance with the Federal Trade Commission's Endorsement Guides, the rules of the platform on which it is published, and applicable law.
 
-7.2 AlgoAlpha grants the Creator a limited, non-exclusive, revocable licence to use AlgoAlpha's name, logo, and Product screenshots solely to produce and publish the Deliverable under this Agreement.
+8.2 The Product is a set of analytical tools and is not financial, investment, or trading advice. The Creator shall not state or imply in the Deliverable that any specific profit, return, or trading result is guaranteed or likely, that the Product removes or reduces the risk of loss, or that AlgoAlpha or the Creator provides personalised financial advice, and shall not make any claim about the Product that is untrue or that the Creator cannot substantiate.
 
-## 8. Disclosure, accuracy, and financial promotion compliance
+8.3 Where the Deliverable presents trading results or performance, the Creator shall include a clear statement that trading carries a risk of loss, that past performance does not indicate future results, and that the content is for educational purposes and is not financial advice.
 
-8.1 The Creator shall clearly and conspicuously disclose that the Deliverable is a paid promotion, in a manner that complies with the FTC Endorsement Guides, the rules of the platform on which it is published, and any applicable law in the Creator's and the audience's jurisdictions. A clear written and, where relevant, verbal disclosure (for example "this video is sponsored by AlgoAlpha") is required.
-
-8.2 The Product is a set of trading tools and is not financial, investment, or trading advice. The Creator shall not, in the Deliverable: (a) promise, guarantee, or imply any specific profit, return, or trading outcome; (b) present the Product as a way to avoid losses or as low risk or no risk; (c) state or imply that AlgoAlpha or the Creator is providing personalised financial advice; or (d) make any claim about the Product that is false, misleading, or that the Creator cannot substantiate.
-
-8.3 The Creator shall include, where it presents trading results or performance, a clear risk warning to the effect that trading carries risk of loss, that past performance does not indicate future results, and that the content is for educational purposes and is not financial advice.
-
-8.4 The Creator is responsible for compliance with any financial promotion, advertising, securities, or consumer protection rules that apply to the Creator or the Creator's audience. If any regulator or platform requires a change to or removal of the Deliverable, the Creator shall comply and notify AlgoAlpha promptly.
+8.4 The Creator is responsible for compliance with any financial promotion, advertising, securities, or consumer law that applies to it or its audience. If a regulator or platform requires the Deliverable to be amended or removed, the Creator shall comply and notify AlgoAlpha without delay.
 
 ## 9. Intellectual property
 
-9.1 The Creator retains ownership of the Deliverable and the Creator's channel and audience. AlgoAlpha retains ownership of the Product and AlgoAlpha's brand assets.
+9.1 The Creator retains ownership of the Deliverable, its channel, and its audience. AlgoAlpha retains ownership of the Product and its brand.
 
-9.2 The Creator grants AlgoAlpha a perpetual, worldwide, royalty free, non-exclusive licence to repost, embed, quote, and use the Deliverable and excerpts of it across AlgoAlpha's own marketing channels, including its website, social accounts, and paid advertising, with attribution to the Creator. This licence survives termination.
+9.2 The Creator grants AlgoAlpha a perpetual, worldwide, royalty-free, non-exclusive licence to reproduce, distribute, and display the Deliverable and extracts from it across AlgoAlpha's own marketing channels, including paid advertising, with attribution to the Creator. This licence survives termination.
 
-9.3 The Creator warrants that the Deliverable is the Creator's original work or properly licensed, and that its use as contemplated by this Agreement does not infringe any third party right.
+9.3 The Creator warrants that the Deliverable is its original work or properly licensed and that AlgoAlpha's use of it under this agreement infringes no third-party right.
 
-## 10. Representations and warranties
+## 10. Warranties
 
-10.1 Each Party warrants that it has the authority to enter into and perform this Agreement.
+10.1 Each party warrants that it has the authority to enter into and perform this agreement.
 
-10.2 The Creator warrants that: (a) the Creator's audience and engagement are genuine and not generated by bots, purchased followers, or artificial means; (b) the Creator will comply with clause 8; and (c) the Creator is not currently subject to any regulatory finding, ban, or restriction that would make promotion of a trading product unlawful or misleading.
+10.2 The Creator further warrants that its audience and engagement are genuine and not generated by automated or purchased means, that it will comply with clause 8, and that it is not subject to any regulatory restriction that would make its promotion of the Product unlawful or misleading.
 
-## 11. Term and termination
+## 11. Confidentiality
 
-11.1 This Agreement begins on the Effective Date and continues until the Deliverable is complete and all Commission Periods have ended, unless terminated earlier under this clause.
+11.1 Each party shall keep confidential the terms of this agreement and any non-public information of the other party, and shall use that information only to perform this agreement. This clause does not apply to information that is or becomes public without breach, that the receiving party already lawfully held, or that it is required to disclose by law.
 
-11.2 Either Party may terminate immediately by written notice if the other commits a material breach that is not remedied within fourteen (14) days of notice, or that cannot be remedied. AlgoAlpha may terminate immediately under clauses 4.3, 6.3, or 8.
+## 12. Limitation of liability
 
-11.3 On termination: (a) AlgoAlpha shall pay any Fee instalment and Commission properly accrued and unpaid up to the termination date, subject to clauses 4.3, 5.2, and 6.3; (b) the Creator may, at AlgoAlpha's request, remove the sponsored Deliverable; and (c) clauses 5.2, 6.3, 8, 9, 12, 13, and 15 survive termination.
+12.1 Nothing in this agreement limits liability for fraud, for death or personal injury caused by negligence, or for any liability that cannot be limited by law.
 
-## 12. Confidentiality
+12.2 Subject to clause 12.1, neither party is liable for any indirect or consequential loss, or for loss of profit, revenue, or goodwill, and each party's total liability arising out of or in connection with this agreement is limited to the total of the Fee and Commission paid or payable under it.
 
-12.1 Each Party shall keep confidential the terms of this Agreement and any non-public information it receives from the other (including Commission rates, Net Revenue figures, and the brief), and shall use it only to perform this Agreement. This clause does not apply to information that is public through no breach, that a Party already held, or that a Party must disclose by law.
+## 13. Termination
 
-## 13. Independent contractor and no exclusivity
+13.1 Either party may terminate this agreement immediately by written notice if the other commits a material breach that is incapable of remedy or, being capable of remedy, is not remedied within fourteen days of notice.
 
-13.1 The Creator acts as an independent contractor and is free to work with other brands, including, unless Schedule 1 states otherwise, competing products, provided the Creator does not disparage the Product in the Deliverable.
+13.2 AlgoAlpha may also terminate immediately under clause 5.3, or for breach of clause 6.5 or clause 8.
 
-13.2 This Agreement is non-exclusive on both sides unless Schedule 1 expressly states an exclusivity period and scope.
+13.3 On termination, AlgoAlpha shall pay any Fee instalment and Commission properly accrued to the date of termination, subject to clauses 5.3, 6.3, and 6.5; at AlgoAlpha's request the Creator shall remove the Deliverable; and clauses 6.3, 8, 9, 11, 12, and 14 survive termination.
 
-## 14. Limitation of liability
+## 14. Indemnity
 
-14.1 Nothing in this Agreement limits liability for fraud, for death or personal injury caused by negligence, or for any liability that cannot lawfully be limited.
+14.1 The Creator shall indemnify AlgoAlpha against all losses, damages, and reasonable costs arising from any third-party claim, to the extent caused by the Creator's breach of clause 8, 9.3, or 10.2, or by the Creator's unlawful or deceptive conduct in producing or publishing the Deliverable.
 
-14.2 Subject to clause 14.1, neither Party is liable to the other for any indirect or consequential loss, or for loss of profit, revenue, or goodwill, and each Party's total aggregate liability arising out of or in connection with this Agreement is limited to the total of the Fee and Commission paid or payable under it.
+## 15. General
 
-## 15. Indemnity
+15.1 **Entire agreement.** This agreement and its Schedule constitute the entire agreement between the parties and supersede any prior arrangement on their subject matter.
 
-15.1 The Creator shall indemnify AlgoAlpha against losses, damages, and reasonable costs arising from a third party claim that results from (a) the Creator's breach of clause 8, 9.3, or 10.2, or (b) the Creator's own unlawful or deceptive conduct in producing or publishing the Deliverable.
+15.2 **Variation.** No variation is effective unless made in writing and signed by or on behalf of both parties.
 
-## 16. General
+15.3 **Assignment.** Neither party may assign or otherwise deal with this agreement without the other's written consent, save that AlgoAlpha may assign to a group company or to a successor of its business.
 
-16.1 **Entire agreement.** This Agreement, including its Schedule, is the entire agreement between the Parties on its subject matter and supersedes any prior discussion.
+15.4 **No exclusivity.** This agreement is non-exclusive unless Schedule 1 states an exclusivity period and scope. The Creator may work with other brands provided it does not disparage the Product in the Deliverable.
 
-16.2 **Variation.** Any variation must be in writing and signed by or on behalf of both Parties.
+15.5 **Notices.** Notices must be in writing and sent to the parties' email addresses in the execution block.
 
-16.3 **Assignment.** Neither Party may assign this Agreement without the other's written consent, except that AlgoAlpha may assign to a group company or to a buyer of its business.
+15.6 **Third parties.** A person who is not a party to this agreement has no right to enforce any of its terms.
 
-16.4 **Notices.** Notices must be in writing and sent to the email addresses in the signature block.
+15.7 **Severance.** If any provision is or becomes invalid or unenforceable, the remainder of the agreement continues in force.
 
-16.5 **Severability.** If any provision is held invalid, the rest of the Agreement continues in force.
+15.8 **Counterparts.** This agreement may be executed in any number of counterparts and by electronic signature, each of which is an original and all of which together constitute one agreement.
 
-16.6 **Counterparts and electronic signature.** This Agreement may be signed in counterparts and by electronic signature, each of which has the same effect as an original.
+## 16. Governing law and jurisdiction
 
-## 17. Governing law and jurisdiction
+16.1 This agreement and any dispute or claim arising out of or in connection with it are governed by the laws of <span class="fill"></span>.
 
-17.1 This Agreement and any dispute arising out of it are governed by the laws of **[AlgoAlpha governing law jurisdiction]**.
-
-17.2 The courts of **[AlgoAlpha governing law jurisdiction]** have exclusive jurisdiction to settle any such dispute.
+16.2 The courts of <span class="fill"></span> have exclusive jurisdiction to settle any such dispute or claim.
 
 ---
 
-## Schedule 1: The Deliverable
+## Schedule 1: Particulars
 
-| Item | Detail |
+| Term | Detail |
 |---|---|
-| Platform | [e.g. YouTube] |
-| Format | [e.g. one dedicated video, minimum 60 seconds of AlgoAlpha integration] |
-| Brief / key points | [what AlgoAlpha wants covered, factual only] |
-| Draft review | [required / not required; if required, how many business days before publication] |
-| Publication date | [date] |
-| Minimum availability | [e.g. the Deliverable stays public for at least 12 months] |
-| Tracking Link / code | [to be issued by AlgoAlpha before publication] |
-| Exclusivity (if any) | [none / describe scope and period] |
+| Creator channel and URL | <span class="fill fill-lg"></span> |
+| Platform | <span class="fill"></span> |
+| Deliverable | <span class="fill fill-lg"></span> |
+| Content points to cover | <span class="fill fill-lg"></span> |
+| Draft review before publication | <span class="fill"></span> |
+| Publication date | <span class="fill"></span> |
+| Minimum period kept public | <span class="fill"></span> |
+| Fee (total) | <span class="fill"></span> &nbsp;&nbsp; (paid 50% on signing, 50% on completion) |
+| Commission rate | <span class="fill"></span> per cent of Net Revenue |
+| Commission Period | <span class="fill"></span> |
+| Exclusivity | <span class="fill"></span> |
 
 ---
 
-## Signatures
+## Execution
 
-The Parties have signed this Agreement on the Effective Date.
+Executed as an agreement on the date first stated above.
 
-**For and on behalf of AlgoAlpha**
+**Signed for and on behalf of AlgoAlpha**
+
+Signature: <span class="fill fill-lg"></span>
 
 Name: **Gabriel Yong**
+
 Title: **Chief Executive Officer**
-Signature: ________________________
-Date: ________________________
-Email: [AlgoAlpha contact email, e.g. admin@algoalpha.io]
 
-**The Creator**
+Date: <span class="fill"></span>
 
-Name: **[Creator full legal name]**
-Title: [if signing for an entity]
-Signature: ________________________
-Date: ________________________
-Email: [Creator email]
+Email: <span class="fill fill-lg"></span>
+
+&nbsp;
+
+**Signed by the Creator**
+
+Signature: <span class="fill fill-lg"></span>
+
+Name: <span class="fill fill-lg"></span>
+
+Date: <span class="fill"></span>
+
+Email: <span class="fill fill-lg"></span>
