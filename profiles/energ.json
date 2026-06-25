@@ -27,7 +27,7 @@
         "verified_at": "2026-06-11T12:08:11.588736+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 14,
+          "current_day": 16,
           "started_at": "2026-06-07",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -45,7 +45,7 @@
         "verified_at": "2026-06-11T12:08:11.588736+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 14,
+          "current_day": 16,
           "started_at": "2026-06-07",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -246,7 +246,7 @@
       "slug": "philipp-hello",
       "from_name": "Philipp von ENER-G",
       "from_addr": "philipp@hello.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater, ENER-G",
       "voice": {
         "register": "berater-direkt",
@@ -269,7 +269,7 @@
       "slug": "philipp-team",
       "from_name": "Philipp von ENER-G",
       "from_addr": "philipp@team.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater, ENER-G",
       "voice": {
         "register": "berater-direkt",
@@ -292,7 +292,7 @@
       "slug": "alex",
       "from_name": "Stefan von ENER-G",
       "from_addr": "alex@mail.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -310,7 +310,7 @@
       "slug": "sam",
       "from_name": "Markus von ENER-G",
       "from_addr": "sam@outreach.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -328,7 +328,7 @@
       "slug": "jordan",
       "from_name": "Andreas von ENER-G",
       "from_addr": "jordan@hi.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -346,7 +346,7 @@
       "slug": "casey",
       "from_name": "Thomas von ENER-G",
       "from_addr": "casey@connect.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -364,7 +364,7 @@
       "slug": "riley",
       "from_name": "Michael von ENER-G",
       "from_addr": "riley@partners.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -382,7 +382,7 @@
       "slug": "taylor",
       "from_name": "Daniel von ENER-G",
       "from_addr": "taylor@reach.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -400,7 +400,7 @@
       "slug": "jamie",
       "from_name": "Jan von ENER-G",
       "from_addr": "jamie@news.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -418,7 +418,7 @@
       "slug": "drew",
       "from_name": "Lukas von ENER-G",
       "from_addr": "drew@send.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -436,7 +436,7 @@
       "slug": "avery",
       "from_name": "Sebastian von ENER-G",
       "from_addr": "avery@desk.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -454,7 +454,7 @@
       "slug": "parker",
       "from_name": "Tobias von ENER-G",
       "from_addr": "parker@hub.ener-g-beratung.de",
-      "reply_to": "info@aureonglobal.de",
+      "reply_to": "info@ener-g-beratung.de",
       "title": "Energieberater",
       "voice": {
         "register": "direct and confident",
@@ -504,10 +504,10 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0.0273,
+      "bounce_rate_7d": 0.0194,
       "complaint_rate_7d": 0.0,
-      "delivered_7d": 285,
-      "last_check": "2026-06-24T04:12:49.562364+00:00"
+      "delivered_7d": 405,
+      "last_check": "2026-06-25T12:12:15.213137+00:00"
     },
     "started_at": "2026-06-07",
     "current_day": 1,

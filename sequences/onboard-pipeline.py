@@ -477,7 +477,15 @@ def process(sub: dict):
     except Exception as _e:
         step(sid, "clarity", "pending", f"Clarity check error: {_e}")
 
-    # 2b. sequence presentation PDF (the branded deck we hand every client)
+    # 2b. Lead magnet: auto-design + produce the client's high-value, recurring give
+    # (a deliverable a prospect would pay for, whose monthly continuation is the
+    # client's paid service), render the branded PDF, and register its reply keyword.
+    # The prospect receives it the moment they reply the keyword (fulfill-magnets),
+    # with no manual asset work. 2026-06-25.
+    run_step_script(sid, "magnet", "Researching and building your lead magnet",
+                    "scripts/generate-client-magnet.py", "--profile", slug)
+
+    # 2c. sequence presentation PDF (the branded deck we hand every client)
     run_step_script(sid, "pdf", "Building your sequence presentation PDF",
                     "scripts/build-client-sequence-pdf.py", "--profile", slug)
 
