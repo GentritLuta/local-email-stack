@@ -27,6 +27,7 @@ import httpx
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "sequences"))
 from profile_lib import load_profile, save_profile  # noqa
+import clarity_gate  # noqa
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -459,6 +460,22 @@ def process(sub: dict):
     push_sequence_and_variants(slug, variants[:7])
     write_variants_file(slug, variants[:7])   # so the PDF deck builder finds the sequence
     step(sid, "copy", "done", f"{len(variants[:7])}-email sequence drafted and saved")
+
+    # 2a. Clarity gate at kickoff: the FIRST email must make a cold stranger
+    # instantly understand what we do + what we want. Recorded now so the verdict
+    # exists before go-live; the sender holds step 1 if it has not passed.
+    try:
+        cv = clarity_gate.check(slug)
+        if cv is None:
+            step(sid, "clarity", "pending", "Clarity check could not run; the daily gate will retry.")
+        elif cv["passed"]:
+            step(sid, "clarity", "done", "First email passes the clarity gate: what we do and what we want are clear.")
+        else:
+            step(sid, "clarity", "needs_input",
+                 "First email is unclear and is held from sending: "
+                 + (cv["fix_hint"] or "; ".join(cv["issues"])[:200]))
+    except Exception as _e:
+        step(sid, "clarity", "pending", f"Clarity check error: {_e}")
 
     # 2b. sequence presentation PDF (the branded deck we hand every client)
     run_step_script(sid, "pdf", "Building your sequence presentation PDF",

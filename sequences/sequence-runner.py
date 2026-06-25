@@ -55,6 +55,7 @@ from profile_lib import (
 from email_render import build_payload
 import algoalpha_offer
 import send_throttle
+import clarity_gate
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE  = REPO_ROOT / "sequences" / "supabase.env"
@@ -649,6 +650,20 @@ def tick(only_profiles: set[str] | None = None) -> None:
         # fetch_today_log docstring). 2026-06-12.
         profile_cache: dict[str, dict] = {}
         today_log_by_profile: dict[str, list[dict]] = {}
+        # ── Clarity gate ─────────────────────────────────────────────────────
+        # A campaign's FIRST email must pass the clarity check (does a cold
+        # stranger instantly get what we do + what we want) before it can go
+        # live. Computed once per tick; holds step 1 for any campaign whose
+        # current step-1 copy has not passed. Follow-ups (step 2+) are never
+        # gated. If the gate machinery itself is unavailable we do NOT block
+        # sends (fail-open at the infra level; the scheduled check alerts).
+        # 2026-06-25.
+        try:
+            clarity_clear = clarity_gate.gate_status()
+        except Exception as _e:
+            print(f"  ! clarity gate unavailable ({_e}); step-1 sends not gated this tick")
+            clarity_clear = None
+        _clarity_held: set[str] = set()
         for run in runs:
             if time.monotonic() - _t_start > _budget_s:
                 print(f"tick time budget ({_budget_s}s) reached — exiting cleanly; "
@@ -669,6 +684,13 @@ def tick(only_profiles: set[str] | None = None) -> None:
             if not step:
                 # No step at this n → done
                 c.patch(f"/runs?id=eq.{run['id']}", json={"status": "completed"})
+                continue
+            # Clarity gate: hold the FIRST email if this campaign's step-1 copy
+            # has not passed the clarity check for its current copy. Step 2+ pass.
+            if step_n == 1 and clarity_clear is not None and not clarity_clear.get(profile_slug, True):
+                if profile_slug not in _clarity_held:
+                    print(f"  ⏸ {profile_slug}: step 1 HELD — clarity gate not passed for current copy")
+                    _clarity_held.add(profile_slug)
                 continue
             # E1 A/B: a step carrying BOTH inline copy AND a linked variant is an
             # A/B test. Split by prospect_id so each lead always gets the same
