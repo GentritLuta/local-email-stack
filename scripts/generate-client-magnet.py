@@ -87,31 +87,51 @@ def gather_context(slug: str, cfg: dict) -> dict:
                 from_addr=from_addr, accent=accent, copy=copy)
 
 
-_SYS = (
-    "You design and write high-value lead magnets for cold-email campaigns. A lead magnet is a free "
-    "deliverable a business gives a prospect who replies with a keyword. Your magnet MUST satisfy all four:\n\n"
-    "1. REAL value: genuinely useful, specific, the kind of thing a prospect would normally PAY a consultant "
-    "for. No fluff, no generic advice. Concrete steps, real numbers, named tools, scripts, checklists, exact "
-    "thresholds. If a reader could have written it themselves in five minutes, it has failed.\n"
-    "2. RECURRING pull: it delivers a result now, but its natural continuation is an ONGOING MONTHLY need that "
-    "THIS EXACT business sells as its paid service. The reader should finish it thinking 'I want this done for "
-    "me every month.' Make that continuation obvious without being pushy.\n"
-    "3. LEADS to the client's offer: the magnet is the first taste of what the client does, so wanting more "
-    "equals wanting the client's paid service.\n"
-    "4. STANDS ALONE as a document: it works as a PDF the prospect reads start to finish. 5 to 7 sections, each "
-    "with a clear heading and several paragraphs of real content.\n\n"
-    "Write in the language of the client's business (English or German). Reuse the SAME one-word reply keyword "
-    "the client's cold email already asks prospects to reply with (it is shown to you); if none is shown, pick "
-    "one clear UPPERCASE keyword. The cover_email is the short note that goes out WITH the PDF when the prospect "
-    "replies the keyword; use {greeting} and {company} placeholders and sign it as the named sender.\n\n"
+FORMULA_FILE = REPO / "lead-magnets" / "hormozi-lead-magnet-formula.md"
+
+_OUT_SCHEMA = (
     "Output ONLY a JSON object, no prose:\n"
     '{"language":"en"|"de","magnet_keyword":"WORD","deliverable_title":"...","one_line_promise":"...",'
     '"recurring_angle":"one sentence naming the monthly continuation the client sells",'
-    '"email_subject":"...","cover_email":"...","sections":[{"heading":"...","body":"real multi-paragraph content"}]}'
+    '"email_subject":"...","cover_email":"... with {greeting} and {company} placeholders, signed by the sender ...",'
+    '"sections":[{"heading":"...","body":"real multi-paragraph content"}]}'
 )
 
 
-def design(ctx: dict) -> dict:
+def _load_formula() -> str:
+    return FORMULA_FILE.read_text(encoding="utf-8") if FORMULA_FILE.exists() else ""
+
+
+def _design_system(formula: str) -> str:
+    return (
+        "You design lead magnets that score high on the Hormozi Lead Magnet Formula below. Follow it "
+        "strictly: solve ONE narrow problem COMPLETELY, maximise the Value Equation, build a clear bridge "
+        "to the client's recurring paid offer, and name it with the MAGIC structure. The content must be "
+        "real and specific (numbers, named tools, scripts, exact steps, thresholds), good enough that the "
+        "prospect would have paid for it, and consumable as a 5 to 7 section PDF. Write in the language of "
+        "the client's business. KEYWORD RULE: reuse the EXACT one-word reply keyword the client's cold email "
+        "already asks prospects to reply with, IF it is a distinctive trigger; otherwise pick one clear "
+        "UPPERCASE keyword that a prospect would only ever type to claim THIS resource. The keyword must be "
+        "DISTINCTIVE: never a common word from the client's own industry or any word likely to appear by chance "
+        "in a normal reply (for a seller-lead business do NOT use SELLERS or LEADS; for an audit business avoid "
+        "AUDIT alone; prefer a vivid, specific trigger tied to the deliverable, e.g. the named kit, blueprint, "
+        "or list). No em-dashes. The cover_email is the short note sent WITH the PDF; sign it as the named sender.\n\n"
+        "=== THE FORMULA ===\n" + formula + "\n=== END FORMULA ===\n\n" + _OUT_SCHEMA
+    )
+
+
+def _score_system(formula: str) -> str:
+    return (
+        "You are a strict, honest grader. Grade the lead magnet against the Section 7 rubric of the Hormozi "
+        "formula below: score each criterion 0 to 10, apply the weights, compute the weighted total out of 10, "
+        "and apply the pass bar including the hard gates on narrow-and-complete and bridge-to-offer. Do not be "
+        "generous.\n\n=== THE FORMULA ===\n" + formula + "\n=== END FORMULA ===\n\n"
+        'Output ONLY JSON: {"weighted_total": number, "gates_ok": true|false, '
+        '"weakest": "the lowest-scoring criterion and a one-line fix", "verdict": "ship"|"revise"}'
+    )
+
+
+def design(ctx: dict, formula: str, feedback: str = "") -> dict:
     prompt = (
         f"CLIENT: {ctx['name']}\n\n"
         f"WHAT THEY SELL / THEIR OFFER:\n{ctx['offer']}\n\n"
@@ -120,33 +140,91 @@ def design(ctx: dict) -> dict:
         f"THE CLIENT'S EXISTING COLD EMAIL (reuse the SAME reply keyword it already asks for):\n"
         f"{ctx['copy'][:1600]}\n"
     )
-    work = tempfile.mkdtemp(prefix="les_magnet_")
+    if feedback:
+        prompt += ("\nA PREVIOUS DRAFT SCORED BELOW THE SHIP BAR. In this version, fix this specifically "
+                   "while keeping everything else at least as strong:\n" + feedback + "\n")
+    def nd(s):  # scrub em-dashes to honour the house style
+        return s.replace(" — ", ", ").replace("—", ", ").replace(" – ", ", ").replace("–", ", ")
+    sysp = _design_system(formula)
+    # The model occasionally emits malformed JSON on large outputs. Retry a few
+    # times rather than failing the (kickoff) step on one bad roll.
+    for attempt in range(2):
+        work = tempfile.mkdtemp(prefix="les_magnet_")
+        try:
+            proc = subprocess.run(
+                [CLAUDE_CMD, "-p", "--system-prompt", sysp,
+                 "--disallowedTools", "Bash,Read,Glob,Grep,Edit,Write,WebFetch,WebSearch",
+                 "--setting-sources", "user"],
+                input=prompt, capture_output=True, text=True, timeout=420,
+                encoding="utf-8", errors="replace", cwd=work,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            out = (proc.stdout or "").strip()
+            m = re.search(r"\{[\s\S]*\}", out)
+            if not m:
+                print(f"  ~ design attempt {attempt+1}: no JSON in output, retrying")
+                continue
+            try:
+                d = json.loads(m.group(0))
+            except json.JSONDecodeError as je:
+                print(f"  ~ design attempt {attempt+1}: malformed JSON ({je}), retrying")
+                continue
+            for f in ("deliverable_title", "one_line_promise", "cover_email", "email_subject", "recurring_angle"):
+                d[f] = nd(d.get(f, ""))
+            for s in d.get("sections", []):
+                s["heading"] = nd(s.get("heading", "")); s["body"] = nd(s.get("body", ""))
+            return d
+        except Exception as e:
+            print(f"  ~ design attempt {attempt+1} error: {e}")
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+    print("  ! design failed after retries")
+    return None
+
+
+def _score(name: str, d: dict, formula: str) -> dict:
+    """Grade a designed magnet against the Hormozi rubric (Section 7). Returns the verdict dict or None."""
+    body = "\n\n".join(f"{s.get('heading','')}\n{s.get('body','')}" for s in d.get("sections", []))
+    prompt = (f"LEAD MAGNET for {name}:\nTITLE: {d.get('deliverable_title','')}\n"
+              f"PROMISE: {d.get('one_line_promise','')}\nRECURRING ANGLE: {d.get('recurring_angle','')}\n\n"
+              f"SECTIONS:\n{body}")
+    work = tempfile.mkdtemp(prefix="les_score_")
     try:
         proc = subprocess.run(
-            [CLAUDE_CMD, "-p", "--system-prompt", _SYS,
+            [CLAUDE_CMD, "-p", "--system-prompt", _score_system(formula),
              "--disallowedTools", "Bash,Read,Glob,Grep,Edit,Write,WebFetch,WebSearch",
              "--setting-sources", "user"],
-            input=prompt, capture_output=True, text=True, timeout=420,
+            input=prompt, capture_output=True, text=True, timeout=200,
             encoding="utf-8", errors="replace", cwd=work,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        out = (proc.stdout or "").strip()
-        m = re.search(r"\{[\s\S]*\}", out)
-        if not m:
-            print("  ! design produced no JSON. stderr:", (proc.stderr or "")[:300])
-            return None
-        d = json.loads(m.group(0))
-        # scrub em-dashes to honour the house style
-        def nd(s): return s.replace(" — ", ", ").replace("—", ", ").replace(" – ", ", ").replace("–", ", ")
-        for f in ("deliverable_title", "one_line_promise", "cover_email", "email_subject", "recurring_angle"):
-            d[f] = nd(d.get(f, ""))
-        for s in d.get("sections", []):
-            s["heading"] = nd(s.get("heading", "")); s["body"] = nd(s.get("body", ""))
-        return d
+        m = re.search(r"\{[\s\S]*\}", proc.stdout or "")
+        return json.loads(m.group(0)) if m else None
     except Exception as e:
-        print(f"  ! design failed: {e}")
+        print(f"  ~ score error: {e}")
         return None
     finally:
         shutil.rmtree(work, ignore_errors=True)
+
+
+def best_magnet(ctx: dict, formula: str, tries: int = 4) -> tuple:
+    """Design and grade up to `tries` times, feeding each round's weakest point into the next
+    draft so the magnet climbs toward the ship bar. Keep the highest-scoring version and stop
+    early once one clears the bar. Returns (design, score_dict)."""
+    best = None
+    feedback = ""
+    for i in range(tries):
+        d = design(ctx, formula, feedback)
+        if not d or not all(d.get(k) for k in
+                            ("magnet_keyword", "deliverable_title", "one_line_promise", "cover_email", "sections")):
+            continue
+        sc = _score(ctx["name"], d, formula) or {}
+        total = float(sc.get("weighted_total") or 0)
+        print(f"  attempt {i+1}: Hormozi score {total:.1f}/10  verdict={sc.get('verdict','?')}  gates_ok={sc.get('gates_ok')}")
+        if best is None or total > float(best[1].get("weighted_total") or 0):
+            best = (d, sc)
+        if sc.get("verdict") == "ship" and sc.get("gates_ok"):
+            break
+        feedback = sc.get("weakest") or ""
+    return best if best else (None, None)
 
 
 def assemble(slug: str, ctx: dict, d: dict) -> dict:
@@ -193,6 +271,7 @@ def main() -> int:
     ap.add_argument("--force", action="store_true", help="overwrite an existing magnet for this client")
     ap.add_argument("--preview", action="store_true", help="design + render a sample without touching the live catalog")
     ap.add_argument("--no-render", action="store_true")
+    ap.add_argument("--tries", type=int, default=4, help="design+grade rounds (lower = faster, higher = better score)")
     a = ap.parse_args()
     slug = a.profile
 
@@ -200,18 +279,25 @@ def main() -> int:
     if not cfg:
         sys.exit(f"no profile config for {slug}")
     ctx = gather_context(slug, cfg)
+    formula = _load_formula()
+    if not formula:
+        print("  ! Hormozi formula missing; run scripts/research-hormozi-magnet.py first.")
+        return 1
     print(f"designing magnet for {slug} ({ctx['name']}) ...")
-    d = design(ctx)
+    d, sc = best_magnet(ctx, formula)
     if not d:
         sys.exit("design failed")
-    for k in ("magnet_keyword", "deliverable_title", "one_line_promise", "cover_email", "sections"):
-        if not d.get(k):
-            sys.exit(f"design missing field: {k}")
+    sc = sc or {}
     spec = assemble(slug, ctx, d)
+    spec["_hormozi_score"] = {"weighted_total": sc.get("weighted_total"), "verdict": sc.get("verdict"),
+                              "gates_ok": sc.get("gates_ok"), "weakest": sc.get("weakest")}
     print(f"  keyword:   {spec['magnet_keywords']}")
     print(f"  title:     {spec['deliverable_title']}")
     print(f"  recurring: {d.get('recurring_angle','')}")
     print(f"  sections:  {len(spec['sections'])}  language: {spec['language']}")
+    print(f"  Hormozi:   {sc.get('weighted_total')}/10  verdict={sc.get('verdict')}  gates_ok={sc.get('gates_ok')}")
+    if sc.get('weakest'):
+        print(f"             weakest: {sc.get('weakest')}")
 
     if a.preview:
         orig = SPECS.read_text(encoding="utf-8") if SPECS.exists() else None
