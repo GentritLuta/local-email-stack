@@ -39,7 +39,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from contract_lib import (
     generate_contract, verify_clean, make_ref, apply_signature,
-    esign_audit_panel, derive_contract_fields,
+    apply_counter_signature, completion_certificate, derive_contract_fields,
 )
 
 
@@ -80,9 +80,10 @@ def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_ema
 
     rows = (
         ("Agreement", contract_ref),
-        ("Signed by", f"{signer_name} ({signer_email})"),
-        ("Signed at (UTC)", signed_at),
-        ("Sealed at (UTC)", sealed_at),
+        ("Signed by (Client)", f"{signer_name} ({signer_email})"),
+        ("Counter-signed by (Provider)", "Gentrit Luta, Aureon Global L.L.C. (Chief Executive Officer)"),
+        ("Client signed at (UTC)", signed_at),
+        ("Fully executed at (UTC)", sealed_at),
         ("Signer IP", ip),
         ("Signer device", ua),
         ("Document SHA-256", sha),
@@ -90,17 +91,18 @@ def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_ema
     tr = "".join(f"<tr><td style='padding:4px 14px 4px 0;color:#64748b'>{k}</td>"
                  f"<td style='padding:4px 0;font-weight:600'>{v}</td></tr>" for k, v in rows)
     body_html = f"""<div style="font-family:system-ui,sans-serif;color:#1e293b;max-width:620px">
-      <h2 style="color:#16a34a;margin:0 0 6px">Service agreement signed</h2>
-      <p style="margin:0 0 14px;color:#475569">The signed agreement is attached. The audit
-      record below is your second, independent evidence trail (the first is the locked record
+      <h2 style="color:#16a34a;margin:0 0 6px">Agreement fully executed</h2>
+      <p style="margin:0 0 14px;color:#475569">The agreement has been signed by both parties and is
+      now fully executed. The fully executed copy, with its Certificate of Completion, is attached.
+      The audit record below is a second, independent evidence trail (the first is the locked record
       in the portal).</p>
       <table style="font-size:13px;border-collapse:collapse;margin:0 0 14px">{tr}</table>
       <p style="font-size:11px;color:#94a3b8">Any change to the agreement text invalidates the
       SHA-256 hash. Retained by Aureon Global L.L.C. as evidence of execution.</p>
     </div>"""
-    text_body = (f"Service agreement signed.\n\n"
+    text_body = (f"Agreement fully executed by both parties.\n\n"
                  + "\n".join(f"{k}: {v}" for k, v in rows)
-                 + "\n\nThe signed agreement is attached.")
+                 + "\n\nThe fully executed agreement (with Certificate of Completion) is attached.")
 
     attach = pdf_path if (pdf_path and pdf_path.exists()) else html_fallback
     recipients = [OPERATOR_ADDR]
@@ -108,7 +110,7 @@ def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_ema
         recipients.append(signer_email)
 
     msg = MIMEMultipart("mixed")
-    msg["Subject"] = f"Signed agreement: {contract_ref}"[:200]
+    msg["Subject"] = f"Fully executed agreement: {contract_ref}"[:200]
     msg["From"] = f"Aureon Global <{user}>"
     msg["To"] = ", ".join(recipients)
     alt = MIMEMultipart("alternative")
@@ -256,24 +258,36 @@ def seal(one_id: str | None = None) -> int:
             f = derive_contract_fields(sub[0].get("raw_answers") or {})
             place_val = f.get("place") or f.get("jurisdiction") or ""
 
-        panel = esign_audit_panel(
-            signer_name=c["signer_name"], signer_email=c.get("signer_email") or "",
-            signed_at=signed_at, signer_ip=ip, user_agent=ua, sha256=sha,
-            ref=c["contract_ref"])
         date_str = signed_at[:10]
-        sealed_html = apply_signature(
+        # 1. Fill the CLIENT signature (no certificate appended yet).
+        client_html = apply_signature(
             html, signer_name=c["signer_name"], signer_title=c.get("signer_title") or "",
-            place=place_val, date_str=date_str, audit_panel_html=panel)
+            place=place_val, date_str=date_str, audit_panel_html="")
+        # 2. Aureon Global (Provider) auto counter-signs, so the agreement is now FULLY
+        #    EXECUTED by both parties. This is Aureon's standing authorisation, as Provider,
+        #    to counter-execute its own pilot agreements the moment the client signs.
+        provider_name, provider_title = "Gentrit Luta", "Chief Executive Officer"
+        executed_at = _now()
+        executed_html = apply_counter_signature(client_html, signer_name=provider_name, date_str=executed_at[:10])
+        # 3. Append the court-defensible Certificate of Completion listing BOTH signers.
+        cert = completion_certificate(
+            contract_ref=c["contract_ref"], contract_id=c["id"], sha256=sha,
+            prepared_at=(c.get("created_at") or "")[:19].replace("T", " "),
+            client_name=c["signer_name"], client_email=c.get("signer_email") or "",
+            client_title=c.get("signer_title") or "", client_signed_at=signed_at, client_ip=ip, client_ua=ua,
+            provider_name=provider_name, provider_title=provider_title, provider_signed_at=executed_at)
+        sealed_html = (executed_html.replace("</body>", cert + "\n</body>", 1)
+                       if "</body>" in executed_html else executed_html + cert)
 
-        out_html = CONTRACT_DIR / f"{c['contract_ref'].replace(' ', '_')}-signed.html"
-        out_pdf = CONTRACT_DIR / f"{c['contract_ref'].replace(' ', '_')}-signed.pdf"
+        out_html = CONTRACT_DIR / f"{c['contract_ref'].replace(' ', '_')}-executed.html"
+        out_pdf = CONTRACT_DIR / f"{c['contract_ref'].replace(' ', '_')}-executed.pdf"
         out_html.write_text(sealed_html, encoding="utf-8")
         pdf_ok = _render_pdf(sealed_html, out_pdf)
 
         patch = {
             "status": "sealed",
             "contract_sha256": sha,
-            "sealed_at": _now(),
+            "sealed_at": executed_at,
             "signer_ip": ip,
             "signer_user_agent": ua,
             "contract_html": sealed_html,  # persist the sealed version (with cert panel)

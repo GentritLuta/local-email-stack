@@ -143,6 +143,14 @@ def derive_contract_fields(a: dict) -> dict:
     icp = (a.get("icp") or "").strip().rstrip(".")
     rep = (a.get("rep") or a.get("signer_name") or "").strip()
     title = (a.get("rep_title") or a.get("signer_title") or "Founder").strip()
+    # Representation chain. When the signatory acts for the Client THROUGH one or more
+    # intermediate entities (e.g. a holding company that is the statutory director, which
+    # in turn acts through its own managing director), the full chain must appear in BOTH
+    # the parties cell and the execution block, never collapsed to name+title. Captured
+    # from the onboarding `rep_chain` answer, e.g.:
+    #   "represented by its sole director, ME Holding B.V., in turn represented by its managing director"
+    # Empty for the common single-tier case (a natural person signs directly).
+    rep_chain = (a.get("rep_chain") or a.get("representation") or "").strip().rstrip(",").strip()
     office = (a.get("office") or "(to be provided by Client)").strip()
     jurisdiction = (a.get("jurisdiction") or "(to be provided by Client)").strip()
     reg = (a.get("registration") or "Company registration number: (to be provided by Client)").strip()
@@ -155,11 +163,17 @@ def derive_contract_fields(a: dict) -> dict:
                + ", and is presently developing its client base"
                + (f" among {icp}" if icp else "") + ".")
     persona = f'"[First name] from {company}"'
+    if rep and rep_chain:
+        cell_rep = f"{rep_chain}, {rep}"   # full chain: "represented by its sole director ..., Mark Eizema"
+    elif rep:
+        cell_rep = f"{rep}, {title}"
+    else:
+        cell_rep = "(to be provided by Client)"
     return dict(
         entity=company, entity_type="a company", office=office, reg=reg,
-        jurisdiction=jurisdiction, business=business, rep=f"{rep}, {title}" if rep else "(to be provided by Client)",
+        jurisdiction=jurisdiction, business=business, rep=cell_rep,
         email=email, recital=_nodash(recital), persona=persona,
-        sig=rep or "(to be provided by Client)", title=title, place=place,
+        sig=rep or "(to be provided by Client)", title=title, place=place, rep_chain=rep_chain,
         domains=domains or "(client sending domains)", website=website,
     )
 
@@ -217,9 +231,15 @@ def generate_contract(a: dict, ref: str) -> str:
     s = s.replace('"[First name] from Diraya"', c["persona"])
     # 4. Reference (title page + footer), all occurrences.
     s = s.replace("AG DIRAYA 2026 01 v1.0", ref)
-    # 5. Client signature block entity + name + title (left blank for live sign).
-    s = s.replace('<div class="sig-entity">Diraya Inc.</div>',
-                  f'<div class="sig-entity">{_esc(c["entity"])}</div>')
+    # 5. Client signature block entity + (representation chain) + name + title.
+    # When the Client signs THROUGH an intermediate entity, reproduce the full chain
+    # in the execution block so the signatory's capacity (q.q.) is unambiguous, instead
+    # of collapsing it to a bare name + title. Single-tier clients render unchanged.
+    sig_entity = f'<div class="sig-entity">{_esc(c["entity"])}</div>'
+    if c.get("rep_chain"):
+        sig_entity += ('\n        <div class="sig-rep" style="font-size:9.5pt;margin:1pt 0 5pt;line-height:1.4">'
+                       f'{_esc(c["rep_chain"])}:</div>')
+    s = s.replace('<div class="sig-entity">Diraya Inc.</div>', sig_entity)
     s = s.replace('<span class="sig-line filled">Mohammed El Amine Amoura</span>',
                   f'<span class="sig-line filled">{_esc(c["sig"])}</span>')
     s = s.replace(
@@ -358,6 +378,75 @@ def apply_signature(html: str, *, signer_name: str, signer_title: str, place: st
     else:
         html = html + audit_panel_html
     return _nodash(html)
+
+
+def apply_counter_signature(html: str, *, signer_name: str, date_str: str) -> str:
+    """Fill the PROVIDER signature block (Aureon Global) AFTER the client has signed.
+    By that point the client's Date/Signature (the 2nd pair) are already filled, so the
+    only remaining blank Date/Signature pair is the Provider's (the 1st column). The
+    Provider Name/Title/Place are set at draft time, so we only stamp Date + Signature.
+    This is what makes the agreement fully executed by both parties."""
+    blank_date = '<div class="sig-field"><span class="label">Date</span><span class="sig-line">&nbsp;</span></div>'
+    blank_sig = '<div class="sig-field"><span class="label">Signature</span><span class="sig-line">&nbsp;</span></div>'
+    filled_date = f'<div class="sig-field"><span class="label">Date</span><span class="sig-line filled">{_esc(date_str)}</span></div>'
+    filled_sig = f'<div class="sig-field"><span class="label">Signature</span><span class="sig-line filled">/s/ {_esc(signer_name)} (e-signed)</span></div>'
+    html = html.replace(blank_date, filled_date, 1)  # first remaining blank = Provider
+    html = html.replace(blank_sig, filled_sig, 1)
+    return _nodash(html)
+
+
+_CONSENT_TEXT = "I have read this agreement and agree to be legally bound by it."
+
+
+def completion_certificate(*, contract_ref: str, contract_id: str, sha256: str, prepared_at: str,
+                           client_name: str, client_email: str, client_title: str,
+                           client_signed_at: str, client_ip: str, client_ua: str,
+                           provider_name: str, provider_title: str, provider_signed_at: str,
+                           consent_text: str = _CONSENT_TEXT) -> str:
+    """The court-defensible Certificate of Completion appended to a fully-executed
+    agreement, modelled on DocuSign/Dropbox Sign. Records BOTH signers (intent, consent,
+    attribution, timestamps, IP/device), the document integrity hash, the signing-event
+    timeline, and the ESIGN/UETA/eIDAS legal basis. A copy is delivered to every party."""
+    def _r(k, v):
+        return (f'<tr><td style="padding:3pt 14pt 3pt 0;color:#475569;white-space:nowrap;vertical-align:top">{_esc(k)}</td>'
+                f'<td style="padding:3pt 0;word-break:break-word">{_esc(v)}</td></tr>')
+
+    def _signer(role, name, email, title, signed, ip, ua):
+        rows = _r("Name", name)
+        if email:
+            rows += _r("Email", email)
+        rows += _r("Signing capacity", title)
+        rows += _r("Intent + consent", f'Adopted a typed electronic signature with intent to be bound, and accepted the statement: "{consent_text}"')
+        rows += _r("Signed at (UTC)", signed)
+        if ip:
+            rows += _r("IP address", ip)
+        if ua:
+            rows += _r("Device / user agent", ua)
+        return (f'<div style="margin:0 0 12pt"><div style="font-weight:700;font-size:10.5pt;margin-bottom:3pt">{_esc(role)}</div>'
+                f'<table style="border-collapse:collapse;font-size:9pt;width:100%">{rows}</table></div>')
+
+    events = "".join(f'<li>{_esc(t)}</li>' for t in (
+        f"Agreement prepared (UTC): {prepared_at}",
+        f"Client signed (UTC): {client_signed_at}",
+        f"Provider counter-signed (UTC): {provider_signed_at}",
+        f"Fully executed by both parties (UTC): {provider_signed_at}",
+    ))
+    head = (_r("Agreement", contract_ref) + _r("Envelope ID", contract_id)
+            + _r("Document SHA-256", sha256))
+    return _nodash(f'''
+<div style="page-break-before:always"></div>
+<div style="margin-top:20pt;border:1.5pt solid #111;padding:18pt 20pt;font-size:10pt;line-height:1.5">
+  <div style="font-size:13pt;font-weight:700;text-transform:uppercase;letter-spacing:.5pt;margin-bottom:10pt">Certificate of Completion</div>
+  <p style="margin:0 0 12pt">This certificate evidences the electronic execution of the agreement below by both parties. A copy of the fully executed agreement and this certificate has been delivered to every party by email and is retained by Aureon Global L.L.C.</p>
+  <table style="border-collapse:collapse;font-size:9pt;margin:0 0 14pt">{head}</table>
+  {_signer("Client signer", client_name, client_email, client_title, client_signed_at, client_ip, client_ua)}
+  {_signer("Provider signer", provider_name, "", provider_title, provider_signed_at, "", "")}
+  <div style="font-weight:700;margin:6pt 0 3pt">Signing events</div>
+  <ul style="margin:0 0 14pt;padding-left:18pt;font-size:9pt">{events}</ul>
+  <p style="font-size:8.5pt;color:#444;margin:0 0 6pt"><strong>Integrity.</strong> The SHA-256 hash above is computed over the exact agreement text the parties agreed to. Any later alteration to that text changes the hash, so tampering is detectable.</p>
+  <p style="font-size:8.5pt;color:#444;margin:0 0 6pt"><strong>Legal basis.</strong> This agreement was executed electronically. Each party expressed intent to be bound and consented to transact electronically, and each signature is attributable to its signer by the record above. The agreement is enforceable under the United States ESIGN Act (15 U.S.C. ch. 96) and the Uniform Electronic Transactions Act (UETA), and under EU Regulation 910/2014 (eIDAS) Article 25(1), by which an electronic signature is not denied legal effect or admissibility as evidence solely because it is electronic. This is a business-to-business agreement; the consumer disclosure regime does not apply.</p>
+  <p style="font-size:8.5pt;color:#444;margin:0"><strong>Retention.</strong> Each party has received and may retain a copy of the fully executed agreement and this certificate.</p>
+</div>''')
 
 
 def make_ref(company: str) -> str:

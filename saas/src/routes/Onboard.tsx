@@ -11,7 +11,7 @@ const EMPTY: OnboardingAnswers = {
   lead_source: "icp_sourcing",
   platforms: "", handles: "", posting_cadence: "",
   notes: "",
-  rep: "", rep_title: "", jurisdiction: "", office: "",
+  rep: "", rep_title: "", rep_chain: "", jurisdiction: "", office: "",
 };
 
 const SERVICES: { id: "email" | "social" | "both"; title: string; desc: string }[] = [
@@ -248,6 +248,15 @@ export default function Onboard() {
               <div>
                 <label>Position / title *</label>
                 <input value={a.rep_title} onChange={(e) => set("rep_title", e.target.value)} placeholder="Owner / Founder / CEO / Director" />
+              </div>
+            </div>
+            <div className="row">
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label>Signing through a holding or parent company? (optional)</label>
+                <input value={a.rep_chain} onChange={(e) => set("rep_chain", e.target.value)} placeholder="represented by its sole director, ME Holding B.V., in turn represented by its managing director" />
+                <div className="hint" style={{ marginTop: 4 }}>
+                  Only if your company's statutory director is another company. Describe the chain down to the person who signs, and put that person's title in their own entity in the field above (e.g. "Managing Director of ME Holding B.V."). Leave blank if you sign the company directly.
+                </div>
               </div>
             </div>
             <div className="row">

@@ -23,6 +23,7 @@ export type OnboardingAnswers = {
   // ─── contract / signer details (drive the auto-prepared agreement) ─────────
   rep: string;              // authorised signer's full legal name
   rep_title: string;        // their title (Owner, Founder, CEO…)
+  rep_chain: string;        // representation chain when signing through a holding/parent entity (optional; empty = signs directly)
   jurisdiction: string;     // jurisdiction of incorporation
   office: string;           // registered office address
   // ─── legal acceptances (T&C, Privacy, AGB) ─────────────────────────────────
