@@ -19,7 +19,7 @@ const ITEMS: Array<{
   },
   {
     key: "agb", label: "AGB", path: "/agb",
-    what: "The general terms and conditions (Allgemeine Geschäftsbedingungen) governing the contract under German law.",
+    what: "The general terms and conditions for the engagement. This agreement is governed by the law of the client's own jurisdiction (where the client is established or signs); where none applies, the laws of the Republic of Kosovo apply.",
   },
 ];
 

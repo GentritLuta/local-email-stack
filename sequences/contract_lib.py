@@ -263,7 +263,7 @@ def generate_contract(a: dict, ref: str) -> str:
     #    and the arbitration-only sub-clauses (20.4 costs, 20.5 proceedings
     #    confidentiality, 20.6 New York Convention) are dropped.
     import re as _re
-    juris = (a.get("jurisdiction") or "").strip() or "the jurisdiction in which the Client is incorporated"
+    juris = (a.get("jurisdiction") or "").strip() or "the Republic of Kosovo"
     je = _esc(juris)
     s = s.replace("the laws of <strong>England and Wales</strong>", f"the laws of <strong>{je}</strong>")
     s = s.replace("a day other than a Saturday, Sunday, or public holiday in England and Wales",
