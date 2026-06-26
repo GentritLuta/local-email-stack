@@ -173,6 +173,18 @@ export async function getContractForSubmission(submissionId: string) {
   return (data ?? null) as Contract | null;
 }
 
+// Fetch a contract directly by its own id. Used as a fallback when a sign link
+// was hand-issued with the contract id instead of the submission id (older
+// re-sign links). maybeSingle so a non-matching id yields null, never throws.
+export async function getContractById(contractId: string) {
+  const { data, error } = await supabase
+    .from("contracts").select("*")
+    .eq("id", contractId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data ?? null) as Contract | null;
+}
+
 // The continuation agreement (issued ~90 days after the pilot is signed).
 export async function getContinuationForSubmission(submissionId: string) {
   const { data, error } = await supabase

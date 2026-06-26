@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  getSubmission, getContractForSubmission, signContract, Contract, Submission,
+  getSubmission, getContractForSubmission, getContractById, signContract, Contract, Submission,
   downloadContractHtml, openContractForPrint,
 } from "../lib/api";
 import LegalConsent, { LegalAcceptance, allAccepted } from "../components/LegalConsent";
@@ -28,10 +28,20 @@ export default function Sign() {
     let tries = 0;
     async function tick() {
       try {
-        const s = await getSubmission(id!);
-        if (alive) setSub(s);
-        const c = await getContractForSubmission(id!);
+        // The route param is normally a submission id, but some hand-issued
+        // re-sign links carry the contract id instead. Resolve either: look up
+        // the contract by submission first, then fall back to contract-by-id
+        // (both maybeSingle, so a wrong-type id returns null instead of
+        // throwing). Then load the submission from the resolved id.
+        let c = await getContractForSubmission(id!);
+        let subId = id!;
+        if (!c) {
+          const byId = await getContractById(id!);
+          if (byId) { c = byId; subId = byId.submission_id; }
+        }
+        const s = await getSubmission(subId);
         if (!alive) return;
+        setSub(s);
         if (c) {
           setContract(c);
           setName((p) => p || c.signer_name || "");
@@ -61,8 +71,10 @@ export default function Sign() {
         signer_title: title.trim(),
       });
       // After signing, collect the client's sending-infra access so the
-      // pipeline can provision automatically, then they land on status.
-      nav(`/access/${id}`);
+      // pipeline can provision automatically, then they land on status. Use the
+      // resolved submission id (sub.id), not the raw param, which may be a
+      // contract id on older re-sign links.
+      nav(`/access/${sub?.id ?? id}`);
     } catch (e: any) {
       setErr(e?.message || String(e));
     } finally {
@@ -82,7 +94,7 @@ export default function Sign() {
           Thanks{contract.signer_name ? `, ${contract.signer_name}` : ""}. Your agreement
           ({contract.contract_ref}) is signed. We are now setting up your campaign.
         </p>
-        <button className="btn" onClick={() => nav(`/access/${id}`)}>Continue setup</button>
+        <button className="btn" onClick={() => nav(`/access/${sub?.id ?? id}`)}>Continue setup</button>
       </div>
     );
   }
