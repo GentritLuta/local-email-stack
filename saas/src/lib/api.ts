@@ -210,7 +210,7 @@ export async function signContract(
     ip = (await r.json())?.ip ?? null;
   } catch { /* non-fatal */ }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("contracts")
     .update({
       status: "signed",
@@ -223,8 +223,18 @@ export async function signContract(
       signer_ip: ip,
       signer_user_agent: navigator.userAgent,
     })
-    .eq("id", contractId);
+    .eq("id", contractId)
+    .eq("status", "draft") // only the draft->signed transition; makes the row-count check meaningful
+    .select("id");
   if (error) throw error;
+  // A blind update can match 0 rows under RLS (expired/wrong session, or the
+  // contract is no longer a signable draft) and still return no error — which
+  // would look like a successful sign while silently changing nothing. Assert a
+  // row was actually updated so any such failure surfaces to the signer.
+  if (!data || data.length === 0)
+    throw new Error(
+      "We couldn't record your signature. Your session may have expired or the agreement is no longer in a signable state. Please reload this page and try again, or contact us."
+    );
 }
 
 export type CampaignMetrics = {
