@@ -8,20 +8,35 @@
   "voice_notes": "Hormozi $100M Leads Struktur (sind-Sie-offen + checking-out + Datenpunkt + sind-Sie-beschäftigt + forced-yes-no + pure-value + breakup). DACH Sie-Form, kurze Sätze, konkrete Zahlen aus dem echten Angebot. Echte Umlaute (ä ö ü) verwenden, ß als ss schreiben (DACH-tauglich inkl. CH). KEINE Apostrophe, KEINE Gedankenstriche, KEINE Word-Bindestriche, KEINE Ausrufezeichen, KEINE Emojis. Required: {first_name}, {company}, {city}.",
   "offer_facts": {
     "value_prop": "Krankenstand in 90 Tagen um rund 22 Prozent senken via sechs Präventionsseminaren (Schlaf, Stress, Resilienz, Regeneration, Konzentration, Leistung)",
-    "proof_points": ["Krankenstand 11 auf 7,8 Prozent", "Burnout Werte 42 auf 26", "47 Führungskräfte seit 2019 begleitet", "14 dokumentierte Mandate", "ROI 6,4x im ersten Jahr (DAK Daten 2025)"],
-    "differentiators": ["vom Gründer persönlich", "Gruppen bis zehn Personen", "kein Trainer Pool, kein White Label, kein Subunternehmer", "Vorher Nachher Audit mit validierten Skalen (PSQI, Maslach, Connor Davidson)"],
+    "proof_points": [
+      "Krankenstand 11 auf 7,8 Prozent",
+      "Burnout Werte 42 auf 26",
+      "47 Führungskräfte seit 2019 begleitet",
+      "14 dokumentierte Mandate",
+      "ROI 6,4x im ersten Jahr (DAK Daten 2025)"
+    ],
+    "differentiators": [
+      "vom Gründer persönlich",
+      "Gruppen bis zehn Personen",
+      "kein Trainer Pool, kein White Label, kein Subunternehmer",
+      "Vorher Nachher Audit mit validierten Skalen (PSQI, Maslach, Connor Davidson)"
+    ],
     "guarantee": "Wirkungsgarantie: zeigt das Vorher Nachher Audit keinen Effekt, gibt es sechs Coaching Sitzungen kostenlos. Antwort in vier Arbeitsstunden. Ausstieg nach der ersten Sitzung ohne Kosten.",
     "lead_magnet": "kostenloser Schlaf Check als PDF für HR Teams, alternativ 30 Minuten Gespräch (Wert 1.600 Euro)"
   },
-  "required_merges": ["first_name", "company", "city"],
+  "required_merges": [
+    "first_name",
+    "company",
+    "city"
+  ],
   "schedule_doc": "delay_days = Abstand zum vorigen Schritt. 0,2,2,3,4,7,10 = Tag 0,2,4,7,11,18,28.",
   "variants": [
     {
       "n": 1,
       "delay_days": 0,
       "angle": "hormozi_sind_sie_offen_de",
-      "subject": "Sind Sie offen?",
-      "body": "Guten Tag {first_name},\n\nsind Sie gerade offen für etwas?\n\nIch sehe, was {company} in {city} aufgebaut hat.\n\nWir helfen mittelständischen Unternehmen in der DACH Region, den Krankenstand in 90 Tagen um rund 22 Prozent zu senken. Mit sechs Präventionsseminaren zu Schlaf, Stress, Resilienz, Regeneration, Konzentration und Leistung.\n\nLetztes Mandat: Krankenstand von 11 auf 7,8 Prozent, Burnout Werte von 42 auf 26. Gemessen mit einem Vorher Nachher Audit.\n\nDas Beste ist die Wirkungsgarantie. Zeigt das Audit keinen Effekt, gibt es sechs Coaching Sitzungen kostenlos.\n\nMacht ein 15 Minuten Telefonat Sinn?\n\nP.s. einfach mit nein antworten, falls kein Interesse."
+      "subject": "kurz-analyse krankenstand kosten {company}",
+      "body": "Guten Tag {first_name},\n\nich schicke {company} kostenlos eine schriftliche Kurzanalyse Ihrer Krankenstand Kosten, mit dem realistischen Einsparpotenzial in Euro. Kein Telefonat nötig, Sie lesen sie in fünf Minuten.\n\nIch rechne anhand Ihrer Mitarbeiterzahl in {city} und Branchen Durchschnittswerten (DAK Daten 2025) aus, was Sie der aktuelle Krankenstand pro Jahr kostet und wie viel davon mit Prävention realistisch vermeidbar ist. Schwarz auf weiss, keine Schätzung ins Blaue.\n\nSo arbeiten wir auch sonst: Vorher Nachher Audit mit validierten Skalen, sechs Präventionsseminare und eine Wirkungsgarantie. Ein DACH Mandat ist damit in einem Jahr von 11 auf 7,8 Prozent Krankenstand gekommen.\n\nWenn die Analyse für Sie nicht passt, kostet Sie das nur die Mail.\n\nAntworten Sie einfach mit dem Wort Analyse, dann schicke ich sie Ihnen innerhalb von 24 Stunden."
     },
     {
       "n": 2,

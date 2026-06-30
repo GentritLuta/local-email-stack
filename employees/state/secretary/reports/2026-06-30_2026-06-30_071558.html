@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Brief, Tue 30 Jun 2026</title><style>
+*{box-sizing:border-box} body{margin:0;background:#f3f4f6;font-family:'Segoe UI',Inter,Arial,sans-serif;color:#1a1a1a;}
+.page{max-width:820px;margin:24px auto;background:#fff;padding:48px 56px;box-shadow:0 1px 4px rgba(0,0,0,.12);position:relative;}
+.lh{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0a0a0a;padding-bottom:14px;margin-bottom:8px;}
+.lh .org{font-size:18px;font-weight:700;letter-spacing:.02em;}
+.lh .sub{font-size:12px;color:#555;margin-top:3px;line-height:1.5;}
+.lh .meta{font-size:12px;color:#333;text-align:right;line-height:1.6;}
+.stamp{display:inline-block;border:2px solid #b00020;color:#b00020;font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;padding:5px 12px;border-radius:4px;transform:rotate(-1deg);margin:14px 0 4px;}
+h1{font-size:20px;margin:18px 0 6px;} h2{font-size:16px;margin:22px 0 6px;border-bottom:1px solid #e5e5e5;padding-bottom:4px;}
+h3{font-size:14px;margin:16px 0 4px;color:#222;}
+p{font-size:13.5px;line-height:1.65;margin:8px 0;} li{font-size:13.5px;line-height:1.6;margin:3px 0;}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:12.5px;}
+th,td{border:1px solid #d8d8d8;padding:7px 9px;text-align:left;vertical-align:top;}
+th{background:#f0f1f3;font-weight:600;} tr:nth-child(even) td{background:#fafafa;}
+code{background:#f0f1f3;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:12px;}
+hr{border:none;border-top:1px solid #e5e5e5;margin:16px 0;}
+.foot{margin-top:28px;border-top:1px solid #e5e5e5;padding-top:10px;font-size:11px;color:#777;line-height:1.6;}
+@media print{body{background:#fff} .page{box-shadow:none;margin:0;max-width:none}}
+</style></head><body>
+<div class="page">
+  <div class="lh">
+    <div>
+      <div class="org">Aureon Global L.L.C. (Sh.P.K.)</div>
+      <div class="sub">Dushkaja 20, 71000 Kaçanik, Republic of Kosovo<br>
+        Fiscal No. (Numri Fiskal): 812368240 &middot; info@aureonglobal.de</div>
+    </div>
+    <div class="meta">Document date: 2026-06-30<br>Role: secretary<br>Currency: EUR</div>
+  </div>
+  <div class="stamp">Prepared &mdash; not submitted</div>
+  <h1>Daily Brief, Tue 30 Jun 2026</h1>
+  <h1>Daily Brief, Tuesday 30 June 2026</h1>
+<p><strong>Prepared by your secretary. Built from the ops logs, profiles, and contract files on this PC, read this morning. I have no live view of the inbox, calendar, or today&#x27;s send numbers. Those gaps are spelled out at the end.</strong></p>
+<p>Bottom line: the outbound machine has been dark since Friday evening and the watchdog itself has stopped completing its checks. That is today&#x27;s fire. Everything else waits until sending is breathing again.</p>
+<h2>Top priorities (ranked)</h2>
+<h3>1. Campaigns are dark. No send since Fri 26 Jun, 20:59 UTC. Restart today.</h3>
+<p><strong>Why it matters:</strong> The watchdog&#x27;s last recorded send is 2026-06-26 20:59 UTC. Weekends are off by design (Mon to Fri only), so Sat and Sun are expected. But Monday 29 Jun and today were full send days, and nothing went out. The backlog reads 1000 queued, 1000 overdue. Every dark weekday is pipeline you already paid to build, sitting idle.</p>
+<p><strong>What the logs show:</strong></p>
+<ul>
+<li>25 to 28 Jun: the watchdog repeatedly logged &quot;keep-awake daemon was not running (relies on next logon).&quot; The PC kept sleeping or logging out, so the scheduled <code>LES-*</code> tasks did not fire reliably.</li>
+<li>29 to 30 Jun: the watchdog&#x27;s own task-state checks now time out (<code>Get-ScheduledTask ... timed out after 15 seconds</code> for the sequence-runner and lead-scrape tasks). Every tick from 29 Jun 01:30 onward writes only a header, no body, no remediation. The Windows Task Scheduler on this machine looks unresponsive. This is the harder failure: the watchdog can no longer fix itself.</li>
+</ul>
+<p><strong>Next step (your hands, on this PC), in order:</strong> 1. Wake the machine, confirm you are logged in, and start the windowless keep-awake daemon so it stops sleeping. 2. Task Scheduler, filter <code>LES-</code>, confirm every <code>LES-sequence-runner-&lt;brand&gt;</code> is <strong>Ready</strong> and not Disabled or stuck Queued (algoalpha, aureon, diraya, energ, lk-advertising, mark-eting). If Task Scheduler is hung, a reboot is the fastest reset. 3. Run one <code>sequences/sequence-runner.py tick --profile &lt;brand&gt;</code> manually per brand to start draining the 1000 backlog. 4. Tail one <code>warmup-state/&lt;brand&gt;.resend.jsonl</code> and confirm fresh send timestamps appear. 5. Confirm tomorrow&#x27;s 08:00 daily report lands with non-zero sends.</p>
+<h3>2. Clean the EnerG and LK bounce trips in the same sitting.</h3>
+<p><strong>Why it matters:</strong> The moment sending resumes, three subdomains auto-pause again on the bounce guard and starve those two campaigns. Confirmed in the ops digest:</p>
+<ul>
+<li><strong>EnerG:</strong> <code>hi.ener-g-beratung.de</code> at 11.1% (4/36 over 72h), <code>hello.ener-g-beratung.de</code> at 5.1 to 5.7% (peaked 6/110). Both over the 5% kill line.</li>
+<li><strong>LK:</strong> <code>desk.lk-advertising.site</code> at 7.0 to 9.5% (4 bad out of 42 to 57). Paused repeatedly all of 25 and 26 Jun.</li>
+</ul>
+<p>The percentages are inflated by a small fixed set of bad addresses at low warmup volume (4 bounces is enough to trip the line).</p>
+<p><strong>Next step:</strong> Either scrub those few bad addresses from the lists feeding those subdomains, or do what the log itself recommends and set <code>relay.from_domains[*].warmup.enabled = false</code> for those subdomains in <code>profiles/energ.json</code> and <code>profiles/lk-advertising.json</code>. Do it before the restart so the relaunch is clean.</p>
+<h3>3. CIT QS filing due 15 Jul 2026. Fifteen days out, start this week.</h3>
+<p><strong>Why it matters:</strong> Hard external deadline (the QS filing under the QS/QL split). Fifteen days is comfortable only if the paperwork starts now, not on the 14th.</p>
+<p><strong>Next step:</strong> Confirm with your accountant what they need from you and whether they are already on it. If any figures or sign-off sit on your side, block 30 minutes this week.</p>
+<h3>4. Confirm the executed Mark-eting agreement is the one of record.</h3>
+<p><strong>Why it matters:</strong> There are five Mark-eting agreement files on disk, including <code>-CORRECTED-for-resign</code>, <code>-CORRECTED-v1.1</code>, and <code>-EXECUTED-sample</code>. That much churn means a correction went back for re-signature. The campaign is already live, so the signed contract should not be lagging the work.</p>
+<p><strong>Next step:</strong> Confirm Mark Eizema signed the corrected version and that you counter-signed it. If the re-sign is still open, that is a one-line follow-up you owe him.</p>
+<h2>Waiting on others</h2>
+<ul>
+<li><strong>SMH, most blocked.</strong> Their contract is empty: no notices email, no authorised contact, no reply endpoint. You cannot issue their pilot agreement until SMH sends these. Tell me the contact and I will draft the request.</li>
+<li><strong>EnerG, LK, OTAI:</strong> registration numbers still blank in <code>client-contract-inputs.json</code>. Cosmetic placeholders in otherwise-complete agreements. Chase when convenient, not urgent.</li>
+</ul>
+<h2>Overdue / slipping</h2>
+<ul>
+<li><strong>ATAL: 12 sending domains stuck at <code>status=failed</code> in Resend.</strong> Throwing the same daily warning every morning, 25 through 29 Jun (<code>*.atalsolidrocks.com</code>). ATAL is dormant so nothing is mis-sending, but it pollutes your daily report and it is a hard blocker the day you launch ATAL. Decide: re-verify the DNS at Hostinger, or delete the 12 failed domains to silence the alert until you are ready.</li>
+<li><strong>Keep-awake daemon chronically not running.</strong> This is the root cause behind item 1. Worth making it reliable (run on logon plus restart-on-crash, the same windowless-task convention you have hit before) so a sleeping PC stops killing your outbound.</li>
+</ul>
+<h2>What I could not see</h2>
+<p>I work from files on this PC. I have no live view of:</p>
+<ul>
+<li><strong>Your inbox and prospect replies.</strong> Needs the IMAP mailbox or the replies table. Last on-disk reply signal (8 Jun analysis): the &quot;a seller test for {company}&quot; zip hook was pulling about 5% replies, Diraya was getting litigation-funding replies, and one aureon broker asked to &quot;set up a call Tuesday.&quot; Whether any of those are still open, I cannot tell from here.</li>
+<li><strong>Your calendar.</strong> No access. If a call was booked off those replies, it is invisible to me.</li>
+<li><strong>Today&#x27;s actual send, open, and reply numbers.</strong> <code>daily-report.py</code> emails them and writes no file I can read.</li>
+</ul>
+<p>Drop an inbox export or a reply list into my data-inbox (currently empty) and I will triage it and draft the replies and follow-ups you owe.</p>
+  <div class="foot">Prepared by the Aureon bookkeeping assistant for internal review. This is a
+  preparation document, not a filed return, and not licensed tax advice. Figures and any
+  statute references must be confirmed with a licensed Kosovo accountant before submission to ATK.</div>
+</div></body></html>

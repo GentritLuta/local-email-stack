@@ -29,6 +29,10 @@
     "zip": "PropertyZip"
   },
   "hamilton": null,
+  "hancock": null,
+  "hendricks": null,
+  "losangeles": null,
+  "madison": null,
   "monroe": {
     "_discovered": true,
     "city": "PropCity",
@@ -57,5 +61,6 @@
     "url": "https://services1.arcgis.com/nYfGJ9xFTKW6VPqW/arcgis/rest/services/Monroe_County_Survey_Utility/FeatureServer/6",
     "val": "TotalValue",
     "zip": "PropertyZip"
-  }
+  },
+  "putnam": null
 }

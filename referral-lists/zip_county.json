@@ -1,9 +1,73 @@
 {
+  "46011": {
+    "county": "madison",
+    "state": "IN"
+  },
+  "46012": {
+    "county": "madison",
+    "state": "IN"
+  },
+  "46013": {
+    "county": "madison",
+    "state": "IN"
+  },
+  "46016": {
+    "county": "madison",
+    "state": "IN"
+  },
+  "46017": {
+    "county": "madison",
+    "state": "IN"
+  },
   "46033": {
     "county": "hamilton",
     "state": "IN"
   },
+  "46055": {
+    "county": "hancock",
+    "state": "IN"
+  },
+  "46060": {
+    "county": "hamilton",
+    "state": "IN"
+  },
+  "46062": {
+    "county": "hamilton",
+    "state": "IN"
+  },
+  "46064": {
+    "county": "madison",
+    "state": "IN"
+  },
+  "46121": {
+    "county": "hendricks",
+    "state": "IN"
+  },
+  "46135": {
+    "county": "putnam",
+    "state": "IN"
+  },
+  "46202": {
+    "county": "marion",
+    "state": "IN"
+  },
   "46220": {
+    "county": "marion",
+    "state": "IN"
+  },
+  "46226": {
+    "county": "marion",
+    "state": "IN"
+  },
+  "46236": {
+    "county": "marion",
+    "state": "IN"
+  },
+  "46250": {
+    "county": "marion",
+    "state": "IN"
+  },
+  "46256": {
     "county": "marion",
     "state": "IN"
   },
@@ -18,5 +82,9 @@
   "47448": {
     "county": "brown",
     "state": "IN"
+  },
+  "90210": {
+    "county": "losangeles",
+    "state": "CA"
   }
 }

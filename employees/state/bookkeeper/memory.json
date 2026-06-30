@@ -1,0 +1,18 @@
+{
+  "role": "bookkeeper",
+  "standing_context": "Shift 2 (2026-06-29): Drafted message to a licensed Kosovo accountant to settle, before 15 Jul 2026 quarterly deadline, whether Aureon (Sh.P.K., <EUR30k, services) files presumptive QS (3%/9%, min EUR37.50/qtr, services=9%) or must keep books and pay 10% CIT with annual CD. Key unsettled point: whether an Sh.P.K. (corporation) may use the presumptive regime at all, or whether it's reserved for individual businesses. Verified rates/threshold/EUR37.50 min/15-day quarterly timing vs PwC Kosovo. Presumptive final settlement due 31 Mar following year. Data-inbox STILL EMPTY (README only) - still need ARBK extract+fiscal+NACE code, EDI access/figures, invoices since incorporation. NACE code is the one blank in the drafted message.",
+  "runs": [
+    {
+      "date": "2026-06-29",
+      "title": "Aureon FY2026 tightened Kosovo CIT compliance plan",
+      "summary": "Tightened the plan to only what binds Aureon as a first-year, non-VAT, no-payroll Kosovo LLC: a quarterly CIT/turnover filing (next due 15 Jul 2026) and the first annual CD return due 31 Mar 2027. Verified all deadlines and rates live against PwC Kosovo and ATK. Key open item: whether Aureon is in the small-business presumptive regime (QS, ~9% of gross for services, EUR 37.50/qtr floor) or the 10%-profit regime (QL/CD) — must be confirmed with a licensed accountant before 15 Jul, along with whether a Q1 2026 filing (due 15 Apr) was missed.",
+      "status": "shipped"
+    },
+    {
+      "date": "2026-06-29",
+      "title": "Message to Kosovo accountant: settle CIT regime (QS vs QL/CD) before 15 Jul",
+      "summary": "Drafted a ready-to-send message to a licensed Kosovo accountant covering the four points you asked for: which regime applies to an Sh.P.K. under EUR 30,000 (presumptive 3%/9% turnover tax vs mandatory 10% profit CIT with annual CD), our correct rate against our NACE code, whether an annual return plus financial statements is still required under the presumptive regime, and the Q1 2026 / nil-filing question. Verified the 3%/9% rates, EUR 30,000 threshold, EUR 37.50 quarterly minimum, and 15-day quarterly payment timing against PwC Kosovo. Data-inbox is still empty (README only); the only blank to fill is the registered NACE/activity code from your ARBK extract.",
+      "status": "shipped"
+    }
+  ]
+}

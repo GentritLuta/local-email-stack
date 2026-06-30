@@ -52,37 +52,6 @@
       }
     ]
   },
-  "f2-malergipser": {
-    "url": "https://f2-malergipser.ch",
-    "ok": true,
-    "title": "F2 Maler Gipser GmbH - Bern und Burgdorf und Umgebung | F2 Maler Gipser GmbH",
-    "h1_text": "Maler und Gipser in Bern, Burgdorf und Umgebung",
-    "body_color": "#1a2332",
-    "body_bg": "#ffffff",
-    "body_font": "\"Plus Jakarta Sans\", sans-serif",
-    "h1_color": "#ffffff",
-    "h1_font": "\"Plus Jakarta Sans\", sans-serif",
-    "primary_button_top": [
-      {
-        "hex": "#6ba94c",
-        "count": 2
-      }
-    ],
-    "accent_candidates": [
-      {
-        "hex": "#6ba94c",
-        "count": 51
-      },
-      {
-        "hex": "#1a2332",
-        "count": 29
-      },
-      {
-        "hex": "#2b899c",
-        "count": 1
-      }
-    ]
-  },
   "lk-advertising": {
     "url": "https://lk-advertising.com",
     "ok": true,

@@ -18,7 +18,7 @@
     "from_domains": [
       {
         "domain": "lukas.atalsolidrocks.io",
-        "resend_domain_id": "ee9cf503-f90f-451b-a825-60553628f24c",
+        "resend_domain_id": "0d9a59c4-4ff6-4ab0-82bf-54f209cc777e",
         "verified_at": "2026-05-21T16:16:58.320575+00:00",
         "warmup": {
           "enabled": true,
@@ -36,7 +36,7 @@
       },
       {
         "domain": "anna.atalsolidrocks.io",
-        "resend_domain_id": "2081f3ab-9921-40f4-81aa-bac4237265f1",
+        "resend_domain_id": "0e4b46a7-3c2d-49fd-aeb4-af9db7893505",
         "verified_at": "2026-05-21T16:16:58.877504+00:00",
         "warmup": {
           "enabled": true,
@@ -54,7 +54,7 @@
       },
       {
         "domain": "tobias.atalsolidrocks.io",
-        "resend_domain_id": "39f4ca05-dbb5-44e1-bb8b-a633b175d5c9",
+        "resend_domain_id": "0543232f-5f55-4fee-9ca1-fcb805cacae4",
         "verified_at": "2026-05-21T16:16:59.388684+00:00",
         "warmup": {
           "enabled": true,
@@ -72,7 +72,7 @@
       },
       {
         "domain": "lea.atalsolidrocks.io",
-        "resend_domain_id": "bea28933-7cf7-4633-8edf-f72b0fb34769",
+        "resend_domain_id": "e2013221-3d1e-4d90-88cf-5f7e93a9e15b",
         "verified_at": "2026-05-21T16:17:00.063614+00:00",
         "warmup": {
           "enabled": true,
@@ -90,7 +90,7 @@
       },
       {
         "domain": "felix.atalsolidrocks.io",
-        "resend_domain_id": "c8312c85-6574-46d7-a9fd-b2c09afe58fb",
+        "resend_domain_id": "e7944ebb-d6d2-42db-9840-e6afd25ff454",
         "verified_at": "2026-05-21T16:17:00.579498+00:00",
         "warmup": {
           "enabled": true,
@@ -108,7 +108,7 @@
       },
       {
         "domain": "sara.atalsolidrocks.io",
-        "resend_domain_id": "b000f792-f95c-43d7-b7d8-6ddbe2def334",
+        "resend_domain_id": "0576552d-0830-49ff-b4a9-33e268d554b0",
         "verified_at": "2026-05-21T16:17:01.121629+00:00",
         "warmup": {
           "enabled": true,
@@ -126,7 +126,7 @@
       },
       {
         "domain": "jonas.atalsolidrocks.io",
-        "resend_domain_id": "f522159b-9b23-4741-ad94-ceae6ac3247e",
+        "resend_domain_id": "c9a66386-ec85-4951-a208-ef0aa7d90d54",
         "verified_at": "2026-05-21T16:17:01.643303+00:00",
         "warmup": {
           "enabled": true,
@@ -144,7 +144,7 @@
       },
       {
         "domain": "mira.atalsolidrocks.io",
-        "resend_domain_id": "5bce0449-f90c-481e-9709-6a83aeec49a9",
+        "resend_domain_id": "7ef53eb1-217a-4ebe-882a-b166aecec74e",
         "verified_at": "2026-05-21T16:17:02.158376+00:00",
         "warmup": {
           "enabled": true,
@@ -162,7 +162,7 @@
       },
       {
         "domain": "niklas.atalsolidrocks.io",
-        "resend_domain_id": "36715dca-6705-4277-bc0a-19998b39e1a1",
+        "resend_domain_id": "60b7f80c-4cac-468b-a345-1da93633b226",
         "verified_at": "2026-05-21T16:17:02.675367+00:00",
         "warmup": {
           "enabled": true,
@@ -180,7 +180,7 @@
       },
       {
         "domain": "lena.atalsolidrocks.io",
-        "resend_domain_id": "bd42b384-c06a-4a67-8c0e-d95cd499c7e9",
+        "resend_domain_id": "471240ef-44ab-4811-bb2a-5888055edde1",
         "verified_at": "2026-05-21T16:17:03.205317+00:00",
         "warmup": {
           "enabled": true,
@@ -198,7 +198,7 @@
       },
       {
         "domain": "elias.atalsolidrocks.io",
-        "resend_domain_id": "9421c3b0-f2e0-4616-9ee9-7bf5256cc387",
+        "resend_domain_id": "b6e365ca-6de6-4125-87c8-3d483859e48a",
         "verified_at": "2026-05-21T16:17:03.724768+00:00",
         "warmup": {
           "enabled": true,
@@ -216,7 +216,7 @@
       },
       {
         "domain": "nora.atalsolidrocks.io",
-        "resend_domain_id": "685bb3fd-e4ee-4d04-8ee4-75b7a59595ae",
+        "resend_domain_id": "d33c02a3-b809-4b77-81c6-76667135207a",
         "verified_at": "2026-05-21T16:17:04.307970+00:00",
         "warmup": {
           "enabled": true,
@@ -234,7 +234,7 @@
       },
       {
         "domain": "lukas.atalsolidrocks.com",
-        "resend_domain_id": "310b85c0-f361-4f23-be59-e6f63ca0f588",
+        "resend_domain_id": "849e6df3-0e97-4d85-bd81-f271899d241b",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -252,7 +252,7 @@
       },
       {
         "domain": "anna.atalsolidrocks.com",
-        "resend_domain_id": "a95fc236-2d90-4518-8c4d-6e40a326be89",
+        "resend_domain_id": "33e89821-eb16-4397-859b-65f997fde69b",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -270,7 +270,7 @@
       },
       {
         "domain": "tobias.atalsolidrocks.com",
-        "resend_domain_id": "3ab9df2e-a4be-417b-bde1-86b0dbff020d",
+        "resend_domain_id": "26dbfbc4-eeb1-4b95-ab23-c410ff8a0fca",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -288,7 +288,7 @@
       },
       {
         "domain": "lea.atalsolidrocks.com",
-        "resend_domain_id": "181785f2-145a-4d33-b4ed-c349b6dcad5a",
+        "resend_domain_id": "d80c987b-e7aa-41d2-84c1-2ca8a6eab521",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -306,7 +306,7 @@
       },
       {
         "domain": "felix.atalsolidrocks.com",
-        "resend_domain_id": "daab631d-e5fb-4fea-bbed-7a5d0eeb56db",
+        "resend_domain_id": "b7d83f5f-c510-42ef-8951-83c53aa6ce51",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -324,7 +324,7 @@
       },
       {
         "domain": "sara.atalsolidrocks.com",
-        "resend_domain_id": "12d97687-e3b7-4ddd-9549-4fd1c6ff317a",
+        "resend_domain_id": "2061f7cc-a3e5-49bf-a0c3-369668a1c18b",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -342,7 +342,7 @@
       },
       {
         "domain": "jonas.atalsolidrocks.com",
-        "resend_domain_id": "a5420d39-dd23-40e8-b657-68b68c21d796",
+        "resend_domain_id": "7a827896-b995-4144-9bc6-24c6d280b35b",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -360,7 +360,7 @@
       },
       {
         "domain": "mira.atalsolidrocks.com",
-        "resend_domain_id": "2cafbd58-be0a-44a9-8283-02e7b3372716",
+        "resend_domain_id": "ea224801-b06a-4fc1-afe7-601ccd858556",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -378,7 +378,7 @@
       },
       {
         "domain": "niklas.atalsolidrocks.com",
-        "resend_domain_id": "571f10cf-f419-4543-99a8-fb75a6a29d0e",
+        "resend_domain_id": "f75aaaa0-42bf-444e-8226-f554f0c00a8e",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -396,7 +396,7 @@
       },
       {
         "domain": "lena.atalsolidrocks.com",
-        "resend_domain_id": "5f656d81-114a-4bf0-8f2a-c925219a01ac",
+        "resend_domain_id": "a71b4d25-88a4-469c-95c7-54e5f744b17d",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -414,7 +414,7 @@
       },
       {
         "domain": "elias.atalsolidrocks.com",
-        "resend_domain_id": "f83e0406-cb10-41ef-af7a-0c41559d96d4",
+        "resend_domain_id": "ba297873-e16a-4a22-8230-a0465b14f77e",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -432,7 +432,7 @@
       },
       {
         "domain": "nora.atalsolidrocks.com",
-        "resend_domain_id": "f9b7bc3d-5de3-4d81-a1c2-bc200e22c73b",
+        "resend_domain_id": "f4df9ab5-49cb-423c-8bd4-634839a76487",
         "verified_at": null,
         "warmup": {
           "enabled": true,
@@ -972,10 +972,10 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0,
-      "complaint_rate_7d": 0,
+      "bounce_rate_7d": 0.0,
+      "complaint_rate_7d": 0.0,
       "delivered_7d": 0,
-      "last_check": null
+      "last_check": "2026-06-28T22:00:28.730314+00:00"
     },
     "started_at": null,
     "current_day": 0,
@@ -1031,7 +1031,7 @@
       ],
       "contact_email": "info@atalsolidrocks.io",
       "copyright_year": 2026,
-      "logo_url": "",
+      "logo_url": "https://atalsolidrocks.com/logo.png",
       "logo_width": 140,
       "privacy_policy_url": "https://atalsolidrocks.com/datenschutz",
       "terms_of_service_url": "https://atalsolidrocks.com/agb",

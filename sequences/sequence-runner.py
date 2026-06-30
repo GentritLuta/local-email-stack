@@ -54,6 +54,7 @@ from profile_lib import (
 )
 from email_render import build_payload
 import algoalpha_offer
+import seo_copy
 import send_throttle
 import clarity_gate
 
@@ -279,9 +280,13 @@ def fetch_due_runs(c: httpx.Client, only_profiles: set[str] | None = None) -> li
         if not sids:
             continue
         idlist = "(" + ",".join(sids) + ")"
+        # Egress diet: select only the run fields the tick actually uses
+        # (id, sequence_id, prospect_id, current_step) instead of *. status is
+        # already filtered; next_send_at is only used for server-side ordering.
         r = c.get(f"/runs?status=eq.queued&sequence_id=in.{idlist}"
                   f"&or=(next_send_at.lte.{now_iso},next_send_at.is.null)"
-                  f"&order=next_send_at.asc.nullsfirst&select=*&limit={FETCH_PER_BRAND_LIMIT}")
+                  f"&order=next_send_at.asc.nullsfirst"
+                  f"&select=id,sequence_id,prospect_id,current_step&limit={FETCH_PER_BRAND_LIMIT}")
         r.raise_for_status()
         out.extend(r.json())
     return out
@@ -370,6 +375,11 @@ _OPTIONAL_MERGE_FIELDS = (
     "proof_line",     # optional social-proof sentence (empty until you have one)
     "retainer_quote", # algoalpha: "a flat 1,600 USD per video" (from audience_size)
     "retainer_math",  # algoalpha: worked retainer math paragraph for step 3
+    "seo_ps",         # mark-eting: email-1 P.S. naming a real competitor + the
+                      # search they are invisible for (from enriched_context.seo);
+                      # falls back to the generic P.S. when no research exists
+    "seo_rivals",     # mark-eting: email-5 concrete competitor sentence from the
+                      # same research; empty (paragraph dropped) when none exists
 )
 
 _KNOWN_MERGE_FIELDS = _REQUIRED_MERGE_FIELDS + _OPTIONAL_MERGE_FIELDS
@@ -453,6 +463,13 @@ def synthesize_optional_merges(prospect: dict, team_size_lookup: dict | None = N
     _avg_views = (prospect.get("enriched_context") or {}).get("avg_views_10")
     syn["retainer_quote"] = algoalpha_offer.retainer_quote(_avg_views)
     syn["retainer_math"]  = algoalpha_offer.retainer_math(_avg_views)
+    # mark-eting give-first proof: name a real competitor + the buyer search the
+    # prospect is missing, from enriched_context.seo (seo_research.py). Returns
+    # the generic P.S. when there is no usable research, so other clients and
+    # un-researched prospects are unaffected.
+    _seo = (prospect.get("enriched_context") or {}).get("seo")
+    syn["seo_ps"] = seo_copy.seo_ps(_seo, prospect)
+    syn["seo_rivals"] = seo_copy.seo_rivals(_seo, prospect)
     return syn
 
 
@@ -608,8 +625,11 @@ def tick(only_profiles: set[str] | None = None) -> None:
         # (a few dozen) are tiny and fixed within a tick, so pull them all up front
         # and serve from a dict. 2026-06-15.
         seq_by_id: dict[str, dict] = {
-            s["id"]: s for s in c.get("/sequences?select=id,profile_slug,name").json()}
-        steps_all = c.get("/sequence_steps?select=*,variants(subject,body)").json()
+            s["id"]: s for s in c.get("/sequences?select=id,profile_slug").json()}
+        # Egress diet: select only the step fields the tick uses, not *. The
+        # variant bodies are still needed to send; everything else is metadata.
+        steps_all = c.get("/sequence_steps?select=sequence_id,step_n,inline_subject,"
+                          "inline_body,forced_persona,delay_days,variants(subject,body)").json()
         steps_by_seq_step: dict[tuple, dict] = {}
         max_step_by_seq: dict[str, int] = {}
         for st in steps_all:
@@ -629,7 +649,15 @@ def tick(only_profiles: set[str] | None = None) -> None:
         for i in range(0, len(_pids), 150):
             chunk = _pids[i:i + 150]
             idlist = "(" + ",".join(chunk) + ")"
-            for pr in c.get(f"/prospects?id=in.{idlist}&select=*").json():
+            # Egress diet: select=* on prospects pulled every heavy column
+            # (custom_fields, mx_hosts, etc.) for every due run every tick. Pull
+            # only what the tick reads: the merge-tag columns (first_name, company,
+            # personal_hook, last_name, city, state, title, website, email),
+            # enriched_context (avg_views_10 + seo), and the verify/unsub fields.
+            sel = ("id,email,first_name,last_name,company,title,city,state,website,"
+                   "personal_hook,enriched_context,unsubscribe_token,verified,"
+                   "verification_method,verification_error,unsubscribed")
+            for pr in c.get(f"/prospects?id=in.{idlist}&select={sel}").json():
                 prospect_by_id[pr["id"]] = pr
 
         # Batch-prefetch the first send_log row per run (for sticky sender on

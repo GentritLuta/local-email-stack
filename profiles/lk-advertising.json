@@ -60,7 +60,7 @@
         "verified_at": "2026-06-11T11:13:42.958114+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 576,
+          "current_day": 895,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -78,7 +78,7 @@
         "verified_at": "2026-06-11T11:13:42.958114+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 576,
+          "current_day": 895,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -96,7 +96,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -114,7 +114,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -132,7 +132,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -150,7 +150,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -168,7 +168,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -186,7 +186,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -204,7 +204,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -222,7 +222,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -240,7 +240,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -258,7 +258,7 @@
         "verified_at": "2026-06-12T14:07:44.122778+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 523,
+          "current_day": 842,
           "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -545,10 +545,10 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0.0173,
+      "bounce_rate_7d": 0.0323,
       "complaint_rate_7d": 0.0,
-      "delivered_7d": 398,
-      "last_check": "2026-06-23T14:09:41.111951+00:00"
+      "delivered_7d": 330,
+      "last_check": "2026-06-28T22:00:28.730314+00:00"
     },
     "advance_only_mode": true
   },

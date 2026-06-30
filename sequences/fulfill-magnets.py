@@ -16,6 +16,9 @@ from __future__ import annotations
 import argparse, base64, glob, json, re, sys, urllib.parse, urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import seo_copy  # per-prospect SEO teardown block for mark-eting's {seo_block}
+
 REPO = Path(__file__).resolve().parent.parent
 SPECS_FILE = REPO / "lead-magnets" / "magnet-specs.json"
 STATE = REPO / "lead-magnets" / ".magnets_fulfilled.json"
@@ -104,9 +107,20 @@ def pdf_for(slug: str) -> Path | None:
     return Path(hits[0]) if hits else None
 
 
-def merge(text: str, first_name: str, company: str) -> str:
-    g = first_name.strip() or "there"
-    return (text or "").replace("{greeting}", g).replace("{first_name}", g).replace("{company}", company or "")
+def merge(text: str, prospect: dict) -> str:
+    fn = (prospect.get("first_name") or "").strip()
+    g = fn or "there"
+    co = (prospect.get("company") or "").strip()
+    # {seo_block}: per-prospect SEO findings for mark-eting (empty-safe for any
+    # other client whose cover_email never contains the placeholder). When the
+    # prospect has no usable research, seo_copy returns the generic personalize
+    # offer so the cover email still closes cleanly.
+    block = seo_copy.seo_block((prospect.get("enriched_context") or {}).get("seo"), prospect)
+    return ((text or "")
+            .replace("{greeting}", g)
+            .replace("{first_name}", g)
+            .replace("{company}", co)
+            .replace("{seo_block}", block))
 
 
 def _wrap_html(text: str, accent: str) -> str:
@@ -185,12 +199,11 @@ def run(only: str | None, dry: bool) -> dict:
             if not kw:
                 continue
             ps = supa_get(f"prospects?profile_slug=eq.{slug}&email=eq.{urllib.parse.quote(addr)}"
-                          f"&select=first_name,company,unsubscribed&limit=1")
+                          f"&select=first_name,company,unsubscribed,enriched_context&limit=1")
             if not ps or ps[0].get("unsubscribed"):
                 continue
             pend += 1; stats["pending"] += 1
-            fn = (ps[0].get("first_name") or "").strip(); co = (ps[0].get("company") or "").strip()
-            body = merge(spec["cover_email"], fn, co)
+            body = merge(spec["cover_email"], ps[0])
             print(f"{slug}: [{kw}] -> fulfil {addr}")
             if send(resend_key, from_name, from_addr, addr, report_to,
                     spec.get("email_subject", "Your free resource"), body, pdf, spec.get("accent_hex", "#1a1a1a"), dry):

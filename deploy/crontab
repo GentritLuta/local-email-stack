@@ -5,8 +5,19 @@
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Sequence runner — every 5 min. Equivalent of LES-sequence-runner.
-*/5 * * * * cd /app && py=python python sequences/sequence-runner.py tick >> warmup-state/cron.log 2>&1
+# Sequence runner — ONE per active brand, every 5 min. Mirrors the Windows
+# per-brand cutover (LES-sequence-runner-<brand>): each brand sends in isolation
+# so one brand's backlog can't crowd out another, and send_throttle.py paces the
+# COMBINED rate under the shared Resend key's per-account limit. Keep this list in
+# sync with the active brands (and the Windows LES-sequence-runner-<brand> tasks);
+# a brand without a line here sends nothing. Do NOT add a bare global `tick` line —
+# it would double-process alongside these and double-send. 2026-06-16.
+*/5 * * * * cd /app && python sequences/sequence-runner.py tick --profile algoalpha >> warmup-state/cron.log 2>&1
+*/5 * * * * cd /app && python sequences/sequence-runner.py tick --profile aureon >> warmup-state/cron.log 2>&1
+*/5 * * * * cd /app && python sequences/sequence-runner.py tick --profile diraya >> warmup-state/cron.log 2>&1
+*/5 * * * * cd /app && python sequences/sequence-runner.py tick --profile energ >> warmup-state/cron.log 2>&1
+*/5 * * * * cd /app && python sequences/sequence-runner.py tick --profile lk-advertising >> warmup-state/cron.log 2>&1
+*/5 * * * * cd /app && python sequences/sequence-runner.py tick --profile mark-eting >> warmup-state/cron.log 2>&1
 
 # IMAP poll — every 5 min. Equivalent of LES-imap-poll.
 */5 * * * * cd /app && python sequences/imap-poll.py >> warmup-state/cron.log 2>&1

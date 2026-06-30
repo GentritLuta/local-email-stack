@@ -5,57 +5,59 @@
   "created_at": "2026-06-10",
   "target": "Self-made B2B founders scaling client acquisition past ~$15k/mo: AI/automation agency owners, high-ticket sales/closing coaches, business/sales/marketing coaches, money & mindset educators. English-speaking (US/UK/CA/AU) + Germany. Solo or lean teams of 1-10.",
   "voice_notes": "Founder-to-founder, no agency-speak, no hype, no exclamation marks, no guru language, no fake scarcity. One concrete question per email. Risk-reversal: you only pay when we beat your current client-acquisition numbers. Required merge: {first_name} (company is optional; many targets are personal brands). NO em dashes.",
-  "required_merges": ["first_name"],
+  "required_merges": [
+    "greeting"
+  ],
   "schedule_doc": "delay_days = gap from the previous step. 0,2,2,3,4,7,10 = days 0,2,4,7,11,18,28.",
   "variants": [
     {
       "n": 1,
       "delay_days": 0,
       "angle": "are_you_open",
-      "subject": "open to this?",
-      "body": "Hey {first_name},\n\nquick one, are you open to something?\n\nI work with founders who already have an offer that converts and want client acquisition that runs without them babysitting it.\n\nOne AI-automation founder went from 6 booked calls a month to 19 in about 7 weeks, same offer, same price. Another closing coach filled their calendar 3 weeks out.\n\nThe part most people like: you only pay once we beat the acquisition numbers you are doing right now. Until then, nothing.\n\nWorth 15 minutes?\n\nReply with where most of your clients come from today and I will tell you straight if we can move it.\n\nDorian\n\nP.s. a plain no is completely fine if the timing is off."
+      "subject": "a teardown of where {company}'s booked calls leak",
+      "body": "{greeting}, I recorded a short teardown of where I think {company}'s booked calls are leaking, the gaps between a booking and a closed deal where most B2B founders quietly lose pipeline. I can have it to you within 48 hours, no call, nothing to sit through live.\n\nIt is a few minutes of me walking through your booking flow and the handoff right after it, pointing at the specific spots that leak and what I would change first. You watch it whenever you want and keep it either way.\n\nI do client acquisition for self-made B2B founders, and I only get paid once we beat your current 30-day numbers. The teardown is just me showing I can read the leak before any of that comes up.\n\nWant it? Reply \"teardown\" and I'll record yours."
     },
     {
       "n": 2,
       "delay_days": 2,
       "angle": "looked_at_your_offer",
       "subject": "had a look at what you do",
-      "body": "Hey {first_name},\n\nhad a look at what you are building.\n\nWe run client acquisition for founders and you only pay when we beat your current numbers. No retainer riding on hope.\n\n15 minutes this week?\n\nDorian"
+      "body": "Hey {greeting},\n\nhad a look at what you are building.\n\nWe run client acquisition for founders and you only pay when we beat your current numbers. No retainer riding on hope.\n\n15 minutes this week?\n\nDorian"
     },
     {
       "n": 3,
       "delay_days": 2,
       "angle": "data_point",
       "subject": "19 calls from 6",
-      "body": "Hey {first_name},\n\none data point.\n\nAn AI-automation founder we work with went from 6 booked calls a month to 19 in roughly 7 weeks. Same offer, same price, just a system that actually runs.\n\nThe same approach would map onto what you are doing.\n\nDorian"
+      "body": "Hey {greeting},\n\none data point.\n\nAn AI-automation founder we work with went from 6 booked calls a month to 19 in roughly 7 weeks. Same offer, same price, just a system that actually runs.\n\nThe same approach would map onto what you are doing.\n\nDorian"
     },
     {
       "n": 4,
       "delay_days": 3,
       "angle": "are_you_busy_problem_solution",
       "subject": "you are probably slammed",
-      "body": "Hey {first_name},\n\nme again, fourth email, you are clearly busy so I will be quick.\n\nProblem: if you want 5 to 15 more qualified calls a month this quarter, dialing in the acquisition takes a stupid amount of your time.\n\nSolution: 15 minutes and I will show you exactly how we beat a founder's existing numbers in 23 days without them touching it.\n\nWhen works?\n\nDorian"
+      "body": "Hey {greeting},\n\nme again, fourth email, you are clearly busy so I will be quick.\n\nProblem: if you want 5 to 15 more qualified calls a month this quarter, dialing in the acquisition takes a stupid amount of your time.\n\nSolution: 15 minutes and I will show you exactly how we beat a founder's existing numbers in 23 days without them touching it.\n\nWhen works?\n\nDorian"
     },
     {
       "n": 5,
       "delay_days": 4,
       "angle": "forced_yes_or_no",
-      "subject": "{first_name}, yes or no",
-      "body": "Hey {first_name},\n\nif we beat your current 30-day client-acquisition numbers and you only paid once we did, is that a yes?\n\nA clear yes or no both work.\n\nDorian"
+      "subject": "{greeting}, yes or no",
+      "body": "Hey {greeting},\n\nif we beat your current 30-day client-acquisition numbers and you only paid once we did, is that a yes?\n\nA clear yes or no both work.\n\nDorian"
     },
     {
       "n": 6,
       "delay_days": 7,
       "angle": "pure_value_audit",
       "subject": "free teardown either way",
-      "body": "Hey {first_name},\n\nwhether you ever work with me or not, this is yours.\n\nI will record a short teardown of your current client-acquisition funnel and where the booked calls are leaking, in your inbox within 48 hours. No call needed.\n\nWant it?\n\nDorian"
+      "body": "Hey {greeting},\n\nwhether you ever work with me or not, this is yours.\n\nI will record a short teardown of your current client-acquisition funnel and where the booked calls are leaking, in your inbox within 48 hours. No call needed.\n\nWant it?\n\nDorian"
     },
     {
       "n": 7,
       "delay_days": 10,
       "angle": "breakup",
       "subject": "closing your file",
-      "body": "Hey {first_name},\n\nclosing your file on my end today since I only take a couple of new founders at a time.\n\nIf the timing is wrong, I get it. If the offer is not a fit, just say so. Otherwise I will stop reaching out.\n\nDorian"
+      "body": "Hey {greeting},\n\nclosing your file on my end today since I only take a couple of new founders at a time.\n\nIf the timing is wrong, I get it. If the offer is not a fit, just say so. Otherwise I will stop reaching out.\n\nDorian"
     }
   ]
 }

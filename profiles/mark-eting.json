@@ -610,8 +610,8 @@
     "reputation": {
       "bounce_rate_7d": 0.0,
       "complaint_rate_7d": 0.0,
-      "delivered_7d": 107,
-      "last_check": "2026-06-19T11:10:50.234109+00:00"
+      "delivered_7d": 70,
+      "last_check": "2026-06-28T22:00:28.730314+00:00"
     },
     "advance_only_mode": true
   },
@@ -639,5 +639,6 @@
     "local_hour_end": 17,
     "default_timezone": "America/New_York",
     "target_audience_note": "US service businesses, all states. 08:00-17:00 recipient-local via prospect_timezone.resolve; default America/New_York."
-  }
+  },
+  "_note": "PRO Resend full-access key (manages + sends). Same account as aureon/diraya/lk/dorian."
 }

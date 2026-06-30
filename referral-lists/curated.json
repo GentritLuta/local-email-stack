@@ -48,15 +48,15 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 30,
         "verified_pct": 1.0,
         "live_pct": 1.0,
         "name_pct": 0.767,
         "phone_pct": 1.0,
-        "email_mx_pct": 0.9,
+        "email_mx_pct": 0.7,
         "flagged": [],
-        "passed": true
+        "passed": false
       }
     },
     {
@@ -94,7 +94,7 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
@@ -142,15 +142,15 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
         "name_pct": 0.875,
         "phone_pct": 1.0,
-        "email_mx_pct": 1.0,
+        "email_mx_pct": 0.857,
         "flagged": [],
-        "passed": true
+        "passed": false
       }
     },
     {
@@ -183,15 +183,15 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
-        "name_pct": 0.917,
+        "name_pct": 0.875,
         "phone_pct": 1.0,
-        "email_mx_pct": 1.0,
+        "email_mx_pct": 0.846,
         "flagged": [],
-        "passed": true
+        "passed": false
       }
     },
     {
@@ -236,11 +236,11 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
-        "name_pct": 0.875,
+        "name_pct": 0.917,
         "phone_pct": 1.0,
         "email_mx_pct": 1.0,
         "flagged": [],
@@ -326,7 +326,7 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
@@ -453,15 +453,15 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
         "name_pct": 0.875,
         "phone_pct": 1.0,
-        "email_mx_pct": 1.0,
+        "email_mx_pct": 0.75,
         "flagged": [],
-        "passed": true
+        "passed": false
       }
     },
     {
@@ -539,15 +539,15 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 29,
         "verified_pct": 1.0,
         "live_pct": 1.0,
-        "name_pct": 0.931,
+        "name_pct": 0.966,
         "phone_pct": 1.0,
-        "email_mx_pct": 1.0,
+        "email_mx_pct": 0.857,
         "flagged": [],
-        "passed": true
+        "passed": false
       }
     },
     {
@@ -599,7 +599,7 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
@@ -648,7 +648,7 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 23,
         "verified_pct": 1.0,
         "live_pct": 1.0,
@@ -691,7 +691,7 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
@@ -734,7 +734,7 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 24,
         "verified_pct": 1.0,
         "live_pct": 1.0,
@@ -773,11 +773,11 @@
         ]
       },
       "quality": {
-        "checked_at": "2026-06-07",
+        "checked_at": "2026-06-28",
         "firms": 17,
         "verified_pct": 1.0,
         "live_pct": 1.0,
-        "name_pct": 0.882,
+        "name_pct": 0.824,
         "phone_pct": 1.0,
         "email_mx_pct": 1.0,
         "flagged": [],

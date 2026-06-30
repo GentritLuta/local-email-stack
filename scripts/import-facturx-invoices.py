@@ -2,8 +2,9 @@
 """import-facturx-invoices.py — pull the AUREON invoice generator's output into
 the portal's `invoices` table so clients see their invoices on the dashboard.
 
-The generator (D:\\Aureon app) writes Factur-X (EN16931 CrossIndustryInvoice) XML
-+ PDF into C:\\Aureon Invoices\\. This parses each factur-x-*.xml, extracts the
+The generator (C:\\Aureon Invoice App) writes Factur-X (EN16931 CrossIndustryInvoice)
+XML + PDF into its own output\\ folder (also commonly copied to C:\\Aureon Invoices\\).
+This parses each factur-x-*.xml, extracts the
 invoice ref / amounts / dates / buyer, matches it to a client by name or email,
 and upserts an `invoices` row (idempotent on invoice_ref). Status defaults to
 'sent'; an admin flips it to 'paid' in the portal (no Payoneer API to poll).

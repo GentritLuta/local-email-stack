@@ -219,6 +219,50 @@ seeds:   # seed_discover.py appends discovered URLs here (block style; do NOT us
   - https://logistics360llc.com/contact-us
   - https://apextechinc.com/insurtech
 
+  # auto-discovered 2026-06-25 08:13 via seed_discover.py
+  - https://saas.group/saas-academy/2
+  - https://techcrunch.com/2026/05/18/anthropic-has-acquired-the-dev-tools-startup-used-by-openai-google-and-cloudflare
+  - https://mistral.ai/contact
+  - https://www.daffodilsw.com/logistics-software-development-company
+  - https://cohere.com/about
+
+  # auto-discovered 2026-06-26 08:18 via seed_discover.py
+  - https://www.forbes.com/lists/fintech50
+  - https://computools.com/top-fintech-software-development-companies
+  - https://www.globalproptech.online/about-us
+
+  # auto-discovered 2026-06-27 08:16 via seed_discover.py
+  - https://www.profitbl.com/blog/best-outbound-lead-generation-agencies-for-b2b-saas
+  - https://medium.com/@eyalcohen4/introducing-the-developer-tools-index-d4d5f0909a3
+  - https://leadiq.com/c/martech/5a1d9a00230000590088f44d/employee-directory
+  - https://b2bbusiness.com/contact-us
+
+  # auto-discovered 2026-06-28 08:11 via seed_discover.py
+  - https://www.linkedin.com/company/devtools
+  - https://www.reachstream.com
+
+  # auto-discovered 2026-06-28 10:22 via seed_discover.py
+  - https://au.linkedin.com/company/devtools
+  - https://www.decisionplatform.io
+  - https://www.cerebras.ai/company
+  - https://www.b2bsoftech.com/contactus.html
+
+  # auto-discovered 2026-06-29 08:06 via seed_discover.py
+  - https://cybersecuritynews.com/top-cybersecurity-companies
+  - https://campusfounders.de/startups/aifounders
+
+  # auto-discovered 2026-06-30 08:05 via seed_discover.py
+  - https://sashealthtech.com/contact
+  - https://www.forbes.com/councils/forbestechcouncil/2023/07/14/the-rise-of-vertical-saas-harnessing-the-next-wave-in-business-software
+  - https://diceus.com/best-insurtech-companies
+
+
+
+
+
+
+
+
 
 
 

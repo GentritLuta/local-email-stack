@@ -1,8 +1,8 @@
 {
   "slug": "dorian",
-  "name": "Mercury Scales — client acquisition for self-made B2B founders",
+  "name": "Mercury Scales - client acquisition for self-made B2B founders",
   "created_at": "2026-06-10",
-  "active": true,
+  "active": false,
   "company": {
     "name": "Skiljo Enterprise (Dorian Skiljo)",
     "site": "mercuryscales.com",
@@ -15,14 +15,15 @@
     "font_stack": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
     "colors": {
-      "accent": "#0a0a0a",
+      "accent": "#3730a3",
       "accent_2": "#3730a3",
       "text": "#0a0a0a",
       "text_2": "#475569",
       "muted": "#94a3b8",
       "bg_page": "#ffffff",
       "bg_card": "#ffffff",
-      "rule": "#e5e7eb"
+      "rule": "#e5e7eb",
+      "unsub_bg": "#fafbff"
     },
     "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/dorian.html?t={token}",
     "legal": {
@@ -42,7 +43,7 @@
       "legal_disclaimer": "This message is intended only for the named recipient. If you are not the intended recipient, please delete it and let us know.",
       "partner_notice": "You are receiving this because we believe Mercury Scales' client-acquisition work could be relevant to your business. Unsubscribe with one click."
     },
-    "template": "dorian-custom"
+    "template": "default"
   },
   "relay": {
     "backend": "resend",
@@ -56,8 +57,8 @@
         "verified_at": "2026-06-10T17:38:47.765393Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -74,8 +75,8 @@
         "verified_at": "2026-06-10T17:31:58.578341Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -92,8 +93,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -110,8 +111,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -128,8 +129,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -146,8 +147,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -164,8 +165,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -182,8 +183,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -200,8 +201,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -218,8 +219,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -236,8 +237,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -254,8 +255,8 @@
         "verified_at": "2026-06-10T00:00:00Z",
         "warmup": {
           "enabled": true,
-          "current_day": 0,
-          "started_at": null,
+          "current_day": 214,
+          "started_at": "2026-06-11",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
           "reputation": {
@@ -266,7 +267,8 @@
           }
         }
       }
-    ]
+    ],
+    "report_to": "skiljodorian@gmail.com"
   },
   "personas": [
     {
@@ -540,32 +542,11 @@
   },
   "send_ramp": {
     "_doc": "Per-profile new-sender ramp. The FROM identities are brand new and need their own ramp even though the subdomains will verify quickly.",
-    "started_at": null,
-    "curve": [
-      {
-        "from_day": 1,
-        "per_persona": 1
-      },
-      {
-        "from_day": 4,
-        "per_persona": 3
-      },
-      {
-        "from_day": 8,
-        "per_persona": 5
-      },
-      {
-        "from_day": 15,
-        "per_persona": 10
-      },
-      {
-        "from_day": 22,
-        "per_persona": 20
-      }
-    ]
+    "started_at": "2026-06-11",
+    "curve": []
   },
   "warmup": {
-    "enabled": false,
+    "enabled": true,
     "warmup_targets": [],
     "ramp_curve": "snowball_v1",
     "real_send_mix": [],
@@ -574,34 +555,37 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0,
-      "complaint_rate_7d": 0,
+      "bounce_rate_7d": 0.0,
+      "complaint_rate_7d": 0.0,
       "delivered_7d": 0,
-      "last_check": null
+      "last_check": "2026-06-28T22:00:28.730314+00:00"
     },
     "advance_only_mode": true
   },
   "ramp_curve_snowball_v1": [
     {
       "from_day": 1,
-      "daily": 9
-    },
-    {
-      "from_day": 4,
-      "daily": 18
+      "daily": 15
     },
     {
       "from_day": 8,
-      "daily": 36
+      "daily": 25
     },
     {
       "from_day": 15,
-      "daily": 60
+      "daily": 35
     },
     {
       "from_day": 22,
-      "daily": 90
+      "daily": 50
     }
   ],
-  "_note": "Dorian sends on RESEND_NEW_ACCOUNT_API_KEY (the PRO account, same as aureon/diraya). Mirrored into dorian.private.json. Reply routing + call booking: skiljodorian@gmail.com / calendly.com/skiljodorian/new-meeting."
+  "_note": "Dorian sends on RESEND_NEW_ACCOUNT_API_KEY (PRO account, re_iPPp8..., same as aureon/diraya). dorian-report.py reads this key too. Reply routing: skiljodorian@gmail.com / calendly.com/skiljodorian/new-meeting.",
+  "send_window": {
+    "weekdays_only": true,
+    "local_hour_start": 8,
+    "local_hour_end": 17,
+    "default_timezone": "America/New_York",
+    "target_audience_note": "US real estate agents. 08:00-17:00 in their LOCAL time (per-prospect via prospect_timezone.resolve). Default if city missing = America/New_York (largest market for current seeds)."
+  }
 }

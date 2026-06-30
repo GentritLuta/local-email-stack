@@ -1,0 +1,12 @@
+{
+  "role": "social-writer",
+  "standing_context": "Confirmed against .site_cache/algoalpha.io.txt on 2026-06-30: site lists screener 'up to 18 tickers', Atlas 'Optimised for win rate, net profit & risk ratios', Echo auto-copies to Bybit Unified Trading. All match the algoalpha memory file; no memory change needed. Self-review fix this shift: stripped a review-commentary preamble that had leaked into the draft body (output-contract violation) and tightened Draft 3 to 'up to eighteen tickers' to match the site's exact 'up to 18' wording.",
+  "runs": [
+    {
+      "date": "2026-06-30",
+      "title": "AlgoAlpha brand social drafts (5), 2026-06-30",
+      "summary": "Five ready-to-post X drafts for AlgoAlpha's brand account, one per angle (sharp opinion, useful tip, relatable story, question, Atlas feature spotlight). Every product claim (75k+ traders, 2x Editor's Choice, four indicators, 18-ticker screener, Echo-to-Bybit, Atlas optimized for win rate/net profit/risk ratio) verified word-for-word against the client's live site cache. All copy kept compliant: zero profit claims, risk line on the backtest post. Two flags for the operator: confirm whether social should drop apostrophes too, and a 30-second freshness check on headline numbers. Asked for a steer on whether AlgoAlpha stays the standing client.",
+      "status": "shipped"
+    }
+  ]
+}

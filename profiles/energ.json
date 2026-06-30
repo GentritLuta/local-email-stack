@@ -27,7 +27,7 @@
         "verified_at": "2026-06-11T12:08:11.588736+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 16,
+          "current_day": 20,
           "started_at": "2026-06-07",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -45,7 +45,7 @@
         "verified_at": "2026-06-11T12:08:11.588736+00:00",
         "warmup": {
           "enabled": true,
-          "current_day": 16,
+          "current_day": 20,
           "started_at": "2026-06-07",
           "ramp_curve": "snowball_v1",
           "max_daily_sends": 50,
@@ -504,10 +504,10 @@
       "complaint_rate": 0.003
     },
     "reputation": {
-      "bounce_rate_7d": 0.0194,
+      "bounce_rate_7d": 0.0383,
       "complaint_rate_7d": 0.0,
-      "delivered_7d": 405,
-      "last_check": "2026-06-25T12:12:15.213137+00:00"
+      "delivered_7d": 176,
+      "last_check": "2026-06-28T22:00:28.730314+00:00"
     },
     "started_at": "2026-06-07",
     "current_day": 1,

@@ -1,0 +1,12 @@
+{
+  "role": "secretary",
+  "standing_context": "30 Jun 2026 brief: outbound dark since Fri 26 Jun 20:59 UTC, both Mon 29 + Tue 30 send days missed, 1000 backlog overdue. Cause: keep-awake daemon chronically down + Task Scheduler unresponsive (Get-ScheduledTask 15s timeouts from 29 Jun 01:30). EnerG subdomains hi.ener-g-beratung.de 11.1% and hello.ener-g-beratung.de ~5.5% over 5% kill line; LK desk.lk-advertising.site 7-9.5% bounces. ATAL: 12 *.atalsolidrocks.com domains status=failed in Resend, daily warning since 25 Jun. SMH pilot blocked: contract missing notices email/authorised contact/reply endpoint. Mark-eting has 5 contract file versions incl CORRECTED-for-resign — verify executed copy of record. Open loops to track next shift: did sending restart, were bounce trips cleared, CIT QS filing (due 15 Jul) started.",
+  "runs": [
+    {
+      "date": "2026-06-30",
+      "title": "Daily Brief, Tue 30 Jun 2026",
+      "summary": "Outbound has been dark since Fri 26 Jun 20:59 UTC; both Mon and Tue send days missed, 1000-email backlog overdue. Root cause: keep-awake daemon not running plus Task Scheduler now unresponsive (Get-ScheduledTask timeouts since 29 Jun), so the watchdog can no longer self-heal. Top fire is restarting sending on the PC, then clearing EnerG/LK bounce trips before relaunch. Secondary: CIT QS filing due 15 Jul (start this week), confirm executed Mark-eting contract of record, SMH blocked on missing contract contact details, ATAL 12 failed Resend domains polluting the daily report. No live view of inbox, calendar, or today's send numbers.",
+      "status": "shipped"
+    }
+  ]
+}
