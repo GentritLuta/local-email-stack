@@ -95,6 +95,9 @@ create index if not exists idx_prospects_enriched_at on prospects (enriched_at);
 alter table prospects add column if not exists unsubscribed        boolean not null default false;
 alter table prospects add column if not exists unsubscribed_at     timestamptz;
 alter table prospects add column if not exists unsubscribe_token   text;
+-- per-prospect personalization hook (SEO magnet etc.); the runner's _REQUIRED_MERGE_FIELDS
+-- gate needs this column to exist or the send tick crashes. Added to schema 2026-07-01.
+alter table prospects add column if not exists personal_hook       text;
 update prospects set unsubscribe_token = gen_random_uuid()::text where unsubscribe_token is null;
 alter table prospects alter column unsubscribe_token set default gen_random_uuid()::text;
 alter table prospects alter column unsubscribe_token set not null;
