@@ -334,16 +334,27 @@ def fetch_today_log(c: httpx.Client, profile_slug: str, profile_config: dict | N
     other profiles' identically-named personas). 2026-06-12.
     """
     today = dt.date.today().isoformat()
-    r = c.get(f"/send_log?sent_at=gte.{today}T00:00:00&select=persona_slug,from_addr,sent_at"
-              f"&order=sent_at.desc&limit=2000")
-    r.raise_for_status()
-    rows = r.json()
+    base = (f"/send_log?sent_at=gte.{today}T00:00:00"
+            f"&select=persona_slug,from_addr,sent_at&order=sent_at.desc&limit=2000")
     if profile_config is not None:
         own = {(d.get("domain") or "").lower()
                for d in (profile_config.get("relay") or {}).get("from_domains", [])}
-        rows = [row for row in rows
+        own = {d for d in own if d}
+        if not own:
+            return []  # no sending domains -> nothing is attributable to this profile
+        # Egress trim (2026-07-01): pre-filter server-side to rows whose from_addr
+        # contains one of THIS profile's sending domains, instead of pulling the whole
+        # global day (up to 2000 rows) on every tick, for every profile. The ilike
+        # pre-filter is a strict superset of the exact _domain_of check below, so the
+        # returned set is identical -- only the bytes over the wire shrink (~30x).
+        ors = ",".join(f"from_addr.ilike.*{d}*" for d in sorted(own))
+        r = c.get(base + f"&or=({ors})")
+        r.raise_for_status()
+        return [row for row in r.json()
                 if _domain_of(row.get("from_addr", "")).lower() in own]
-    return rows
+    r = c.get(base)
+    r.raise_for_status()
+    return r.json()
 
 
 def get_api_key(profile_slug: str) -> str:

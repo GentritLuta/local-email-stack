@@ -169,7 +169,7 @@ def main() -> int:
     args = ap.parse_args()
     d = Path(args.dir)
     if not d.exists():
-        print(f"invoice dir not found: {d}"); return 1
+        print(f"invoice dir not found: {d} - nothing to import"); return 0  # dir lives on the laptop; no-op here
     xmls = sorted(d.glob("factur-x-*.xml"))
     print(f"found {len(xmls)} Factur-X invoice(s) in {d}")
     n = 0

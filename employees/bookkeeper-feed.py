@@ -202,8 +202,8 @@ def main() -> int:
     since = "" if args.all else args.since
     inv_dirs = [Path(args.dir)] if args.dir else INV_DIRS
     if not any(d.exists() for d in inv_dirs):
-        print(f"no invoice dir found among: {[str(d) for d in inv_dirs]}")
-        return 1
+        print(f"no invoice dir found among: {[str(d) for d in inv_dirs]} - nothing to process")
+        return 0  # invoices live on the laptop; no dir here means no-op, not a failure
     rows, excluded = build_ledger(inv_dirs, since)
     out_dir = L.role_paths("bookkeeper")["data"]
     write_outputs(rows, out_dir, since=since, excluded=excluded)
