@@ -164,6 +164,31 @@ create policy "runs_select" on public.runs
     or exists (select 1 from public.sequences sq
                where sq.id = runs.sequence_id and public.owns_slug(sq.profile_slug)));
 
+-- send_log: the client dashboard reads sent/delivered volume from here. It had
+-- NO scoped policy (only schema.sql's wide-open "anon full access"), so every
+-- client could read every client's sends. Add profile_slug (set by the runner's
+-- log_send + backfilled by domain/run) and scope reads to the owner or admin.
+alter table public.send_log add column if not exists profile_slug text;
+create index if not exists send_log_profile_slug_idx on public.send_log (profile_slug);
+alter table public.send_log enable row level security;
+drop policy if exists "anon full access" on public.send_log;
+drop policy if exists "send_log_select" on public.send_log;
+create policy "send_log_select" on public.send_log
+  for select to authenticated using (public.is_admin() or public.owns_slug(profile_slug));
+
+-- prospects: same leak (leads were readable by every client). Scope reads to the
+-- owner/admin, but KEEP the anon INSERT so the public opt-in funnel still writes,
+-- and rely on the SECURITY DEFINER unsubscribe_by_token RPC for opt-outs (no anon
+-- UPDATE needed). Backend writers use the service-role key and bypass RLS.
+alter table public.prospects enable row level security;
+drop policy if exists "anon full access" on public.prospects;
+drop policy if exists "prospects_select" on public.prospects;
+create policy "prospects_select" on public.prospects
+  for select to authenticated using (public.is_admin() or public.owns_slug(profile_slug));
+drop policy if exists "anon insert optin" on public.prospects;
+create policy "anon insert optin" on public.prospects
+  for insert to anon with check (true);
+
 -- ───────────────────────────────────────────────────────────────────────────
 -- 8. One identity per email — dedup index (clients table). The find-or-create
 --    flow in the Edge Function relies on this to never make two client rows for

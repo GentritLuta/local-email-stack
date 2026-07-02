@@ -272,13 +272,12 @@ export async function getCampaignMetrics(profileSlug: string): Promise<CampaignM
     supabase.from("replies").select("id", head).eq("profile_slug", profileSlug).eq("class", "reply"),
   ]);
 
-  // Send volume + delivery from send_log, scoped to this client's sending
-  // subdomains (root). RLS already restricts what the client can read, and the
-  // subdomain filter narrows to their own brand.
+  // Send volume + delivery from send_log, scoped to this client's own
+  // profile_slug. RLS (send_log_select = owns_slug(profile_slug)) enforces the
+  // isolation server-side; this filter is the matching query.
   let sentTotal = 0, delivered = 0;
-  const root = profileSlug.replace(/[^a-z0-9-]/gi, "");
   const slRows = await supabase.from("send_log")
-    .select("delivered, from_addr").like("from_addr", `%${root}%`).limit(5000);
+    .select("delivered").eq("profile_slug", profileSlug).limit(5000);
   const rows = (slRows.data ?? []) as Array<{ delivered: boolean | null }>;
   sentTotal = rows.length;
   delivered = rows.filter((r) => r.delivered).length;
@@ -361,11 +360,11 @@ export async function getReplyOutcomes(profileSlug: string): Promise<ReplyOutcom
   });
 }
 
-// Outreach report from send_log, scoped to the client's sending subdomains.
+// Outreach report from send_log, scoped to the client's own profile_slug
+// (RLS-enforced by send_log_select).
 export async function getOutreachReport(profileSlug: string): Promise<OutreachReport> {
-  const root = profileSlug.replace(/[^a-z0-9-]/gi, "");
   const { data } = await supabase.from("send_log")
-    .select("delivered, bounced, replied, step_n, from_addr").like("from_addr", `%${root}%`).limit(8000);
+    .select("delivered, bounced, replied, step_n").eq("profile_slug", profileSlug).limit(8000);
   const rows = (data ?? []) as Array<{ delivered: boolean | null; bounced: boolean | null; replied: boolean | null; step_n: number | null }>;
   const sent = rows.length;
   const delivered = rows.filter((r) => r.delivered).length;

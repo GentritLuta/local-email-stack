@@ -1,0 +1,10 @@
+# Voice agent stack (RTX self-hosted path = cheapest). Pin exact versions on the
+# RTX box after `pip install` so agent.py imports match the installed pipecat.
+pipecat-ai            # orchestration (STT -> LLM -> TTS pipeline), free/OSS
+faster-whisper        # local STT on the RTX (free); or swap for Deepgram
+chatterbox-tts        # local voice cloning on the RTX (free, SOTA-open)
+httpx                 # Supabase REST + Telnyx REST
+python-dotenv         # load .env
+# LLM: run a local OpenAI-compatible endpoint (Ollama or vLLM) on the RTX and
+# point OPENAI_BASE_URL at it; no extra package needed beyond pipecat's openai svc.
+# Telephony: Telnyx (SIP/media) - configured via env, no SDK strictly required.
