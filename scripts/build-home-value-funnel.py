@@ -37,10 +37,8 @@ REPO = Path(__file__).resolve().parent.parent
 OUT_DIR = REPO / "docs" / "home-value"
 PAGES_BASE = "https://gentritluta.github.io/local-email-stack/home-value"
 
-SUPABASE_URL = "https://ccmqkljsjiuavpydbkva.supabase.co"
-SUPABASE_ANON = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6"
-                 "ImNjbXFrbGpzaml1YXZweWRia3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTYzNjUs"
-                 "ImV4cCI6MjA5NDU5MjM2NX0.cCUuVEYMlShJkM4FlaCwYYYEn_-pQeuZAZgCRob0ONc")
+SUPABASE_URL = "https://zmzolkijhiaedzcmdfji.supabase.co"
+SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptem9sa2lqaGlhZWR6Y21kZmppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4OTkyOTgsImV4cCI6MjA5ODQ3NTI5OH0.xedlcfQT4DR7wxZDcblQB03s4q5f4k2JlbnPqo9EwiM"
 
 
 def page_html(*, agent_name: str, agent_company: str, agent_email: str,
