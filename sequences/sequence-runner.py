@@ -411,6 +411,84 @@ _BIG_BROKERAGE_DOMAINS = frozenset({
 })
 
 
+# Common US first names + nicknames (compact; covers the frequent cases). Used to recover a
+# first name from an email local-part when the scrape left first_name blank.
+_COMMON_FIRST_NAMES = frozenset("""
+james john robert michael william david richard joseph thomas charles christopher daniel matthew
+anthony mark donald steven paul andrew joshua kenneth kevin brian george timothy ronald jason edward
+jeffrey ryan jacob gary nicholas eric jonathan stephen larry justin scott brandon benjamin samuel
+gregory frank alexander raymond patrick jack dennis jerry tyler aaron jose adam nathan henry zachary
+douglas peter kyle noah ethan jeremy walter christian keith roger terry austin sean gerald carl harold
+dylan nathaniel jordan bryan mason cody derek troy shane phillip cole trevor luke marcus max evan chad
+mary patricia jennifer linda elizabeth barbara susan jessica sarah karen nancy lisa margaret betty
+sandra ashley dorothy kimberly emily donna michelle carol amanda melissa deborah stephanie rebecca
+sharon laura cynthia kathleen amy angela shirley anna brenda pamela emma nicole helen samantha katherine
+christine debra rachel carolyn janet catherine maria heather diane ruth julie olivia joyce virginia
+victoria kelly lauren christina joan evelyn judith megan andrea cheryl hannah jacqueline martha gloria
+teresa ann sara madison frances kathryn janice jean abigail alice julia judy sophia grace denise amber
+danielle marilyn beverly charlotte natalie theresa diana brittany kayla alexis lori marie tiffany
+crystal marti
+mike dave steve jim tom bob bill dan danny joe joey chris matt nick tony rob rick ron ed ted sam ben
+will nate gabe jeff ken larry fred pat andy drew phil greg doug jake zack alex tim rich jerry
+liz beth sue kate katie kathy cathy jen jenny becky deb kim pam meg angie mandy patty val cassie carrie
+mia ava ella zoe chloe abby maggie josh
+caroline christy christina joann kaitlyn cassandra isabella alexandra gabriela savannah veronica
+priscilla penelope gwendolyn natalia adriana vanessa allison kristen kristina meredith melanie
+""".split())
+
+_NAME_ROLE_WORDS = frozenset({"info","admin","sales","contact","team","hello","office","support","help",
+    "mail","email","realtor","realty","homes","home","group","agent","broker","properties","property",
+    "listings","sold","buy","sell","reply","noreply","service","services","marketing","the","best","top",
+    "my","your","our","first","last","new","exp","century","realestate","realtors"})
+
+
+def _name_of_token(tok: str) -> str:
+    """A token -> a first name only if it IS a known name or STARTS with a >=4-char known
+    name (angelabrownrealtor -> Angela). Company-ish junk (pricerealtors) -> ''."""
+    if tok in _COMMON_FIRST_NAMES:
+        return tok.capitalize()
+    best = ""
+    for n in _COMMON_FIRST_NAMES:
+        if len(n) >= 4 and tok.startswith(n) and len(n) > len(best):
+            best = n
+    return best.capitalize() if best else ""
+
+
+def first_name_from_email(email: str) -> str:
+    """Best-effort first name from an email local-part. Conservative: returns a name only
+    when confident (each candidate token must pass _name_of_token), else '' so the greeting
+    falls back cleanly. Never guesses a wrong name from a run-together company token."""
+    if not email or "@" not in email:
+        return ""
+    local = re.sub(r"[0-9]+", "", email.split("@", 1)[0].lower()).strip("._-+")
+    if not local:
+        return ""
+    parts = [p for p in re.split(r"[._\-+]", local) if p]
+    candidates = ([parts[0]] if len(parts) > 1 else []) + [local]
+    for tok in candidates:
+        if 3 <= len(tok) <= 20 and tok.isalpha() and tok not in _NAME_ROLE_WORDS:
+            nm = _name_of_token(tok)
+            if nm:
+                return nm
+    return ""
+
+
+def _clean_company(prospect: dict) -> str:
+    """Return the prospect's company only if it looks like a REAL name, else "".
+    Suppresses domain-derived single-word garbage (e.g. "Nexthomepriority" scraped
+    from nexthomepriority.com) that renders as obvious auto-fill spam in the subject.
+    Real multi-word names ("Edina Realty", "The 608 Team") are kept."""
+    company = (prospect.get("company") or "").strip()
+    if not company:
+        return ""
+    email = (prospect.get("email") or "").lower()
+    sld = email.split("@", 1)[1].split(".")[0] if "@" in email else ""
+    norm = re.sub(r"[^a-z0-9]", "", company.lower())
+    if sld and " " not in company and norm == re.sub(r"[^a-z0-9]", "", sld):
+        return ""  # single token == the email domain -> scraped from the domain, not a real name
+    return company
+
+
 def synthesize_optional_merges(prospect: dict, team_size_lookup: dict | None = None) -> dict:
     """Return a dict of optional/derived merge fields, every key always set to
     a string (possibly empty). The strict gate ignores these, the variant body
@@ -431,8 +509,16 @@ def synthesize_optional_merges(prospect: dict, team_size_lookup: dict | None = N
     elif city:            syn["geo_clause"] = f" in {city}"
     else:                 syn["geo_clause"] = ""
     # team_phrase + team_size
-    company = (prospect.get("company") or "").strip()
+    company = _clean_company(prospect)  # real name or "" (domain-derived garbage suppressed)
     email   = (prospect.get("email") or "").lower()
+    # Recover a first name from the email local-part when the scrape left it blank, so leads
+    # with no first_name get "Hey Angela," (angelabrownrealtor@) instead of "Hey {company} team,".
+    # Conservative (see first_name_from_email): confident parses only; mutates the prospect so
+    # greeting, {first_name} and first_name_v all use it.
+    if not (prospect.get("first_name") or "").strip():
+        _rec = first_name_from_email(email)
+        if _rec:
+            prospect["first_name"] = _rec
     domain  = email.split("@", 1)[1] if "@" in email else ""
     team_size = 1
     if (team_size_lookup and domain
@@ -481,6 +567,10 @@ def synthesize_optional_merges(prospect: dict, team_size_lookup: dict | None = N
     _seo = (prospect.get("enriched_context") or {}).get("seo")
     syn["seo_ps"] = seo_copy.seo_ps(_seo, prospect)
     syn["seo_rivals"] = seo_copy.seo_rivals(_seo, prospect)
+    # {company} tag: never render domain-derived garbage or empty. Falls back to a
+    # neutral phrase so the subject reads "... for your business", never "... for Conroeisd"
+    # (and the required-merge gate no longer cancels sends over a scraped junk company).
+    syn["company"] = company or "your business"
     return syn
 
 
