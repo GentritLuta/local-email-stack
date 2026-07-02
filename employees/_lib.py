@@ -166,8 +166,19 @@ def send_email(to_addr: str, subject: str, body: str,
             return False
 
 
-def send_to_operator(subject: str, body: str, dry: bool = False) -> bool:
-    return send_email(OPERATOR_ADDR, subject, body, dry=dry)
+def send_to_operator(subject: str, body: str, dry: bool = False,
+                     to_addr: str = OPERATOR_ADDR) -> bool:
+    return send_email(to_addr, subject, body, dry=dry)
+
+
+# ─── local-RTX-model backend (roles with "backend": "local" in their config) ──
+
+def ask_local_agent(system: str, prompt: str, cwd: Path, timeout: int = 900) -> str:
+    """Drop-in alternative to ask_claude() that reasons on the RTX's local Ollama
+    model instead of the paid cloud, via a real tool-calling loop (news/wikipedia/
+    image search + read-only data-inbox access). See local_agent.py."""
+    import local_agent
+    return local_agent.ask_local_agent(system, prompt, cwd, timeout)
 
 
 # ─── per-role config (can this employee send to third parties on approval?) ──

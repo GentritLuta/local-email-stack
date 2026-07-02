@@ -20,7 +20,9 @@ import tempfile
 from pathlib import Path
 
 import _lib as L
-from employee import _parse_meta
+from employee import _ask_brain, _parse_meta
+
+ADRIATIK_PUBLISH = Path("D:/adriatik/scripts/publish_approved.py")
 
 _REVISE_SYSTEM = (
     "You are an autonomous employee revising your own earlier work product after "
@@ -63,27 +65,65 @@ def _show(role, item):
     print("=" * 72)
 
 
+_PUBLISH_REQUIRED = ("title_en", "dek_en", "body_en", "author_slug", "work_type", "section")
+
+
+def _execute_publish_adriatik(a, dry) -> str:
+    missing = [k for k in _PUBLISH_REQUIRED if not a.get(k)]
+    if missing:
+        return f"  - [publish_adriatik] FAILED, missing fields: {', '.join(missing)}"
+    if dry:
+        return f"  - [publish_adriatik] (dry) would publish: {a.get('title_en', '')!r}"
+    if not ADRIATIK_PUBLISH.exists():
+        return f"  - [publish_adriatik] FAILED, publish script not found: {ADRIATIK_PUBLISH}"
+    tmp = Path(tempfile.mkstemp(suffix=".json", prefix="adriatik_publish_")[1])
+    tmp.write_text(json.dumps(a, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"    publishing to adriatik ({a.get('title_en','')!r}) - this can take "
+          f"several minutes (translate + build + deploy)...")
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(ADRIATIK_PUBLISH), str(tmp)],
+            capture_output=True, text=True, timeout=1500,
+            encoding="utf-8", errors="replace")
+        tail = (proc.stdout or "")[-800:] + (("\n" + proc.stderr[-400:]) if proc.stderr else "")
+        if proc.returncode == 0:
+            return f"  - [publish_adriatik] PUBLISHED. {tail.strip()}"
+        return f"  - [publish_adriatik] FAILED (exit {proc.returncode}). {tail.strip()}"
+    except subprocess.TimeoutExpired:
+        return "  - [publish_adriatik] FAILED, timed out after 25 min."
+    except Exception as e:
+        return f"  - [publish_adriatik] FAILED: {e}"
+
+
 def _execute_actions(role, item, dry, allow_send=True):
-    """On approval, send fully-specified email actions IF this role is cleared to
-    send AND sends are allowed. allow_send=False (auto-deliver) HOLDS every
-    third-party send as a proposal, so nothing reaches a third party unattended."""
+    """On approval, execute fully-specified actions IF this role is cleared to send
+    AND sends are allowed. allow_send=False (auto-deliver) HOLDS every third-party
+    or irreversible action as a proposal, so nothing ships unattended."""
     cfg = L.load_role_config(role)
     results = []
     for a in item.get("push_actions", []):
-        if a.get("type") != "email" or not a.get("to") or not a.get("body"):
-            continue
-        if not allow_send or not cfg.get("can_send"):
-            why = ("auto-deliver holds third-party sends" if not allow_send
-                   else "role not cleared to send")
-            results.append(f"  - [email->{a['to']}] HELD, not sent ({why}). "
+        atype = a.get("type")
+        if atype == "email" and a.get("to") and a.get("body"):
+            if not allow_send or not cfg.get("can_send"):
+                why = ("auto-deliver holds third-party sends" if not allow_send
+                       else "role not cleared to send")
+                results.append(f"  - [email->{a['to']}] HELD, not sent ({why}). "
+                               f"{a.get('desc', '')}")
+                continue
+            ok = L.send_email(a["to"], a.get("subject", "(no subject)"), a["body"],
+                              from_addr=cfg.get("send_from", L.OPERATOR_ADDR),
+                              from_name=cfg.get("send_name", "Gentrit"), dry=dry)
+            results.append(f"  - [email->{a['to']}] {'SENT' if ok else 'FAILED'}. "
                            f"{a.get('desc', '')}")
-            continue
-        ok = L.send_email(a["to"], a.get("subject", "(no subject)"), a["body"],
-                          from_addr=cfg.get("send_from", L.OPERATOR_ADDR),
-                          from_name=cfg.get("send_name", "Gentrit"), dry=dry)
-        results.append(f"  - [email->{a['to']}] {'SENT' if ok else 'FAILED'}. "
-                       f"{a.get('desc', '')}")
-        print(f"    {'(dry) ' if dry else ''}{'sent' if ok else 'FAILED'} -> {a['to']}")
+            print(f"    {'(dry) ' if dry else ''}{'sent' if ok else 'FAILED'} -> {a['to']}")
+        elif atype == "publish_adriatik":
+            if not allow_send or not cfg.get("can_send"):
+                why = ("auto-deliver holds publishing" if not allow_send
+                       else "role not cleared to publish")
+                results.append(f"  - [publish_adriatik] HELD, not published ({why}). "
+                               f"{a.get('desc', '')}")
+                continue
+            results.append(_execute_publish_adriatik(a, dry))
     return results
 
 
@@ -105,7 +145,8 @@ def _approve(role, fpath, item, dry, allow_send=True):
     lines.append(item["body"])
     body = "\n".join(lines)
     subject = f"[{role}] {item['title']}"
-    ok = L.send_to_operator(subject, body, dry=dry)
+    review_to = L.load_role_config(role).get("review_to", L.OPERATOR_ADDR)
+    ok = L.send_to_operator(subject, body, dry=dry, to_addr=review_to)
 
     # archive
     item["status"] = "approved"
@@ -130,7 +171,7 @@ def _approve(role, fpath, item, dry, allow_send=True):
     if item.get("memory_update"):
         mem["standing_context"] = item["memory_update"]
     L.save_memory(role, mem)
-    print(f"  approved. {'(dry) ' if dry else ''}shipped to info@ and archived.")
+    print(f"  approved. {'(dry) ' if dry else ''}shipped to {review_to} and archived.")
 
 
 def _revise(role, fpath, item, notes=None, remember=False):
@@ -152,7 +193,7 @@ def _revise(role, fpath, item, notes=None, remember=False):
               "Redo the work, fix everything in the feedback, and return the full "
               "corrected work product plus the metadata block.")
     print("  employee is revising...")
-    out = L.ask_claude(_REVISE_SYSTEM, prompt, cwd=L.role_paths(role)["base"] / "workspace")
+    out = _ask_brain(role, _REVISE_SYSTEM, prompt, L.role_paths(role)["base"] / "workspace")
     body, meta = _parse_meta(out)
     item["version"] += 1
     item["revision_log"].append({"v": item["version"], "feedback": notes})
@@ -275,10 +316,12 @@ def _email_fallback(role, fpath, item):
         lines.append("")
     lines.append("=" * 60)
     lines.append(item["body"])
-    L.send_to_operator(f"[Review needed] [{role}] {item['title']}", "\n".join(lines))
+    review_to = L.load_role_config(role).get("review_to", L.OPERATOR_ADDR)
+    L.send_to_operator(f"[Review needed] [{role}] {item['title']}", "\n".join(lines),
+                       to_addr=review_to)
     item["review_notified"] = True
     fpath.write_text(json.dumps(item, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"  [{role}] popup unavailable; emailed draft to info@. Left pending.")
+    print(f"  [{role}] popup unavailable; emailed draft to {review_to}. Left pending.")
 
 
 def _review_popup(items, dry):

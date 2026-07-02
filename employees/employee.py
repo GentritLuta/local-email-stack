@@ -123,6 +123,16 @@ _VERIFY_SYSTEM = (
 )
 
 
+def _ask_brain(role: str, system: str, prompt: str, cwd) -> str:
+    """Dispatch to the role's configured backend. Default stays "claude" (paid
+    cloud, unchanged behavior for every existing role); a role's <role>.config.json
+    can set "backend": "local" to reason on the RTX's local model instead."""
+    cfg = L.load_role_config(role)
+    if cfg.get("backend") == "local":
+        return L.ask_local_agent(system, prompt, cwd)
+    return L.ask_claude(system, prompt, cwd=cwd)
+
+
 def _self_verify(role, charter, body, meta, sandbox, rounds=2):
     """Self-critique loop: the employee improves its own draft until it converges
     or the round cap is hit. Bounded so cost stays sane; the operator's review
@@ -134,7 +144,7 @@ def _self_verify(role, charter, body, meta, sandbox, rounds=2):
                   f"# YOUR DRAFT WORK PRODUCT\n{body}\n\n"
                   "Review and improve this draft per your instruction, then return the "
                   "full work product and metadata block.")
-        out = L.ask_claude(_VERIFY_SYSTEM, prompt, cwd=sandbox)
+        out = _ask_brain(role, _VERIFY_SYSTEM, prompt, sandbox)
         nb, nm = _parse_meta(out)
         if len(nb) < 200:
             break  # bad review output; keep the current draft
@@ -157,7 +167,7 @@ def _do_shift(role: str, task: str | None, dry: bool, verify: bool = True):
 
     print(f"[{role}] starting shift ({L.today()}) - {task or 'self-directed'}")
     prompt = _build_prompt(role, charter, mem, task)
-    out = L.ask_claude(_SYSTEM, prompt, cwd=sandbox)
+    out = _ask_brain(role, _SYSTEM, prompt, sandbox)
     body, meta = _parse_meta(out)
 
     # Self-heal: if the final message dropped the work product (model narrated it
@@ -167,7 +177,7 @@ def _do_shift(role: str, task: str | None, dry: bool, verify: bool = True):
         retry_prompt = (prompt + "\n\nYOUR LAST REPLY DID NOT CONTAIN THE WORK PRODUCT. "
                         "Output the COMPLETE work product now, in full, as this message, "
                         "then the metadata block. Do not refer to anything 'above'.")
-        out = L.ask_claude(_SYSTEM, retry_prompt, cwd=sandbox)
+        out = _ask_brain(role, _SYSTEM, retry_prompt, sandbox)
         body2, meta2 = _parse_meta(out)
         if len(body2) > len(body):
             body, meta = body2, meta2
