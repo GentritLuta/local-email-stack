@@ -227,12 +227,23 @@ COUNTY_PARCELS = {
         "city": "City", "pstate": "State", "val": None,
         "klass": None, "res": None,
     },
+    "hamilton": {  # Noblesville / Fishers / Carmel (confirmed reachable from the VPS 2026-07-02)
+        "url": "https://gis1.hamiltoncounty.in.gov/arcgis/rest/services/HamCoParcelsPublic/FeatureServer/0",
+        "zip": "LOCZIP", "owner": "OWNNAME", "ostate": "OWNSTATE", "ocity": "OWNCITY",
+        "omail": "OWNADDRESS", "ozip": "OWNZIP", "stname": "LOCADDRESS", "stno": None,
+        "city": "LOCCITY", "pstate": None, "val": None,  # no property-state field -> resolves to IN from the zip
+        "klass": "PROPCLASS", "res": None,
+    },
 }
 # Indiana zip -> county. 3-digit prefix first, exact-zip overrides where a prefix spans counties.
 # These are the hand-mapped seeds; for any OTHER zip we auto-resolve via _zip_to_county
 # (zippopotam + Census geocoder) and auto-discover the parcel layer (_discover_county_layer).
 _ZIP_COUNTY_PFX = {"460": "marion", "461": "marion", "462": "marion"}
-_ZIP_COUNTY_EXACT = {"47383": "delaware", "47302": "delaware", "47303": "delaware", "47304": "delaware", "47305": "delaware"}
+_ZIP_COUNTY_EXACT = {"47383": "delaware", "47302": "delaware", "47303": "delaware", "47304": "delaware", "47305": "delaware",
+    # Hamilton county (overrides the 460/461-> marion prefix seed for these): Noblesville 46060/62/64,
+    # Fishers 46037/38, Carmel 46032/33, Westfield 46074, Cicero 46034.
+    "46060": "hamilton", "46062": "hamilton", "46064": "hamilton", "46037": "hamilton", "46038": "hamilton",
+    "46032": "hamilton", "46033": "hamilton", "46074": "hamilton", "46034": "hamilton"}
 
 # Persistent self-building registry: discovered county -> {url + field map} entries are
 # cached here so each county's ArcGIS layer is discovered ONCE, then reused every run.
