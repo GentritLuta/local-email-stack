@@ -48,8 +48,17 @@ AGENCY_INBOX = "info@aureonglobal.de"
 
 def _reply_to_list(persona: dict) -> list[str]:
     """Reply-To = [client's reply mailbox, agency inbox], deduped, order-preserved.
-    Every cold send routes replies to both the client and Aureon."""
-    client = persona.get("reply_to") or persona.get("from_addr")
+    Every cold send routes replies to both the client and Aureon.
+
+    Exception: when a persona sets reply_to_exclusive, Reply-To is just its own
+    reply_to and the agency inbox is NOT appended. Used when reply_to is a
+    same-domain forwarder that already relays to the agency inbox (e.g. AlgoAlpha
+    sends from *.tryalgoalpha.com and replies to reply@tryalgoalpha.com, which
+    Cloudflare forwards to info@aureonglobal.de). Keeping From and Reply-To on the
+    same registrable domain stops corporate spam filters flagging the mismatch."""
+    client = (persona.get("reply_to") or persona.get("from_addr") or "").strip()
+    if persona.get("reply_to_exclusive") and client:
+        return [client]
     out = []
     for addr in (client, AGENCY_INBOX):
         a = (addr or "").strip()
