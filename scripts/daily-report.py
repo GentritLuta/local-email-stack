@@ -524,6 +524,15 @@ def build_action_items(replies: list[dict]) -> list[dict]:
     genuine = [r for r in replies
                if r.get("class") == "reply"
                and not AUTO_RX.search(f"{r.get('subject','')}\n{r.get('body_snippet','')}")]
+    # Ask each reply ONCE: drop any that have already been handled (the operator
+    # decided it in the reply-review popup -> raw_headers.reviewed, or the pipeline
+    # already auto-answered it). Without this, the same reply -- and every past
+    # answered one -- is re-listed as a to-do every day for the whole 7d window.
+    def _already_handled(r: dict) -> bool:
+        rh = r.get("raw_headers") or {}
+        return bool(rh.get("reviewed") or rh.get("autosent")
+                    or rh.get("autoreply_sent") or rh.get("answer_text"))
+    genuine = [r for r in genuine if not _already_handled(r)]
     if not genuine:
         return []
     import os, subprocess, tempfile, shutil
