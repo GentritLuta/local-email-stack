@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import seo_copy  # per-prospect SEO teardown block for mark-eting's {seo_block}
+import listing_copy  # per-prospect listing content plan for lk's {listing_block}
 
 REPO = Path(__file__).resolve().parent.parent
 SPECS_FILE = REPO / "lead-magnets" / "magnet-specs.json"
@@ -116,11 +117,15 @@ def merge(text: str, prospect: dict) -> str:
     # prospect has no usable research, seo_copy returns the generic personalize
     # offer so the cover email still closes cleanly.
     block = seo_copy.seo_block((prospect.get("enriched_context") or {}).get("seo"), prospect)
+    # {listing_block}: lk's personalised content plan for the realtor's real listing
+    # (empty-safe for any client whose cover_email never contains the placeholder).
+    lblock = listing_copy.listing_block((prospect.get("enriched_context") or {}).get("listing"), prospect)
     return ((text or "")
             .replace("{greeting}", g)
             .replace("{first_name}", g)
             .replace("{company}", co)
-            .replace("{seo_block}", block))
+            .replace("{seo_block}", block)
+            .replace("{listing_block}", lblock))
 
 
 def _wrap_html(text: str, accent: str) -> str:

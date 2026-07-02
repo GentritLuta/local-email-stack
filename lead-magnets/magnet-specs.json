@@ -75,11 +75,12 @@
     "client_slug": "lk-advertising",
     "language": "en",
     "magnet_keywords": [
+      "plan",
       "teardown"
     ],
     "deliverable_title": "The Seller-Lead Teardown: A Realtor's Field Guide to Ad Creative and Funnels That Actually Book Listing Appointments",
     "one_line_promise": "A short 5 minute teardown of how your current setup brings in seller leads and where appointments are slipping, made for your market, not a template.",
-    "cover_email": "Hi,\n\nYou asked for the teardown, so here it is.\n\nThis is the full framework version, the same checklist I use when I take apart a real estate agent's ad creative and seller funnel before I run a single dollar of media. It walks through the four places appointments leak between a Facebook ad and your calendar, the numbers a healthy seller funnel actually hits, and the money-losing mistakes I see in almost every account I open.\n\nRead it with your own ads and landing page open in another tab. Most of what is in here you can fix yourself this week.\n\nThe personalized version is the part I cannot put in a PDF. Send me the main area you work and a link to whatever you are running now, a Facebook ad, a valuation page, a Zillow lead form, anything, and I will record a 5 minute video walking through your exact setup and the one change I would make first. No charge, no card, no obligation.\n\nJust reply teardown with your market and a link, and I will record yours.\n\nLukas\nLK Advertising",
+    "cover_email": "Hi,\n\nHere it is, a full week of content built for one of your listings. Post it as is or hand it to whoever runs your socials.\n\n{listing_block}\n\nI also attached the Seller-Lead Teardown, the framework behind all of this: the four places appointments leak between a Facebook ad and your calendar, and the numbers a healthy seller funnel actually hits. Read it with your own ads open in another tab.\n\nLukas\nLK Advertising",
     "sections": [
       {
         "heading": "Why most real estate ad money buys clicks instead of listing appointments",
@@ -111,7 +112,7 @@
       }
     ],
     "accent_hex": "#c9a25a",
-    "email_subject": "Your seller-lead teardown",
+    "email_subject": "Your listing content plan",
     "from_name": "Lukas",
     "from_addr": "hello@mail.lk-advertising.site"
   },

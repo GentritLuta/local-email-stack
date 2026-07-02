@@ -24,7 +24,7 @@
       "delay_days": 2,
       "angle": "soft_bump_one_ask",
       "subject": "still happy to record it",
-      "body": "Hi {greeting},\n\nProbably buried by now, so short version.\n\nThe offer still stands. I will record a short 5 minute teardown of how your current setup brings in seller leads and where appointments are slipping, made for your market, not a template.\n\nReply teardown and it is yours, no charge."
+      "body": "Hi {greeting},\n\nProbably buried by now, so short version.\n\nThe offer still stands. I will record a short 5 minute teardown of how your current setup brings in seller leads and where appointments are slipping, made for your market, not a template.\n\nReply teardown and it is yours, no charge.\n\n{listing_ps}"
     },
     {
       "n": 3,

@@ -55,6 +55,7 @@ from profile_lib import (
 from email_render import build_payload
 import algoalpha_offer
 import seo_copy
+import listing_copy
 import send_throttle
 import clarity_gate
 
@@ -391,6 +392,9 @@ _OPTIONAL_MERGE_FIELDS = (
                       # falls back to the generic P.S. when no research exists
     "seo_rivals",     # mark-eting: email-5 concrete competitor sentence from the
                       # same research; empty (paragraph dropped) when none exists
+    "listing_ps",     # lk-advertising: email-1 P.S. naming one of the realtor's
+                      # REAL listings + offering a content plan for it (from
+                      # enriched_context.listing); generic give-first P.S. otherwise
 )
 
 _KNOWN_MERGE_FIELDS = _REQUIRED_MERGE_FIELDS + _OPTIONAL_MERGE_FIELDS
@@ -567,6 +571,12 @@ def synthesize_optional_merges(prospect: dict, team_size_lookup: dict | None = N
     _seo = (prospect.get("enriched_context") or {}).get("seo")
     syn["seo_ps"] = seo_copy.seo_ps(_seo, prospect)
     syn["seo_rivals"] = seo_copy.seo_rivals(_seo, prospect)
+    # lk-advertising give-first: name one of the realtor's real listings and offer
+    # a content plan for it, from enriched_context.listing (listing_research.py).
+    # Generic give-first P.S. when there is no usable listing, so other clients and
+    # un-researched prospects are unaffected.
+    _listing = (prospect.get("enriched_context") or {}).get("listing")
+    syn["listing_ps"] = listing_copy.listing_ps(_listing, prospect)
     # {company} tag: never render domain-derived garbage or empty. Falls back to a
     # neutral phrase so the subject reads "... for your business", never "... for Conroeisd"
     # (and the required-merge gate no longer cancels sends over a scraped junk company).
@@ -634,11 +644,12 @@ def send_via_resend(api_key: str, persona: dict, prospect: dict, subject: str, b
 
 
 def log_send(c: httpx.Client, run: dict, step_n: int, persona: dict, prospect: dict,
-             subject: str, outcome: dict) -> None:
+             subject: str, outcome: dict, profile_slug: str | None = None) -> None:
     row = {
         "run_id":       run["id"],
         "step_n":       step_n,
         "persona_slug": persona["slug"],
+        "profile_slug": profile_slug,   # per-client attribution -> RLS scoping of the dashboard
         "from_addr":    persona["from_addr"],
         "to_addr":      prospect["email"],
         "subject":      subject,
@@ -1048,7 +1059,8 @@ def tick(only_profiles: set[str] | None = None) -> None:
                                       brand=profile_config.get("brand"),
                                       step_n=step_n,
                                       tracker_base=TRACKER_BASE)
-            log_send(c, run, step_n, persona, prospect, rendered_subject, outcome)
+            log_send(c, run, step_n, persona, prospect, rendered_subject, outcome,
+                     profile_slug=profile_slug)
 
             print(f"  [{persona['slug']:7}] step {step_n} -> {prospect['email']:30}"
                   f"  {'SENT '+(outcome.get('resend_id') or '') if outcome['ok'] else 'FAIL '+outcome.get('error','')}")
