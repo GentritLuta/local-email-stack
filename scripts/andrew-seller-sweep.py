@@ -17,7 +17,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def main():
     seen, rows = set(), []
-    for z in ZIPS:
+    zips = [z.strip() for z in sys.argv[1].split(",")] if len(sys.argv) > 1 else ZIPS
+    for z in zips:
         try:
             out = subprocess.run(
                 [sys.executable, os.path.join("scripts", "source-seller-leads.py"),
@@ -54,6 +55,33 @@ def main():
     print(f"\nTOTAL unique: {len(rows)} | FSBO (reply-via-listing): {fsbo} "
           f"| absentee (mail-ready): {len(rows) - fsbo}")
     print(f"CSV -> {out_csv}")
+
+    # --- CLEAN DIALING SHEET for the legal calling operation ---------------------
+    # FSBO rows carry a public phone (call directly). Absentee/other rows carry a
+    # free people-search LOOKUP URL (a person opens it, gets the phone, dials).
+    # Sorted highest-intent first so the caller works the hottest sellers first.
+    import re as _re
+    def _lookup(L):
+        m = _re.search(r"https?://\S*(?:fastpeoplesearch|truepeoplesearch|thatsthem)\S+",
+                       (L.get("source") or ""))
+        return m.group(0) if m else ""
+    def _mailing(L):
+        m = _re.search(r"Owner mailing:\s*([^|]+)", (L.get("source") or ""))
+        return m.group(1).strip() if m else ""
+    dial_csv = os.path.join(REPO, "out", "andrew_dialing_sheet.csv")
+    dial_rows = sorted(rows, key=lambda L: -(L.get("intent_score") or 0))
+    with open(dial_csv, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["priority", "signal", "owner_name", "property_address", "mailing_address",
+                    "phone_ready", "phone_lookup_url", "context", "zip"])
+        for L in dial_rows:
+            w.writerow([L.get("intent_score"), L.get("signal"), L.get("owner_name"),
+                        L.get("address"), _mailing(L), L.get("contact_phone"),
+                        _lookup(L), L.get("context"), L.get("zip_searched")])
+    ready = sum(1 for L in dial_rows if L.get("contact_phone"))
+    lookup = sum(1 for L in dial_rows if _lookup(L))
+    print(f"DIALING SHEET -> {dial_csv} ({len(dial_rows)} rows | {ready} phone-ready "
+          f"| {lookup} need a 10-sec lookup)")
 
 
 if __name__ == "__main__":
