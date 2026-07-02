@@ -1056,6 +1056,11 @@ def render_html(a: dict, client_mode: dict | None = None) -> str:
         "Every email that landed in info@ since yesterday, across all types. The poller auto-marks these read, so this is your catch-all so nothing slips by.",
         inbox_inner,
     )
+    # This "everything that hit info@" digest is an OPERATOR-only catch-all (info@
+    # is the agency inbox). It must never appear in a per-client report, even after
+    # scoping. Belt-and-braces with the scope_to_profile replies_all fix.
+    if client_mode:
+        inbox_block = ""
 
     # ── Alerts ──
     bounces = a["todays_bounces"]
@@ -1242,16 +1247,29 @@ def scope_to_profile(data: dict, profile_slug: str) -> dict:
 
     prospect_emails = {(p.get("email") or "").lower()
                        for p in data["prospects"] if p.get("profile_slug") == profile_slug}
+    def _reply_belongs(r: dict) -> bool:
+        ps = r.get("profile_slug")
+        if ps == profile_slug:
+            return True
+        # from_addr fallback ONLY for UNattributed replies. If a reply is already
+        # tagged to another client, it is theirs even when the sender also appears
+        # in this client's prospect list (overlapping lists) - never pull it in.
+        if not ps and (r.get("from_addr") or "").lower() in prospect_emails:
+            return True
+        return False
     out = dict(data)
     out["profiles"]  = profs
     out["sends"]     = [s for s in data["sends"] if belongs(s)]
-    out["replies"]   = [r for r in data["replies"]
-                        if (r.get("profile_slug") == profile_slug)
-                        or ((r.get("from_addr") or "").lower() in prospect_emails)]
+    out["replies"]   = [r for r in data["replies"] if _reply_belongs(r)]
+    # CRITICAL (cross-client leak fix): replies_all feeds the "inbox to info@"
+    # section of the report. It MUST be scoped too, or a per-client report leaks
+    # every other client's inbound replies. Do not remove this.
+    out["replies_all"] = [r for r in data.get("replies_all", []) if _reply_belongs(r)]
     out["prospects"] = [p for p in data["prospects"] if p.get("profile_slug") == profile_slug]
     out["sequences"] = [q for q in data.get("sequences", []) if q.get("profile_slug") == profile_slug]
     print(f"  scoped to {profile_slug}: sends={len(out['sends'])} "
-          f"replies={len(out['replies'])} prospects={len(out['prospects'])}")
+          f"replies={len(out['replies'])} replies_all={len(out['replies_all'])} "
+          f"prospects={len(out['prospects'])}")
     return out
 
 
