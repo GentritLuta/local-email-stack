@@ -212,7 +212,15 @@ def main() -> int:
         return 2
 
     log("forward is live -> flipping AlgoAlpha reply-to (DB config)")
-    flip()
+    n = flip()
+    try:  # surface the go-live once in the next operator daily report
+        sys.path.insert(0, str(REPO / "sequences"))
+        import ops_digest
+        ops_digest.record("algoalpha-golive", "AlgoAlpha reply-to is now live",
+                          f"{n} personas now reply to {FORWARD_ADDR} (Cloudflare forward to info@); "
+                          "From/Reply-To aligned for deliverability.")
+    except Exception:
+        pass
     log("DONE. AlgoAlpha replies now route via reply@tryalgoalpha.com -> info@ (From/Reply-To aligned).")
     return 0
 
