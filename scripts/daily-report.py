@@ -1229,8 +1229,15 @@ def scope_to_profile(data: dict, profile_slug: str) -> dict:
     (collision-free), with a persona fallback, mirroring aggregate()._send_profile."""
     profs = [p for p in data["profiles"] if p["slug"] == profile_slug]
     if not profs:
-        print(f"  ! --profile {profile_slug}: not found; reporting all")
-        return data
+        # NEVER fall back to all-clients data for an unknown slug: that leaks every
+        # client's sends/replies into one client's report (2026-07-03 incident, via
+        # an orphaned .tmp profile file). Return an EMPTY scope so a bad slug yields
+        # an empty report, never a cross-client leak.
+        print(f"  ! --profile {profile_slug}: not found; returning EMPTY scope (no cross-client leak)")
+        out = dict(data)
+        for k in ("profiles", "sends", "replies", "replies_all", "prospects", "sequences"):
+            out[k] = []
+        return out
     prof = profs[0]
     domains = {fd["domain"].lower()
                for fd in (prof.get("config", {}).get("relay", {}).get("from_domains") or [])

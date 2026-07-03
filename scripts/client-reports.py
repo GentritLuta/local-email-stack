@@ -46,6 +46,10 @@ def list_target_slugs(args) -> list[str]:
     for f in sorted((REPO / "profiles").glob("*.json")):
         if f.name.endswith(".private.json"):
             continue
+        if f.name.startswith("."):
+            # orphaned atomic-write temp (.tmp.*.json) — never a real profile.
+            # Loading it as a client would leak all clients' data (2026-07-03).
+            continue
         slug = f.stem
         if args.profile:
             if slug == args.profile:

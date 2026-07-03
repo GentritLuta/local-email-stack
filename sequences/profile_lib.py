@@ -241,7 +241,10 @@ def today_iso() -> str:
 
 def _atomic_write(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".tmp.", suffix=".json")
+    # suffix must NOT be .json: an orphaned temp (crash between write and replace)
+    # would otherwise match glob("*.json") and be loaded as a phantom profile,
+    # which leaked every client's data into one client's report (2026-07-03).
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".tmp.", suffix=".json.tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
