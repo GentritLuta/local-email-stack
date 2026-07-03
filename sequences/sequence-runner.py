@@ -70,10 +70,13 @@ RESEND_API = "https://api.resend.com/emails"
 # PostgREST. The tracker is deployed on the user's free Hostinger subdomain
 # (zero additional infra). If AUREON_TRACKER_BASE is set, it overrides.
 import os as _os
-TRACKER_BASE = (
-    _os.environ.get("AUREON_TRACKER_BASE")
-    or "https://darkturquoise-mouse-998841.hostingersite.com"
-)
+# Link-wrapping DISABLED 2026-07-03: rewriting every link through an off-brand
+# hostingersite.com tracker is a spam signal (link domain != sending domain), and
+# the tracker's open/click write-back was pointing at a dead Supabase project, so
+# it captured no analytics anyway. Empty base => build_payload skips _inject_tracking,
+# leaving clean on-brand links. Set AUREON_TRACKER_BASE to re-enable if a real,
+# same-domain tracker is stood up.
+TRACKER_BASE = _os.environ.get("AUREON_TRACKER_BASE", "")
 
 
 def load_supabase() -> tuple[str, str]:
