@@ -54,7 +54,22 @@ if hasattr(sys.stderr, "reconfigure"):
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "sequences"))
-STORE = REPO / "out" / "pending_replies.json"
+# Queue file. Overridable via REPLY_STORE so the review can run on the LAPTOP against a
+# copy pulled from the VPS (see review-here.py), keeping the popups on your own PC.
+STORE = Path(os.environ["REPLY_STORE"]) if os.environ.get("REPLY_STORE") else REPO / "out" / "pending_replies.json"
+
+
+# Single-instance guard: a Windows named mutex so only ONE reply-review ever shows
+# dialogs. This is the fix for the "stacked popup flood / my click doesn't stick" bug -
+# concurrent runs used to each pop the same items and stomp each other's resolved flag.
+_MUTEX_HANDLE = None
+def _ensure_single_instance() -> bool:
+    global _MUTEX_HANDLE
+    if os.name != "nt":
+        return True
+    import ctypes
+    _MUTEX_HANDLE = ctypes.windll.kernel32.CreateMutexW(None, False, "Global\\LES_reply_review")
+    return ctypes.windll.kernel32.GetLastError() != 183  # 183 = ERROR_ALREADY_EXISTS
 OPERATOR_ADDR = "info@aureonglobal.de"
 UA = "local-email-stack reply-review/1.0"
 
@@ -568,6 +583,9 @@ def main() -> int:
     p_run = sub.add_parser("run"); p_run.add_argument("--dry", action="store_true")
     sub.add_parser("list")
     a = ap.parse_args()
+    if a.cmd in ("scan", "run", "prompt") and not _ensure_single_instance():
+        print("reply-review: another instance is already running; exiting (no duplicate popups).")
+        return 0
     if a.cmd in ("scan", "run"):
         prompt(dry=getattr(a, "dry", False))
     elif a.cmd == "prompt":
