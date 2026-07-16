@@ -24,7 +24,7 @@ Usage:
     py sequences/contract-sign.py seal [--id <contract_id>]
 """
 from __future__ import annotations
-import argparse, base64, hashlib, json, sys, ssl, smtplib, tempfile, datetime as dt
+import argparse, base64, hashlib, html as _html, json, sys, ssl, smtplib, tempfile, datetime as dt
 from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -65,14 +65,131 @@ HENV = _load_env(REPO / "sequences" / "hostinger.env")
 OPERATOR_ADDR = "info@aureonglobal.de"
 
 
+def _send_mail(recipients: list[str], subject: str, body_html: str, text_body: str,
+               attach: Path, filename: str) -> bool:
+    """Send one email via Resend over HTTPS (the VPS blocks SMTP ports 25/465/587),
+    falling back to Hostinger SMTP on the laptop. Returns True if sent."""
+    resend_key = (HENV.get("RESEND_NEW_ACCOUNT_API_KEY")
+                  or HENV.get("RESEND_FULL_ACCESS_API_KEY")
+                  or HENV.get("RESEND_API_KEY"))
+    if resend_key:
+        payload = {"from": "Aureon Global <info@send.aureonglobal.de>", "to": recipients,
+                   "reply_to": OPERATOR_ADDR, "subject": subject, "html": body_html, "text": text_body}
+        try:
+            payload["attachments"] = [{"filename": filename,
+                                       "content": base64.b64encode(attach.read_bytes()).decode()}]
+        except Exception as e:
+            print(f"    (attachment skipped: {e})")
+        try:
+            r = httpx.post("https://api.resend.com/emails", json=payload, timeout=30,
+                           headers={"Authorization": f"Bearer {resend_key}",
+                                    "Content-Type": "application/json",
+                                    "User-Agent": "aureon-contract-sign/1.0"})
+            if r.status_code in (200, 201):
+                print(f"    ✓ sent via Resend to {', '.join(recipients)}")
+                return True
+            print(f"    ! Resend send failed {r.status_code}: {r.text[:200]}")
+        except Exception as e:
+            print(f"    ! Resend send error: {e}")
+
+    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
+    pw = HENV.get("SMTP_PASS")
+    if not pw:
+        print("    (no SMTP_PASS and Resend unavailable — email not sent)")
+        return False
+    msg = MIMEMultipart("mixed")
+    msg["Subject"] = subject
+    msg["From"] = f"Aureon Global <{user}>"
+    msg["To"] = ", ".join(recipients)
+    alt = MIMEMultipart("alternative")
+    alt.attach(MIMEText(text_body, "plain", "utf-8"))
+    alt.attach(MIMEText(body_html, "html", "utf-8"))
+    msg.attach(alt)
+    try:
+        part = MIMEApplication(attach.read_bytes(), _subtype=("pdf" if attach.suffix == ".pdf" else "html"))
+        part.add_header("Content-Disposition", "attachment", filename=filename)
+        msg.attach(part)
+    except Exception as e:
+        print(f"    (attachment skipped: {e})")
+    try:
+        with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
+            s.login(user, pw)
+            s.sendmail(user, recipients, msg.as_string())
+        print(f"    ✓ sent via SMTP to {', '.join(recipients)}")
+        return True
+    except Exception as e:
+        print(f"    ! SMTP send failed: {e}")
+        return False
+
+
+# Onboarding fields the operator wants at signing, in reading order. Any other non-empty
+# answer is appended generically so nothing the client provided is lost.
+_ONBOARD_LABELS = [
+    ("Company", "company"), ("Website", "website"), ("Contact email", "contact_email"),
+    ("Reply-to", "reply_to"), ("Service type", "service_type"), ("Platforms", "platforms"),
+    ("Handles", "handles"), ("Posting cadence", "posting_cadence"), ("Offer", "offer"),
+    ("ICP", "icp"), ("CTA", "cta"), ("Proof", "proof"), ("Give-first", "give_first"),
+    ("Sending domain", "sending_root"), ("DNS host", "dns_host"), ("Jurisdiction", "jurisdiction"),
+    ("Office", "office"), ("Signer", "rep"), ("Position", "rep_title"),
+    ("Representation chain", "rep_chain"), ("Lead source", "lead_source"), ("Notes", "notes"),
+]
+_ONBOARD_SKIP = {"accepted_terms", "accepted_privacy", "accepted_agb", "accepted_at"}
+
+
+def _format_onboarding(a: dict | None) -> tuple[str, str]:
+    """Render the client's onboarding answers into (html, text) for the operator email."""
+    if not a:
+        return "", ""
+    def val(v):
+        return ", ".join(str(x) for x in v) if isinstance(v, list) else str(v)
+    seen, pairs = set(), []
+    for label, key in _ONBOARD_LABELS:
+        seen.add(key)
+        v = a.get(key)
+        if v not in (None, "", []):
+            pairs.append((label, val(v)))
+    for k, v in a.items():
+        if k in seen or k in _ONBOARD_SKIP:
+            continue
+        if v not in (None, "", []):
+            pairs.append((k, val(v)))
+    consent = (f"Terms {a.get('accepted_terms')}, Privacy {a.get('accepted_privacy')}, "
+               f"AGB {a.get('accepted_agb')} at {a.get('accepted_at')}")
+    tr = "".join(f"<tr><td style='padding:3px 14px 3px 0;color:#64748b;vertical-align:top'>{_html.escape(k)}</td>"
+                 f"<td style='padding:3px 0'>{_html.escape(v)}</td></tr>" for k, v in pairs)
+    html = (f"<h3 style='margin:20px 0 6px;color:#1e293b'>What the client provided (onboarding)</h3>"
+            f"<table style='font-size:13px;border-collapse:collapse'>{tr}</table>"
+            f"<p style='font-size:11px;color:#94a3b8;margin:8px 0 0'>Consent: {_html.escape(consent)}</p>")
+    text = ("\n\nWHAT THE CLIENT PROVIDED (ONBOARDING)\n"
+            + "\n".join(f"  {k}: {v}" for k, v in pairs) + f"\n  Consent: {consent}")
+    return html, text
+
+
+def _onboarding_for(submission_id: str | None, client_id: str | None) -> dict:
+    """Fetch the client's onboarding raw_answers (by submission id, else latest for the client)."""
+    try:
+        if submission_id:
+            r = cli.get(f"/onboarding_submissions?id=eq.{submission_id}&select=raw_answers", headers=H).json()
+            if r and r[0].get("raw_answers"):
+                return r[0]["raw_answers"]
+        if client_id:
+            r = cli.get(f"/onboarding_submissions?client_id=eq.{client_id}"
+                        "&select=raw_answers&order=created_at.desc&limit=1", headers=H).json()
+            if r and r[0].get("raw_answers"):
+                return r[0]["raw_answers"]
+    except Exception as e:
+        print(f"    (onboarding fetch failed: {e})")
+    return {}
+
+
 def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_email: str,
                               signed_at: str, sealed_at: str, ip: str, ua: str, sha: str,
                               pdf_path: Path | None, html_fallback: Path,
-                              operator_only: bool = False) -> bool:
-    """On seal, email the operator (info@) and — unless operator_only — the client a copy
-    of the signed agreement (PDF attached) plus the signature audit trail. Primary transport
-    is Resend over HTTPS, because the VPS (where seal runs) blocks the SMTP ports 25/465/587;
-    Hostinger SMTP is a fallback for the laptop. Returns True if the email was sent."""
+                              operator_only: bool = False, onboarding: dict | None = None) -> bool:
+    """On seal, email the operator (info@) the executed agreement + audit trail + everything the
+    client provided at onboarding, and — unless operator_only — email the client just their
+    executed copy. Resend over HTTPS (the VPS blocks SMTP ports); SMTP is a laptop fallback.
+    Returns True if the operator email sent."""
     rows = (
         ("Agreement", contract_ref),
         ("Signed by (Client)", f"{signer_name} ({signer_email})"),
@@ -101,72 +218,15 @@ def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_ema
 
     subject = f"Fully executed agreement: {contract_ref}"[:200]
     attach = pdf_path if (pdf_path and pdf_path.exists()) else html_fallback
-    recipients = [OPERATOR_ADDR]
-    if not operator_only and signer_email and "@" in signer_email:
-        recipients.append(signer_email)
     filename = f"{contract_ref.replace(' ', '_')}-signed{attach.suffix if hasattr(attach, 'suffix') else '.pdf'}"
 
-    # --- Primary: Resend over HTTPS (the VPS blocks SMTP ports; Resend uses 443). ---
-    resend_key = (HENV.get("RESEND_NEW_ACCOUNT_API_KEY")
-                  or HENV.get("RESEND_FULL_ACCESS_API_KEY")
-                  or HENV.get("RESEND_API_KEY"))
-    if resend_key:
-        payload = {
-            "from": "Aureon Global <info@send.aureonglobal.de>",
-            "to": recipients,
-            "reply_to": OPERATOR_ADDR,
-            "subject": subject,
-            "html": body_html,
-            "text": text_body,
-        }
-        try:
-            payload["attachments"] = [{"filename": filename,
-                                       "content": base64.b64encode(attach.read_bytes()).decode()}]
-        except Exception as e:
-            print(f"    (attachment skipped: {e})")
-        try:
-            r = httpx.post("https://api.resend.com/emails", json=payload, timeout=30,
-                           headers={"Authorization": f"Bearer {resend_key}",
-                                    "Content-Type": "application/json",
-                                    "User-Agent": "aureon-contract-sign/1.0"})
-            if r.status_code in (200, 201):
-                print(f"    ✓ evidence email sent via Resend to {', '.join(recipients)}")
-                return True
-            print(f"    ! Resend send failed {r.status_code}: {r.text[:200]}")
-        except Exception as e:
-            print(f"    ! Resend send error: {e}")
-
-    # --- Fallback: Hostinger SMTP (works on the laptop; blocked on the VPS). ---
-    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
-    pw = HENV.get("SMTP_PASS")
-    if not pw:
-        print("    (no SMTP_PASS and Resend unavailable — evidence email not sent)")
-        return False
-    msg = MIMEMultipart("mixed")
-    msg["Subject"] = subject
-    msg["From"] = f"Aureon Global <{user}>"
-    msg["To"] = ", ".join(recipients)
-    alt = MIMEMultipart("alternative")
-    alt.attach(MIMEText(text_body, "plain", "utf-8"))
-    alt.attach(MIMEText(body_html, "html", "utf-8"))
-    msg.attach(alt)
-    try:
-        data = attach.read_bytes()
-        subt = "pdf" if attach.suffix == ".pdf" else "html"
-        part = MIMEApplication(data, _subtype=subt)
-        part.add_header("Content-Disposition", "attachment", filename=filename)
-        msg.attach(part)
-    except Exception as e:
-        print(f"    (attachment skipped: {e})")
-    try:
-        with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-            s.login(user, pw)
-            s.sendmail(user, recipients, msg.as_string())
-        print(f"    ✓ evidence email sent via SMTP to {', '.join(recipients)}")
-        return True
-    except Exception as e:
-        print(f"    ! SMTP send failed: {e}")
-        return False
+    # Operator (info@) gets the evidence PLUS everything the client provided at onboarding.
+    ob_html, ob_text = _format_onboarding(onboarding)
+    op_ok = _send_mail([OPERATOR_ADDR], subject, body_html + ob_html, text_body + ob_text, attach, filename)
+    # The client gets just their executed copy (no internal onboarding notes).
+    if not operator_only and signer_email and "@" in signer_email:
+        _send_mail([signer_email], subject, body_html, text_body, attach, filename)
+    return op_ok
 
 
 def _rows(resp) -> list | None:
@@ -343,7 +403,8 @@ def seal(one_id: str | None = None) -> int:
                     contract_ref=c["contract_ref"], signer_name=c.get("signer_name") or "",
                     signer_email=c.get("signer_email") or "", signed_at=signed_at,
                     sealed_at=patch["sealed_at"], ip=ip, ua=ua, sha=sha,
-                    pdf_path=out_pdf if pdf_ok else None, html_fallback=out_html):
+                    pdf_path=out_pdf if pdf_ok else None, html_fallback=out_html,
+                    onboarding=_onboarding_for(c.get("submission_id"), c.get("client_id"))):
                     cli.patch(f"/contracts?id=eq.{c['id']}",
                               json={"notified_at": patch["sealed_at"]},
                               headers={**H, "Prefer": "return=minimal"})
@@ -382,7 +443,8 @@ def renotify(one_id: str | None, do_all: bool) -> int:
                 signer_email=c.get("signer_email") or "", signed_at=c.get("signed_at") or "",
                 sealed_at=c.get("sealed_at") or "", ip=c.get("signer_ip") or "",
                 ua=c.get("signer_user_agent") or "", sha=c.get("contract_sha256") or "",
-                pdf_path=pdf_path, html_fallback=tmp_html, operator_only=True):
+                pdf_path=pdf_path, html_fallback=tmp_html, operator_only=True,
+                onboarding=_onboarding_for(c.get("submission_id"), c.get("client_id"))):
             cli.patch(f"/contracts?id=eq.{c['id']}", json={"notified_at": now},
                       headers={**H, "Prefer": "return=minimal"})
             sent += 1
