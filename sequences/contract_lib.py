@@ -190,6 +190,25 @@ def _build_cell(c: dict) -> str:
         Email for notices: {_esc(c["email"])}''')
 
 
+# ─── Liability cap (clause 12.2) ────────────────────────────────────────────
+# The pilot's aggregate liability cap defaults to EUR 25,000. A small set of early
+# clients stay on the original EUR 5,000 cap. The base templates carry the EUR 5,000
+# text verbatim, so keeping a client at 5,000 means simply NOT swapping it, and
+# raising a client to 25,000 is a single literal swap at generation time.
+_CAP_5K = "five thousand euros (EUR 5,000)"
+_CAP_25K = "twenty five thousand euros (EUR 25,000)"
+
+
+def _keeps_5k_cap(company: str) -> bool:
+    """True for the named early clients kept on the original EUR 5,000 cap
+    (diraya, atal, ener-g). Word-anchored so 'Atal Solidrocks' / 'ENER G' match
+    but 'Catalyst' / 'Energy Corp' do not."""
+    cl = (company or "").strip().lower().replace("-", " ")
+    if re.search(r"\b(diraya|atal)", cl):
+        return True
+    return "ener g" in cl
+
+
 def generate_contract(a: dict, ref: str) -> str:
     """Build the DRAFT agreement HTML for these onboarding answers."""
     # Route to the agreement matching the service: social-only -> social base;
@@ -296,6 +315,10 @@ def generate_contract(a: dict, ref: str) -> str:
     _rec = _client_inputs_for(a.get("company", ""))
     if _rec:
         s, _ = fill_client_inputs(s, _rec)
+    # 6c. Liability cap (clause 12.2): default EUR 25,000; the named early-client
+    # exceptions (diraya, atal, ener-g) keep the original EUR 5,000.
+    if not _keeps_5k_cap(a.get("company", "")):
+        s = s.replace(_CAP_5K, _CAP_25K)
     # 7. No em/en dashes anywhere.
     s = _nodash(s)
     return s
