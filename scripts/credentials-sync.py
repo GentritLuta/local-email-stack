@@ -200,11 +200,15 @@ def _notify(cr: dict, client: dict, answers: dict, env_key: str) -> bool:
 
 def main() -> int:
     now = dt.datetime.now(dt.timezone.utc).isoformat()
-    pending = _get(
+    # --ig-only: run only the Instagram -> SocialForge sync. Used by the laptop task
+    # (where SocialForge lives); the VPS task owns the DNS/access handover block below.
+    ig_only = "--ig-only" in sys.argv
+    pending = [] if ig_only else _get(
         "client_credentials?authorized=eq.true"
         "&or=(written_to_env_at.is.null,notified_at.is.null)"
         "&select=*")
-    print(f"credentials-sync: {len(pending)} DNS/access handover(s) to process")
+    if not ig_only:
+        print(f"credentials-sync: {len(pending)} DNS/access handover(s) to process")
     for cr in pending:
         client = _client(cr["client_id"])
         answers = _latest_answers(cr["client_id"])
