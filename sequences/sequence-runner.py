@@ -58,6 +58,7 @@ import seo_copy
 import listing_copy
 import send_throttle
 import clarity_gate
+import suppress
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE  = REPO_ROOT / "sequences" / "supabase.env"
@@ -806,6 +807,7 @@ def tick(only_profiles: set[str] | None = None) -> None:
         except Exception as _e:
             print(f"  ! clarity gate unavailable ({_e}); step-1 sends not gated this tick")
             clarity_clear = None
+        _sup = suppress.load_suppressed()  # global do-not-contact, loaded once per tick
         _clarity_held: set[str] = set()
         for run in runs:
             if time.monotonic() - _t_start > _budget_s:
@@ -948,9 +950,11 @@ def tick(only_profiles: set[str] | None = None) -> None:
             if not prospect:
                 continue
             # AlgoAlpha qualification gate: only contact creators whose last-10-video
-            # average views (enriched_context.avg_views_10) is >= 3000. Below that we
-            # cancel the run (never contact an unqualified creator). Unknown = skip this
-            # tick only, so a backfill can still fill the metric and qualify them; we
+            # average views (enriched_context.avg_views_10) is inside the auto-offer
+            # window 3000..100000. Below = cancel (unqualified). Above = cancel too
+            # (whale — the public 35 USD/1k rate would over-commit; manual negotiated
+            # deal only; re-enroll is blocked by the same window in daily-fill).
+            # Unknown = skip this tick only, so a backfill can still qualify them; we
             # never contact a creator we cannot confirm qualifies.
             if profile_slug == "algoalpha":
                 _av = (prospect.get("enriched_context") or {}).get("avg_views_10")
@@ -965,6 +969,11 @@ def tick(only_profiles: set[str] | None = None) -> None:
                 if _avn < 3000:
                     print(f"  ! run {run['id']} cancelled: {prospect.get('email')} "
                           f"avg_views_10={int(_avn)} < 3000 (unqualified creator)")
+                    c.patch(f"/runs?id=eq.{run['id']}", json={"status": "cancelled"})
+                    continue
+                if _avn > 100_000:
+                    print(f"  ! run {run['id']} cancelled: {prospect.get('email')} WHALE "
+                          f"avg_views_10={int(_avn)} > 100000 — manual negotiated deal only")
                     c.patch(f"/runs?id=eq.{run['id']}", json={"status": "cancelled"})
                     continue
             # Enrich the prospect with synthesized optional merge fields
@@ -1001,6 +1010,13 @@ def tick(only_profiles: set[str] | None = None) -> None:
                 print(f"  ! run {run['id']} cancelled: prospect {prospect.get('email')} unsubscribed")
                 c.patch(f"/runs?id=eq.{run['id']}",
                         json={"status": "cancelled"})
+                continue
+            # Global do-not-contact backstop: repliers, opt-outs, blocked domains
+            # (e.g. former clients) are never re-contacted by ANY profile, even if a
+            # re-scrape re-created the row before enrollment could screen it out.
+            if suppress.is_suppressed(prospect.get("email"), _sup):
+                print(f"  ! run {run['id']} cancelled: {prospect.get('email')} is on the suppression list")
+                c.patch(f"/runs?id=eq.{run['id']}", json={"status": "cancelled"})
                 continue
             api_key  = get_api_key(profile_slug)
             if not api_key:

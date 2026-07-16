@@ -45,6 +45,8 @@ import urllib.error
 from collections import Counter
 from pathlib import Path
 
+import suppress  # global do-not-contact list (repliers, opt-outs, blocked domains)
+
 REPO = Path(__file__).resolve().parent.parent
 ENV  = REPO / "sequences" / "supabase.env"
 
@@ -528,6 +530,7 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
     )
     cross = (_emails_touched_by_other_brands(profile_slug)
              if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
+    sup = suppress.load_suppressed()
     n = 0
     for p in rows:
         if p["id"] in enrolled: continue
@@ -535,6 +538,7 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
         if requires_first_name and not p.get("first_name"): continue
         if requires_city and not p.get("city"): continue
         if cross is not None and (p.get("email") or "").lower() in cross: continue
+        if suppress.is_suppressed(p.get("email"), sup): continue
         if not _source_ok(profile_slug, p): continue
         if not _renders_ok(profile_slug, p): continue
         if not _avg_views_ok(profile_slug, p): continue
@@ -559,12 +563,14 @@ def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
     )
     cross = (_emails_touched_by_other_brands(profile_slug)
              if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
+    sup = suppress.load_suppressed()
     eligible = [p for p in rows
                 if p["id"] not in enrolled
                 and p.get("company")
                 and (p.get("first_name") or not requires_first_name)
                 and (not requires_city or p.get("city"))
                 and (cross is None or (p.get("email") or "").lower() not in cross)
+                and not suppress.is_suppressed(p.get("email"), sup)
                 and _source_ok(profile_slug, p)
                 and _renders_ok(profile_slug, p)
                 and _avg_views_ok(profile_slug, p)]

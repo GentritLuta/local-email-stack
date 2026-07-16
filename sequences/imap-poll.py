@@ -47,6 +47,10 @@ from pathlib import Path
 
 import httpx
 
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+import suppress  # global do-not-contact list
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # ─── Config loader ─────────────────────────────────────────────────────────
@@ -579,6 +583,13 @@ def one_pass(verbose: bool = True) -> dict:
                         if run_id and paused == 0:
                             supa.pause_run(run_id, "replied"); paused = 1
                         stats["runs_paused"] += paused
+                        # Global do-not-contact: a prospect who replied is never
+                        # cold-emailed again by ANY profile, including a future
+                        # re-scrape into another brand's pool.
+                        try:
+                            suppress.add_email(from_addr, "replied")
+                        except Exception as _se:
+                            print(f"  ! suppress add failed for {from_addr}: {_se}")
                         # Honor opt-out requests. Check only the TOP of the reply
                         # (+ subject) so our own quoted unsubscribe footer can not
                         # self-trigger. A genuine "unsubscribe/stop/remove me" ->
