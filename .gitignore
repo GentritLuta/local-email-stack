@@ -92,3 +92,6 @@ out/AUREON-Admin-Portal-Credentials.pdf
 
 # all sequences env secrets (payoneer.env was exposed 2026-06-24)
 sequences/*.env
+
+# per-prospect generated ghost-check harnesses (not source)
+lead-magnets/ghostcheck/out/
