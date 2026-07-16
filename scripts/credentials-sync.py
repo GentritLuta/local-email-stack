@@ -115,11 +115,6 @@ def _write_env(key: str, value: str) -> None:
 
 
 def _notify(cr: dict, client: dict, answers: dict, env_key: str) -> bool:
-    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
-    pw = HENV.get("SMTP_PASS")
-    if not pw:
-        print("    (no SMTP_PASS — combined email not sent)")
-        return False
     company = client.get("company") or answers.get("company") or "A client"
 
     def block(title, pairs):
@@ -186,16 +181,48 @@ def _notify(cr: dict, client: dict, answers: dict, env_key: str) -> bool:
                f"  Brand assets: {cr.get('asset_link')}\n"
                f"  Content approver: {cr.get('content_approver')}\n" if has_social else "")
             + f"\n  Authorized: {cr.get('authorized_at')} IP {cr.get('signer_ip')}\n")
+    subject = f"Client ready to provision — {company}"
+    # Primary: Resend over HTTPS (the VPS blocks SMTP ports 25/465/587).
+    resend_key = (HENV.get("RESEND_NEW_ACCOUNT_API_KEY")
+                  or HENV.get("RESEND_FULL_ACCESS_API_KEY")
+                  or HENV.get("RESEND_API_KEY"))
+    if resend_key:
+        payload = {"from": "Aureon Global <info@send.aureonglobal.de>", "to": [OPERATOR_ADDR],
+                   "reply_to": OPERATOR_ADDR, "subject": subject, "html": html, "text": text}
+        try:
+            req = urllib.request.Request(
+                "https://api.resend.com/emails", data=json.dumps(payload).encode(), method="POST",
+                headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json",
+                         "User-Agent": "aureon-credentials-sync/1.0"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                if resp.status in (200, 201):
+                    print(f"    ✓ combined details sent via Resend to {OPERATOR_ADDR}")
+                    return True
+            print("    ! Resend send did not return 200/201")
+        except Exception as e:
+            print(f"    ! Resend send error: {e}")
+
+    # Fallback: Hostinger SMTP (laptop only; blocked on the VPS).
+    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
+    pw = HENV.get("SMTP_PASS")
+    if not pw:
+        print("    (no SMTP_PASS and Resend unavailable — combined email not sent)")
+        return False
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"Client ready to provision — {company}"
-    msg["From"] = user
+    msg["Subject"] = subject
+    msg["From"] = f"Aureon Global <{user}>"
     msg["To"] = OPERATOR_ADDR
     msg.attach(MIMEText(text, "plain", "utf-8"))
     msg.attach(MIMEText(html, "html", "utf-8"))
-    with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-        s.login(user, pw)
-        s.sendmail(user, [OPERATOR_ADDR], msg.as_string())
-    return True
+    try:
+        with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
+            s.login(user, pw)
+            s.sendmail(user, [OPERATOR_ADDR], msg.as_string())
+        print(f"    ✓ combined details sent via SMTP to {OPERATOR_ADDR}")
+        return True
+    except Exception as e:
+        print(f"    ! SMTP send failed: {e}")
+        return False
 
 
 def main() -> int:
