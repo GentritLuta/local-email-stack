@@ -21,6 +21,8 @@ except Exception:
     requests = None
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "sequences"))
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 STATE = REPO / "out" / "_deliv_verify_state.json"
 TASK = "LES-deliv-verify"
 OPERATOR = "info@aureonglobal.de"
@@ -81,7 +83,7 @@ def restore_energ():
         if requests is None:
             raise RuntimeError("requests unavailable")
         supa = load_env(REPO / "sequences" / "supabase.env")
-        url = "https://api.supabase.com/v1/projects/ccmqkljsjiuavpydbkva/database/query"
+        url = "https://api.supabase.com/v1/projects/zmzolkijhiaedzcmdfji/database/query"
         h = {"Authorization": f"Bearer {supa.get('SUPABASE_ACCESS_TOKEN','')}",
              "Content-Type": "application/json", "User-Agent": "Mozilla/5.0 Chrome/123"}
         db = requests.post(url, headers=h, json={"query": "SELECT config FROM profiles WHERE slug='energ'"}).json()[0]["config"]
@@ -96,12 +98,8 @@ def restore_energ():
 
 
 def alert(subject, body):
-    user = HOST.get("SMTP_USER", OPERATOR); pw = HOST.get("SMTP_PASS", "")
-    m = MIMEText(body, "plain", "utf-8")
-    m["Subject"] = subject; m["From"] = f"Deliverability Watch <{user}>"
-    m["To"] = OPERATOR; m["Reply-To"] = user
-    with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-        s.login(user, pw); s.sendmail(user, [OPERATOR], m.as_string())
+    send_mail(to=OPERATOR, subject=subject, text=body,
+              from_addr="Deliverability Watch <info@send.aureonglobal.de>", reply_to=OPERATOR)
 
 def main():
     lk = dmarc_records("_dmarc.lk-advertising.site")

@@ -29,6 +29,8 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "sequences"))
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 CLIENTS_DIR = Path(r"C:\Aureon Invoices\clients")
 OPERATOR_ADDR = "info@aureonglobal.de"
 
@@ -100,11 +102,6 @@ def _drop_json(bp: dict, client: dict) -> Path:
 
 
 def _notify(bp: dict, client: dict, json_path: Path) -> bool:
-    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
-    pw = HENV.get("SMTP_PASS")
-    if not pw:
-        print("    (no SMTP_PASS — notification email not sent)")
-        return False
     company = client.get("company") or bp.get("legal_name") or "A client"
     fund = bp.get("payoneer_email") or bp.get("iban") or "—"
     rows = "".join(
@@ -134,16 +131,8 @@ def _notify(bp: dict, client: dict, json_path: Path) -> bool:
             f"Funding: {fund}\nAuthorized: {bp.get('authorized_at')} "
             f"IP {bp.get('signer_ip')}\nSHA {bp.get('authorization_sha')}\n"
             f"Profile JSON: {json_path}\n")
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"Billing on file — {company}"
-    msg["From"] = user
-    msg["To"] = OPERATOR_ADDR
-    msg.attach(MIMEText(text, "plain", "utf-8"))
-    msg.attach(MIMEText(html, "html", "utf-8"))
-    with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-        s.login(user, pw)
-        s.sendmail(user, [OPERATOR_ADDR], msg.as_string())
-    return True
+    return send_mail(to=OPERATOR_ADDR, subject=f"Billing on file — {company}",
+                     html=html, text=text, reply_to=OPERATOR_ADDR)
 
 
 def main() -> int:

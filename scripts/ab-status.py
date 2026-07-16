@@ -19,6 +19,8 @@ from pathlib import Path
 
 ssl._create_default_https_context = ssl._create_unverified_context
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "sequences"))
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -34,7 +36,7 @@ def env(p: Path) -> dict:
 
 S = env(REPO / "sequences" / "supabase.env")
 TOK = S.get("SUPABASE_ACCESS_TOKEN")
-REF = "ccmqkljsjiuavpydbkva"
+REF = "zmzolkijhiaedzcmdfji"
 
 
 def q(sql: str):
@@ -100,27 +102,9 @@ def fmt(profile: str, since: str) -> str:
 
 
 def send_email(subject: str, body: str) -> bool:
-    import smtplib
-    import ssl as _ssl
-    from email.mime.text import MIMEText
-    from email.utils import formatdate, make_msgid
-    H = env(REPO / "sequences" / "hostinger.env")
-    host, port = H.get("SMTP_HOST"), int(H.get("SMTP_PORT", "465"))
-    user, pw = H.get("SMTP_USER"), H.get("SMTP_PASS")
-    to = "info@aureonglobal.de"
-    if not (host and user and pw):
-        print("  ! SMTP creds missing — printed only"); return False
-    msg = MIMEText(body, "plain", "utf-8")
-    msg["From"] = f"AB digest <{H.get('FROM_ADDR', user)}>"
-    msg["To"] = to; msg["Subject"] = subject
-    msg["Date"] = formatdate(localtime=True)
-    msg["Message-ID"] = make_msgid(domain="aureonglobal.de")
-    try:
-        with smtplib.SMTP_SSL(host, port, timeout=30, context=_ssl.create_default_context()) as s:
-            s.login(user, pw); s.send_message(msg)
-        return True
-    except Exception as e:
-        print(f"  ! send failed: {str(e)[:120]}"); return False
+    return send_mail(to="info@aureonglobal.de", subject=subject, text=body,
+                     from_addr="AB digest <info@send.aureonglobal.de>",
+                     reply_to="info@aureonglobal.de")
 
 
 def main() -> int:

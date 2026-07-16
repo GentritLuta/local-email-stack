@@ -26,6 +26,7 @@ import urllib.request, urllib.parse
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "sequences"))
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -285,28 +286,17 @@ def forward(reply: dict, client_email: str, dry: bool, answer: str | None = None
         print(f"  [DRY] would forward {tag} from {prospect} -> client {client_email}")
         print("        action list: " + " | ".join(actions))
         return True
-    m = MIMEMultipart("alternative")
-    m["Subject"] = (f"[Campaign reply #{relay_tok}] {fwd_subject}" if relay_tok
-                    else f"[Campaign reply] {fwd_subject}")[:200]
-    m["From"] = f"AUREON Campaign <{user}>"
-    m["To"] = client_email
-    m["Reply-To"] = prospect      # client hits Reply -> goes straight to the prospect
-    m.attach(MIMEText(text, "plain", "utf-8"))
-    # info@ keeps a silent copy of the handoff for visibility. Delivered via the
-    # envelope recipient list, NOT a Bcc header, so it stays blind to the client
-    # (m.as_string() would otherwise serialise a Bcc header into their copy).
-    envelope = [client_email]
-    if OPERATOR_ADDR.lower() != client_email.lower():
-        envelope.append(OPERATOR_ADDR)
-    try:
-        with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-            s.login(user, pw)
-            s.sendmail(user, envelope, m.as_string())
+    subj = (f"[Campaign reply #{relay_tok}] {fwd_subject}" if relay_tok
+            else f"[Campaign reply] {fwd_subject}")[:200]
+    # info@ keeps a silent (blind) copy of the handoff for visibility. Resend's bcc is
+    # blind to the client (never serialised into their copy), matching the old envelope-Bcc.
+    bcc = [OPERATOR_ADDR] if OPERATOR_ADDR.lower() != client_email.lower() else None
+    if send_mail(to=client_email, subject=subj, text=text, reply_to=prospect,
+                 from_addr="AUREON Campaign <info@send.aureonglobal.de>", bcc=bcc):
         print(f"  -> forwarded reply from {prospect} to {client_email}")
         return True
-    except Exception as e:
-        print(f"  ! forward failed ({prospect} -> {client_email}): {e}")
-        return False
+    print(f"  ! forward failed ({prospect} -> {client_email})")
+    return False
 
 
 def reconcile_forward_bounces(dry: bool) -> dict:

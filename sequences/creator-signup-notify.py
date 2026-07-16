@@ -21,10 +21,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "sequences"))
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-PROJECT = "ccmqkljsjiuavpydbkva"
+PROJECT = "zmzolkijhiaedzcmdfji"
 OPERATOR_ADDR = "info@aureonglobal.de"
 
 
@@ -69,7 +71,8 @@ def client_email_for(slug: str) -> str | None:
             or ((p.get("brand") or {}).get("legal") or {}).get("contact_email"))
 
 
-def build_email(sig: dict, client_email: str, user: str) -> MIMEMultipart:
+def build_email(sig: dict) -> tuple[str, str, str]:
+    """Return (subject, text_body, reply_to=creator) for a signup notification."""
     creator = (sig.get("email") or "").strip()
     name = sig.get("channel_name") or "(no name)"
     lines = [
@@ -91,14 +94,7 @@ def build_email(sig: dict, client_email: str, user: str) -> MIMEMultipart:
         f">> Just hit Reply to reach {name} directly (Reply-To is the creator). "
         "Confirm their per-video number and walk them into signup.",
     ]
-    m = MIMEMultipart("alternative")
-    m["Subject"] = f"[AlgoAlpha signup] {name}"[:200]
-    m["From"] = f"AUREON Campaign <{user}>"
-    m["To"] = client_email
-    if creator:
-        m["Reply-To"] = creator
-    m.attach(MIMEText("\n".join(lines), "plain", "utf-8"))
-    return m
+    return f"[AlgoAlpha signup] {name}"[:200], "\n".join(lines), creator
 
 
 def once(limit: int, dry: bool, to_override: str | None) -> dict:
@@ -110,11 +106,6 @@ def once(limit: int, dry: bool, to_override: str | None) -> dict:
     stats = {"pending": len(rows), "sent": 0, "skipped_no_client": 0, "errors": 0}
     if not rows:
         print("=== creator-signup-notify === no un-notified signups"); return stats
-
-    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
-    pw = HENV.get("SMTP_PASS")
-    if not pw and not dry:
-        print("  ! no SMTP_PASS, cannot send"); stats["errors"] = len(rows); return stats
 
     for s in rows:
         slug = s.get("profile_slug") or "algoalpha"
@@ -128,19 +119,16 @@ def once(limit: int, dry: bool, to_override: str | None) -> dict:
                   f"{s.get('channel_name')} ({s.get('email')})  Reply-To={s.get('email')}")
             stats["sent"] += 1
             continue
-        m = build_email(s, client_email, user)
-        envelope = [client_email]
-        if OPERATOR_ADDR.lower() != client_email.lower():
-            envelope.append(OPERATOR_ADDR)   # blind copy info@ (envelope, not a header)
-        try:
-            with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as srv:
-                srv.login(user, pw)
-                srv.sendmail(user, envelope, m.as_string())
+        subject, text, creator = build_email(s)
+        # info@ blind-copied for visibility (Resend bcc is blind to the client).
+        bcc = [OPERATOR_ADDR] if OPERATOR_ADDR.lower() != client_email.lower() else None
+        if send_mail(to=client_email, subject=subject, text=text, reply_to=(creator or None),
+                     from_addr="AUREON Campaign <info@send.aureonglobal.de>", bcc=bcc):
             mq(f"update creator_signups set notified = true where id = '{_q(s['id'])}'")
             print(f"  -> notified {client_email} of signup {s.get('channel_name')}")
             stats["sent"] += 1
-        except Exception as e:
-            print(f"  ! send failed ({s.get('channel_name')}): {str(e)[:120]}")
+        else:
+            print(f"  ! send failed ({s.get('channel_name')})")
             stats["errors"] += 1
 
     print(f"=== creator-signup-notify === {json.dumps(stats)}")

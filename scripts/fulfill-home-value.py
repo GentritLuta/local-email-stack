@@ -44,6 +44,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "sequences"))
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -149,34 +151,14 @@ def report_html(*, owner_first: str, address: str, mid: str, found: bool) -> tup
 
 def smtp_send(*, to_addr: str, reply_to: str, subject: str, html: str, text: str,
               pdf: bytes | None = None, pdf_name: str = "Home-Value-Report.pdf") -> bool:
-    host = HOST.get("SMTP_HOST"); port = int(HOST.get("SMTP_PORT", "465"))
-    user = HOST.get("SMTP_USER"); pw = HOST.get("SMTP_PASS")
-    from_addr = HOST.get("FROM_ADDR", user)
-    if not (host and user and pw):
-        print("  ! SMTP creds missing"); return False
-    msg = MIMEMultipart("mixed")
-    msg["From"] = f'"Home Value Report" <{from_addr}>'
-    msg["To"] = to_addr
-    msg["Reply-To"] = reply_to or from_addr
-    msg["Subject"] = subject
-    msg["Date"] = formatdate(localtime=True)
-    msg["Message-ID"] = make_msgid(domain="aureonglobal.de")
-    alt = MIMEMultipart("alternative")
-    alt.attach(MIMEText(text, "plain", "utf-8"))
-    alt.attach(MIMEText(html, "html", "utf-8"))
-    msg.attach(alt)
-    if pdf:
-        att = MIMEApplication(pdf, _subtype="pdf")
-        att.add_header("Content-Disposition", "attachment", filename=pdf_name)
-        msg.attach(att)
-    try:
-        ctx = ssl.create_default_context()
-        with smtplib.SMTP_SSL(host, port, timeout=30, context=ctx) as s:
-            s.login(user, pw)
-            s.send_message(msg, from_addr=from_addr, to_addrs=[to_addr, BCC])
-        return True
-    except Exception as e:
-        print(f"  ! send failed: {str(e)[:120]}"); return False
+    # info@ keeps a blind copy, except when the primary recipient already IS info@
+    # (the HOT-alert path passes to_addr=BCC, so we must not duplicate it).
+    bcc = [BCC] if (BCC and BCC.lower() != to_addr.lower()) else None
+    atts = [(pdf_name, pdf)] if pdf else None
+    return send_mail(to=to_addr, subject=subject, html=html, text=text,
+                     reply_to=(reply_to or "info@aureonglobal.de"),
+                     from_addr='"Home Value Report" <info@send.aureonglobal.de>',
+                     bcc=bcc, attachments=atts)
 
 
 def booking_when(rc: dict) -> str:

@@ -27,6 +27,7 @@ if hasattr(sys.stdout, "reconfigure"):
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "sequences"))
 from continuation_lib import generate_continuation, make_continuation_ref  # noqa: E402
+from mailer import send as send_mail   # Resend primary (VPS blocks SMTP), SMTP fallback
 
 CONTINUATION_AFTER_DAYS = 90
 OPERATOR_ADDR = "info@aureonglobal.de"
@@ -71,11 +72,6 @@ def _patch(path, body):
 
 
 def _email_client_to_sign(*, to_email: str, company: str, sub_id: str, ref: str) -> bool:
-    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
-    pw = HENV.get("SMTP_PASS")
-    if not pw:
-        print("    (no SMTP_PASS — sign-request email not sent)")
-        return False
     sign_url = f"{PORTAL}/continuation/{sub_id}"
     html = f"""<div style="font-family:Inter,Arial,sans-serif;color:#111">
     <h2 style="margin:0 0 8px">Your continuation agreement is ready</h2>
@@ -89,17 +85,8 @@ def _email_client_to_sign(*, to_email: str, company: str, sub_id: str, ref: str)
     </div>"""
     text = (f"Your continuation agreement ({ref}) is ready. "
             f"Review and sign: {sign_url}")
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Your AUREON continuation agreement is ready to sign"
-    msg["From"] = user
-    msg["To"] = to_email
-    msg["Cc"] = OPERATOR_ADDR
-    msg.attach(MIMEText(text, "plain", "utf-8"))
-    msg.attach(MIMEText(html, "html", "utf-8"))
-    with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-        s.login(user, pw)
-        s.sendmail(user, [to_email, OPERATOR_ADDR], msg.as_string())
-    return True
+    return send_mail(to=to_email, subject="Your AUREON continuation agreement is ready to sign",
+                     html=html, text=text, cc=[OPERATOR_ADDR], reply_to=OPERATOR_ADDR)
 
 
 def main() -> int:
