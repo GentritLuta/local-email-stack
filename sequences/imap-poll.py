@@ -294,8 +294,20 @@ class Supa:
             return row.get("run_id"), row.get("resend_id"), row.get("id")
         return None, None, None
 
+    @staticmethod
+    def _w(r, what: str):
+        """Raise on a failed WRITE. Every write here used to discard the Response,
+        so a 4xx PATCH looked like success and stats['errors'] stayed 0 — that is
+        how reply-pauses went missing (chad@soldbymarkz.com replied 2026-06-16,
+        was never paused, and got step 2 on 06-19 and step 3 on 07-03). Raising
+        aborts this message before it is flagged \\Seen, so the next poll retries
+        it. Reads still branch on status_code by hand — only writes raise."""
+        if r.status_code >= 400:
+            raise RuntimeError(f"{what} failed: {r.status_code} {r.text[:200]}")
+        return r
+
     def insert_reply(self, row: dict) -> None:
-        self.client.post(f"{self.base}/replies", json=row)
+        self._w(self.client.post(f"{self.base}/replies", json=row), "insert_reply")
 
     def already_have(self, message_id: str) -> bool:
         if not message_id:
@@ -306,24 +318,24 @@ class Supa:
 
     def mark_send_replied(self, send_log_id: str) -> None:
         """Set send_log.replied=true on the outbound row this reply answered."""
-        self.client.patch(f"{self.base}/send_log",
+        self._w(self.client.patch(f"{self.base}/send_log",
                           params={"id": f"eq.{send_log_id}"},
-                          json={"replied": True})
+                          json={"replied": True}), "mark_send_replied")
 
     def mark_send_bounced(self, send_log_id: str) -> None:
-        self.client.patch(f"{self.base}/send_log",
+        self._w(self.client.patch(f"{self.base}/send_log",
                           params={"id": f"eq.{send_log_id}"},
-                          json={"bounced": True, "delivered": False})
+                          json={"bounced": True, "delivered": False}), "mark_send_bounced")
 
     def mark_send_complained(self, send_log_id: str) -> None:
-        self.client.patch(f"{self.base}/send_log",
+        self._w(self.client.patch(f"{self.base}/send_log",
                           params={"id": f"eq.{send_log_id}"},
-                          json={"complained": True})
+                          json={"complained": True}), "mark_send_complained")
 
     def pause_run(self, run_id: str, reason: str) -> None:
-        self.client.patch(f"{self.base}/runs",
+        self._w(self.client.patch(f"{self.base}/runs",
                           params={"id": f"eq.{run_id}"},
-                          json={"status": f"paused_{reason}"})
+                          json={"status": f"paused_{reason}"}), "pause_run")
 
     def pause_runs_for_email(self, email: str) -> int:
         """Robust reply-stop: pause EVERY still-queued run for the prospect at
@@ -343,9 +355,9 @@ class Supa:
                                  params={"prospect_id": f"eq.{p['id']}",
                                          "status": "eq.queued", "select": "id"})
             for run in (qr.json() if qr.status_code == 200 else []):
-                self.client.patch(f"{self.base}/runs",
+                self._w(self.client.patch(f"{self.base}/runs",
                                  params={"id": f"eq.{run['id']}"},
-                                 json={"status": "paused_replied"})
+                                 json={"status": "paused_replied"}), "pause_runs_for_email")
                 n += 1
         return n
 
@@ -408,16 +420,18 @@ class Supa:
             return 0
         n = 0
         for p in rows:
-            self.client.patch(f"{self.base}/prospects",
+            # Compliance path (CAN-SPAM / GDPR): a silent 4xx here meant someone
+            # who asked to opt out stayed subscribed and kept getting mail. Raise.
+            self._w(self.client.patch(f"{self.base}/prospects",
                              params={"id": f"eq.{p['id']}"},
-                             json={"unsubscribed": True})
+                             json={"unsubscribed": True}), "unsubscribe_prospect")
             runs = self.client.get(f"{self.base}/runs",
                                    params={"prospect_id": f"eq.{p['id']}",
                                            "status": "in.(queued,paused_replied,paused_bounced)",
                                            "select": "id"})
             for run in (runs.json() if runs.status_code == 200 else []):
-                self.client.patch(f"{self.base}/runs", params={"id": f"eq.{run['id']}"},
-                                 json={"status": "cancelled"})
+                self._w(self.client.patch(f"{self.base}/runs", params={"id": f"eq.{run['id']}"},
+                                 json={"status": "cancelled"}), "unsubscribe_cancel_run")
             n += 1
         return n
 
@@ -544,20 +558,11 @@ def one_pass(verbose: bool = True) -> dict:
 
                     snippet = extract_snippet(msg)
 
-                    supa.insert_reply({
-                        "run_id":       run_id,
-                        "profile_slug": supa.resolve_profile_slug(from_addr=from_addr, to_addr=to_addr),
-                        "from_addr":    from_addr,
-                        "to_addr":      to_addr,
-                        "subject":      subject[:500],
-                        "class":        klass,
-                        "body_snippet": snippet,
-                        "raw_headers":  {"Message-ID":  msg_id,
-                                         "In-Reply-To": msg.get("In-Reply-To", ""),
-                                         "References":  msg.get("References", ""),
-                                         "Folder":      folder,
-                                         "Matched-Via": match_via if send_log_id else "none"},
-                    })
+                    # The `replies` row is now inserted LAST, just before \Seen —
+                    # see the COMMIT MARKER block below. Its Message-ID is the
+                    # already_have() dedupe key, so writing it here made any later
+                    # failure permanent: the next poll matched the key, skipped the
+                    # message, and the reply-pause was never retried.
 
                     if send_log_id:
                         if   klass == "reply":     supa.mark_send_replied(send_log_id)
@@ -617,6 +622,27 @@ def one_pass(verbose: bool = True) -> dict:
                                 stats["alerts_sent"] += 1
                         except Exception as e:
                             if verbose: print(f"  ! reply-alert error: {e}")
+
+                    # COMMIT MARKER — must stay the LAST write before \Seen.
+                    # mark_send_replied / pause_runs_for_email / unsubscribe_email
+                    # now raise on a 4xx (Supa._w), which aborts this message
+                    # before it is flagged Seen, so the next poll replays it whole.
+                    # Those writes are idempotent and already_have() stays False
+                    # until this row lands, so the replay actually re-runs them.
+                    supa.insert_reply({
+                        "run_id":       run_id,
+                        "profile_slug": supa.resolve_profile_slug(from_addr=from_addr, to_addr=to_addr),
+                        "from_addr":    from_addr,
+                        "to_addr":      to_addr,
+                        "subject":      subject[:500],
+                        "class":        klass,
+                        "body_snippet": snippet,
+                        "raw_headers":  {"Message-ID":  msg_id,
+                                         "In-Reply-To": msg.get("In-Reply-To", ""),
+                                         "References":  msg.get("References", ""),
+                                         "Folder":      folder,
+                                         "Matched-Via": match_via if send_log_id else "none"},
+                    })
 
                     imap.store(num, "+FLAGS", "\\Seen")
                     if verbose:

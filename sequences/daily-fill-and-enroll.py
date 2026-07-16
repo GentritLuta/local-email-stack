@@ -73,9 +73,41 @@ PROFILE_CFG = {
         # personal name — incl. front-desk info@/office@ inboxes — is a valid
         # target. Named leads are still enrolled first (see enroll_up_to).
         "requires_first_name": False,
+        # SOURCE DENYLIST (2026-07-16, measured on 7335 lifetime sends).
+        # Every aureon reply ever (18) came from a cross-brokerage agent
+        # DIRECTORY — whitestagrealty 14, fastexpert 3 (0.45% pooled). The
+        # sources below are SINGLE-brokerage staff rosters: salaried agents
+        # who don't buy seller leads. Together 0 replies on 960 sends; at the
+        # directory rate we'd have expected ~13 (p ~ 1e-6). See _source_ok.
+        # corcoranperry (24 sends) and cwbr.org (61) are NOT listed — too
+        # little data to condemn; they stay in and get measured.
+        "source_deny": ["blairrg.com", "compass.com",
+                        "ascendgroupre.com", "jenniferlandro.com"],
+        # Work the sources that actually reply first (measured, see above).
+        "source_prefer": ["whitestagrealty.com", "fastexpert.com"],
+        # E1 guard (2026-07-16): don't enroll a lead until {company} renders a
+        # real name — see _renders_ok. 589 of 1006 eligible are waiting on a
+        # company backfill from their website; they are held, not dropped.
+        "require_real_company": True,
+        # CROSS-BRAND (2026-07-16). lk-advertising has had this since 06-13, but
+        # aureon never did, so the guard was one-way: LK stayed out of aureon's
+        # leads while aureon freely re-mailed LK's. 84 humans got cold email from
+        # both brands, 73 of them after 06-19 and 13 on 07-15 alone. The
+        # send-time check in safeguards.check_recipient_dedup is scoped to each
+        # profile's own sending root ON PURPOSE (a blanket block once starved LK),
+        # so enroll-time is the right layer. Costs aureon 66 of 400 eligible.
+        # NOTE: this makes the two brands race for shared directory leads rather
+        # than giving aureon first claim — that allocation call is the user's,
+        # since LK is a paying client.
+        "dedupe_cross_brand": True,
     },
     "algoalpha": {
-        "niche_slug":      "crypto_influencer",
+        # 2026-07-07: was "crypto_influencer" (team_pages niche) which scraped crypto
+        # NEWSROOM team/speaker pages (decrypt.co/team, coindesk speakers) = media
+        # outlets and companies, NOT individual creators = off-ICP. Set to None so
+        # daily-fill skips team-page sourcing and uses only the creator_scrapers
+        # (YouTube + TradingView), which yield real individual crypto/trading creators.
+        "niche_slug":      None,
         "backfill_script": "scripts/backfill-algoalpha-prospects.py",
         "creator_scrapers": [
             # (script, args)
@@ -108,12 +140,18 @@ PROFILE_CFG = {
         # enroll. The YC published-email harvest (diraya-nightly-grow) still runs as
         # a second, higher-quality named-founder source. Sends on the Pro Resend
         # account (key in profiles/diraya.private.json).
-        "niche_slug":      "diraya_b2b_saas",
+        # REVERTED 2026-07-07: the diraya_b2b_saas widening pulled IT dev-shops /
+        # consultancies / "logistics software" industry pages (computools, edvantis,
+        # eliftech) that are NOT venture-stage software-product startups = off-ICP.
+        # diraya's real ICP is venture AI/SaaS startups; those come from the YC
+        # published-email harvest (diraya-nightly-grow -> yc_ai csv_import). Fit
+        # over volume: use only that source, stop scraping the broad junk niche.
+        "niche_slug":      None,
         "backfill_script": None,
         "creator_scrapers": [],
         "requires_city":   False,
         "requires_first_name": False,  # name-optional ({greeting}); role inboxes OK
-        "import_only":     False,      # scrape the broad B2B-SaaS niche
+        "import_only":     True,       # YC-imported venture startups only, no broad scrape
     },
     "energ": {
         # Energy-intensive German KMU/Gewerbe in NRW. Leads come from German
@@ -216,6 +254,26 @@ def http_get(path: str) -> list:
     return json.loads(urllib.request.urlopen(req, timeout=60).read())
 
 
+def http_get_all(path: str) -> list:
+    """http_get, paged past PostgREST's server-side row cap.
+
+    The server caps a response at 1000 rows no matter how big the client's
+    `limit` is, and returns 200 — so a bare `limit=2000` silently truncates.
+    That made enroll_up_to blind to prospects beyond the first 1000 AND gave
+    it a short `enrolled` set, so already-enrolled leads looked eligible,
+    consumed the day's target, then 409'd on the (sequence_id, prospect_id)
+    unique key. Page until a short chunk comes back.
+    """
+    out, step, start = [], 1000, 0
+    sep = "&" if "?" in path else "?"
+    while True:
+        chunk = http_get(f"{path}{sep}limit={step}&offset={start}")
+        out.extend(chunk)
+        if len(chunk) < step:
+            return out
+        start += step
+
+
 def http_post(path: str, body: dict) -> None:
     req = urllib.request.Request(
         f"{URL}/rest/v1/{path}",
@@ -273,15 +331,39 @@ def _warmup_day(w: dict) -> int:
 
 def cap_target_for_profile(profile_slug: str) -> tuple[int, dict[str, int]]:
     """Today's room across all subdomains in this profile = sum(
-    daily_target - sent_today ) per from_domain."""
-    pf = REPO / "profiles" / f"{profile_slug}.json"
-    if not pf.exists(): return 0, {}
-    d = json.loads(pf.read_text(encoding="utf-8"))
+    daily_target - sent_today ) per from_domain.
+
+    Reads the DB `profiles.config`, NOT profiles/<slug>.json, because the
+    sequence-runner sends off the DB config (fetch_profile_config) — budgeting
+    against the local file over-enrolls whenever the two have drifted. They
+    HAD drifted badly for aureon (2026-07-16): the file listed 12 subdomains
+    on a 15/25/35/50 curve (up to 600/day) while the DB had 6 subdomains on a
+    17/21/25 curve (150/day), so enrollment bought ~4x the capacity that could
+    actually send. The surplus sat queued, aged into follow-up steps, and ate
+    the cap that new step-1 sends needed. Falls back to the file only if the
+    DB has no config for this profile.
+    """
+    d = None
+    try:
+        rows = http_get(f"profiles?slug=eq.{profile_slug}&select=config")
+        if rows and rows[0].get("config"):
+            d = rows[0]["config"]
+    except Exception as e:
+        print(f"  ! {profile_slug}: DB config unavailable ({e}); falling back to profile JSON")
+    if d is None:
+        pf = REPO / "profiles" / f"{profile_slug}.json"
+        if not pf.exists(): return 0, {}
+        d = json.loads(pf.read_text(encoding="utf-8"))
     curve = d.get("ramp_curve_snowball_v1", [])
-    # Today's send_log per subdomain (UTC midnight cutoff is close enough)
+    # Today's send_log for THIS profile's subdomains. Scoped + paged: the old
+    # query was op-wide with limit=500, so once the whole operation passed 500
+    # sends in a day it silently under-counted sent_today and over-enrolled.
+    own = {fd["domain"].lower() for fd in d.get("relay", {}).get("from_domains", [])}
     today_iso = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT00:00:00Z")
-    rows = http_get(f"send_log?sent_at=gte.{urllib.parse.quote(today_iso)}&select=from_addr&limit=500")
-    sent_by_sub = Counter(r["from_addr"].split("@")[-1] for r in rows if r.get("from_addr"))
+    rows = http_get_all(f"send_log?sent_at=gte.{urllib.parse.quote(today_iso)}&select=from_addr")
+    sent_by_sub = Counter(
+        dom for r in rows
+        if (dom := (r.get("from_addr") or "").split("@")[-1].lower()) in own)
 
     room_by_sub: dict[str, int] = {}
     total_room = 0
@@ -359,15 +441,77 @@ def _emails_touched_by_other_brands(profile_slug: str) -> set[str]:
 
 def _avg_views_ok(profile_slug: str, p: dict) -> bool:
     """AlgoAlpha only: a creator is enrollable only if their last-10-video average views
-    (enriched_context.avg_views_10) is >= 3000. Unknown counts as not-ok (never enroll a
-    creator we cannot confirm qualifies). Every other profile is unaffected."""
+    (enriched_context.avg_views_10) is inside the auto-offer window 3,000..100,000.
+    Unknown counts as not-ok (never enroll a creator we cannot confirm qualifies).
+    Above the window = whale: excluded from auto-enroll, handled as a manual negotiated
+    deal (the 35 USD/1k rate would over-commit there). Every other profile is unaffected."""
     if profile_slug != "algoalpha":
         return True
     av = (p.get("enriched_context") or {}).get("avg_views_10")
     try:
-        return av not in (None, "") and float(av) >= 3000
+        return av not in (None, "") and 3000 <= float(av) <= 100_000
     except (TypeError, ValueError):
         return False
+
+
+def _runner():
+    """Load sequence-runner.py (hyphen in the name blocks a plain import).
+
+    Reused so this script's enrollment gate uses the SAME _clean_company the
+    runner uses at send time — a local copy would drift and re-open E1.
+    """
+    global _RUNNER
+    try:
+        return _RUNNER
+    except NameError:
+        pass
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_sr", REPO / "sequences" / "sequence-runner.py")
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except SystemExit:
+        pass
+    _RUNNER = mod
+    return mod
+
+
+def _renders_ok(profile_slug: str, p: dict) -> bool:
+    """Only enroll a lead whose {company} will render as a REAL name.
+
+    2026-07-16: _clean_company() (sequence-runner.py:483) blanks any
+    single-token company equal to the email domain — 'Firstweber' from
+    firstweber.com, 'Isellwausau' from isellwausau.com — and :586 then falls
+    back to 'your business', so the subject ships as "a seller test for your
+    business". That was 40 of the 57 queued step-1 runs (70%). The copy's whole
+    edge is the personalised subject ("a seller test for Keller Williams"
+    replied at 5.88%), so send those leads only once `company` is backfilled
+    into a real name — do NOT widen the fallback and do NOT edit the copy
+    (editing step-1 copy changes the clarity_checks hash, and with the local
+    Claude CLI at 401 the judge cannot re-issue a verdict -> every step-1 send
+    would be held). All 589 currently-blocked leads have a `website` set, so
+    they are recoverable by a backfill, not lost.
+    Only gates profiles that opt in via require_real_company.
+    """
+    if not PROFILE_CFG.get(profile_slug, {}).get("require_real_company"):
+        return True
+    return bool(_runner()._clean_company(p))
+
+
+def _source_ok(profile_slug: str, p: dict) -> bool:
+    """Drop prospects from lead sources this profile has measured as dead.
+
+    Aureon's replies come only from cross-brokerage agent DIRECTORIES
+    (whitestagrealty, fastexpert: 18 replies / 4027 sends = 0.45%). Sources
+    that are a SINGLE brokerage's staff roster are salaried agents who never
+    reply — blairrg + compass + ascendgroupre + jenniferlandro together are
+    0 replies on 960 sends (expected ~13 at the directory rate). A denylist,
+    not an allowlist: an unknown new source should still flow through and get
+    a fair measurement rather than silently starving enrollment to zero.
+    """
+    deny = PROFILE_CFG.get(profile_slug, {}).get("source_deny") or []
+    src = (p.get("source") or "").lower()
+    return not any(d in src for d in deny)
 
 
 def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
@@ -377,10 +521,10 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
     # Only count active enrollments — cancelled runs from a prior cleanup
     # pass shouldn't block a clean re-enrollment.
     enrolled = {r["prospect_id"] for r in
-                http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
-    rows = http_get(
+                http_get_all(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id")}
+    rows = http_get_all(
         f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
-        f"&select=id,email,first_name,company,city,enriched_context&limit=2000"
+        f"&select=id,email,first_name,company,city,enriched_context,source"
     )
     cross = (_emails_touched_by_other_brands(profile_slug)
              if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
@@ -391,6 +535,8 @@ def count_eligible_unenrolled(profile_slug: str, requires_city: bool,
         if requires_first_name and not p.get("first_name"): continue
         if requires_city and not p.get("city"): continue
         if cross is not None and (p.get("email") or "").lower() in cross: continue
+        if not _source_ok(profile_slug, p): continue
+        if not _renders_ok(profile_slug, p): continue
         if not _avg_views_ok(profile_slug, p): continue
         n += 1
     return n
@@ -406,10 +552,10 @@ def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
     # Only count active enrollments — cancelled runs from a prior cleanup
     # pass shouldn't block a clean re-enrollment.
     enrolled = {r["prospect_id"] for r in
-                http_get(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id&limit=2000")}
-    rows = http_get(
+                http_get_all(f"runs?sequence_id=eq.{SID}&status=in.(queued,running,paused_replied,paused_bounced,completed)&select=prospect_id")}
+    rows = http_get_all(
         f"prospects?profile_slug=eq.{profile_slug}&verified=eq.true&unsubscribed=eq.false"
-        f"&select=id,email,first_name,company,city,enriched_context&limit=2000"
+        f"&select=id,email,first_name,company,city,enriched_context,source"
     )
     cross = (_emails_touched_by_other_brands(profile_slug)
              if PROFILE_CFG.get(profile_slug, {}).get("dedupe_cross_brand") else None)
@@ -419,11 +565,23 @@ def enroll_up_to(profile_slug: str, target: int, requires_city: bool,
                 and (p.get("first_name") or not requires_first_name)
                 and (not requires_city or p.get("city"))
                 and (cross is None or (p.get("email") or "").lower() not in cross)
+                and _source_ok(profile_slug, p)
+                and _renders_ok(profile_slug, p)
                 and _avg_views_ok(profile_slug, p)]
-    # Prefer leads we can personalize by NAME — send to the best prospects first,
-    # leaving company-only / front-desk (info@) leads as overflow. Stable sort
-    # keeps prior ordering within each tier.
-    eligible.sort(key=lambda p: 0 if (p.get("first_name") or "").strip() else 1)
+    # Order: proven lead SOURCE first, then leads we can personalize by NAME —
+    # send to the best prospects first, leaving company-only / front-desk
+    # (info@) leads as overflow. Stable sort keeps prior ordering within a tier.
+    # source_prefer is exploitation of what the reply data actually shows
+    # (whitestagrealty 1.4%, fastexpert 0.7%); everything not listed still gets
+    # enrolled behind them, so untested sources keep being measured rather than
+    # frozen out. Profiles with no source_prefer sort exactly as before.
+    prefer = PROFILE_CFG.get(profile_slug, {}).get("source_prefer") or []
+
+    def _src_rank(p: dict) -> int:
+        src = (p.get("source") or "").lower()
+        return next((i for i, s in enumerate(prefer) if s in src), len(prefer))
+
+    eligible.sort(key=lambda p: (_src_rank(p), 0 if (p.get("first_name") or "").strip() else 1))
     # Per-domain cap: don't let one recipient domain dominate a day's enrollment.
     # A single brokerage/firm team page can list 100s of agents; hammering one
     # domain looks like spam and lets one bad domain (a server that rejects us)
@@ -568,6 +726,14 @@ def fill_profile(profile_slug: str, *, do_scrape: bool, dry: bool) -> dict:
             for s, args in cfg["creator_scrapers"]:
                 rc, _ = run_subprocess(s, args)
                 print(f"     {Path(s).name} rc={rc}")
+            # Creator scrapers run --no-smtp (fast, unverified). The VPS has port 25
+            # blocked so no live SMTP RCPT is possible; MX-verify the fresh creator
+            # leads (MX + heuristics, no port 25) so they become eligible. Same
+            # confidence tier the team-page brands already send on.
+            if cfg["creator_scrapers"]:
+                rc, _ = run_subprocess("sequences/promote_mx.py",
+                                       ["--profile", profile_slug, "--creators-only"])
+                print(f"     promote_mx rc={rc}")
             if cfg["backfill_script"]:
                 rc, _ = run_subprocess(cfg["backfill_script"], cfg.get("backfill_args", []))
                 print(f"     {Path(cfg['backfill_script']).name} rc={rc}")
