@@ -12,6 +12,7 @@ import ResetPassword from "./routes/ResetPassword";
 import AuthCallback from "./routes/AuthCallback";
 import Admin from "./routes/Admin";
 import Security from "./routes/Security";
+import ConnectInstagram from "./routes/ConnectInstagram";
 import { ProtectedRoute, AdminRoute } from "./components/Guards";
 import { useAuth } from "./lib/auth";
 import Logo from "./components/Logo";
@@ -30,6 +31,7 @@ function Header() {
               Admin
             </Link>
           )}
+          <Link to="/connect-instagram" className="hint" style={{ marginTop: 0 }}>Instagram</Link>
           <Link to="/security" className="hint" style={{ marginTop: 0 }}>Security</Link>
           <span className="hint" style={{ marginTop: 0 }}>{session.user.email}</span>
           <button className="btn ghost" style={{ marginTop: 0, padding: "7px 14px", fontSize: 13 }} onClick={() => signOut()}>
@@ -59,6 +61,7 @@ export default function App() {
         <Route path="/dashboard/:slug" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
+        <Route path="/connect-instagram" element={<ProtectedRoute><ConnectInstagram /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

@@ -604,6 +604,23 @@ export async function submitCredentials(submissionId: string, credentials: Crede
   return data as { ok: true; client_id: string; sha: string };
 }
 
+// A social/both client connects their own Instagram by pasting a long-lived Graph
+// API token. The auth-admin Edge Function verifies it against Meta server-side,
+// derives the IG Business account, and stores it (never returned to the browser).
+export async function connectInstagram(token: string): Promise<{ ok: true; username: string; ig_user_id: string }> {
+  const { data, error } = await supabase.functions.invoke("auth-admin", {
+    body: { action: "connect_instagram", token },
+  });
+  if (error) {
+    // On 4xx the Edge Function returns a JSON { error } body; surface that message.
+    let msg = (error as any)?.message ?? String(error);
+    try { const body = await (error as any)?.context?.json?.(); if (body?.error) msg = body.error; } catch { /* ignore */ }
+    throw new Error(msg);
+  }
+  if (data?.error) throw new Error(data.error);
+  return data as { ok: true; username: string; ig_user_id: string };
+}
+
 // Has the client already handed over access? (drives whether the step is shown).
 // The api_token itself is never selected back to the browser.
 export async function getCredentialsForClient(): Promise<CredentialsProfile | null> {

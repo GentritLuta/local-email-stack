@@ -46,6 +46,9 @@ def _load_env(path: Path) -> dict:
 
 SENV = _load_env(REPO / "sequences" / "supabase.env")
 HENV = _load_env(HOSTINGER_ENV)
+# SocialForge's env, where per-client Instagram publishing tokens land (poster reads them).
+# Override via SOCIALFORGE_ENV in supabase.env; only written when the dir exists on this box.
+SOCIALFORGE_ENV = Path(SENV.get("SOCIALFORGE_ENV", r"D:/socialforge/.env"))
 URL = SENV["SUPABASE_URL"].rstrip("/")
 KEY = SENV["SUPABASE_SERVICE_KEY"]          # service role — bypasses RLS
 H = {"apikey": KEY, "Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
@@ -92,9 +95,9 @@ def _env_key(cr: dict, slug: str) -> str:
     return f"CLIENT_API_TOKEN_{token}"
 
 
-def _write_env(key: str, value: str) -> None:
-    """Set or replace KEY=value in hostinger.env, preserving everything else."""
-    lines = HOSTINGER_ENV.read_text(encoding="utf-8").splitlines() if HOSTINGER_ENV.exists() else []
+def _set_env(path: Path, key: str, value: str) -> None:
+    """Set or replace KEY=value in an env file, preserving everything else."""
+    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
     out, found = [], False
     for ln in lines:
         if re.match(rf"^\s*{re.escape(key)}\s*=", ln):
@@ -103,7 +106,12 @@ def _write_env(key: str, value: str) -> None:
             out.append(ln)
     if not found:
         out.append(f"{key}={value}")
-    HOSTINGER_ENV.write_text("\n".join(out) + "\n", encoding="utf-8")
+    path.write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
+def _write_env(key: str, value: str) -> None:
+    """Set or replace KEY=value in hostinger.env, preserving everything else."""
+    _set_env(HOSTINGER_ENV, key, value)
 
 
 def _notify(cr: dict, client: dict, answers: dict, env_key: str) -> bool:
@@ -191,15 +199,12 @@ def _notify(cr: dict, client: dict, answers: dict, env_key: str) -> bool:
 
 
 def main() -> int:
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
     pending = _get(
         "client_credentials?authorized=eq.true"
         "&or=(written_to_env_at.is.null,notified_at.is.null)"
         "&select=*")
-    if not pending:
-        print("credentials-sync: nothing pending")
-        return 0
-    print(f"credentials-sync: {len(pending)} handover(s) to process")
-    now = dt.datetime.now(dt.timezone.utc).isoformat()
+    print(f"credentials-sync: {len(pending)} DNS/access handover(s) to process")
     for cr in pending:
         client = _client(cr["client_id"])
         answers = _latest_answers(cr["client_id"])
@@ -228,6 +233,30 @@ def main() -> int:
 
         if patch:
             _patch(f"client_credentials?id=eq.{cr['id']}", patch)
+
+    # Instagram publishing tokens -> SocialForge env (separate flow; no authorization gate).
+    ig_pending = _get(
+        "client_credentials?ig_access_token=not.is.null&ig_written_to_env_at=is.null"
+        "&select=id,client_id,profile_slug,ig_access_token,ig_user_id,ig_username")
+    if ig_pending:
+        print(f"credentials-sync: {len(ig_pending)} Instagram token(s) to sync")
+    for cr in ig_pending:
+        client = _client(cr["client_id"])
+        slug = cr.get("profile_slug") or client.get("profile_slug") \
+            or _slugify(client.get("company") or "")
+        key = re.sub(r"[^A-Z0-9]", "", slug.upper()) or "BRAND"
+        label = client.get("company") or cr["client_id"]
+        if not SOCIALFORGE_ENV.parent.exists():
+            print(f"  . {label}: SocialForge not on this box ({SOCIALFORGE_ENV}); skipping IG sync")
+            continue
+        try:
+            _set_env(SOCIALFORGE_ENV, f"IG_{key}_TOKEN", (cr.get("ig_access_token") or "").strip())
+            if cr.get("ig_user_id"):
+                _set_env(SOCIALFORGE_ENV, f"IG_{key}_USER_ID", str(cr["ig_user_id"]).strip())
+            _patch(f"client_credentials?id=eq.{cr['id']}", {"ig_written_to_env_at": now})
+            print(f"  + {label}: Instagram @{cr.get('ig_username')} -> SocialForge env [IG_{key}_*]")
+        except Exception as e:
+            print(f"  ! {label}: IG env write failed: {e}")
     return 0
 
 

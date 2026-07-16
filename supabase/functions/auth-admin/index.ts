@@ -457,6 +457,54 @@ Deno.serve(async (req) => {
       return json({ ok: true, client_id: client.id, sha });
     }
 
+    if (action === "connect_instagram") {
+      // A social/both client connects their own Instagram: they paste a long-lived
+      // Graph API token. Verify it against Meta server-side (this function runs on
+      // Supabase, not behind the operator's local network filters), derive the IG
+      // Business account, and store it on the client's credentials row.
+      const authz = req.headers.get("Authorization") ?? "";
+      const jwt = authz.replace(/^Bearer\s+/i, "");
+      if (!jwt) return json({ error: "sign in first" }, 401);
+      const { data: who, error: whoErr } = await admin.auth.getUser(jwt);
+      if (whoErr || !who?.user) return json({ error: "invalid session" }, 401);
+
+      const token = String(payload.token ?? "").trim();
+      if (!token) return json({ error: "missing token" }, 400);
+
+      const { data: client } = await admin
+        .from("clients")
+        .select("id, auth_user_id, profile_slug")
+        .eq("auth_user_id", who.user.id)
+        .maybeSingle();
+      if (!client) return json({ error: "no client account for this user" }, 404);
+
+      // Verify the token + derive the IG Business account via the Graph API.
+      const G = "https://graph.facebook.com/v21.0";
+      const acc = await (await fetch(`${G}/me/accounts?fields=instagram_business_account,name&access_token=${encodeURIComponent(token)}`)).json();
+      if (acc.error) return json({ error: "Meta rejected the token: " + (acc.error.message ?? "invalid token") }, 400);
+      const page = (acc.data ?? []).find((p: any) => p.instagram_business_account);
+      if (!page) return json({ error: "No Instagram Business account is linked to a Facebook Page this token manages. Convert the account to Business/Creator and link a Page." }, 400);
+      const igId = page.instagram_business_account.id;
+      const me = await (await fetch(`${G}/${igId}?fields=username&access_token=${encodeURIComponent(token)}`)).json();
+      if (!me.username) return json({ error: "Could not read the Instagram account." }, 400);
+
+      const nowIso = new Date().toISOString();
+      const { error: upErr } = await admin
+        .from("client_credentials")
+        .upsert({
+          client_id: client.id,
+          profile_slug: client.profile_slug ?? null,
+          ig_access_token: token,
+          ig_user_id: igId,
+          ig_username: me.username,
+          ig_token_verified_at: nowIso,
+          ig_written_to_env_at: null,
+        }, { onConflict: "client_id" });
+      if (upErr) throw upErr;
+
+      return json({ ok: true, username: me.username, ig_user_id: igId });
+    }
+
     return json({ error: `unknown action: ${action}` }, 400);
   } catch (e) {
     console.error("auth-admin error", action, e);
