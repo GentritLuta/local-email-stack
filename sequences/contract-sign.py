@@ -24,7 +24,7 @@ Usage:
     py sequences/contract-sign.py seal [--id <contract_id>]
 """
 from __future__ import annotations
-import argparse, hashlib, json, sys, ssl, smtplib, datetime as dt
+import argparse, base64, hashlib, json, sys, ssl, smtplib, tempfile, datetime as dt
 from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -67,17 +67,12 @@ OPERATOR_ADDR = "info@aureonglobal.de"
 
 def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_email: str,
                               signed_at: str, sealed_at: str, ip: str, ua: str, sha: str,
-                              pdf_path: Path | None, html_fallback: Path) -> None:
-    """On seal, email BOTH the operator (info@) and the client a copy of the
-    signed agreement (PDF attached) plus the signature audit trail — a second,
-    independent evidence record beyond the DB + the stored PDF. Sends from
-    info@aureonglobal.de via Hostinger SMTP."""
-    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
-    pw = HENV.get("SMTP_PASS")
-    if not pw:
-        print("    (no SMTP_PASS — evidence email not sent)")
-        return
-
+                              pdf_path: Path | None, html_fallback: Path,
+                              operator_only: bool = False) -> bool:
+    """On seal, email the operator (info@) and — unless operator_only — the client a copy
+    of the signed agreement (PDF attached) plus the signature audit trail. Primary transport
+    is Resend over HTTPS, because the VPS (where seal runs) blocks the SMTP ports 25/465/587;
+    Hostinger SMTP is a fallback for the laptop. Returns True if the email was sent."""
     rows = (
         ("Agreement", contract_ref),
         ("Signed by (Client)", f"{signer_name} ({signer_email})"),
@@ -104,13 +99,51 @@ def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_ema
                  + "\n".join(f"{k}: {v}" for k, v in rows)
                  + "\n\nThe fully executed agreement (with Certificate of Completion) is attached.")
 
+    subject = f"Fully executed agreement: {contract_ref}"[:200]
     attach = pdf_path if (pdf_path and pdf_path.exists()) else html_fallback
     recipients = [OPERATOR_ADDR]
-    if signer_email and "@" in signer_email:
+    if not operator_only and signer_email and "@" in signer_email:
         recipients.append(signer_email)
+    filename = f"{contract_ref.replace(' ', '_')}-signed{attach.suffix if hasattr(attach, 'suffix') else '.pdf'}"
 
+    # --- Primary: Resend over HTTPS (the VPS blocks SMTP ports; Resend uses 443). ---
+    resend_key = (HENV.get("RESEND_NEW_ACCOUNT_API_KEY")
+                  or HENV.get("RESEND_FULL_ACCESS_API_KEY")
+                  or HENV.get("RESEND_API_KEY"))
+    if resend_key:
+        payload = {
+            "from": "Aureon Global <info@send.aureonglobal.de>",
+            "to": recipients,
+            "reply_to": OPERATOR_ADDR,
+            "subject": subject,
+            "html": body_html,
+            "text": text_body,
+        }
+        try:
+            payload["attachments"] = [{"filename": filename,
+                                       "content": base64.b64encode(attach.read_bytes()).decode()}]
+        except Exception as e:
+            print(f"    (attachment skipped: {e})")
+        try:
+            r = httpx.post("https://api.resend.com/emails", json=payload, timeout=30,
+                           headers={"Authorization": f"Bearer {resend_key}",
+                                    "Content-Type": "application/json",
+                                    "User-Agent": "aureon-contract-sign/1.0"})
+            if r.status_code in (200, 201):
+                print(f"    ✓ evidence email sent via Resend to {', '.join(recipients)}")
+                return True
+            print(f"    ! Resend send failed {r.status_code}: {r.text[:200]}")
+        except Exception as e:
+            print(f"    ! Resend send error: {e}")
+
+    # --- Fallback: Hostinger SMTP (works on the laptop; blocked on the VPS). ---
+    user = HENV.get("SMTP_USER") or OPERATOR_ADDR
+    pw = HENV.get("SMTP_PASS")
+    if not pw:
+        print("    (no SMTP_PASS and Resend unavailable — evidence email not sent)")
+        return False
     msg = MIMEMultipart("mixed")
-    msg["Subject"] = f"Fully executed agreement: {contract_ref}"[:200]
+    msg["Subject"] = subject
     msg["From"] = f"Aureon Global <{user}>"
     msg["To"] = ", ".join(recipients)
     alt = MIMEMultipart("alternative")
@@ -119,17 +152,21 @@ def _email_signature_evidence(*, contract_ref: str, signer_name: str, signer_ema
     msg.attach(alt)
     try:
         data = attach.read_bytes()
-        sub = "pdf" if attach.suffix == ".pdf" else "html"
-        part = MIMEApplication(data, _subtype=sub)
-        part.add_header("Content-Disposition", "attachment",
-                        filename=f"{contract_ref.replace(' ', '_')}-signed{attach.suffix}")
+        subt = "pdf" if attach.suffix == ".pdf" else "html"
+        part = MIMEApplication(data, _subtype=subt)
+        part.add_header("Content-Disposition", "attachment", filename=filename)
         msg.attach(part)
     except Exception as e:
         print(f"    (attachment skipped: {e})")
-    with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
-        s.login(user, pw)
-        s.sendmail(user, recipients, msg.as_string())
-    print(f"    ✓ evidence email sent to {', '.join(recipients)}")
+    try:
+        with smtplib.SMTP_SSL("smtp.hostinger.com", 465, context=ssl.create_default_context()) as s:
+            s.login(user, pw)
+            s.sendmail(user, recipients, msg.as_string())
+        print(f"    ✓ evidence email sent via SMTP to {', '.join(recipients)}")
+        return True
+    except Exception as e:
+        print(f"    ! SMTP send failed: {e}")
+        return False
 
 
 def _rows(resp) -> list | None:
@@ -302,11 +339,14 @@ def seal(one_id: str | None = None) -> int:
             # Second evidence trail: email the operator (info@) the signed copy +
             # the audit details (signer, timestamp, IP, SHA) with the PDF attached.
             try:
-                _email_signature_evidence(
+                if _email_signature_evidence(
                     contract_ref=c["contract_ref"], signer_name=c.get("signer_name") or "",
                     signer_email=c.get("signer_email") or "", signed_at=signed_at,
                     sealed_at=patch["sealed_at"], ip=ip, ua=ua, sha=sha,
-                    pdf_path=out_pdf if pdf_ok else None, html_fallback=out_html)
+                    pdf_path=out_pdf if pdf_ok else None, html_fallback=out_html):
+                    cli.patch(f"/contracts?id=eq.{c['id']}",
+                              json={"notified_at": patch["sealed_at"]},
+                              headers={**H, "Prefer": "return=minimal"})
             except Exception as e:
                 print(f"    (evidence email skipped: {e})")
         else:
@@ -315,12 +355,48 @@ def seal(one_id: str | None = None) -> int:
     return sealed
 
 
+def renotify(one_id: str | None, do_all: bool) -> int:
+    """Re-send the fully-executed evidence email (operator-only) for sealed contracts that
+    were never notified — recovers signings lost to the VPS SMTP-port block. --id targets one
+    contract; --all covers every sealed contract with notified_at still null."""
+    if one_id:
+        q = f"/contracts?id=eq.{one_id}&select=*"
+    elif do_all:
+        q = "/contracts?status=eq.sealed&notified_at=is.null&select=*&order=sealed_at.asc"
+    else:
+        print("renotify: pass --id <contract_id> or --all"); return 2
+    rows = cli.get(q, headers=H).json()
+    if not rows:
+        print("renotify: nothing to do"); return 0
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
+    sent = 0
+    for c in rows:
+        ref = c.get("contract_ref") or c["id"]
+        sp = c.get("signed_pdf_path") or ""
+        pdf_path = Path(sp) if (sp.lower().endswith(".pdf") and Path(sp).exists()) else None
+        tmp_html = Path(tempfile.gettempdir()) / f"{str(ref).replace(' ', '_')}.html"
+        tmp_html.write_text(c.get("contract_html") or "<html></html>", encoding="utf-8")
+        print(f"  renotify {ref} ({c.get('signer_name')} / {c.get('signer_email')})")
+        if _email_signature_evidence(
+                contract_ref=str(ref), signer_name=c.get("signer_name") or "",
+                signer_email=c.get("signer_email") or "", signed_at=c.get("signed_at") or "",
+                sealed_at=c.get("sealed_at") or "", ip=c.get("signer_ip") or "",
+                ua=c.get("signer_user_agent") or "", sha=c.get("contract_sha256") or "",
+                pdf_path=pdf_path, html_fallback=tmp_html, operator_only=True):
+            cli.patch(f"/contracts?id=eq.{c['id']}", json={"notified_at": now},
+                      headers={**H, "Prefer": "return=minimal"})
+            sent += 1
+    print(f"renotify: {sent}/{len(rows)} operator notification(s) sent")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("prepare")
     sp = sub.add_parser("seal"); sp.add_argument("--id", default=None)
     sub.add_parser("run")
+    rn = sub.add_parser("renotify"); rn.add_argument("--id", default=None); rn.add_argument("--all", action="store_true")
     args = ap.parse_args()
     if args.cmd == "prepare":
         prepare()
@@ -328,6 +404,8 @@ def main() -> int:
         seal(args.id)
     elif args.cmd == "run":
         prepare(); seal(None)
+    elif args.cmd == "renotify":
+        return renotify(args.id, args.all)
     return 0
 
 
