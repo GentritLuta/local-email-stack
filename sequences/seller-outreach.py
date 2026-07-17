@@ -145,8 +145,19 @@ def is_suppressed(addr: str) -> str | None:
 # Opt-out intent in the prospect's reply -> acknowledge and stop, do not pitch.
 _OPTOUT_RX = re.compile(
     r"\b(unsubscribe|opt[\s-]?out|remove me|stop emailing|take me off|"
-    r"not interested|kein interesse|abmelden|austragen|nicht interessiert|"
-    r"do not contact|leave me alone)\b", re.I)
+    r"not interested|no thank|kein interesse|kein bedarf|abmelden|austragen|"
+    r"nicht interessiert|nein danke|do not contact|leave me alone)\b", re.I)
+
+# A reply that IS just a bare negative ("NEIN", "No", "Nope", "Non") is a hard
+# decline — matched on the WHOLE stripped top-reply so a longer interested reply
+# that merely contains the word ("nein, aber Dienstag passt") is NOT caught.
+# Added after a NEIN reply got a follow-up auto-sent to it (2026-07-17).
+_BARE_NO_RX = re.compile(r"^\W*(no|nein|nope|non|stop|kein interesse|nein danke|kein bedarf)\W*$", re.I)
+
+
+def is_optout(text: str) -> bool:
+    t = (text or "").strip()
+    return bool(_OPTOUT_RX.search(t) or _BARE_NO_RX.match(t))
 
 # A reply asking for the free list/sellers (keyword, or a short ZIP-dominated
 # reply) gets the value delivered first and is NEVER pitched a Calendly link.
@@ -816,7 +827,7 @@ def one_pass(limit: int, dry: bool) -> dict:
         is_german = profile.get("slug") in GERMAN_PROFILES
 
         # opt-out -> acknowledge-and-stop draft, no pitch, no link
-        if _OPTOUT_RX.search(msg):
+        if is_optout(msg):
             print(f"  ⚠ opt-out intent from {prospect_email} — acknowledge-only draft")
             stats["optout"] += 1
             sig = (persona or {}).get("signature", "")

@@ -96,6 +96,17 @@ BOUNCE_SUBJ = re.compile(r"(undelivered|delivery (status|failure)|returned mail|
 UNSUB_RX = re.compile(r"\b(unsubscribe|opt[\s-]?out|remove me|take me off|stop "
                       r"(?:emailing|sending|contacting)|do not (?:contact|email)|"
                       r"no longer.*(?:contact|email)|leave me alone|not interested.*stop)\b", re.I)
+# A reply that IS just a bare negative ("NEIN", "No", "Nope") is a hard decline.
+# Matched on the WHOLE stripped top-reply so a longer interested reply that merely
+# contains the word is not caught. Added after a NEIN reply was pitched (2026-07-17).
+_BARE_NO_RX = re.compile(r"^\W*(no|nein|nope|non|stop|kein interesse|nein danke|kein bedarf)\W*$", re.I)
+
+
+def is_optout_reply(top: str, subject: str) -> bool:
+    """True if the prospect's reply signals opt-out/decline: an explicit unsubscribe
+    phrase anywhere, OR a bare-negative that is the entire top reply."""
+    return bool(UNSUB_RX.search((top or "") + " " + (subject or ""))
+                or _BARE_NO_RX.match((top or "").strip()))
 # Free/shared email providers — never domain-suppress these on a single opt-out (a person
 # replying "unsubscribe" from their personal gmail must not opt out every gmail prospect).
 _FREE_EMAIL_DOMAINS = {
@@ -594,7 +605,7 @@ def one_pass(verbose: bool = True) -> dict:
                         # (+ subject) so our own quoted unsubscribe footer can not
                         # self-trigger. A genuine "unsubscribe/stop/remove me" ->
                         # suppress the prospect + cancel all runs (compliance).
-                        if UNSUB_RX.search(top_reply_text(snippet) + " " + subject):
+                        if is_optout_reply(top_reply_text(snippet), subject):
                             u = supa.unsubscribe_email(from_addr)
                             if u:
                                 stats["unsubscribed"] = stats.get("unsubscribed", 0) + u
@@ -613,7 +624,7 @@ def one_pass(verbose: bool = True) -> dict:
                     # opt-out check above never runs. An unsubscribe is ALWAYS honored, by
                     # exact address or the company domain (unsubscribe_email handles both).
                     if klass not in ("reply", "bounce", "complaint", "self_alert", "optout") and \
-                       UNSUB_RX.search(top_reply_text(snippet) + " " + subject):
+                       is_optout_reply(top_reply_text(snippet), subject):
                         u = supa.unsubscribe_email(from_addr)
                         if u:
                             stats["unsubscribed"] = stats.get("unsubscribed", 0) + u
