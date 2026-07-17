@@ -299,6 +299,16 @@ def forward(reply: dict, client_email: str, dry: bool, answer: str | None = None
     return False
 
 
+# "<user@host>: host mx.example[1.2.3.4] said: 550-5.1.1 ..." -> (recipient, "5.1.1")
+_FAILED_RCPT_RX = re.compile(r"<([^>]+)>:\s*host[^\n]*?said:\s*\d{3}[-\s](\d\.\d\.\d)", re.I)
+
+# ONE window for both the reconcile pass and the forward pass. They must agree:
+# reconcile un-freezing a lead that once() cannot see leaves it stranded at
+# client_forwarded=None forever (reconcile was 35d, once() 30d, and the 9 recovered
+# algoalpha leads were 37d old — freed by one pass, invisible to the other).
+LOOKBACK_DAYS = 90
+
+
 def reconcile_forward_bounces(dry: bool) -> dict:
     """Self-heal silent forward losses. forward() marks client_forwarded=True on
     SMTP hand-off to Hostinger, so a lead sent to a dead/typo report_to bounces
@@ -314,7 +324,7 @@ def reconcile_forward_bounces(dry: bool) -> dict:
     'bounced_address_dead' (visible, never looped). A reply previously flagged
     whose target is no longer dead is restored to delivered.
     """
-    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=35)).isoformat()
+    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=LOOKBACK_DAYS)).isoformat()
     bounces = supa_get(f"replies?class=eq.bounce&received_at=gte.{urllib.parse.quote(since)}"
                        f"&select=body_snippet,subject,received_at&limit=500")
     fwd = supa_get(f"replies?class=eq.reply&received_at=gte.{urllib.parse.quote(since)}"
@@ -336,9 +346,25 @@ def reconcile_forward_bounces(dry: bool) -> dict:
             fwd_time[to] = at
 
     def _bounced_after(addr: str, t: str) -> bool:
+        """An address is dead only when IT is the failed recipient AND the
+        failure is 5.1.x (mailbox does not exist). A 5.7.1 means OUR message was
+        malformed (bad From: header), not that the client's inbox is gone, and a
+        bounce body quotes the original message, so a plain substring match also
+        condemns any address merely MENTIONED in it. Both together froze 9
+        algoalpha leads behind a healthy admin@algoalpha.io: one 5.7.1
+        RFC-compliance rejection marked the address dead forever (2026-07-17)."""
         for b in bounces:
-            txt = ((b.get("body_snippet") or "") + " " + (b.get("subject") or "")).lower()
-            if addr in txt and (b.get("received_at") or "") >= t:
+            if (b.get("received_at") or "") < t:
+                continue
+            body = b.get("body_snippet") or ""
+            failed = _FAILED_RCPT_RX.findall(body)
+            if failed:
+                if any(r.strip().lower() == addr and c.startswith("5.1") for r, c in failed):
+                    return True
+                continue
+            # Bounce format we cannot parse — keep the old substring signal so an
+            # unrecognised provider's hard bounce still condemns the address.
+            if addr in (body + " " + (b.get("subject") or "")).lower():
                 return True
         return False
     dead = {a for a, t in fwd_time.items() if t and _bounced_after(a, t)}
@@ -368,9 +394,14 @@ def reconcile_forward_bounces(dry: bool) -> dict:
                     supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": {**rh, "client_forwarded": "bounced_address_dead"}})
                 stats["still_dead"] += 1
         elif flagged:
-            # previously flagged but the target is no longer dead -> it delivered; restore.
+            # Previously flagged, target no longer dead. It was flagged BECAUSE it
+            # bounced, so it never reached the client — marking it delivered here
+            # stranded the lead silently. Clear the flags so once() re-forwards it;
+            # a duplicate in the client's inbox beats a lead they never got.
+            clean = {k: v for k, v in rh.items() if not k.startswith("client_forwarded")}
+            clean["forward_bounce_recovered"] = dt.datetime.now(dt.timezone.utc).isoformat()
             if not dry:
-                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": {**rh, "client_forwarded": True}})
+                supa_patch(f"replies?id=eq.{r['id']}", {"raw_headers": clean})
             stats["restored"] += 1
     print(f"reconcile_forward_bounces: {json.dumps(stats)}")
     return stats
@@ -379,8 +410,8 @@ def reconcile_forward_bounces(dry: bool) -> dict:
 def once(limit: int, dry: bool) -> dict:
     # First self-heal any leads that bounced off a dead/typo client address.
     reconcile_forward_bounces(dry)
-    # genuine prospect replies from the last 30 days not yet forwarded
-    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).isoformat()
+    # genuine prospect replies not yet forwarded (same window as the reconcile above)
+    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=LOOKBACK_DAYS)).isoformat()
     rows = supa_get(
         f"replies?class=eq.reply&received_at=gte.{urllib.parse.quote(since)}"
         f"&select=id,profile_slug,from_addr,to_addr,subject,body_snippet,raw_headers,received_at"

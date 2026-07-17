@@ -599,6 +599,12 @@ def one_pass(verbose: bool = True) -> dict:
                             if u:
                                 stats["unsubscribed"] = stats.get("unsubscribed", 0) + u
                                 if verbose: print(f"  ⊘ unsubscribed {from_addr} (opt-out reply)")
+                            # Downgrade class so the row is NOT picked up as a prospect
+                            # reply: reply-autodraft (class=eq.reply) would draft an answer
+                            # and pop the operator to approve a reply to someone who just
+                            # asked to be removed, and forward-replies would forward it to
+                            # the client as a lead. The opt-out is already honored above.
+                            klass = "optout"
                     elif klass == "bounce" and run_id:
                         supa.pause_run(run_id, "bounced")
                         stats["runs_paused"] += 1
@@ -606,7 +612,7 @@ def one_pass(verbose: bool = True) -> dict:
                     # the In-Reply-To header is classed 'unrelated', so the reply-branch
                     # opt-out check above never runs. An unsubscribe is ALWAYS honored, by
                     # exact address or the company domain (unsubscribe_email handles both).
-                    if klass not in ("reply", "bounce", "complaint", "self_alert") and \
+                    if klass not in ("reply", "bounce", "complaint", "self_alert", "optout") and \
                        UNSUB_RX.search(top_reply_text(snippet) + " " + subject):
                         u = supa.unsubscribe_email(from_addr)
                         if u:
