@@ -1,0 +1,43 @@
+slug: aureon_msp_us
+name: "US managed-IT / MSP and cybersecurity firms (Aureon Global, secondary)"
+profile_slug: aureon
+engine: team_pages
+
+# WHY THIS NICHE (Aureon self-acquisition):
+#   - Runs on leads: MSPs live on a steady flow of new SMB contracts.
+#   - High-ticket recurring: 2-10k/mo managed contracts, high margin.
+#   - Sells B2B: their customers are SMBs, sourceable by industry + headcount,
+#     so the 25-verified-leads free sample is real.
+#   - Buys done-for-you lead-gen constantly (crowded, competitive market).
+# Decider: owner / principal / head of sales.
+
+places:
+  country: us
+  max_per_query: 20
+  require_first_name: false
+  categories:
+    - "Computer support and services"
+    - "Computer consultant"
+    - "Computer security service"
+    - "Telecommunications service provider"
+    - "Computer networking center"
+    - "Data recovery service"
+    - "Software company"
+  cities:
+    - "New York, NY"
+    - "Los Angeles, CA"
+    - "Chicago, IL"
+    - "Houston, TX"
+    - "Dallas, TX"
+    - "Atlanta, GA"
+    - "Phoenix, AZ"
+    - "Denver, CO"
+    - "Charlotte, NC"
+    - "Tampa, FL"
+    - "Columbus, OH"
+    - "Minneapolis, MN"
+    - "Kansas City, MO"
+    - "Raleigh, NC"
+    - "Salt Lake City, UT"
+
+seeds: []

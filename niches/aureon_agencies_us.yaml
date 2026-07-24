@@ -1,0 +1,48 @@
+slug: aureon_agencies_us
+name: "US B2B marketing / growth / creative agencies and consultancies (Aureon Global, PRIMARY)"
+profile_slug: aureon
+engine: team_pages   # httpx + bs4, auto-upgrades to playwright if static HTML is empty
+
+# WHY THIS NICHE (Aureon self-acquisition, primary):
+#   - Runs on leads: an agency with no pipeline dies; they buy lead-gen readily.
+#   - High-ticket + 40%+ margin: retainers 3-20k/mo, service margins 50-70%.
+#   - Sells B2B: their customers are companies, so the free-sample promise
+#     (25 verified leads in their exact ICP) is genuinely fulfillable.
+#   - Native done-for-you buyers: they already outsource, they get the model.
+# Decider: founder / owner / head of growth. require_first_name off to maximise
+# yield; enrichment fills names, sequence greeting falls back to "there".
+
+places:
+  country: us
+  max_per_query: 20
+  require_first_name: false
+  categories:
+    - "Marketing agency"
+    - "Advertising agency"
+    - "Internet marketing service"
+    - "Digital marketing agency"
+    - "Website designer"
+    - "Business management consultant"
+    - "Public relations firm"
+    - "Video production service"
+    - "Graphic designer"
+    - "Software company"
+  cities:
+    - "New York, NY"
+    - "Los Angeles, CA"
+    - "Chicago, IL"
+    - "Austin, TX"
+    - "Dallas, TX"
+    - "Miami, FL"
+    - "Atlanta, GA"
+    - "Denver, CO"
+    - "Seattle, WA"
+    - "Boston, MA"
+    - "Phoenix, AZ"
+    - "San Diego, CA"
+    - "Nashville, TN"
+    - "Charlotte, NC"
+    - "Tampa, FL"
+
+# Seeds optional (Places yields plenty). Expand via seed_discover if wanted.
+seeds: []

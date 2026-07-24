@@ -1,0 +1,46 @@
+slug: aureon_commercial_svc_us
+name: "US commercial service contractors: cleaning / facilities / commercial solar and HVAC (Aureon Global, secondary)"
+profile_slug: aureon
+engine: team_pages
+
+# WHY THIS NICHE (Aureon self-acquisition):
+#   - Runs on leads: contract-based, always chasing the next commercial account.
+#   - High-ticket: 10-100k contracts; installers and facilities margins 40%+.
+#   - Sells B2B: buyers are property managers, facility teams, and general
+#     contractors, all sourceable, so the 25-verified-leads free sample is real.
+#   - Heavy lead-gen buyers (voracious, low-differentiation markets).
+# Decider: owner / GM / head of business development.
+
+places:
+  country: us
+  max_per_query: 20
+  require_first_name: false
+  categories:
+    - "Commercial cleaning service"
+    - "Janitorial service"
+    - "Building restoration service"
+    - "Facility management company"
+    - "Commercial refrigerator supplier"
+    - "HVAC contractor"
+    - "Solar energy company"
+    - "Electrician"
+    - "Fire protection service"
+    - "Landscaper"
+  cities:
+    - "New York, NY"
+    - "Los Angeles, CA"
+    - "Chicago, IL"
+    - "Houston, TX"
+    - "Dallas, TX"
+    - "Atlanta, GA"
+    - "Phoenix, AZ"
+    - "Denver, CO"
+    - "Orlando, FL"
+    - "Charlotte, NC"
+    - "Philadelphia, PA"
+    - "San Antonio, TX"
+    - "Las Vegas, NV"
+    - "Columbus, OH"
+    - "Sacramento, CA"
+
+seeds: []

@@ -1,10 +1,10 @@
 {
-  "name": "Aureon Global - 7-email give-first Hormozi sequence (The Listing Engine beta, lead-magnet led)",
+  "name": "Aureon Global - 7-email give-first Hormozi sequence (Free Sample magnet: 3 done-for-you cold emails + 25 verified leads)",
   "slug": "aureon-default",
   "profile_slug": "aureon",
-  "created_at": "2026-05-19",
-  "target": "Real estate agents in the US closing 3+ deals/month OR brokerage teams of 2+ agents. Sourced via real_estate_us.yaml niche.",
-  "voice_notes": "GIVE-FIRST Hormozi $100M Leads structure. E1+E2 lead with a free attorney referral list (reply LIST). E3 names the pain (shared bought leads) + the mechanism The Listing Engine. E4 the free 60-day beta offer with reason-why. E5 binary yes/no. E6 second give (reply PROBATE). E7 breakup, give still open. PROOF: {proof_line} is an optional merge, empty by default. When you have a real beta result, set it in sequence-runner.synthesize_optional_merges (e.g. 'Our first beta brokerage booked 14 listing appointments in 30 days.'). The give itself is the live proof of competence. Strict char rules: NO apostrophes, em-dashes, en-dashes, smart quotes, ellipses, contractions, word-internal hyphens. Required merges {greeting} {company}; optional {geo_clause} {team_phrase} {proof_line}. Lead-magnet fulfilment: scripts/pull-referral-list.py <city> --type divorce|estate|probate.",
+  "created_at": "2026-07-24",
+  "target": "High-ticket B2B service firms that RUN ON LEADS, sell to OTHER BUSINESSES, and buy done-for-you. Primary niche: B2B marketing/growth/creative agencies and consultancies (retainers 3-20k/mo, 40%+ margin, perpetual need for pipeline, native DFY buyers, ICP is trivially sourceable so the free-sample promise is genuinely fulfillable). Secondary niches (same structure, own configs): managed-IT/MSP and cybersecurity firms; commercial service contractors (commercial cleaning, facilities, commercial solar and HVAC). Sourced via aureon_agencies_us.yaml / aureon_msp_us.yaml / aureon_commercial_svc_us.yaml.",
+  "voice_notes": "GIVE-FIRST Hormozi $100M Leads structure, reworked 2026-07-24 from the real-estate wedge to high-ticket B2B DFY-outbound. THE MAGIC MAGNET: E1 leads with the free SAMPLE = a complete slice of the paid product (three ready-to-send cold emails written for their business + 25 verified leads in their exact ICP, name/company/direct email each). This is Hormozi magnet type 2 (free sample of the actual thing) AND type 3 (step one of the multi-step engine): completing it proves the machine and reveals the next problem (they can send 25 but need the engine for 2,500). E2 re-offer. E3 names the pain (SDR at 5-6k, shared bought lists, DIY outbound goes quiet) + names the mechanism. E4 the paid offer with a free trial (accurate to Aureon pricing: free trial then conditional setup, keep 40%+ framing). E5 binary yes/no. E6 second give (an inline outbound value tip plus a SAMPLE re-offer, no orphan keyword). E7 breakup, SAMPLE still open. One live keyword: SAMPLE, fulfilled by the dedicated two-phase engine sequences/aureon-sample.py (intake -> work order -> deliver), NOT fulfill-magnets.py. PROOF: {proof_line} optional merge, empty by default; the give itself is the live proof of competence. STRICT CHAR RULES (enforced by the char guard): NO apostrophes, em-dashes, en-dashes, smart quotes, ellipses, contractions, word-internal hyphens. Required merges: {greeting} {company}. Copy is written niche-agnostic (phrases like 'your best-fit clients', 'the right buyers') so the single sequence runs for all three niches; clone per niche only when sharper niche lines are wanted.",
   "required_merges": [
     "company"
   ],
@@ -13,52 +13,51 @@
     {
       "n": 1,
       "delay_days": 0,
-      "angle": "free_seller_lead_test_grand_slam_offer",
-      "subject": "a seller test for {company}",
-      "_ab_note": "STEP-1 A/B RESTARTED 2026-06-22. A-side (this linked variant) = 'a seller test for {company}' (prior winner, but its 5.4% was small-sample and REGRESSED to ~0.7% reply at 1,396 sends / 0.4% aggregate). B-side (inline_subject/inline_body on sequence_steps id 06c5a296-aff7-4f2b-8917-174222a7b315) = give-first 'attorney list' opener ('45 attorneys who hand off listings, {company}'), which LEADS with the Reply LIST give instead of burying it in the P.S. — testing the AlgoAlpha lesson (lead with the believable, low-friction give). Runner splits 50/50 by prospect_id hash (E1 A/B path, sequence-runner ~L681). Measure: genuine reply rate by step-1 subject in send_log. Prior: STEP-1 SUBJECT A/B ENDED 2026-06-08 on winner A vs 0.3-0.5%.",
-      "body": "Hey {greeting},\n\nStraight offer, free.\n\nGive me the main zip you work. For 14 days I run seller outreach into that area and hand you every home seller lead and listing appointment it produces. You keep all of them. No card, no contract, stop any day.\n\nHere is the shape of a booked listing appointment the test produces (sample, name changed):\n\nSeller: Karen M.\nProperty: 3 bedroom single family home, owner occupied\nReason for selling: relocating for work, wants to list within 60 days\nAppointment: this Thursday at 6pm, at the property\nPhone: shared once you confirm\n\nYours would be real, booked appointments from the zip you give me.\n\nWhy free: we are building a few case studies{geo_clause} before we set a price. The only catch is one honest review at the end if it works. If it produces nothing, you are out nothing.\n\nMost agents fight over the same shared Zillow buyers. This puts motivated sellers in front of {company} instead, the listings that build a business.\n\nRoom for a few agents near you this week. Reply with your zip and I will set it up.\n\nP.s. want something smaller first? Reply LIST and I send 40 to 50 divorce and estate attorneys{geo_clause} who refer home sellers, each with name, firm, and direct email. Free, no strings."
+      "angle": "free_sample_grand_slam_offer",
+      "subject": "3 cold emails for {company}, free",
+      "body": "Hey {greeting},\n\nStraight offer, free.\n\nReply with the word SAMPLE and I write you three cold emails built for {company}, ready to send, plus a list of 25 verified leads in your exact target market, name, company, and direct email for each. Yours to keep and send yourself. No call, no card, no pitch to sit through.\n\nWhy free: we run done for you outbound for a small group of B2B teams, and this sample is the first thing we do for every one of them. It is the fastest way to show you the work is real instead of telling you.\n\nYou get three emails you can send today and 25 real leads to send them to. If they land, you will start wondering what a full engine pointed at your ideal clients would do. If they do not, you spent one word and you are out nothing.\n\nRoom for a few this week. Reply SAMPLE and I will get started."
     },
     {
       "n": 2,
       "delay_days": 2,
-      "angle": "give_repeat_soft_bridge",
-      "subject": "still yours if you want it",
-      "body": "Hey {greeting},\n\nQuick follow up. That attorney list for {company} still stands. Reply LIST and I send back 40 to 50 divorce and estate attorneys{geo_clause}, each one a name, firm, and direct email, the kind who hand a home sale to one agent they trust. Yours free, no strings.\n\nWhy I have these ready: we run seller outbound for a small group of brokerages, and a list like this is one small piece of it. More on that another day.\n\nFor now, want it?"
+      "angle": "reoffer_low_friction",
+      "subject": "still open for {company}",
+      "body": "Hey {greeting},\n\nQuick follow up. The free sample for {company} still stands.\n\nReply SAMPLE and I send back three cold emails written for you and 25 verified leads in your market, each one a name, a company, and a direct email, yours to keep and send yourself.\n\nWhy I can turn this around fast: we do outbound for teams selling to other businesses every day, so writing three sharp emails and pulling a clean list is one small piece of the machine.\n\nWant it?"
     },
     {
       "n": 3,
       "delay_days": 2,
-      "angle": "pain_shared_leads_mechanism",
-      "subject": "the problem with bought leads",
-      "body": "Hey {greeting},\n\nHere is the trap most agents{geo_clause} are stuck in. You buy leads from Zillow or Realtor that 5 or 6 other agents buy at the same second. You race to call first, you cut your fee to win, and you end up chasing buyers instead of taking listings.\n\nWe built The Listing Engine to flip that. It runs done for you seller outbound so {team_phrase} gets listing appointments that belong to you alone. {proof_line}\n\nWorth 15 minutes to see how it works?"
+      "angle": "name_the_pain_and_mechanism",
+      "subject": "why most outbound goes quiet",
+      "body": "Hey {greeting},\n\nHere is the trap most B2B teams fall into with outbound.\n\nYou either hire an SDR at 5k or 6k a month who takes three months to ramp, or you buy a list that ten other companies bought the same day, or you try to run it yourself between client work and it goes quiet after two weeks.\n\nWe built our engine to remove all three. We run done for you cold email and social outreach so {company} gets booked calls with the right buyers, and you only show up for the calls. The finding, the writing, the sending, the follow up, all ours. {proof_line}\n\nWorth 15 minutes to see how it runs?"
     },
     {
       "n": 4,
       "delay_days": 3,
-      "angle": "offer_beta_reason_why",
-      "subject": "60 days at zero cost for {company}",
-      "body": "Hey {greeting},\n\nHere is the straight offer.\n\nWe are taking 12 brokerages into a 60 day beta. You get full setup, all the seller outbound done for you, live appointment alerts, and a weekly numbers report. You keep 100 percent of every commission and every lead we source.\n\nWhy it is free: we want 12 clean case studies before we set the price. That is the whole catch. One honest review at the end. {proof_line}\n\nOne closed listing at average US prices pays you about 9k, for 15 minutes on a setup call. Open to it this week?"
+      "angle": "paid_offer_free_trial",
+      "subject": "a free trial for {company}",
+      "body": "Hey {greeting},\n\nHere is the straight offer.\n\nWe take on a few B2B teams at a time and run the whole outbound engine for them, cold email and social, done for you. You get the booked calls, the copy, the lead sourcing, and a weekly numbers report.\n\nWe start with a free trial so you see real replies before you decide anything. No long contract. If it works we keep going. If it does not, you walk away with everything we built.\n\nOne closed client at your deal size usually pays for a year of this. Reply and I will show you exactly what the first 30 days would look like for {company}."
     },
     {
       "n": 5,
       "delay_days": 4,
-      "angle": "forced_yes_or_no",
+      "angle": "binary_yes_no",
       "subject": "{company}, a clear yes or no",
-      "body": "Hey {greeting},\n\nIf we ran The Listing Engine on {company} for 60 days at zero cost, you kept every commission, and you could walk away any day with every lead we sourced, would you try it?\n\nA clear yes or a clear no both help me."
+      "body": "Hey {greeting},\n\nIf we ran our outbound engine on {company} for a month, you got the booked calls, and you could stop any day and keep everything we built, would you try it?\n\nA clear yes or a clear no both help me. If it is a no, tell me what would make it a yes and I will listen."
     },
     {
       "n": 6,
       "delay_days": 7,
-      "angle": "pure_value_second_give",
-      "subject": "one more thing you can use",
-      "body": "Hey {greeting},\n\nBeta or no beta, here is something you can use today.\n\nReply with the word PROBATE and I pull you a fresh list of 30 to 40 probate and estate attorneys{geo_clause} who handle home sales for families. Name, firm, and direct email for each. These attorneys refer the listing to one trusted agent, the family does not shop it, and most of these names are not worked yet by anyone near you. Free, no call, yours to keep.\n\nWant it?"
+      "angle": "second_give_inline_value",
+      "subject": "something you can use either way",
+      "body": "Hey {greeting},\n\nTrial or no trial, here is one thing you can use today.\n\nThe biggest lift in cold outbound is not the copy, it is the list. Most teams email a bought list that ten others bought the same day, so the reply rate is dead before the first send. Build your own from scratch instead, one clean sourcing rule, verified emails only, and the same copy that got ignored starts getting answered. That one change is usually the whole difference.\n\nIf you want me to prove it on {company}, reply SAMPLE and I hand you three cold emails and 25 verified leads built exactly that way, free. Either way, that tip is yours to keep."
     },
     {
       "n": 7,
       "delay_days": 10,
-      "angle": "breakup",
+      "angle": "breakup_gives_open",
       "subject": "closing your file",
-      "body": "Hey {greeting},\n\nI am closing your file at Aureon today. The beta has 12 slots and they fill this week.\n\nIf the timing is off for {company}, I understand. If the offer is off, tell me what would land and I will listen. Either way, the attorney list is still yours, 40 to 50 names with direct emails, free. Just reply LIST."
+      "body": "Hey {greeting},\n\nI am closing your file at Aureon today.\n\nIf the timing is off for {company}, I understand. If the offer is off, tell me what would land and I will listen.\n\nEither way, the sample still stands. Reply SAMPLE and I send you three cold emails and 25 verified leads for {company}, free, yours to keep."
     }
   ]
 }

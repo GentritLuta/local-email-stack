@@ -1,17 +1,17 @@
 {
   "slug": "aureon",
-  "name": "Aureon Global - Real estate growth partner (DACH + NL)",
+  "name": "Aureon Global - Done-for-you cold email and social for high-ticket B2B teams (US)",
   "created_at": "2026-05-17",
   "active": true,
   "company": {
     "name": "Aureon Global",
     "site": "aureonglobal.de",
-    "tagline": "Performance Partner for Real Estate Agents & Brokerages"
+    "tagline": "Done-For-You Cold Email & Social for B2B Teams"
   },
   "brand": {
     "wordmark": "Aureon Global",
     "site": "aureonglobal.de",
-    "tagline": "Performance Partner for Real Estate Agents & Brokerages",
+    "tagline": "Done-For-You Cold Email & Social for B2B Teams",
     "font_stack": "Inter, ui-sans-serif, system-ui",
     "font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
     "colors": {
@@ -24,7 +24,7 @@
       "bg_card": "#ffffff",
       "rule": "#e5e7eb"
     },
-    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/aureon.html?t={token}",
+    "unsubscribe_url_template": "https://aureonglobal.de/unsubscribe/aureon.html?t={token}",
     "_unsubscribe_note": "If you later point unsubscribe.aureonglobal.de via CNAME at the static page host, update this template and the email link will use it automatically. The token=eq.{token} match in Supabase is the same either way.",
     "legal": {
       "company_name": "Aureon Global L.L.C.",
@@ -47,7 +47,7 @@
     },
     "template": "aureon-custom",
     "signup_url": "https://portal.aureonglobal.de",
-    "offer_brief": "Aureon Global is a performance partner for real estate agents. We run seller outreach in the agent's own zip code and hand them booked listing appointments; the agent takes the appointments, we do the finding. How it works: (1) we set up a branded Home Value page for the agent, their name and brand, that homeowners in their zip use to get a quick value estimate, which captures real sellers who raise their hand; (2) we seed it with for-sale-by-owner and expired-listing owners already in that zip, plus estate and probate referral sources nearby, people who have shown they want to sell; (3) we reach out to those sellers on the agent's behalf, qualify them, and book the listing appointment straight onto the agent's calendar. No cold-calling strangers, only people showing real intent. Terms: we run it as a 3 month test. The agent gets the leads and booked appointments the whole time, and in return gives an honest review at the end so Aureon has a real result to show the next agent. No big upfront commitment."
+    "offer_brief": "Aureon Global runs done-for-you cold email and social outreach for high-ticket B2B teams (marketing and creative agencies, managed-IT and MSP firms, and commercial service contractors) so booked sales calls with their ideal clients show up on their calendar. The give-first lead magnet leads: reply SAMPLE and we hand the prospect three ready-to-send cold emails written for their business plus 25 verified leads in their exact ICP (name, company, direct email), free, no call. That is a complete slice of the paid product, which proves the machine and reveals the next problem it solves (they can send 25, they need the engine for thousands). The paid engine is done-for-you: we source the ICP list every week, write the copy, send from warmed infrastructure, run the follow-up and the social presence, and report the numbers weekly. Terms: we start with a free trial so the client sees real replies before deciding, then a conditional setup fee, month-to-month, cancel any day and keep everything we built. The client shows up only for the calls."
   },
   "_architecture_note": [
     "Per-persona reputation isolation: each persona sends from a unique address on a",
