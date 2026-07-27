@@ -49,6 +49,7 @@ from profile_lib import (
     load_profile,
     iter_send_domains,
     daily_target_for_domain,
+    warmup_day,
     reputation_exceeded_for_domain,
     materialize_persona,
 )
@@ -222,7 +223,19 @@ def pick_persona_and_domain(profile_config: dict, send_log_rows: list[dict]) -> 
         # force a foreign-persona rebind, which is exactly what we're forbidding.
         if d["domain"] not in persona_for_domain:
             continue
-        ceiling = daily_target_for_domain(profile_config, d) or quota
+        # daily_target_for_domain() returns 0 for two DIFFERENT reasons, and
+        # `or quota` used to collapse them into one:
+        #   a) warmup hasn't started (warmup_day < 1) — must send NOTHING
+        #   b) no ramp curve configured — fall back to the static quota
+        # Treating (a) as (b) opened a never-warmed subdomain at the full
+        # static rate (30/day instead of 0) — the cold-blast landmine
+        # warmup_day() warns about. Caught on atalsolidrocks 2026-07-27: all
+        # 12 .com subdomains sat at started_at=None, so activating the profile
+        # would have blasted brand-new domains at full quota. Separate them.
+        target = daily_target_for_domain(profile_config, d)
+        if target <= 0 and warmup_day(d) < 1:
+            continue
+        ceiling = target or quota
         room = max(0, ceiling - domain_total_today.get(d["domain"], 0))
         if room <= 0: continue
         eligible.append((room, d))

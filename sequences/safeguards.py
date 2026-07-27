@@ -30,6 +30,12 @@ that send-attempt but does NOT cancel the run, so it retries next tick):
       No sends between QUIET_START and QUIET_END (server-local time).
       Default 21:00 - 07:00. Cold sends at 3am scream spammer.
 
+  GUARD 6 (reply-to deliverable)
+      The bound persona's reply_to domain must publish an MX (or an
+      A record usable as implicit MX). A reply address that bounces
+      means the client never receives the lead, and provisioning only
+      ever verifies the SENDING domain, so nothing else catches it.
+
 If ANY guard fails for >= ALERT_THRESHOLD distinct subdomains in a
 single tick, send_alert() ships an email to info@aureonglobal.de via
 the same path daily-report.py uses (Resend, reports@hi.aureonglobal.de).
@@ -386,6 +392,84 @@ def check_no_solicitation(prospect: dict | None = None) -> tuple[bool, str | Non
     return True, None
 
 
+# ── Guard 6: reply-to deliverability (the reply address must accept mail) ──
+#
+# A persona whose reply_to domain has no MX (and no implicit-MX A record) sends
+# prospects a Reply-To that bounces, so the client never gets the lead. Caught
+# live on atalsolidrocks 2026-07-27: 12 personas replied to info@atalsolidrocks.io,
+# a domain with no MX and no A record at all. Nothing had shipped yet, but the
+# profile was one activation away from mailing 320 prospects an unreachable
+# reply address. Provisioning verifies the SENDING domain at Resend and never
+# checks the RECEIVING one, so this class of bug is invisible until a lead is lost.
+#
+# Fails CLOSED on a definitive "domain accepts no mail" answer (NXDOMAIN, or
+# NoAnswer for both MX and A) and OPEN on resolver trouble (timeout, servfail) —
+# a flaky resolver must not halt every brand's sending.
+
+_REPLYTO_MX_CACHE: dict[str, tuple[float, bool, str]] = {}   # domain -> (checked_ts, ok, detail)
+_REPLYTO_TTL_OK   = 6 * 3600   # a working MX rarely disappears; re-check every 6h
+_REPLYTO_TTL_BAD  = 900        # re-check a broken one every 15min so a fix unblocks fast
+
+
+def _domain_accepts_mail(domain: str) -> tuple[bool, str]:
+    """True if `domain` publishes an MX, or an A/AAAA usable as implicit MX
+    (RFC 5321 §5.1). Cached; see TTLs above."""
+    now = time.time()
+    hit = _REPLYTO_MX_CACHE.get(domain)
+    if hit and (now - hit[0]) < (_REPLYTO_TTL_OK if hit[1] else _REPLYTO_TTL_BAD):
+        return hit[1], hit[2]
+
+    import dns.resolver  # local import: never break module load if absent
+    res = dns.resolver.Resolver()
+    res.lifetime = res.timeout = 5.0
+    try:
+        if res.resolve(domain, "MX"):
+            out = (True, "MX present")
+    except dns.resolver.NoAnswer:
+        try:
+            res.resolve(domain, "A")
+            out = (True, "no MX, implicit-MX A record")
+        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
+            out = (False, "no MX and no A record")
+        except Exception as e:
+            # The A lookup failed without answering (timeout/servfail). We know
+            # there is no MX but NOT that there is no A, so this is not a verdict.
+            return True, f"dns inconclusive on A ({type(e).__name__}) - allowing"
+    except dns.resolver.NXDOMAIN:
+        out = (False, "domain does not exist")
+    except Exception as e:
+        # Resolver trouble, not a verdict — fail OPEN and do not cache.
+        return True, f"dns inconclusive ({type(e).__name__}) - allowing"
+
+    _REPLYTO_MX_CACHE[domain] = (now, out[0], out[1])
+    return out
+
+
+def check_reply_to_deliverable(profile_config: dict | None = None,
+                               subdomain: str | None = None) -> tuple[bool, str | None]:
+    """Block the send if the bound persona's reply_to domain cannot receive mail.
+
+    The persona is derived from `subdomain` using the same 1:1 binding the
+    rotation enforces (a subdomain's persona is the one whose from_addr lives
+    on it), so this needs no new argument threaded through check_all()."""
+    if not profile_config or not subdomain:
+        return True, None
+    persona = next((p for p in profile_config.get("personas", [])
+                    if (p.get("from_addr", "").split("@")[-1].lower() == subdomain.lower())), None)
+    if not persona:
+        return True, None
+    reply_to = (persona.get("reply_to") or "").strip()
+    if "@" not in reply_to:
+        return True, None
+    domain = reply_to.rsplit("@", 1)[1].lower()
+    ok, detail = _domain_accepts_mail(domain)
+    if not ok:
+        return False, (f"dead_reply_to: persona {persona.get('slug')} replies to "
+                       f"{reply_to} but {domain} {detail} - the client would never "
+                       f"receive this lead")
+    return True, None
+
+
 # ── Unified check ──────────────────────────────────────────────────────────
 
 def check_all(*, supa_client, profile_slug: str, profile_config: dict,
@@ -401,6 +485,7 @@ def check_all(*, supa_client, profile_slug: str, profile_config: dict,
     cfg = _load_config()
     for guard, args in [
         (check_no_solicitation,       {"prospect": prospect}),
+        (check_reply_to_deliverable,  {"profile_config": profile_config, "subdomain": subdomain}),
         (check_send_window,           {"profile_config": profile_config, "prospect": prospect, "cfg": cfg}),
         (check_subdomain_reputation,  {"supa_client": supa_client, "subdomain": subdomain, "cfg": cfg}),
         (check_global_daily_cap,      {"supa_client": supa_client, "profile_slug": profile_slug, "profile_config": profile_config, "cfg": cfg}),

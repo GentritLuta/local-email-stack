@@ -21,7 +21,7 @@
         "resend_domain_id": "0d9a59c4-4ff6-4ab0-82bf-54f209cc777e",
         "verified_at": "2026-05-21T16:16:58.320575+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -31,7 +31,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -39,7 +40,7 @@
         "resend_domain_id": "0e4b46a7-3c2d-49fd-aeb4-af9db7893505",
         "verified_at": "2026-05-21T16:16:58.877504+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -49,7 +50,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -57,7 +59,7 @@
         "resend_domain_id": "0543232f-5f55-4fee-9ca1-fcb805cacae4",
         "verified_at": "2026-05-21T16:16:59.388684+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -67,7 +69,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -75,7 +78,7 @@
         "resend_domain_id": "e2013221-3d1e-4d90-88cf-5f7e93a9e15b",
         "verified_at": "2026-05-21T16:17:00.063614+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -85,7 +88,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -93,7 +97,7 @@
         "resend_domain_id": "e7944ebb-d6d2-42db-9840-e6afd25ff454",
         "verified_at": "2026-05-21T16:17:00.579498+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -103,7 +107,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -111,7 +116,7 @@
         "resend_domain_id": "0576552d-0830-49ff-b4a9-33e268d554b0",
         "verified_at": "2026-05-21T16:17:01.121629+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -121,7 +126,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -129,7 +135,7 @@
         "resend_domain_id": "c9a66386-ec85-4951-a208-ef0aa7d90d54",
         "verified_at": "2026-05-21T16:17:01.643303+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -139,7 +145,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -147,7 +154,7 @@
         "resend_domain_id": "7ef53eb1-217a-4ebe-882a-b166aecec74e",
         "verified_at": "2026-05-21T16:17:02.158376+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -157,7 +164,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -165,7 +173,7 @@
         "resend_domain_id": "60b7f80c-4cac-468b-a345-1da93633b226",
         "verified_at": "2026-05-21T16:17:02.675367+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -175,7 +183,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -183,7 +192,7 @@
         "resend_domain_id": "471240ef-44ab-4811-bb2a-5888055edde1",
         "verified_at": "2026-05-21T16:17:03.205317+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -193,7 +202,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -201,7 +211,7 @@
         "resend_domain_id": "b6e365ca-6de6-4125-87c8-3d483859e48a",
         "verified_at": "2026-05-21T16:17:03.724768+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -211,7 +221,8 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
@@ -219,7 +230,7 @@
         "resend_domain_id": "d33c02a3-b809-4b77-81c6-76667135207a",
         "verified_at": "2026-05-21T16:17:04.307970+00:00",
         "warmup": {
-          "enabled": true,
+          "enabled": false,
           "current_day": 0,
           "started_at": null,
           "ramp_curve": "snowball_v1",
@@ -229,13 +240,14 @@
             "complaint_rate_7d": 0.0,
             "delivered_7d": 0,
             "last_check": null
-          }
+          },
+          "disabled_reason": "root atalsolidrocks.io has no MX, so info@atalsolidrocks.io cannot receive replies; parked 2026-07-27 until a forward exists"
         }
       },
       {
         "domain": "lukas.atalsolidrocks.com",
         "resend_domain_id": "849e6df3-0e97-4d85-bd81-f271899d241b",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -253,7 +265,7 @@
       {
         "domain": "anna.atalsolidrocks.com",
         "resend_domain_id": "33e89821-eb16-4397-859b-65f997fde69b",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -271,7 +283,7 @@
       {
         "domain": "tobias.atalsolidrocks.com",
         "resend_domain_id": "26dbfbc4-eeb1-4b95-ab23-c410ff8a0fca",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -289,7 +301,7 @@
       {
         "domain": "lea.atalsolidrocks.com",
         "resend_domain_id": "d80c987b-e7aa-41d2-84c1-2ca8a6eab521",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -307,7 +319,7 @@
       {
         "domain": "felix.atalsolidrocks.com",
         "resend_domain_id": "b7d83f5f-c510-42ef-8951-83c53aa6ce51",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -325,7 +337,7 @@
       {
         "domain": "sara.atalsolidrocks.com",
         "resend_domain_id": "2061f7cc-a3e5-49bf-a0c3-369668a1c18b",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -343,7 +355,7 @@
       {
         "domain": "jonas.atalsolidrocks.com",
         "resend_domain_id": "7a827896-b995-4144-9bc6-24c6d280b35b",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -361,7 +373,7 @@
       {
         "domain": "mira.atalsolidrocks.com",
         "resend_domain_id": "ea224801-b06a-4fc1-afe7-601ccd858556",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -379,7 +391,7 @@
       {
         "domain": "niklas.atalsolidrocks.com",
         "resend_domain_id": "f75aaaa0-42bf-444e-8226-f554f0c00a8e",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -397,7 +409,7 @@
       {
         "domain": "lena.atalsolidrocks.com",
         "resend_domain_id": "a71b4d25-88a4-469c-95c7-54e5f744b17d",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -415,7 +427,7 @@
       {
         "domain": "elias.atalsolidrocks.com",
         "resend_domain_id": "ba297873-e16a-4a22-8230-a0465b14f77e",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -433,7 +445,7 @@
       {
         "domain": "nora.atalsolidrocks.com",
         "resend_domain_id": "f4df9ab5-49cb-423c-8bd4-634839a76487",
-        "verified_at": null,
+        "verified_at": "2026-07-27T19:38:27.875700+00:00",
         "warmup": {
           "enabled": true,
           "current_day": 0,
@@ -1022,7 +1034,7 @@
       "bg_card": "#ffffff",
       "rule": "#e2e8f0"
     },
-    "unsubscribe_url_template": "https://gentritluta.github.io/local-email-stack/unsubscribe/atalsolidrocks.html?t={token}",
+    "unsubscribe_url_template": "https://aureonglobal.de/unsubscribe/atalsolidrocks.html?t={token}",
     "legal": {
       "company_name": "Atal SolidRocks",
       "address_lines": [
