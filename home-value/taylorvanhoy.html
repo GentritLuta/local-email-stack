@@ -106,6 +106,19 @@
       estate expert will reach out to set it up. No pressure, no obligation to ever list.</p>
    <div class="row2">
      <div><label>Best day for a call</label><input id="bk_date" type="date"></div>
+     <!-- CONSENT: the only thing that makes a lead legally callable by the voice agent.
+          An AI/cloned voice is an "artificial voice" under the TCPA, so dialing without
+          prior express consent is $500-1500 per call. compliance.can_call() refuses any
+          lead without consent_to_ai_call=true. Do not remove this checkbox. -->
+     <div style="grid-column:1/-1">
+       <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:13px;margin-top:14px;line-height:1.4;">
+         <input id="consent_call" type="checkbox" style="margin-top:3px;flex:0 0 auto;">
+         <span>You can call me about my home. I agree that Keller Williams and Aureon Global may
+           contact me at the phone number above, including by automated or artificial (AI) voice calls
+           and texts. This is optional and not required to get my report. I can opt out anytime by
+           saying stop or asking to be removed. Message and data rates may apply.</span>
+       </label>
+     </div>
      <div><label>Best time</label>
        <select id="bk_win"><option value="">Select&hellip;</option>
          <option>Morning (8&ndash;12)</option><option>Afternoon (12&ndash;5)</option>
@@ -126,8 +139,7 @@
  <p class="foot">Prepared by Aureon Global. Your information is used only to prepare your report and is never sold.</p>
 </div></div>
 <script>
-const SUPABASE_URL="https://zmzolkijhiaedzcmdfji.supabase.co";
-const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptem9sa2lqaGlhZWR6Y21kZmppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4OTkyOTgsImV4cCI6MjA5ODQ3NTI5OH0.xedlcfQT4DR7wxZDcblQB03s4q5f4k2JlbnPqo9EwiM";
+const LEAD_ENDPOINT="https://aureonglobal.de/lead.php";
 const CF={"for_agent": "taylorvanhoy@kw.com", "funnel": "home_value", "zip": "47448", "agent_name": "Taylor", "agent_company": "Keller Williams"};
 const f=document.getElementById('f'),btn=document.getElementById('btn'),err=document.getElementById('err');
 f.addEventListener('submit',async(e)=>{
@@ -149,20 +161,28 @@ f.addEventListener('submit',async(e)=>{
   // Self-hosted booking: a motivated homeowner picks a time -> captured here, surfaced to
   // the agent by fulfill-home-value as a HOT appointment request. Needs nothing from the agent.
   if(bkDate||bkWin){ details.requested_call={date:bkDate,window:bkWin,requested_at:new Date().toISOString()}; }
+  // Express consent to an AI/automated call is recorded ONLY when the box is ticked
+  // AND a phone was given. compliance.can_call() refuses to dial anyone without
+  // consent_to_ai_call=true, so this is what makes a lead legally callable at all.
+  const consentCall = !!(document.getElementById('consent_call') && document.getElementById('consent_call').checked);
   const row={
     profile_slug:"aureon", source:"home_value_funnel",
     email:email, first_name:parts[0]||"", last_name:parts.slice(1).join(' ')||"",
     company:addr, phone:phone, verified:true,
     custom_fields:Object.assign({},CF,{address:addr,zip:zip||CF.zip,details:details,submitted_at:new Date().toISOString()})
   };
+  if(phone && consentCall){
+    row.consent_to_ai_call=true;
+    row.call_consent_at=new Date().toISOString();
+    row.call_consent_source="home_value_funnel";
+  }
   try{
-    const r=await fetch(SUPABASE_URL+"/rest/v1/prospects",{
+    const r=await fetch(LEAD_ENDPOINT,{
       method:"POST",
-      headers:{apikey:SUPABASE_ANON,Authorization:"Bearer "+SUPABASE_ANON,
-        "Content-Type":"application/json",Prefer:"return=minimal"},
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify(row)
     });
-    if(!r.ok && r.status!==201 && r.status!==204) throw new Error("HTTP "+r.status);
+    if(!r.ok) throw new Error("HTTP "+r.status);
     f.style.display='none';
     if(bkDate||bkWin){
       document.getElementById('booked_when').textContent=[bkWin,bkDate?("on "+bkDate):""].filter(Boolean).join(' ');
